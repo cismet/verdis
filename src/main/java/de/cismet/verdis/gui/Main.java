@@ -106,6 +106,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 //There should be a referece to their own view so that they can change it by themself
+
 /**
  *
  * @author  hell
@@ -115,7 +116,6 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     public static Main getCurrentInstance() {
         return Main.THIS;
     }
-
     //private Color myBlue=new java.awt.Color(0, 51, 153);
     private Color myBlue = new Color(124, 160, 221);
     de.cismet.tools.ConnectionInfo connectionInfo = new de.cismet.tools.ConnectionInfo();
@@ -143,7 +143,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private boolean clipboardPasted = true; //wegen des ersten mals
     private AppPreferences prefs;
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
-    private View vKassenzeichen,  vKanaldaten,  vSummen,  vDokumente,  vFlaechen;
+    private View vKassenzeichen, vKanaldaten, vSummen, vDokumente, vFlaechen;
     private RootWindow rootWindow;
     private StringViewMap viewMap = new StringViewMap();
     private String home = System.getProperty("user.home");
@@ -157,9 +157,10 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     public static Main THIS;
     private ArrayList<JMenuItem> menues = new ArrayList<JMenuItem>();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
-    private ActiveLayerModel mappingModel=new ActiveLayerModel();
+    private ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final String verdisConfig = ".verdisConfig";
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
+
     private void setupDefaultLayout() {
         rootWindow.setWindow(new SplitWindow(false, 0.31842107f,
                 new SplitWindow(true, 0.24596775f,
@@ -253,19 +254,17 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 try {
                     if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
                         try {
-                            org.apache.log4j.PropertyConfigurator.configure(home+fs+".verdis"+fs+"custom.log4j.properties");
+                            org.apache.log4j.PropertyConfigurator.configure(home + fs + ".verdis" + fs + "custom.log4j.properties");
                             log.info("CustomLoggingOn");
-                        }
-                        catch (Exception ex){
+                        } catch (Exception ex) {
                             org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource("de/cismet/verdis/res/log4j.properties"));
                         }
-                    }
-                    else {
+                    } else {
                         org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource("de/cismet/verdis/res/log4j.properties"));
                     }
                 } catch (Exception e) {
                     System.err.println("Fehler bei Log4J-Config");
-                //e.printStackTrace();
+                    //e.printStackTrace();
                 }
                 Action doNothing = new AbstractAction() {
 
@@ -296,10 +295,10 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             try {
                 //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()) ;
                 javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-            //javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
-            //javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.PlasticXPLookAndFeel());
-            //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-            // UIManager.setLookAndFeel(new PlasticLookAndFeel());
+                //javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
+                //javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.PlasticXPLookAndFeel());
+                //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+                // UIManager.setLookAndFeel(new PlasticLookAndFeel());
             } catch (Exception e) {
                 log.warn("Fehler beim Einstellen des Look&Feels's!", e);
             }
@@ -357,7 +356,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             }
             configurationManager.setClassPathFolder("/verdis/");
             configurationManager.setFolder(".verdis");
-            log.debug("mc:"+getMappingComponent());
+            log.debug("mc:" + getMappingComponent());
             configurationManager.addConfigurable(mappingModel);
             configurationManager.addConfigurable(getMappingComponent());
 
@@ -366,7 +365,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
                 public void run() {
                     validateTree(); //is needed to compute the mappingComponent size, so that
-                //the layers are displayed correctly
+                    //the layers are displayed correctly
                 }
             });
 
@@ -559,7 +558,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             //doConfigKeystrokes();
 
             log.debug("Crossover: starte server.");
-            initCrossoverServer(prefs.getVerdisCrossoverPort());            
+            initCrossoverServer(prefs.getVerdisCrossoverPort());
             isInit = false;
         } catch (Throwable t) {
             t.printStackTrace();
@@ -589,7 +588,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 if (readonly) {
                     cmdEditMode.setEnabled(false);
                     cmdNewKassenzeichen.setEnabled(false);
-                }                
+                }
                 if (context != null && context.getEnvironment() != null && this.context.getEnvironment().isProgressObservable()) {
                     this.context.getEnvironment().getProgressObserver().setProgress(1000, "verdis Plugin fertig...");
                 }
@@ -620,7 +619,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         configurationManager.configure(mapC);
         mapC.setMappingModel(mappingModel);
         getFlPanel().getFlOverviewPanel().changeSelectedButtonAccordingToInteractionMode();
-        
+
         mapC.unlock();
 
 
@@ -629,13 +628,13 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         CustomFeatureInfoListener cfil = (CustomFeatureInfoListener) mapC.getInputListener(MappingComponent.CUSTOM_FEATUREINFO);
         cfil.setFeatureInforetrievalUrl(prefs.getAlbUrl());
 
-        
-        File dotverdisDir=new File(verdisDirectory);
+
+        File dotverdisDir = new File(verdisDirectory);
         dotverdisDir.mkdir();
-        
+
         loadClipboardBackup();
-        if (clipboard!=null) {
-            JOptionPane.showMessageDialog(this.getComponent(), "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.","Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",JOptionPane.INFORMATION_MESSAGE);
+        if (clipboard != null) {
+            JOptionPane.showMessageDialog(this.getComponent(), "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.", "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -658,7 +657,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 defaultServerPortUsed = true;
                 try {
                     initCrossoverServerImpl(defaultServerPort);
-                    log.debug("Crossover: Server started at port: "+defaultServerPort);
+                    log.debug("Crossover: Server started at port: " + defaultServerPort);
                 } catch (Exception ex1) {
                     log.error("Crossover: Failed to initialize Crossover server on defaultport: " + defaultServerPort + ". No Server is started");
                 }
@@ -688,7 +687,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 //        INITIAL_WMS_BB_Y1 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getY1();
 //        INITIAL_WMS_BB_X2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getX2();
 //        INITIAL_WMS_BB_Y2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getY2();
-        
+
         connectionInfo = prefs.getDbConnectionInfo();
         if (!plugin) {
             if (prefs.getMode().trim().toLowerCase().equals("readonly")) {
@@ -1271,6 +1270,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }//GEN-LAST:event_mniSaveLayoutActionPerformed
     //TODO Bundle
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
+
     public void loadLayout(String file) {
         log.debug("Load Layout.. from " + file);
         File layoutFile = new File(file);
@@ -1314,7 +1314,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                         //setupDefaultLayout();
                         //DeveloperUtil.createWindowLayoutFrame("nach setup1",rootWindow).setVisible(true);
                         setupDefaultLayout();
-                    //DeveloperUtil.createWindowLayoutFrame("nach setup2",rootWindow).setVisible(true);
+                        //DeveloperUtil.createWindowLayoutFrame("nach setup2",rootWindow).setVisible(true);
                     }
                 });
             } else {
@@ -1325,6 +1325,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
     }
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
+
     public void saveLayout(String file) {
         log.debug("Saving Layout.. to " + file);
         File layoutFile = new File(file);
@@ -1378,9 +1379,9 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
     public void setLetzteAenderungTooltip(String letzteAenderung) {
         if (!isInit) {
-        //((ImageIcon)vKassenzeichen.getIcon()).setDescription()
-        //vKassenzeichen.get        
-        //vKassenzeichen.getViewProperties().getViewTitleBarProperties().getNormalProperties().
+            //((ImageIcon)vKassenzeichen.getIcon()).setDescription()
+            //vKassenzeichen.get
+            //vKassenzeichen.getViewProperties().getViewTitleBarProperties().getNormalProperties().
         }
     }
 
@@ -1465,11 +1466,10 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                     try {
                         ((JXPanel) ((JXPanel) login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
                     } catch (Exception skip) {
-
                     }
                     d.setVisible(true);
 //                        }
-                //});
+                    //});
 
                 }
             });
@@ -1505,7 +1505,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 try {
                     appletContext = context.getEnvironment().getAppletContext();
                 } catch (Exception npe) {
-                //nothing to do
+                    //nothing to do
                 }
                 if (appletContext == null) {
                     de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
@@ -1532,7 +1532,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                     flPanel.pasteFlaeche(clipboardFlaeche);
 //                    clipboard=null;
 //                    cmdPasteFlaeche.setEnabled(false);
-                //siehe unten
+                    //siehe unten
                 } else {
                     flPanel.pasteFlaeche(clipboardFlaeche);
                     clipboardPasted = true;
@@ -1565,7 +1565,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
             }
         }
-        
+
     }//GEN-LAST:event_cmdPasteFlaecheActionPerformed
 
     private void cmdCutFlaecheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutFlaecheActionPerformed
@@ -1575,7 +1575,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
         if (answer == JOptionPane.YES_OPTION) {
             clipboard = flPanel.cutSelectedFlaeche();
-            storeClipboardBackup();           
+            storeClipboardBackup();
 
             if (clipboard != null) {
                 this.cmdPasteFlaeche.setEnabled(true);
@@ -1584,8 +1584,8 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 this.cmdPasteFlaeche.setEnabled(false);
             }
         }
-        
-        
+
+
     }//GEN-LAST:event_cmdCutFlaecheActionPerformed
 
     private void cmdInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdInfoActionPerformed
@@ -1615,7 +1615,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
         about.setLocationRelativeTo(this);
         about.setVisible(true);
-        
+
     }//GEN-LAST:event_cmdInfoActionPerformed
 
     private void mnuInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoActionPerformed
@@ -1623,20 +1623,17 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }//GEN-LAST:event_mnuInfoActionPerformed
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
-    // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_formKeyReleased
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
 
         if (evt.getKeyCode() == KeyEvent.VK_F1 && evt.isControlDown()) {
-
         }
-    // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_formKeyPressed
 
     private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
-        
-        
     }//GEN-LAST:event_formKeyTyped
 
     private void cmdPutKassenzeichenToSearchTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
@@ -1662,7 +1659,6 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }//GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
 
     private void cmdWorkflowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
-        
     }//GEN-LAST:event_cmdWorkflowActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -1679,7 +1675,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             }
         }
         closeAllConnections();
-        
+
     }//GEN-LAST:event_formWindowClosing
 
     private void closeAllConnections() {
@@ -1694,7 +1690,6 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        
     }//GEN-LAST:event_formWindowClosed
 
     private void cmdNewKassenzeichenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
@@ -1717,8 +1712,8 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         if (changesPending()) {
             storeChanges();
         }
-        
-        
+
+
     }//GEN-LAST:event_cmdOkActionPerformed
 
     private void cmdCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
@@ -1764,55 +1759,53 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 this.cmdPasteFlaeche.setEnabled(false);
             }
         }
-      
+
     }//GEN-LAST:event_cmdCopyFlaecheActionPerformed
 
-    
     private void storeClipboardBackup() {
-         try {
+        try {
             XStream x = new XStream(new Dom4JDriver());
-            FileWriter f=new FileWriter(clipboardBackup);
+            FileWriter f = new FileWriter(clipboardBackup);
             x.toXML(clipboard, f);
             f.close();
-            
+
         } catch (Exception ex) {
-            log.error("Beim Sichern des Clipboards ist etwas schiefgegangen",ex);
+            log.error("Beim Sichern des Clipboards ist etwas schiefgegangen", ex);
         }
     }
-    
-    private void  loadClipboardBackup() {
+
+    private void loadClipboardBackup() {
         try {
 
             XStream x = new XStream(new Dom4JDriver());
             Flaeche f = (Flaeche) x.fromXML(new FileReader(clipboardBackup));
             f.initAfterXMLLoad();
-            clipboard=f;
+            clipboard = f;
         } catch (Exception exception) {
-            log.error("Beim Laden des ClipboardBackups ist etwas schiefgegangen",exception);
+            log.error("Beim Laden des ClipboardBackups ist etwas schiefgegangen", exception);
         }
-        
+
     }
-    
+
     private void deleteClipboardBackup() {
         try {
             File f = new File(clipboardBackup);
             f.delete();
 
         } catch (Exception exception) {
-            log.warn("Beim L\u00F6schen vom Clipboardbackup ging etwas schief",exception);
+            log.warn("Beim L\u00F6schen vom Clipboardbackup ging etwas schief", exception);
         }
     }
     private void cmdTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestActionPerformed
-       
 }//GEN-LAST:event_cmdTestActionPerformed
 
     private void cmdTest2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
-
-
     }//GEN-LAST:event_cmdTest2ActionPerformed
 
+
+    //ToDo Threading and Progressbar
     private void cmdLagisCrossoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
-         try {
+        try {
             final String currentKZ = getKzPanel().getShownKassenzeichen();
             if (currentKZ != null && currentKZ.length() > 0) {
                 final Geometry kassenzeichenGeom = getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
@@ -1830,6 +1823,13 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                                 if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
                                     log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
                                 }
+                                JDialog dialog = new JDialog(this, "", true);
+                                dialog.add(new LagisCrossoverPanel(prefs.getLagisCrossoverPort(),flurstueckSchluessel));
+                                dialog.pack();
+                                dialog.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());
+                                dialog.setTitle("Flurstück in LagIS öffnen.");
+                                dialog.setLocationRelativeTo(this);
+                                dialog.setVisible(true);
                             } else {
                                 log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
                                 if (wfsFlurstuecke.size() != 0) {
@@ -1898,7 +1898,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 this.unlockDataset(kz2delete);
                 //kzPanel.gotoKassenzeichen("6000467");
                 kzPanel.clear();
-            //flPanel.clear();
+                //flPanel.clear();
 
             }
         }
@@ -1978,11 +1978,9 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }
 
     public void shown() {
-
     }
 
     public void resized() {
-
     }
 
     public void moved() {
@@ -2005,7 +2003,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
     public java.util.Collection getButtons() {
         return Arrays.asList(this.tobVerdis.getComponents());
-    //return null;
+        //return null;
     }
 
     public void floatingStopped() {
@@ -2123,6 +2121,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private javax.swing.JPanel panMain;
     private javax.swing.JToolBar tobVerdis;
     // End of variables declaration//GEN-END:variables
+
     public boolean changesPending() {
         Iterator it = stores.iterator();
         while (it.hasNext()) {
@@ -2139,28 +2138,27 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             editmode = b;
 
 
-        cmdOk.setEnabled(b);
-        cmdCancel.setEnabled(b);
-        cmdDeleteKassenzeichen.setEnabled(b);
+            cmdOk.setEnabled(b);
+            cmdCancel.setEnabled(b);
+            cmdDeleteKassenzeichen.setEnabled(b);
 
-        cmdPasteFlaeche.setEnabled(b);
-        cmdCopyFlaeche.setEnabled(b);
-        cmdCutFlaeche.setEnabled(b);
-        cmdRefreshEnumeration.setEnabled(b);
+            cmdPasteFlaeche.setEnabled(b);
+            cmdCopyFlaeche.setEnabled(b);
+            cmdCutFlaeche.setEnabled(b);
+            cmdRefreshEnumeration.setEnabled(b);
 
 
-        Iterator it = stores.iterator();
-        while (it.hasNext()) {
-            Storable store = (Storable) it.next();
-            store.enableEditing(b);
-        }
-        refreshLeftTitleBarColor();
+            Iterator it = stores.iterator();
+            while (it.hasNext()) {
+                Storable store = (Storable) it.next();
+                store.enableEditing(b);
+            }
+            refreshLeftTitleBarColor();
 
-        flPanel.getFlOverviewPanel().getMappingComponent().getMemRedo().clear();
-        flPanel.getFlOverviewPanel().getMappingComponent().getMemUndo().clear();
-        }
-        catch (Exception e){
-            log.error("Fehler beim Wechseln in den EditMode",e);
+            flPanel.getFlOverviewPanel().getMappingComponent().getMemRedo().clear();
+            flPanel.getFlOverviewPanel().getMappingComponent().getMemUndo().clear();
+        } catch (Exception e) {
+            log.error("Fehler beim Wechseln in den EditMode", e);
         }
     }
 
@@ -2274,7 +2272,6 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 //        } catch (DataConversionException ex) {
 //            log.warn("Fehler in configure", ex);
 //        }
-
     }
 
     public Element getConfiguration() {
@@ -2293,7 +2290,6 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     }
 
     public void masterConfigure(Element arg0) {
-
     }
 
     public MappingComponent getMappingComponent() {

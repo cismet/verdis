@@ -91,6 +91,7 @@ public class AppPreferences {
     private int secondaryPort;
     private String rmRegistryServerPath;
     private int verdisCrossoverPort;
+    private int lagisCrossoverPort;
     LagisCrossoverRemote lagisCrossoverAccessor;
     LagisServerRemote lagisServerAccessor;
             
@@ -187,13 +188,12 @@ public class AppPreferences {
 
              try {
                 Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                log.debug("crossoverPrefs: "+crossoverPrefs);
-                log.debug("LagisServer: "+crossoverPrefs.getChild("LagisConfiguration"));
-                log.debug("Host: "+crossoverPrefs.getChild("LagisConfiguration").getChildText("Host"));
                 final String lagisHost = crossoverPrefs.getChild("LagisConfiguration").getChildText("Host");
                 log.debug("Crossover: lagisHost: " + lagisHost);
                 final String lagisORBPort = crossoverPrefs.getChild("LagisConfiguration").getChildText("ORBPort");
                 log.debug("Crossover: lagisHost: " + lagisORBPort);
+                setLagisCrossoverPort(Integer.parseInt(crossoverPrefs.getChild("LagisConfiguration").getChildText("LagisCrossoverPort")));
+                log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
                 lagisCrossoverAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisCrossoverRemote.class).getEjbInterface();
                 lagisServerAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisServerRemote.class).getEjbInterface();
             } catch (Exception ex) {
@@ -238,6 +238,14 @@ public class AppPreferences {
         this.verdisCrossoverPort = verdisCrossoverPort;
     }
 
+    public int getLagisCrossoverPort() {
+        return lagisCrossoverPort;
+    }
+
+    public void setLagisCrossoverPort(int lagisCrossoverPort) {
+        this.lagisCrossoverPort = lagisCrossoverPort;
+    }
+        
      public LagisCrossoverRemote getLagisCrossoverAccessor() {
         return lagisCrossoverAccessor;
     }
