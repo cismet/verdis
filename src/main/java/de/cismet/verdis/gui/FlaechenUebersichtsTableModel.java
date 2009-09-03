@@ -123,6 +123,10 @@ public class FlaechenUebersichtsTableModel extends AbstractTableModel implements
     
     
     private Geometry getEnvelope(Vector flaechen) {
+        return getKassenzeichenGeometry(flaechen).getEnvelope().buffer(0.01).getEnvelope();
+    }
+
+    private GeometryCollection getKassenzeichenGeometry(Vector flaechen) {
         Vector notNullGeometries=new Vector();
         Iterator it=flaechen.iterator();
         int i=0;
@@ -134,9 +138,15 @@ public class FlaechenUebersichtsTableModel extends AbstractTableModel implements
         }
         Geometry[] gArr=new Geometry[notNullGeometries.size()];
         gArr=(Geometry[])notNullGeometries.toArray(gArr);
-        
+
         GeometryCollection gCol=new GeometryCollection(gArr,new GeometryFactory());
-        return gCol.getEnvelope().buffer(0.01).getEnvelope();
+        return gCol;
+    }
+
+    //ToDo maybe not enough what about fresh,removed
+    public Geometry getKassenzeichenGeometry(){
+        //ToDo make tolerance configurable ??
+        return getKassenzeichenGeometry(data).buffer(0.01);
     }
     
     private SimpleDbAction getStatement4KassenzeichenGeometry() {

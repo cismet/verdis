@@ -32,6 +32,7 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
+import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
@@ -42,6 +43,10 @@ import de.cismet.extensions.timeasy.TimEasyEvent;
 import de.cismet.extensions.timeasy.TimEasyListener;
 import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
 
+import de.cismet.lagisEE.bean.LagisServerRemote;
+import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
+import de.cismet.lagisEE.crossover.entity.WfsFlurstuecke;
+import de.cismet.lagisEE.entity.core.FlurstueckSchluessel;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -49,7 +54,6 @@ import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.dbwriter.DbWriterDialog;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.validation.NotValidException;
-import de.cismet.verdis.crossover.VerdisCrossover;
 import de.cismet.verdis.data.AppPreferences;
 import de.cismet.verdis.data.Flaeche;
 import de.cismet.verdis.data.Kassenzeichen;
@@ -756,6 +760,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         jSeparator3 = new javax.swing.JSeparator();
         cmdInfo = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JSeparator();
+        cmdLagisCrossover = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -804,26 +809,26 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("verdis");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                formKeyTyped(evt);
+            }
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
             }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 formKeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                formKeyTyped(evt);
-            }
-        });
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
             }
         });
 
@@ -859,7 +864,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(cmdEditMode);
 
         cmdCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png"))); // NOI18N
-        cmdCancel.setToolTipText("\u00C4nderungen abbrechen");
+        cmdCancel.setToolTipText("Änderungen abbrechen");
         cmdCancel.setFocusPainted(false);
         cmdCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -869,7 +874,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(cmdCancel);
 
         cmdOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/ok.png"))); // NOI18N
-        cmdOk.setToolTipText("\u00C4nderungen annehmen");
+        cmdOk.setToolTipText("Änderungen annehmen");
         cmdOk.setFocusPainted(false);
         cmdOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -889,7 +894,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(cmdNewKassenzeichen);
 
         cmdDeleteKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/deleteKassenzeichen.png"))); // NOI18N
-        cmdDeleteKassenzeichen.setToolTipText("Kassenzeichen l\u00F6schen");
+        cmdDeleteKassenzeichen.setToolTipText("Kassenzeichen löschen");
         cmdDeleteKassenzeichen.setEnabled(false);
         cmdDeleteKassenzeichen.setFocusPainted(false);
         cmdDeleteKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
@@ -904,7 +909,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(jSeparator6);
 
         cmdCutFlaeche.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
-        cmdCutFlaeche.setToolTipText("Fl\u00E4che ausschneiden");
+        cmdCutFlaeche.setToolTipText("Fläche ausschneiden");
         cmdCutFlaeche.setEnabled(false);
         cmdCutFlaeche.setFocusPainted(false);
         cmdCutFlaeche.addActionListener(new java.awt.event.ActionListener() {
@@ -915,7 +920,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(cmdCutFlaeche);
 
         cmdCopyFlaeche.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
-        cmdCopyFlaeche.setToolTipText("Fl\u00E4che kopieren (Teileigentum erzeugen)");
+        cmdCopyFlaeche.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
         cmdCopyFlaeche.setEnabled(false);
         cmdCopyFlaeche.setFocusPainted(false);
         cmdCopyFlaeche.addActionListener(new java.awt.event.ActionListener() {
@@ -926,7 +931,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(cmdCopyFlaeche);
 
         cmdPasteFlaeche.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
-        cmdPasteFlaeche.setToolTipText("Fl\u00E4che einf\u00FCgen");
+        cmdPasteFlaeche.setToolTipText("Fläche einfügen");
         cmdPasteFlaeche.setEnabled(false);
         cmdPasteFlaeche.setFocusPainted(false);
         cmdPasteFlaeche.addActionListener(new java.awt.event.ActionListener() {
@@ -941,7 +946,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         tobVerdis.add(jSeparator4);
 
         cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
-        cmdRefreshEnumeration.setToolTipText("Alle Fl\u00E4chen neu nummerieren");
+        cmdRefreshEnumeration.setToolTipText("Alle Flächen neu nummerieren");
         cmdRefreshEnumeration.setEnabled(false);
         cmdRefreshEnumeration.setFocusPainted(false);
         cmdRefreshEnumeration.addActionListener(new java.awt.event.ActionListener() {
@@ -993,6 +998,19 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator8);
+
+        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
+        cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
+        cmdLagisCrossover.setFocusPainted(false);
+        cmdLagisCrossover.setFocusable(false);
+        cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdLagisCrossoverActionPerformed(evt);
+            }
+        });
+        tobVerdis.add(cmdLagisCrossover);
 
         getContentPane().add(tobVerdis, java.awt.BorderLayout.NORTH);
 
@@ -1123,7 +1141,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         mniFlaechen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_5, java.awt.event.InputEvent.CTRL_MASK));
         mniFlaechen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniFlaechen.setMnemonic('S');
-        mniFlaechen.setText("Fl\u00E4chen");
+        mniFlaechen.setText("Flächen");
         mniFlaechen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mniFlaechenActionPerformed(evt);
@@ -1134,7 +1152,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
         mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
         mniResetWindowLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
-        mniResetWindowLayout.setText("Fensteranordnung zur\u00FCcksetzen");
+        mniResetWindowLayout.setText("Fensteranordnung zurücksetzen");
         mniResetWindowLayout.setToolTipText("Standard Fensteranordnung wiederherstellen");
         mniResetWindowLayout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1793,6 +1811,54 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
     }//GEN-LAST:event_cmdTest2ActionPerformed
 
+    private void cmdLagisCrossoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
+         try {
+            final String currentKZ = getKzPanel().getShownKassenzeichen();
+            if (currentKZ != null && currentKZ.length() > 0) {
+                final Geometry kassenzeichenGeom = getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
+                if (kassenzeichenGeom != null) {
+                    log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
+                    LagisCrossoverRemote lagisCrossover = prefs.getLagisCrossoverAccessor();
+                    LagisServerRemote lagisServer = prefs.getLagisServerAccessor();
+                    if (lagisCrossover != null && lagisServer != null) {
+                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom);
+                        if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
+                            log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
+                            final Set<FlurstueckSchluessel> flurstueckSchluessel = lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
+                            if (flurstueckSchluessel != null && flurstueckSchluessel.size() > 0) {
+                                log.debug("Crossover: Anzahl Flurstück Schlüssel: " + flurstueckSchluessel.size());
+                                if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
+                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
+                                }
+                            } else {
+                                log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
+                                if (wfsFlurstuecke.size() != 0) {
+                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
+                                }
+                            }
+                        } else {
+                            log.info("Crossover: Keine geschnittenen Flurstücke gefunden(WFS).");
+                            //ToDo Meldung an benutzer
+                        }
+                    } else {
+                        log.warn("Crossover: Kann die Flurstücke nicht bestimmen, weil die Verbindung zum server nicht richtig konfiguriert ist.");
+                        log.warn("Crossover: lagisCrossover=" + lagisCrossover);
+                        log.warn("Crossover: lagisServer=" + lagisServer);
+                    }
+                } else {
+                    //ToDo user message !
+                    log.warn("Crossover: Keine Geometrie vorhanden zum bestimmen der Flurstücke");
+                }
+            } else {
+                //ToDo user message !
+                log.warn("Crossover: Kein Kassenzeichen ausgewählt kann Lagis Flurstück nicht bestimmen");
+            }
+        } catch (Exception ex) {
+            log.error("Crossover: Fehler im LagIS Crossover", ex);
+            //ToDo Meldung an Benutzer
+        }
+    }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
+
     public void newKZ() {
 
         String newKZ = JOptionPane.showInputDialog(this, "Geben Sie das neue Kassenzeichen ein:", "Neues Kassenzeichen", JOptionPane.QUESTION_MESSAGE);
@@ -2014,6 +2080,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private javax.swing.JButton cmdDeleteKassenzeichen;
     private javax.swing.JButton cmdEditMode;
     private javax.swing.JButton cmdInfo;
+    private javax.swing.JButton cmdLagisCrossover;
     private javax.swing.JButton cmdNewKassenzeichen;
     private javax.swing.JButton cmdOk;
     private javax.swing.JButton cmdPasteFlaeche;

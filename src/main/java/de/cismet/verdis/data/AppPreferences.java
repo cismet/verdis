@@ -38,6 +38,9 @@ package de.cismet.verdis.data;
 import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
+import de.cismet.ee.EJBAccessor;
+import de.cismet.lagisEE.bean.LagisServerRemote;
+import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
 import de.cismet.tools.ConnectionInfo;
 import java.io.InputStream;
 import java.net.URL;
@@ -88,6 +91,8 @@ public class AppPreferences {
     private int secondaryPort;
     private String rmRegistryServerPath;
     private int verdisCrossoverPort;
+    LagisCrossoverRemote lagisCrossoverAccessor;
+    LagisServerRemote lagisServerAccessor;
             
     /** Creates a new instance of AppPreferences */
     
@@ -179,6 +184,21 @@ public class AppPreferences {
             } catch (Exception ex) {
                 log.warn("Crossover: Error beim setzen des Server ports", ex);
             }
+
+             try {
+                Element crossoverPrefs = root.getChild("CrossoverConfiguration");
+                log.debug("crossoverPrefs: "+crossoverPrefs);
+                log.debug("LagisServer: "+crossoverPrefs.getChild("LagisConfiguration"));
+                log.debug("Host: "+crossoverPrefs.getChild("LagisConfiguration").getChildText("Host"));
+                final String lagisHost = crossoverPrefs.getChild("LagisConfiguration").getChildText("Host");
+                log.debug("Crossover: lagisHost: " + lagisHost);
+                final String lagisORBPort = crossoverPrefs.getChild("LagisConfiguration").getChildText("ORBPort");
+                log.debug("Crossover: lagisHost: " + lagisORBPort);
+                lagisCrossoverAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisCrossoverRemote.class).getEjbInterface();
+                lagisServerAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisServerRemote.class).getEjbInterface();
+            } catch (Exception ex) {
+                log.warn("Crossover: Error beim setzen des LagIS servers", ex);
+            }
             
             List list=root.getChild("usergroups").getChildren("ug");
             Iterator it=list.iterator();
@@ -216,6 +236,14 @@ public class AppPreferences {
 
     public void setVerdisCrossoverPort(int verdisCrossoverPort) {
         this.verdisCrossoverPort = verdisCrossoverPort;
+    }
+
+     public LagisCrossoverRemote getLagisCrossoverAccessor() {
+        return lagisCrossoverAccessor;
+    }
+
+    public LagisServerRemote getLagisServerAccessor() {
+        return lagisServerAccessor;
     }
     
     //ADDED FOR RM PLUGIN FUNCTIONALTY 22.07.07 Sebastian Puhl
