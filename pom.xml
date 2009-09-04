@@ -67,6 +67,12 @@
             <artifactId>LagisEECrossover-ejb</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>de.cismet.cids.plugin</groupId>
+            <artifactId>VerdisEEServer-ejb</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
+
 
