@@ -1811,8 +1811,8 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 final Geometry kassenzeichenGeom = getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
                 if (kassenzeichenGeom != null) {
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
-                    LagisCrossoverRemote lagisCrossover = prefs.getLagisCrossoverAccessor();
-                    LagisServerRemote lagisServer = prefs.getLagisServerAccessor();
+                    final LagisCrossoverRemote lagisCrossover = prefs.getLagisCrossoverAccessor();
+                    final LagisServerRemote lagisServer = prefs.getLagisServerAccessor();
                     if (lagisCrossover != null && lagisServer != null) {
                         final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom);
                         if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
@@ -1823,7 +1823,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                                 if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
                                     log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
                                 }
-                                JDialog dialog = new JDialog(this, "", true);
+                                final JDialog dialog = new JDialog(this, "", true);
                                 dialog.add(new LagisCrossoverPanel(prefs.getLagisCrossoverPort(),flurstueckSchluessel));
                                 dialog.pack();
                                 dialog.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());

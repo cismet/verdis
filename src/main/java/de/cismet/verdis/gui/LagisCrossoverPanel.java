@@ -39,7 +39,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     private static final String request = "/lagis/loadFlurstueck?";
     //ToDo perhaps place in LagisCrossover
     //Problem: would be the the only dependency to LagisClient
-    //http://localhost:9000/lagis/loadFlurstueck?gemarkung=Barmen&flur=1&zaehler=100&nenner=0
+    //http://localhost:19000/lagis/loadFlurstueck?gemarkung=Barmen&flur=1&zaehler=100&nenner=0
     public static final NameValuePair PARAMETER_GEMARKUNG = new NameValuePair("gemarkung", "");
     public static final NameValuePair PARAMETER_FLUR = new NameValuePair("flur", "");
     public static final NameValuePair PARAMETER_FLURSTUECK_ZAEHLER = new NameValuePair("zaehler", "");
