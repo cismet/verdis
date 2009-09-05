@@ -10,20 +10,29 @@
  */
 package de.cismet.verdis.gui;
 
+import com.vividsolutions.jts.geom.Geometry;
+import de.cismet.lagisEE.bean.LagisServerRemote;
+import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
+import de.cismet.lagisEE.crossover.entity.WfsFlurstuecke;
 import de.cismet.lagisEE.entity.core.FlurstueckSchluessel;
+import entity.KassenzeichenEntity;
+import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.JDialog;
+import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXTable;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -44,19 +53,29 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     public static final NameValuePair PARAMETER_FLUR = new NameValuePair("flur", "");
     public static final NameValuePair PARAMETER_FLURSTUECK_ZAEHLER = new NameValuePair("zaehler", "");
     public static final NameValuePair PARAMETER_FLURSTUECK_NENNER = new NameValuePair("nenner", "");
+    private final Main mainApp;
+    private final ExecutorService execService = Executors.newCachedThreadPool();;
 
     /** Creates new form LagisCrossoverPanel */
-    public LagisCrossoverPanel(final int lagisCrossoverPort) {
+    public LagisCrossoverPanel(final int lagisCrossoverPort,Main verdisMain) {
         initComponents();
         tblFlurstuecke.setModel(tableModel);
         tblFlurstuecke.addMouseListener(this);
         this.lagisCrossoverPort = lagisCrossoverPort;
+        mainApp = verdisMain;
+        pgbProgress.setIndeterminate(true);
+        this.add(panContentProgress, BorderLayout.CENTER);
     }
 
-    LagisCrossoverPanel(final int lagisCrossoverPort, final Set<FlurstueckSchluessel> flurstueckSchluessel) {
-        this(lagisCrossoverPort);
-        tableModel.updateTableModel(flurstueckSchluessel);
+    public void startSearch() {
+        try {
+            execService.execute(new FlurstueckRetriever());
+        } catch (Exception ex) {
+            log.error("Fehler während dem suchen der Flurstücke: ", ex);
+            //ToDo Nachricht an benutzer
+        }
     }
+    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -67,9 +86,73 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panContentMessage = new javax.swing.JPanel();
+        lblMessage = new javax.swing.JLabel();
+        panContentProgress = new javax.swing.JPanel();
+        pgbProgress = new javax.swing.JProgressBar();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        panContent = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblFlurstuecke = new JXTable();
+        panControl = new javax.swing.JPanel();
         btnClose = new javax.swing.JButton();
+
+        panContentMessage.setPreferredSize(new java.awt.Dimension(250, 140));
+
+        lblMessage.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.lblMessage.text")); // NOI18N
+
+        javax.swing.GroupLayout panContentMessageLayout = new javax.swing.GroupLayout(panContentMessage);
+        panContentMessage.setLayout(panContentMessageLayout);
+        panContentMessageLayout.setHorizontalGroup(
+            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panContentMessageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panContentMessageLayout.setVerticalGroup(
+            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panContentMessageLayout.createSequentialGroup()
+                .addContainerGap(69, Short.MAX_VALUE)
+                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panContentProgress.setPreferredSize(new java.awt.Dimension(250, 140));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/searching.png"))); // NOI18N
+
+        jLabel2.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.jLabel2.text")); // NOI18N
+
+        javax.swing.GroupLayout panContentProgressLayout = new javax.swing.GroupLayout(panContentProgress);
+        panContentProgress.setLayout(panContentProgressLayout);
+        panContentProgressLayout.setHorizontalGroup(
+            panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panContentProgressLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pgbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                    .addComponent(jLabel2))
+                .addContainerGap())
+        );
+        panContentProgressLayout.setVerticalGroup(
+            panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panContentProgressLayout.createSequentialGroup()
+                .addContainerGap(61, Short.MAX_VALUE)
+                .addGroup(panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(panContentProgressLayout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pgbProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 107));
 
         tblFlurstuecke.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -82,7 +165,34 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblFlurstuecke.setPreferredSize(new java.awt.Dimension(100, 107));
         jScrollPane1.setViewportView(tblFlurstuecke);
+
+        javax.swing.GroupLayout panContentLayout = new javax.swing.GroupLayout(panContent);
+        panContent.setLayout(panContentLayout);
+        panContentLayout.setHorizontalGroup(
+            panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 250, Short.MAX_VALUE)
+            .addGroup(panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panContentLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        panContentLayout.setVerticalGroup(
+            panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 131, Short.MAX_VALUE)
+            .addGroup(panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panContentLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+
+        setLayout(new java.awt.BorderLayout());
+
+        panControl.setMinimumSize(new java.awt.Dimension(50, 50));
+        panControl.setPreferredSize(new java.awt.Dimension(300, 50));
 
         btnClose.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.btnClose.text")); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
@@ -91,34 +201,29 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
-                        .addGap(13, 13, 13))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnClose)
-                        .addContainerGap())))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnClose)
+        javax.swing.GroupLayout panControlLayout = new javax.swing.GroupLayout(panControl);
+        panControl.setLayout(panControlLayout);
+        panControlLayout.setHorizontalGroup(
+            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panControlLayout.createSequentialGroup()
+                .addContainerGap(308, Short.MAX_VALUE)
+                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+        panControlLayout.setVerticalGroup(
+            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panControlLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnClose)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        add(panControl, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         closeDialog();
-    }//GEN-LAST:event_btnCloseActionPerformed
+}//GEN-LAST:event_btnCloseActionPerformed
 
     //ToDo ugly
     private void closeDialog() {
@@ -156,6 +261,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     }
 
     //ToDo place query generation in LagisCrossover. Give key get Query.
+    //ToDo maybe thread ?? 
     private void openFlurstueckInLagis(FlurstueckSchluessel key) {
         try {
             if (key != null) {
@@ -196,7 +302,15 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblMessage;
+    private javax.swing.JPanel panContent;
+    private javax.swing.JPanel panContentMessage;
+    private javax.swing.JPanel panContentProgress;
+    private javax.swing.JPanel panControl;
+    private javax.swing.JProgressBar pgbProgress;
     private javax.swing.JTable tblFlurstuecke;
     // End of variables declaration//GEN-END:variables
 
@@ -267,5 +381,88 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
             }
         }
         return null;
+    }
+
+     class FlurstueckRetriever extends SwingWorker<Set<FlurstueckSchluessel>, Void> {
+
+        @Override
+        protected Set<FlurstueckSchluessel> doInBackground() throws Exception {
+             final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
+            if (currentKZ != null && currentKZ.length() > 0) {
+                final Geometry kassenzeichenGeom = mainApp.getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
+                if (kassenzeichenGeom != null) {
+                    log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
+                    final LagisCrossoverRemote lagisCrossover = mainApp.getPrefs().getLagisCrossoverAccessor();
+                    final LagisServerRemote lagisServer = mainApp.getPrefs().getLagisServerAccessor();
+                    if (lagisCrossover != null && lagisServer != null) {
+                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom);
+                        if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
+                            log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
+                            final Set<FlurstueckSchluessel> flurstueckSchluessel = lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
+                            if (flurstueckSchluessel != null && flurstueckSchluessel.size() > 0) {
+                                log.debug("Crossover: Anzahl Flurstück Schlüssel: " + flurstueckSchluessel.size());
+                                if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
+                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
+                                }
+                                 } else {
+                                log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
+                                if (wfsFlurstuecke.size() != 0) {
+                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
+                                }
+                            }
+                            return flurstueckSchluessel;
+                        } else {
+                            log.info("Crossover: Keine geschnittenen Flurstücke gefunden(WFS).");
+                            //ToDo Meldung an benutzer
+                        }
+                    } else {
+                        lblMessage.setText("<html>Die Verbindung zum LagIS Server<br/>ist nicht richtig konfiguriert.</html>");
+                        log.warn("Crossover: Kann die Flurstücke nicht bestimmen, weil die Verbindung zum server nicht richtig konfiguriert ist.");
+                        log.warn("Crossover: lagisCrossover=" + lagisCrossover);
+                        log.warn("Crossover: lagisServer=" + lagisServer);
+                    }
+                } else {
+                    //ToDo user message !
+                    lblMessage.setText("<html>Keine Kassenzeichengeometrie vorhanden,<br/>bestimmen der Flurstücke nicht möglich.</html>");
+                    log.warn("Crossover: Keine Geometrie vorhanden zum bestimmen der Flurstücke");
+                }
+            } else {
+                //ToDo user message !
+                lblMessage.setText("<html>Bitte wählen Sie ein Kassenzeichen aus,<br/>damit Flurstücke bestimmt werden können.</html>");
+                log.warn("Crossover: Kein Kassenzeichen ausgewählt kann Lagis Flurstück nicht bestimmen");
+            }            
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            log.debug("FlurstueckRetriever done.");
+            super.done();
+            if (isCancelled()) {
+                log.debug("FlurstueckRetriever canceled. Nothing to do");
+            }
+            try {
+                Set<FlurstueckSchluessel> results = get();
+                if (results == null) {
+                    results = new HashSet<FlurstueckSchluessel>();
+                    tableModel.updateTableModel(results);
+                    LagisCrossoverPanel.this.remove(panContentProgress);
+                    LagisCrossoverPanel.this.add(panContentMessage, BorderLayout.CENTER);
+                } else {
+                    tableModel.updateTableModel(results);
+                    LagisCrossoverPanel.this.remove(panContentProgress);
+                    LagisCrossoverPanel.this.add(panContent, BorderLayout.CENTER);
+                }
+            } catch (Exception ex) {
+                log.error("Fehler beim verarbeiten der Ergebnisse: ", ex);
+                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());
+                LagisCrossoverPanel.this.remove(panContentProgress);
+                lblMessage.setText("<html>Fehler beim abfragen<br/>der Flurstücke.</html>");
+                LagisCrossoverPanel.this.add(panContentMessage, BorderLayout.CENTER);
+            }
+            LagisCrossoverPanel.this.revalidate();
+            LagisCrossoverPanel.this.repaint();
+            ((JDialog) getParent().getParent().getParent().getParent()).repaint();
+        }
     }
 }

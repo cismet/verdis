@@ -32,7 +32,6 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
-import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
@@ -43,10 +42,6 @@ import de.cismet.extensions.timeasy.TimEasyEvent;
 import de.cismet.extensions.timeasy.TimEasyListener;
 import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
 
-import de.cismet.lagisEE.bean.LagisServerRemote;
-import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
-import de.cismet.lagisEE.crossover.entity.WfsFlurstuecke;
-import de.cismet.lagisEE.entity.core.FlurstueckSchluessel;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -1802,57 +1797,20 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private void cmdTest2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
     }//GEN-LAST:event_cmdTest2ActionPerformed
 
-
     //ToDo Threading and Progressbar
     private void cmdLagisCrossoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
-            final String currentKZ = getKzPanel().getShownKassenzeichen();
-            if (currentKZ != null && currentKZ.length() > 0) {
-                final Geometry kassenzeichenGeom = getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
-                if (kassenzeichenGeom != null) {
-                    log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
-                    final LagisCrossoverRemote lagisCrossover = prefs.getLagisCrossoverAccessor();
-                    final LagisServerRemote lagisServer = prefs.getLagisServerAccessor();
-                    if (lagisCrossover != null && lagisServer != null) {
-                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom);
-                        if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
-                            log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
-                            final Set<FlurstueckSchluessel> flurstueckSchluessel = lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
-                            if (flurstueckSchluessel != null && flurstueckSchluessel.size() > 0) {
-                                log.debug("Crossover: Anzahl Flurstück Schlüssel: " + flurstueckSchluessel.size());
-                                if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
-                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
-                                }
-                                final JDialog dialog = new JDialog(this, "", true);
-                                dialog.add(new LagisCrossoverPanel(prefs.getLagisCrossoverPort(),flurstueckSchluessel));
-                                dialog.pack();
-                                dialog.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());
-                                dialog.setTitle("Flurstück in LagIS öffnen.");
-                                dialog.setLocationRelativeTo(this);
-                                dialog.setVisible(true);
-                            } else {
-                                log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
-                                if (wfsFlurstuecke.size() != 0) {
-                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
-                                }
-                            }
-                        } else {
-                            log.info("Crossover: Keine geschnittenen Flurstücke gefunden(WFS).");
-                            //ToDo Meldung an benutzer
-                        }
-                    } else {
-                        log.warn("Crossover: Kann die Flurstücke nicht bestimmen, weil die Verbindung zum server nicht richtig konfiguriert ist.");
-                        log.warn("Crossover: lagisCrossover=" + lagisCrossover);
-                        log.warn("Crossover: lagisServer=" + lagisServer);
-                    }
-                } else {
-                    //ToDo user message !
-                    log.warn("Crossover: Keine Geometrie vorhanden zum bestimmen der Flurstücke");
-                }
-            } else {
-                //ToDo user message !
-                log.warn("Crossover: Kein Kassenzeichen ausgewählt kann Lagis Flurstück nicht bestimmen");
-            }
+
+            final JDialog dialog = new JDialog(this, "", true);
+            final LagisCrossoverPanel lcp= new LagisCrossoverPanel(prefs.getLagisCrossoverPort(),this);
+            dialog.add(lcp);
+            dialog.setSize(300,200);
+            dialog.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());
+            dialog.setTitle("Flurstück in LagIS öffnen.");
+            dialog.setLocationRelativeTo(this);
+            lcp.startSearch();
+            dialog.setVisible(true);
+
         } catch (Exception ex) {
             log.error("Crossover: Fehler im LagIS Crossover", ex);
             //ToDo Meldung an Benutzer
@@ -2387,5 +2345,9 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         saveLayout(defaultLayoutFile);
         deleteClipboardBackup();
         System.exit(0);
+    }
+
+    public AppPreferences getPrefs() {
+        return prefs;
     }
 }
