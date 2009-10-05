@@ -119,6 +119,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private boolean editmode = false;
     private boolean plugin = false;
     private boolean readonly = true;
+    private static boolean loggedIn = false;
     /** Creates new form Main */
     private String userString;
     public static int KASSENZEICHEN_CLASS_ID = 11;
@@ -1480,6 +1481,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             usernames.saveUserNames();
             usernames.addUserName((login.getUserName()));
             usernames.saveUserNames();
+            setLoggedIn(true);
             //Added for RM Plugin functionalty 22.07.2007 Sebastian Puhl
             log.debug("Login erfolgreich");
         } else {
@@ -2350,4 +2352,13 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     public AppPreferences getPrefs() {
         return prefs;
     }
+
+    public static boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public static void setLoggedIn(boolean loggedIn) {
+        Main.loggedIn = loggedIn;
+    }
+
 }

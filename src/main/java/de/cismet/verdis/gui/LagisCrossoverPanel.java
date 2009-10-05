@@ -55,15 +55,15 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     public static final NameValuePair PARAMETER_FLURSTUECK_ZAEHLER = new NameValuePair("zaehler", "");
     public static final NameValuePair PARAMETER_FLURSTUECK_NENNER = new NameValuePair("nenner", "");
     private final Main mainApp;
-    private final ExecutorService execService = Executors.newCachedThreadPool();;
+    private final ExecutorService execService = Executors.newCachedThreadPool();
 
     private FadingCardLayout layout = new FadingCardLayout();
-    private static final String PROGRESS_CARD_NAME="progress";
-    private static final String CONTENT_CARD_NAME="content";
-    private static final String MESSAGE_CARD_NAME="message";
-    
+    private static final String PROGRESS_CARD_NAME = "progress";
+    private static final String CONTENT_CARD_NAME = "content";
+    private static final String MESSAGE_CARD_NAME = "message";
+
     /** Creates new form LagisCrossoverPanel */
-    public LagisCrossoverPanel(final int lagisCrossoverPort,Main verdisMain) {
+    public LagisCrossoverPanel(final int lagisCrossoverPort, Main verdisMain) {
         initComponents();
         panAll.setLayout(layout);
         panAll.removeAll();
@@ -86,7 +86,6 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
             //ToDo Nachricht an benutzer
         }
     }
-    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -287,26 +286,40 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     //ToDo place query generation in LagisCrossover. Give key get Query.
     //ToDo maybe thread ?? 
     private void openFlurstueckInLagis(FlurstueckSchluessel key) {
-        try {
-            if (key != null) {
-                if (lagisCrossoverPort < 0 || lagisCrossoverPort > 65535) {
-                    log.warn("Crossover: lagisCrossoverPort ist ungültig: " + lagisCrossoverPort);
-                } else {
-                    //ToDo Thread
-                    URL lagisQuery = createQuery(lagisCrossoverPort, key);
-                    if (lagisQuery != null) {
-                        lagisQuery.openStream();
-                    } else {
-                        log.warn("Crossover: konnte keine Query anlegen. Kein Abruf der Flurstücke möglich.");
-                    }
-                }
-            } else {
-                log.warn("Crossover: Kann angebenes Flurstück nicht öffnwen");
-            }
-        } catch (IOException ex) {
-            log.error("Crossover: Fehler beim öffnen des Flurstücks in LagIS.",ex);
-        }
 
+        if (key != null) {
+            if (lagisCrossoverPort < 0 || lagisCrossoverPort > 65535) {
+                log.warn("Crossover: lagisCrossoverPort ist ungültig: " + lagisCrossoverPort);
+            } else {
+                //ToDo Thread
+                final URL lagisQuery = createQuery(lagisCrossoverPort, key);
+                if (lagisQuery != null) {
+                    final SwingWorker<Void, Void> openKassenzeichen = new SwingWorker<Void, Void>() {
+
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            lagisQuery.openStream();
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                get();
+                            } catch (Exception ex) {
+                                log.error("Fehler beim öffnen des Kassenzeichens",ex);
+                                //ToDo message to user;
+                                }
+                        }
+                    };
+                    execService.execute(openKassenzeichen);
+                } else {
+                    log.warn("Crossover: konnte keine Query anlegen. Kein Abruf der Flurstücke möglich.");
+                }
+            }
+        } else {
+            log.warn("Crossover: Kann angebenes Flurstück nicht öffnwen");
+        }
     }
 
     @Override
@@ -408,20 +421,20 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
         return null;
     }
 
-     class FlurstueckRetriever extends SwingWorker<Set<FlurstueckSchluessel>, Void> {
+    class FlurstueckRetriever extends SwingWorker<Set<FlurstueckSchluessel>, Void> {
 
         @Override
         protected Set<FlurstueckSchluessel> doInBackground() throws Exception {
-             final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
-            if (currentKZ != null && currentKZ.length() > 0) {                
+            final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
+            if (currentKZ != null && currentKZ.length() > 0) {
                 final Geometry kassenzeichenGeom = mainApp.getFlPanel().getFlOverviewPanel().getModel().getSingleKassenzeichenGeometry();
                 if (kassenzeichenGeom != null) {
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
                     final LagisCrossoverRemote lagisCrossover = mainApp.getPrefs().getLagisCrossoverAccessor();
                     final LagisServerRemote lagisServer = mainApp.getPrefs().getLagisServerAccessor();
                     if (lagisCrossover != null && lagisServer != null) {
-                        log.debug("buffer: "+mainApp.getPrefs().getFlurstueckBuffer());
-                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom,mainApp.getPrefs().getFlurstueckBuffer());
+                        log.debug("buffer: " + mainApp.getPrefs().getFlurstueckBuffer());
+                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom, mainApp.getPrefs().getFlurstueckBuffer());
                         if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
                             log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
                             final Set<FlurstueckSchluessel> flurstueckSchluessel = lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
@@ -430,7 +443,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                                 if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
                                     log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
                                 }
-                                 } else {
+                            } else {
                                 log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
                                 if (wfsFlurstuecke.size() != 0) {
                                     log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
@@ -456,7 +469,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 //ToDo user message !
                 lblMessage.setText("<html>Bitte wählen Sie ein Kassenzeichen aus,<br/>damit Flurstücke bestimmt werden können.</html>");
                 log.warn("Crossover: Kein Kassenzeichen ausgewählt kann Lagis Flurstück nicht bestimmen");
-            }            
+            }
             return null;
         }
 
@@ -479,7 +492,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 }
             } catch (Exception ex) {
                 log.error("Fehler beim verarbeiten der Ergebnisse: ", ex);
-                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());                
+                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());
                 lblMessage.setText("<html>Fehler beim abfragen<br/>der Flurstücke.</html>");
                 layout.show(panAll, MESSAGE_CARD_NAME);
             }
