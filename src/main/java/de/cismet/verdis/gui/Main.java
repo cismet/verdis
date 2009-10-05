@@ -1804,7 +1804,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             final JDialog dialog = new JDialog(this, "", true);
             final LagisCrossoverPanel lcp= new LagisCrossoverPanel(prefs.getLagisCrossoverPort(),this);
             dialog.add(lcp);
-            dialog.setSize(300,200);
+            dialog.pack();
             dialog.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());
             dialog.setTitle("Flurstück in LagIS öffnen.");
             dialog.setLocationRelativeTo(this);

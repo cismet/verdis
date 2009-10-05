@@ -15,6 +15,7 @@ import de.cismet.lagisEE.bean.LagisServerRemote;
 import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
 import de.cismet.lagisEE.crossover.entity.WfsFlurstuecke;
 import de.cismet.lagisEE.entity.core.FlurstueckSchluessel;
+import de.cismet.layout.FadingCardLayout;
 import entity.KassenzeichenEntity;
 import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;
@@ -56,15 +57,25 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     private final Main mainApp;
     private final ExecutorService execService = Executors.newCachedThreadPool();;
 
+    private FadingCardLayout layout = new FadingCardLayout();
+    private static final String PROGRESS_CARD_NAME="progress";
+    private static final String CONTENT_CARD_NAME="content";
+    private static final String MESSAGE_CARD_NAME="message";
+    
     /** Creates new form LagisCrossoverPanel */
     public LagisCrossoverPanel(final int lagisCrossoverPort,Main verdisMain) {
         initComponents();
+        panAll.setLayout(layout);
+        panAll.removeAll();
+        panAll.add(panContentProgress, PROGRESS_CARD_NAME);
+        panAll.add(panContent, CONTENT_CARD_NAME);
+        panAll.add(panContentMessage, MESSAGE_CARD_NAME);
         tblFlurstuecke.setModel(tableModel);
         tblFlurstuecke.addMouseListener(this);
         this.lagisCrossoverPort = lagisCrossoverPort;
         mainApp = verdisMain;
         pgbProgress.setIndeterminate(true);
-        this.add(panContentProgress, BorderLayout.CENTER);
+        layout.show(panAll, PROGRESS_CARD_NAME);
     }
 
     public void startSearch() {
@@ -86,38 +97,47 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panContentMessage = new javax.swing.JPanel();
-        lblMessage = new javax.swing.JLabel();
+        panControl = new javax.swing.JPanel();
+        btnClose = new javax.swing.JButton();
+        panAll = new javax.swing.JPanel();
         panContentProgress = new javax.swing.JPanel();
         pgbProgress = new javax.swing.JProgressBar();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        panContentMessage = new javax.swing.JPanel();
+        lblMessage = new javax.swing.JLabel();
         panContent = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblFlurstuecke = new JXTable();
-        panControl = new javax.swing.JPanel();
-        btnClose = new javax.swing.JButton();
 
-        panContentMessage.setPreferredSize(new java.awt.Dimension(250, 140));
+        panControl.setMinimumSize(new java.awt.Dimension(50, 50));
+        panControl.setPreferredSize(new java.awt.Dimension(500, 200));
 
-        lblMessage.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.lblMessage.text")); // NOI18N
+        btnClose.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.btnClose.text")); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout panContentMessageLayout = new javax.swing.GroupLayout(panContentMessage);
-        panContentMessage.setLayout(panContentMessageLayout);
-        panContentMessageLayout.setHorizontalGroup(
-            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panContentMessageLayout.createSequentialGroup()
+        javax.swing.GroupLayout panControlLayout = new javax.swing.GroupLayout(panControl);
+        panControl.setLayout(panControlLayout);
+        panControlLayout.setHorizontalGroup(
+            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panControlLayout.createSequentialGroup()
+                .addContainerGap(406, Short.MAX_VALUE)
+                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        panControlLayout.setVerticalGroup(
+            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panControlLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(btnClose)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        panContentMessageLayout.setVerticalGroup(
-            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panContentMessageLayout.createSequentialGroup()
-                .addContainerGap(69, Short.MAX_VALUE)
-                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+
+        panAll.setLayout(new java.awt.CardLayout());
 
         panContentProgress.setPreferredSize(new java.awt.Dimension(250, 140));
 
@@ -134,14 +154,14 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pgbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                    .addComponent(pgbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
                     .addComponent(jLabel2))
                 .addContainerGap())
         );
         panContentProgressLayout.setVerticalGroup(
             panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panContentProgressLayout.createSequentialGroup()
-                .addContainerGap(61, Short.MAX_VALUE)
+                .addContainerGap(51, Short.MAX_VALUE)
                 .addGroup(panContentProgressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panContentProgressLayout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -152,7 +172,30 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 .addContainerGap())
         );
 
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 107));
+        panAll.add(panContentProgress, "card3");
+
+        panContentMessage.setPreferredSize(new java.awt.Dimension(250, 140));
+
+        lblMessage.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.lblMessage.text")); // NOI18N
+
+        javax.swing.GroupLayout panContentMessageLayout = new javax.swing.GroupLayout(panContentMessage);
+        panContentMessage.setLayout(panContentMessageLayout);
+        panContentMessageLayout.setHorizontalGroup(
+            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panContentMessageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panContentMessageLayout.setVerticalGroup(
+            panContentMessageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panContentMessageLayout.createSequentialGroup()
+                .addContainerGap(59, Short.MAX_VALUE)
+                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panAll.add(panContentMessage, "card2");
 
         tblFlurstuecke.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -165,60 +208,41 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblFlurstuecke.setPreferredSize(new java.awt.Dimension(100, 107));
         jScrollPane1.setViewportView(tblFlurstuecke);
 
         javax.swing.GroupLayout panContentLayout = new javax.swing.GroupLayout(panContent);
         panContent.setLayout(panContentLayout);
         panContentLayout.setHorizontalGroup(
             panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 250, Short.MAX_VALUE)
-            .addGroup(panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(panContentLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(panContentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panContentLayout.setVerticalGroup(
             panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 131, Short.MAX_VALUE)
-            .addGroup(panContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(panContentLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-
-        setLayout(new java.awt.BorderLayout());
-
-        panControl.setMinimumSize(new java.awt.Dimension(50, 50));
-        panControl.setPreferredSize(new java.awt.Dimension(300, 50));
-
-        btnClose.setText(org.openide.util.NbBundle.getMessage(LagisCrossoverPanel.class, "LagisCrossoverPanel.btnClose.text")); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panControlLayout = new javax.swing.GroupLayout(panControl);
-        panControl.setLayout(panControlLayout);
-        panControlLayout.setHorizontalGroup(
-            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panControlLayout.createSequentialGroup()
-                .addContainerGap(308, Short.MAX_VALUE)
-                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(panContentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        panControlLayout.setVerticalGroup(
-            panControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panControlLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnClose)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
-        add(panControl, java.awt.BorderLayout.SOUTH);
+        panAll.add(panContent, "card4");
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panAll, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+            .addComponent(panControl, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panAll, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panControl, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -306,6 +330,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblMessage;
+    private javax.swing.JPanel panAll;
     private javax.swing.JPanel panContent;
     private javax.swing.JPanel panContentMessage;
     private javax.swing.JPanel panContentProgress;
@@ -316,7 +341,7 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
 
     public class FlurstueckTableModel extends AbstractTableModel {
 
-        private final String[] COLUMN_HEADER = {"Flurstück"};
+        private final String[] COLUMN_HEADER = {"Flurstücke"};
         private final ArrayList<FlurstueckSchluessel> data = new ArrayList<FlurstueckSchluessel>();
 
         @Override
@@ -388,14 +413,15 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
         @Override
         protected Set<FlurstueckSchluessel> doInBackground() throws Exception {
              final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
-            if (currentKZ != null && currentKZ.length() > 0) {
-                final Geometry kassenzeichenGeom = mainApp.getFlPanel().getFlOverviewPanel().getModel().getKassenzeichenGeometry();
+            if (currentKZ != null && currentKZ.length() > 0) {                
+                final Geometry kassenzeichenGeom = mainApp.getFlPanel().getFlOverviewPanel().getModel().getSingleKassenzeichenGeometry();
                 if (kassenzeichenGeom != null) {
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
                     final LagisCrossoverRemote lagisCrossover = mainApp.getPrefs().getLagisCrossoverAccessor();
                     final LagisServerRemote lagisServer = mainApp.getPrefs().getLagisServerAccessor();
                     if (lagisCrossover != null && lagisServer != null) {
-                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom);
+                        log.debug("buffer: "+mainApp.getPrefs().getFlurstueckBuffer());
+                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(kassenzeichenGeom,mainApp.getPrefs().getFlurstueckBuffer());
                         if (wfsFlurstuecke != null && wfsFlurstuecke.size() > 0) {
                             log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
                             final Set<FlurstueckSchluessel> flurstueckSchluessel = lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
@@ -446,23 +472,20 @@ public class LagisCrossoverPanel extends javax.swing.JPanel implements MouseList
                 if (results == null) {
                     results = new HashSet<FlurstueckSchluessel>();
                     tableModel.updateTableModel(results);
-                    LagisCrossoverPanel.this.remove(panContentProgress);
-                    LagisCrossoverPanel.this.add(panContentMessage, BorderLayout.CENTER);
+                    layout.show(panAll, MESSAGE_CARD_NAME);
                 } else {
                     tableModel.updateTableModel(results);
-                    LagisCrossoverPanel.this.remove(panContentProgress);
-                    LagisCrossoverPanel.this.add(panContent, BorderLayout.CENTER);
+                    layout.show(panAll, CONTENT_CARD_NAME);
                 }
             } catch (Exception ex) {
                 log.error("Fehler beim verarbeiten der Ergebnisse: ", ex);
-                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());
-                LagisCrossoverPanel.this.remove(panContentProgress);
+                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());                
                 lblMessage.setText("<html>Fehler beim abfragen<br/>der Flurstücke.</html>");
-                LagisCrossoverPanel.this.add(panContentMessage, BorderLayout.CENTER);
+                layout.show(panAll, MESSAGE_CARD_NAME);
             }
-            LagisCrossoverPanel.this.revalidate();
-            LagisCrossoverPanel.this.repaint();
-            ((JDialog) getParent().getParent().getParent().getParent()).repaint();
+//            LagisCrossoverPanel.this.revalidate();
+//            LagisCrossoverPanel.this.repaint();
+//            ((JDialog) getParent().getParent().getParent().getParent()).repaint();
         }
     }
 }

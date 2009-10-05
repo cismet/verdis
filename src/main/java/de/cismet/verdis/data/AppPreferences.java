@@ -92,9 +92,10 @@ public class AppPreferences {
     private String rmRegistryServerPath;
     private int verdisCrossoverPort;
     private int lagisCrossoverPort;
-    LagisCrossoverRemote lagisCrossoverAccessor;
-    LagisServerRemote lagisServerAccessor;
-            
+    private LagisCrossoverRemote lagisCrossoverAccessor;
+    private LagisServerRemote lagisServerAccessor;
+    private double flurstueckBuffer=-0.5;
+
     /** Creates a new instance of AppPreferences */
     
     
@@ -198,6 +199,13 @@ public class AppPreferences {
                 lagisServerAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisServerRemote.class).getEjbInterface();
             } catch (Exception ex) {
                 log.warn("Crossover: Error beim setzen des LagIS servers", ex);
+            }
+            try{
+                Element crossoverPrefs = root.getChild("CrossoverConfiguration");
+                flurstueckBuffer = Double.parseDouble(crossoverPrefs.getChildText("FlurstueckBuffer"));
+
+            } catch(Exception ex){
+                log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage",ex);
             }
             
             List list=root.getChild("usergroups").getChildren("ug");
@@ -394,6 +402,13 @@ public class AppPreferences {
     public void setStandaloneCallServerHost(String standaloneCallServerHost) {
         this.standaloneCallServerHost = standaloneCallServerHost;
     }
-    
+
+    public double getFlurstueckBuffer() {
+        return flurstueckBuffer;
+    }
+
+    public void setFlurstueckBuffer(double flurstueckBuffer) {
+        this.flurstueckBuffer = flurstueckBuffer;
+    }
     
 }

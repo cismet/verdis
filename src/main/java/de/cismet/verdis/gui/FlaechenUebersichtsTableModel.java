@@ -143,11 +143,17 @@ public class FlaechenUebersichtsTableModel extends AbstractTableModel implements
         return gCol;
     }
 
+    public Geometry getSingleKassenzeichenGeometry() {
+        //same as union;
+        return getKassenzeichenGeometry(data).buffer(0);
+    }
+
     //ToDo maybe not enough what about fresh,removed
     public Geometry getKassenzeichenGeometry(){
         //ToDo make tolerance configurable ??
         return getKassenzeichenGeometry(data).buffer(0.01);
     }
+
     
     private SimpleDbAction getStatement4KassenzeichenGeometry() {
         
