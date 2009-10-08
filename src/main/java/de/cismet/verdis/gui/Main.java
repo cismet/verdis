@@ -28,7 +28,9 @@ import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
@@ -49,6 +51,7 @@ import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.dbwriter.DbWriterDialog;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.validation.NotValidException;
+import de.cismet.verdis.crossover.VerdisCrossover;
 import de.cismet.verdis.data.AppPreferences;
 import de.cismet.verdis.data.Flaeche;
 import de.cismet.verdis.data.Kassenzeichen;
@@ -74,6 +77,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.Remote;
 import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileFilter;
@@ -97,9 +103,6 @@ import org.jdesktop.swingx.auth.LoginService;
 
 //TODO instead of giving a reference of main to the widgets so they can change icons and othe docking stuff
 import org.jdom.Element;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
 //There should be a referece to their own view so that they can change it by themself
 
 /**
@@ -216,7 +219,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private KassenzeichenPanel kzPanel;
     private KanaldatenPanel kanaldatenPanel;
 
-    public Main(PluginContext context) {
+    public Main(PluginContext context) {        
         try {
             javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
         } catch (Exception ex) {
@@ -647,32 +650,31 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 initCrossoverServerImpl(crossoverServerPort);
             }
         } catch (Exception ex) {
-            log.error("Crossover: Error while creating crossover server on port: " + crossoverServerPort);
+            log.error("Crossover: Error while creating crossover server on port: " + crossoverServerPort,ex);
             if (!defaultServerPortUsed) {
                 log.debug("Crossover: Trying to create server with defaultPort: " + defaultServerPort);
                 defaultServerPortUsed = true;
                 try {
                     initCrossoverServerImpl(defaultServerPort);
-                    log.debug("Crossover: Server started at port: " + defaultServerPort);
+                    log.debug("Crossover: Server started at port: " + defaultServerPort,ex);
                 } catch (Exception ex1) {
-                    log.error("Crossover: Failed to initialize Crossover server on defaultport: " + defaultServerPort + ". No Server is started");
+                    log.error("Crossover: Failed to initialize Crossover server on defaultport: " + defaultServerPort + ". No Server is started",ex);
+                    cmdLagisCrossover.setEnabled(false);
                 }
             }
         }
     }
 
     private void initCrossoverServerImpl(int crossoverServerPort) throws Exception {
-        ServletHolder sh = new ServletHolder(ServletContainer.class);
-        sh.setInitParameter("com.sun.jersey.config.property.packages", "de.cismet.verdis.crossover");
-        Server server = new Server(crossoverServerPort);
-        Context context = new Context(server, "/", Context.SESSIONS);
-        context.addServlet(sh, "/*");
+        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class,VerdisCrossover.class);
+        HttpServer server = HttpServer.create(new InetSocketAddress(crossoverServerPort), 0);
+        server.createContext("/",handler);
+        server.setExecutor(null);
         server.start();
     }
 
     private void loadProperties() {
         // Read properties file.
-
         prefs = new AppPreferences(getClass().getResourceAsStream("/verdis2properties.xml"));
         log.debug(getClass().getClassLoader());
         KASSENZEICHEN_CLASS_ID = prefs.getKassenzeichenClassId();
