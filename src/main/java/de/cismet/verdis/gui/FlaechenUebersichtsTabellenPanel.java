@@ -659,6 +659,7 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         cmdForward = new JHistoryButton();
         jSeparator5 = new javax.swing.JSeparator();
         cmdWmsBackground = new javax.swing.JButton();
+        cmdForeground = new javax.swing.JButton();
         cmdSnap = new javax.swing.JButton();
         sep2 = new javax.swing.JSeparator();
         cmdZoom = new javax.swing.JButton();
@@ -712,7 +713,6 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         cmdAdd.setBorderPainted(false);
         cmdAdd.setFocusPainted(false);
         cmdAdd.setMinimumSize(new java.awt.Dimension(25, 25));
-        cmdAdd.setOpaque(false);
         cmdAdd.setPreferredSize(new java.awt.Dimension(25, 25));
         cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -832,6 +832,21 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             }
         });
         tobVerdis.add(cmdWmsBackground);
+
+        cmdForeground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png"))); // NOI18N
+        cmdForeground.setToolTipText("Vordergrund an/aus");
+        cmdForeground.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
+        cmdForeground.setFocusable(false);
+        cmdForeground.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdForeground.setSelected(true);
+        cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
+        cmdForeground.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdForeground.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdForegroundActionPerformed(evt);
+            }
+        });
+        tobVerdis.add(cmdForeground);
 
         cmdSnap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png"))); // NOI18N
         cmdSnap.setToolTipText("Snapping an/aus");
@@ -1309,6 +1324,16 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
 }//GEN-LAST:event_cmdALBActionPerformed
 
+    private void cmdForegroundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdForegroundActionPerformed
+        if (mappingComp.isFeatureCollectionVisible()) {
+            mappingComp.setFeatureCollectionVisibility(false);
+            cmdForeground.setSelected(false);
+        } else {
+            mappingComp.setFeatureCollectionVisibility(true);
+            cmdForeground.setSelected(true);
+        }
+}//GEN-LAST:event_cmdForegroundActionPerformed
+
     public void removeSelectedFlaeche() {
         Feature f = tableModel.getSelectedFlaeche();
         tableModel.removeSelectedFlaeche();
@@ -1326,6 +1351,7 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
     private javax.swing.JButton cmdAddHandle;
     private javax.swing.JButton cmdAttachPolyToAlphadata;
     private javax.swing.JButton cmdBack;
+    private javax.swing.JButton cmdForeground;
     private javax.swing.JButton cmdForward;
     private javax.swing.JButton cmdFullPoly;
     private javax.swing.JButton cmdFullPoly1;
