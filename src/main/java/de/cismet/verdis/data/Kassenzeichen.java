@@ -317,6 +317,100 @@ public class Kassenzeichen implements Cloneable{
             
     }
     
+    public static void collectActions4RenameKassenzeichen(Vector v,String oldKZ,String newKZ) {
+        v.add(getAction4RenameKassenzeichen_CS_CAT_NODE(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_KASSENZEICHEN(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_DMS_URLS(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_FLAECHEN(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_CS_ALL_ATTR_MAPPING(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_CS_ATTR_STRING(oldKZ, newKZ));
+        v.add(getAction4RenameKassenzeichen_CS_LOCKS(oldKZ, newKZ));
+
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_CS_CAT_NODE(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE cs_cat_node SET " +
+                "   name = 'Kassenzeichen: " + newKZ + "'," +
+                "   object_id = " + newKZ + ", " +
+                "   org = NULL " +
+                "WHERE " +
+                "   class_id = " + Main.KASSENZEICHEN_CLASS_ID + " AND " +
+                "   object_id = " + oldKZ
+        );
+        sdba.setDescription("UPDATE KASSENZEICHEN SET id ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_KASSENZEICHEN(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE kassenzeichen SET " +
+                "   id = " + newKZ + " " +
+                "WHERE " +
+                "   id = " + oldKZ
+        );
+        sdba.setDescription("UPDATE KASSENZEICHEN SET id ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_DMS_URLS(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE dms_urls SET " +
+                "   kassenzeichen_reference = " + newKZ + " " +
+                "WHERE " +
+                "   kassenzeichen_reference = " + oldKZ
+        );
+        sdba.setDescription("UPDATE DMS_URLS SET kassenzeichen ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_FLAECHEN(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE flaechen SET " +
+                "   kassenzeichen_reference = " + newKZ + " " +
+                "WHERE " +
+                "   kassenzeichen_reference = " + oldKZ
+        );
+        sdba.setDescription("UPDATE FLAECHEN SET kassenzeichen ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_CS_ALL_ATTR_MAPPING(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE cs_all_attr_mapping SET " +
+                "   object_id = " + newKZ + " " +
+                "WHERE " +
+                "   class_id = " + Main.KASSENZEICHEN_CLASS_ID + " AND " +
+                "   object_id = " + oldKZ
+        );
+        sdba.setDescription("UPDATE CS_ALL_ATTR_MAPPING SET kassenzeichen ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_CS_ATTR_STRING(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE cs_attr_string SET " +
+                "   object_id = " + newKZ + " " +
+                "WHERE " +
+                "   class_id = " + Main.KASSENZEICHEN_CLASS_ID + " AND " +
+                "   object_id = " + oldKZ
+        );
+        sdba.setDescription("UPDATE CS_ATTR_STRING SET kassenzeichen ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+    private static SimpleDbAction getAction4RenameKassenzeichen_CS_LOCKS(String oldKZ,String newKZ) {
+        SimpleDbAction sdba = new SimpleDbAction();
+        sdba.setStatement("UPDATE cs_locks SET " +
+                "   object_id = " + newKZ + " " +
+                "WHERE " +
+                "   class_id = " + Main.KASSENZEICHEN_CLASS_ID + " AND " +
+                "   object_id = " + oldKZ
+        );
+        sdba.setDescription("UPDATE CS_ATTR_STRING SET kassenzeichen ...");
+        sdba.setType(SimpleDbAction.UPDATE);
+        return sdba;
+    }
+
     public static void collectActions4NewKassenzeichen(Vector v,String newKZ) {
         v.add(getAction4NewKassenzeichen_CS_CAT_NODE(newKZ));
         v.add(getAction4NewKassenzeichen_Kassenzeichen(newKZ));

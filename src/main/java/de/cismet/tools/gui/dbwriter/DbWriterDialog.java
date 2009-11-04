@@ -26,6 +26,7 @@ public class DbWriterDialog extends javax.swing.JDialog {
     private javax.swing.ImageIcon ok;
     private javax.swing.ImageIcon error;
     protected final static boolean DEBUG_MODE=false;
+    private boolean hasError = false;
     /** Creates new form DbWriterDialog */
     public DbWriterDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -194,6 +195,10 @@ public class DbWriterDialog extends javax.swing.JDialog {
         this.connectionInfo=connectionInfo;
     }
 
+    public boolean hasError() {
+        return hasError;
+    }
+
     public void write(final Vector statements) {
         this.prbMain.setValue(0);
         this.prbMain.setMaximum(statements.size());
@@ -298,14 +303,14 @@ public class DbWriterDialog extends javax.swing.JDialog {
             }   
             catch (Exception e) {
                 log.error("Schliessen der Connection ging schief",e);
-            }
-            
+            }            
+
             java.awt.event.ActionListener timerAction = new java.awt.event.ActionListener() {
                       public void actionPerformed( java.awt.event.ActionEvent event ) {
                         prbMain.setForeground(javax.swing.UIManager.getDefaults().getColor("ProgressBar.foreground"));
                         if (chkAutoClose.isSelected()&&(!error.hasError())) {
                             dispose();
-                            
+
                         }
                       }
                       
@@ -313,11 +318,12 @@ public class DbWriterDialog extends javax.swing.JDialog {
             javax.swing.Timer timer = new javax.swing.Timer(timerMs, timerAction );
             timer.setRepeats(false);
             timer.start();
-            
-            
+                        
+            hasError = error.hasError();
             
         }catch (Exception ex) {
             log.error("FEHLER",ex);
+            hasError = true;
         }
     }
     

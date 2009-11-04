@@ -769,6 +769,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         menEdit = new javax.swing.JMenu();
         mnuEditMode = new javax.swing.JMenuItem();
         mnuNewKassenzeichen = new javax.swing.JMenuItem();
+        mnuRenameKZ = new javax.swing.JMenuItem();
         menExtras = new javax.swing.JMenu();
         mnuChangeUser = new javax.swing.JMenuItem();
         menWindows = new javax.swing.JMenu();
@@ -1067,6 +1068,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             }
         });
         menEdit.add(mnuNewKassenzeichen);
+
+        mnuRenameKZ.setText("Kassenzeichen umbenennen");
+        mnuRenameKZ.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRenameKZActionPerformed(evt);
+            }
+        });
+        menEdit.add(mnuRenameKZ);
 
         jMenuBar1.add(menEdit);
 
@@ -1821,6 +1830,49 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
     }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
 
+    private void mnuRenameKZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRenameKZActionPerformed
+        if (!readonly) {
+            if (changesPending()) {
+                int answer = JOptionPane.showConfirmDialog(this, "Wollen Sie die gemachten \u00C4nderungen zuerst speichern?", "Kassenzeichen umbenennen", JOptionPane.YES_NO_CANCEL_OPTION);
+                if (answer == JOptionPane.YES_OPTION) {
+                    storeChanges();
+                    renameKZ();
+                } else if (answer == JOptionPane.NO_OPTION) {
+                    kzPanel.refresh();
+                    renameKZ();
+                }
+            } else {
+                renameKZ();
+            }
+        }
+    }//GEN-LAST:event_mnuRenameKZActionPerformed
+
+    public void renameKZ() {
+        String oldKZ = this.kzPanel.getShownKassenzeichen();
+        String newKZ = JOptionPane.showInputDialog(this, "Geben Sie das neue Kassenzeichens ein:", "Kassenzeichen umbenennen", JOptionPane.QUESTION_MESSAGE);
+
+        if (!(newKZ == null)) {
+            try {
+                new Integer(newKZ);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Kassenzeichen muss eine Zahl sein.", "Fehler", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            this.unlockDataset();
+            if (this.lockDataset(oldKZ)) {
+                Vector newKZStatements = new Vector();
+                Kassenzeichen.collectActions4RenameKassenzeichen(newKZStatements, oldKZ, newKZ);
+                if (storeChanges(newKZStatements, false, newKZ)) {
+                    this.unlockDataset(newKZ);
+                    //kzPanel.setKZSearchField(newKZ);
+                } else {
+                    log.debug("storechanges error");
+                }
+            }
+        }
+    }
+
     public void newKZ() {
 
         String newKZ = JOptionPane.showInputDialog(this, "Geben Sie das neue Kassenzeichen ein:", "Neues Kassenzeichen", JOptionPane.QUESTION_MESSAGE);
@@ -1836,12 +1888,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             if (this.lockDataset(newKZ)) {
                 Vector newKZStatements = new Vector();
                 Kassenzeichen.collectActions4NewKassenzeichen(newKZStatements, newKZ);
-                kzPanel.setKZSearchField(newKZ);
-                storeChanges(newKZStatements, true, newKZ);
+                boolean isChangeOK = storeChanges(newKZStatements, true, newKZ);
                 this.unlockDataset(newKZ);
-                //kzPanel.gotoKassenzeichen(newKZ);
-                flPanel.kassenzeichenChanged(newKZ);
-                enableEditing(true);
+                if (isChangeOK) {
+                    kzPanel.setKZSearchField(newKZ);
+                    //kzPanel.gotoKassenzeichen(newKZ);
+                    flPanel.kassenzeichenChanged(newKZ);
+                    enableEditing(true);
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Neues Kassenzeichen kann nicht gesperrt werden.", "Fehler", JOptionPane.ERROR_MESSAGE);
             }
@@ -2080,6 +2134,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
     private javax.swing.JMenuItem mnuHelp;
     private javax.swing.JMenuItem mnuInfo;
     private javax.swing.JMenuItem mnuNewKassenzeichen;
+    private javax.swing.JMenuItem mnuRenameKZ;
     private javax.swing.JPanel panMain;
     private javax.swing.JToolBar tobVerdis;
     // End of variables declaration//GEN-END:variables
@@ -2109,6 +2164,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             cmdCutFlaeche.setEnabled(b);
             cmdRefreshEnumeration.setEnabled(b);
 
+            mnuRenameKZ.setEnabled(b);
 
             Iterator it = stores.iterator();
             while (it.hasNext()) {
@@ -2151,28 +2207,31 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
     }
 
-    public void storeChanges(Vector statements, final boolean editModeAfterStoring, String refreshingKassenzeichen) {
+    public boolean storeChanges(Vector statements, final boolean editModeAfterStoring, String refreshingKassenzeichen) {
         Vector allStatements = statements;
 
         dbWriter.write(allStatements);
         Point p = getLocation();
         dbWriter.setLocation(p.x + (getWidth() - dbWriter.getWidth()) / 2, p.y + (getHeight() - dbWriter.getHeight()) / 2);
         this.dbWriter.setVisible(true);
-        if (!editModeAfterStoring) {
-            unlockDataset();
-        }
-        enableEditing(editModeAfterStoring);
-
-        fixMapExtent = getFlPanel().getFlOverviewPanel().getMappingComponent().isFixedMapExtent();
-        getFlPanel().getFlOverviewPanel().getMappingComponent().setFixedMapExtent(true);
-        if (refreshingKassenzeichen == null) {
+        if (dbWriter.hasError()) {
             getKzPanel().refresh();
+            return false;
         } else {
-            getKzPanel().gotoKassenzeichen(refreshingKassenzeichen);
+            if (!editModeAfterStoring) {
+                unlockDataset();
+            }
+            enableEditing(editModeAfterStoring);
+
+            fixMapExtent = getFlPanel().getFlOverviewPanel().getMappingComponent().isFixedMapExtent();
+            getFlPanel().getFlOverviewPanel().getMappingComponent().setFixedMapExtent(true);
+            if (refreshingKassenzeichen == null) {
+                getKzPanel().refresh();
+            } else {
+                getKzPanel().gotoKassenzeichen(refreshingKassenzeichen);
+            }
+            return true;
         }
-
-
-
     }
     private boolean fixMapExtent;
 
