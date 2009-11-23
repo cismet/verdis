@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
 import org.jdom.Document;
@@ -85,7 +86,7 @@ public class AppPreferences {
         this.albUrl = albUrl;
     }
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private HashMap<String,AbstractWFSForm>  wfsForms=new HashMap<String,AbstractWFSForm>();
+    private LinkedHashMap<String,AbstractWFSForm>  wfsForms=new LinkedHashMap<String,AbstractWFSForm>();
     //ADDED FOR RM PLUGIN FUNCTIONALTY 22.07.07 Sebastian Puhl
     private int primaryPort;
     private int secondaryPort;
