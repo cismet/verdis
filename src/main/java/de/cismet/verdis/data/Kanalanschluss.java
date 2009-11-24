@@ -65,6 +65,7 @@ public class Kanalanschluss {
     private boolean kkaEntleerung=false;
     private boolean evg=false;
     private Vector<BefreiungErlaubnis> befreiungen=new Vector<BefreiungErlaubnis>();
+    private Vector<BefreiungErlaubnis> befreiungenToDelete = new Vector<BefreiungErlaubnis>();
     
     
     private CheckBoxModel rkVorhandenModel;
@@ -738,6 +739,21 @@ public class Kanalanschluss {
                 
             }
         }
+        for (BefreiungErlaubnis elem : befreiungenToDelete) {
+            if (elem.getId() > 0) {
+                sdba = new SimpleDbAction();
+                sdba.setStatement("delete from befreiungerlaubnis where id=" + elem.getId());
+                sdba.setDescription("Delete in >>Befreiungerlaubnis<<");
+                sdba.setType(SimpleDbAction.DELETE);
+                v.add(sdba);
+                sdba = new SimpleDbAction();
+                sdba.setStatement("delete from befreiungerlaubnisarray where befreiungerlaubnis=" + elem.getId());
+                sdba.setDescription("Delete in >>Befreiungerlaubnisarray<<");
+                sdba.setType(SimpleDbAction.DELETE);
+                v.add(sdba);
+            }
+        }
+        befreiungenToDelete.clear();
     }
     
     public BefreiungenModel getBefreiungenModel() {
@@ -764,5 +780,13 @@ public class Kanalanschluss {
         this.befreiungen = befreiungen;
     }
     
+    public Vector<BefreiungErlaubnis> getBefreiungenToDelete() {
+        return befreiungenToDelete;
+    }
+
+    public void addBefreiungToDelete(BefreiungErlaubnis befreiungToDelete) {
+        befreiungenToDelete.add(befreiungToDelete);
+    }
+
 }
 

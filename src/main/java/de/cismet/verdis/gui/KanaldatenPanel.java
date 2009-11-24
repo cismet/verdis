@@ -12,12 +12,30 @@ import de.cismet.verdis.data.Kanalanschluss;
 import de.cismet.verdis.interfaces.KassenzeichenChangedListener;
 import de.cismet.verdis.interfaces.Storable;
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -31,6 +49,21 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
     private Kanalanschluss kanalanschlussdaten;
     private Main main;
     
+    private boolean isClipboardBECutPasted  = true;
+
+    private static final String STRING_CUT = "cut";
+    private static final String STRING_COPY = "copy";
+    private static final String STRING_PASTE = "paste";
+    private static final String STRING_DELETE = "delete";
+
+    private static final String SEPARATOR_BE = "\n";
+    private static final String SEPARATOR_BE_DATA = "\t";
+
+    private static final KeyStroke KEYSTROKE_CUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK);
+    private static final KeyStroke KEYSTROKE_COPY = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK);
+    private static final KeyStroke KEYSTROKE_PASTE = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK);
+    private static final KeyStroke KEYSTROKE_DELETE = javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+
     /** Creates new form KanaldatenPanel */
     public KanaldatenPanel() {
         //UIManager.put( "ComboBox.disabledForeground", Color.black );
@@ -118,6 +151,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         cboSKangeschlossen.setEnabled(editable&&chkSKvorhanden.isSelected());
         tblBE.setEnabled(editable);
         cmdAddBefreiungErlaubnis.setEnabled(editable);
+        updateClipboardMenu();
         visualizeValidity();
     }
     //Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -134,7 +168,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
     public void setMain(Main main) {
         this.main = main;
     }
-    
     
     public void kassenzeichenChanged(final String kassenzeichen) {
         log.debug("Kanaldatenretrieval");
@@ -252,16 +285,184 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
     public boolean isEditmode() {
         return editmode;
     }
-    
+
+    private void updateClipboardMenu() {
+        log.debug("updateClipboardMenu()");
+
+        boolean isClipboardEmpty = getClipboardBEs().isEmpty();
+        boolean isSelectionEmpty = tblBE.getSelectionModel().isSelectionEmpty();
+
+        // popupmenu aktualisieren
+        mniPaste.setEnabled(!isClipboardEmpty);
+        mniCut.setEnabled(!isSelectionEmpty);
+        mniCopy.setEnabled(!isSelectionEmpty);
+        mniDelete.setEnabled(!isSelectionEmpty);
+        
+        // deletebutton aktualisieren
+        cmdDeleteBefreiungErlaubnis.setEnabled(!isSelectionEmpty);
+    }
+
+    private void deleteSelectedBE() {
+        log.debug("deleteBE()");
+
+        // nur um Editmodus reagieren
+        if (isEditmode()) {
+            Vector<BefreiungErlaubnis> selectedBefreiungen = getSelectedBE();
+            for (BefreiungErlaubnis selectedBefreiung : selectedBefreiungen) {
+                log.debug("selectedBefreiung: " + selectedBefreiung);
+                kanalanschlussdaten.addBefreiungToDelete(selectedBefreiung);
+                kanalanschlussdaten.getBefreiungen().remove(selectedBefreiung);
+            }
+
+            // Tabelle aktualisieren
+            kanalanschlussdaten.updateModels();
+            tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
+
+            // Menus aktualisieren
+            updateClipboardMenu();
+        }
+    }
+
+    private boolean cutSelectedBE() {
+        log.debug("cutBE()");
+
+        // nur um Editmodus reagieren
+        if (isEditmode()) {
+            // ausgewählte BE in die Zwischenablage kopieren
+            boolean copySuccessful = copySelectedBE();
+            // ging das Kopieren gut?
+            if (copySuccessful) {
+                // ausgewählte BE löschen
+                deleteSelectedBE();
+                // festhalten dass ausgeschnittene Daten noch nicht wieder eingefügt wurden
+                isClipboardBECutPasted = false;
+                // ausscheiden ging gut
+                return true;
+            } else { // Kopieren ging schief
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean copySelectedBE() {
+        log.debug("copyBE()");
+
+        // nur um Editmodus reagieren
+        if (isEditmode()) {
+            // ausgeschnittene Daten noch nicht wieder eingefügt?
+            if (!isClipboardBECutPasted && getClipboardBEs().size() > 0) {
+                // Dialog zum Nachfragen ob ausgeschnittene Daten verworfen werden
+                int answer = JOptionPane.showConfirmDialog(this, "Sie haben zuvor Daten in die Zwischenablage ausgeschnitten und nicht wieder eingefügt.\nWenn Sie jetzt fortfahren, werden diese Daten verworfen !", "Daten verwerfen?", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                // Wenn nicht OK, abbrechen
+                if (answer != JOptionPane.OK_OPTION) {
+                    return false;
+                }
+            }
+
+            // Zwischenspeicher vorbereiten
+            StringBuffer clipboardString = new StringBuffer();
+
+            // markierte BE in die Zwischenablage speichern
+            Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            for (BefreiungErlaubnis befreiung : getSelectedBE()) {
+                clipboardString.append(befreiung.getAktenzeichen() + SEPARATOR_BE_DATA + befreiung.getGueltigBis() + SEPARATOR_BE);
+            }
+            systemClipboard.setContents(new StringSelection(clipboardString.toString()), null);
+
+
+            // Menus aktualisieren
+            updateClipboardMenu();
+            // Kopieren ging gut
+            return true;
+        }
+        return false;
+    }
+
+    private Vector<BefreiungErlaubnis> getClipboardBEs() {
+        Vector<BefreiungErlaubnis> befreiungen = new Vector<BefreiungErlaubnis>();
+        String data = "";
+
+        //
+        Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable transfer = systemClipboard.getContents(null);
+        try {
+            data = (String)transfer.getTransferData(DataFlavor.stringFlavor);
+        } catch (UnsupportedFlavorException ex) {
+            log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
+        } catch (IOException ex) {
+            log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
+        }
+
+        //
+        String[] befreiungStrings = data.split(SEPARATOR_BE);
+        for (String befreiungString : befreiungStrings) {
+            String[] befreiungData = befreiungString.split(SEPARATOR_BE_DATA);
+            if (befreiungData.length == 2) {
+                BefreiungErlaubnis befreiung = new BefreiungErlaubnis();
+                befreiung.setAktenzeichen(befreiungData[0]);
+                befreiung.setGueltigBis(befreiungData[1]);
+                befreiungen.add(befreiung);
+            }
+        }
+
+        return befreiungen;
+    }
+
+    private void pasteBE() {
+        log.debug("pasteBE()");
+
+        // nur um Editmodus reagieren
+        if (isEditmode()) {
+            for (BefreiungErlaubnis clipboardBefreiung : getClipboardBEs()) {
+                log.debug("clipboardBefreiung: " + clipboardBefreiung);
+
+                // neue BE erzeugen
+                BefreiungErlaubnis newBefreiung = new BefreiungErlaubnis();
+                // Daten der BE im Zwischenspeicher in neue BE kopieren
+                newBefreiung.setAktenzeichen(clipboardBefreiung.getAktenzeichen());
+                newBefreiung.setGueltigBis(clipboardBefreiung.getGueltigBis());
+
+                // neue BE einfügen
+                kanalanschlussdaten.getBefreiungen().add(newBefreiung);
+            }
+
+            // ausgeschnittene Daten wurden wieder eingefügt
+            if (!isClipboardBECutPasted) {
+                isClipboardBECutPasted = true;
+            }
+
+            // Tabelle aktualisieren
+            kanalanschlussdaten.updateModels();
+            tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
+
+            // Menus aktualisieren
+            updateClipboardMenu();
+        }
+    }
+
+    private Vector<BefreiungErlaubnis> getSelectedBE() {
+        Vector<BefreiungErlaubnis> befreiungen = new Vector<BefreiungErlaubnis>();
+        int[] rows = tblBE.getSelectedRows();
+        for (int row : rows) {
+            befreiungen.add(kanalanschlussdaten.getBefreiungen().get(row));
+        }
+        return befreiungen;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel3 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        mniCut = new javax.swing.JMenuItem();
+        mniCopy = new javax.swing.JMenuItem();
+        mniPaste = new javax.swing.JMenuItem();
+        mniDelete = new javax.swing.JMenuItem();
         panMain = new javax.swing.JPanel();
         lblRK = new javax.swing.JLabel();
         lblMKR = new javax.swing.JLabel();
@@ -292,9 +493,35 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         lblBE = new javax.swing.JLabel();
         lblEVG = new javax.swing.JLabel();
         cmdAddBefreiungErlaubnis = new javax.swing.JButton();
+        cmdDeleteBefreiungErlaubnis = new javax.swing.JButton();
 
-        jLabel3.setText("jLabel3");
-        jLabel6.setText("jLabel6");
+        mniCut.setAction(new CutAction());
+        mniCut.setAccelerator(KEYSTROKE_CUT);
+        mniCut.setMnemonic('A');
+        mniCut.setText("Ausschneiden");
+        mniCut.setEnabled(false);
+        jPopupMenu1.add(mniCut);
+
+        mniCopy.setAction(new CopyAction());
+        mniCopy.setAccelerator(KEYSTROKE_COPY);
+        mniCopy.setMnemonic('K');
+        mniCopy.setText("Kopieren");
+        mniCopy.setEnabled(false);
+        jPopupMenu1.add(mniCopy);
+
+        mniPaste.setAction(new PasteAction());
+        mniPaste.setAccelerator(KEYSTROKE_PASTE);
+        mniPaste.setMnemonic('E');
+        mniPaste.setText("Einfügen");
+        mniPaste.setEnabled(false);
+        jPopupMenu1.add(mniPaste);
+
+        mniDelete.setAction(new DeleteAction());
+        mniDelete.setAccelerator(KEYSTROKE_DELETE);
+        mniDelete.setMnemonic('L');
+        mniDelete.setText("Löschen");
+        mniDelete.setEnabled(false);
+        jPopupMenu1.add(mniDelete);
 
         setLayout(new java.awt.BorderLayout());
 
@@ -314,7 +541,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         lblVorhanden1.setToolTipText("vorhanden");
 
         chkRKvorhanden.setBorder(null);
-        chkRKvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkRKvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkRKvorhandenActionPerformed(evt);
@@ -322,7 +548,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         });
 
         chkMKRvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkMKRvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkMKRvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkMKRvorhandenActionPerformed(evt);
@@ -330,7 +555,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         });
 
         chkMKSvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkMKSvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkMKSvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkMKSvorhandenActionPerformed(evt);
@@ -339,7 +563,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
 
         chkSKvorhanden.setToolTipText("");
         chkSKvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkSKvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkSKvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkSKvorhandenActionPerformed(evt);
@@ -391,10 +614,9 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         lblEntleerung.setText("Entleerung");
 
         lblKKA.setText("KKA");
-        lblKKA.setToolTipText("Kleinkl\u00e4ranlage");
+        lblKKA.setToolTipText("Kleinkläranlage");
 
         chkSGvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkSGvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkSGvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkSGvorhandenActionPerformed(evt);
@@ -402,7 +624,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         });
 
         chkKKAvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkKKAvorhanden.setMargin(new java.awt.Insets(0, 0, 0, 0));
         chkKKAvorhanden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkKKAvorhandenActionPerformed(evt);
@@ -410,23 +631,26 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         });
 
         chkSGentleerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkSGentleerung.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         chkKKAentleerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkKKAentleerung.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         chkErlaubnisfreieVersickerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkErlaubnisfreieVersickerung.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         scpBE.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        scpBE.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                scpBEMousePressed(evt);
+            }
+        });
+
         tblBE.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Aktenzeichen", "g\u00FCltig bis"
+                "Aktenzeichen", "gültig bis"
             }
         ) {
             Class[] types = new Class [] {
@@ -437,20 +661,54 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
                 return types [columnIndex];
             }
         });
+        tblBE.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblBEMousePressed(evt);
+            }
+        });
         scpBE.setViewportView(tblBE);
+        // reagieren auf Verändern der Selektion
+        tblBE.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                log.debug("selectionChanged");
+                updateClipboardMenu();
+            }
+        });
+
+        // registrieren von STRG+X für Ausschneiden
+        tblBE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_CUT, STRING_CUT);
+        tblBE.getActionMap().put(STRING_CUT, new CutAction());
+
+        // registrieren von STRG+C für Kopieren
+        tblBE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_COPY, STRING_COPY);
+        tblBE.getActionMap().put(STRING_COPY, new CopyAction());
+
+        // registrieren von STRG+V für Einfügen
+        tblBE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_PASTE, STRING_PASTE);
+        tblBE.getActionMap().put(STRING_PASTE, new PasteAction());
+
+        // registrieren von ENTF für Löschen
+        tblBE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_DELETE, STRING_DELETE);
+        tblBE.getActionMap().put(STRING_DELETE, new DeleteAction());
 
         lblBE.setText("Befreiung / Erlaubnis");
 
         lblEVG.setText("EVG");
         lblEVG.setToolTipText("Erlaubnisfreie Versickerung");
 
-        cmdAddBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));
+        cmdAddBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
         cmdAddBefreiungErlaubnis.setFocusPainted(false);
         cmdAddBefreiungErlaubnis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdAddBefreiungErlaubnisActionPerformed(evt);
             }
         });
+
+        cmdDeleteBefreiungErlaubnis.setAction(new DeleteAction());
+        cmdDeleteBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
+        cmdDeleteBefreiungErlaubnis.setEnabled(false);
+        cmdDeleteBefreiungErlaubnis.setFocusPainted(false);
 
         org.jdesktop.layout.GroupLayout panMainLayout = new org.jdesktop.layout.GroupLayout(panMain);
         panMain.setLayout(panMainLayout);
@@ -511,9 +769,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
                 .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(panMainLayout.createSequentialGroup()
                         .add(lblBE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 49, Short.MAX_VALUE)
-                        .add(cmdAddBefreiungErlaubnis))
-                    .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE)
+                        .add(cmdAddBefreiungErlaubnis)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(cmdDeleteBefreiungErlaubnis))
+                    .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panMainLayout.setVerticalGroup(
@@ -567,19 +827,20 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
                 .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(chkErlaubnisfreieVersickerung)
                     .add(lblEVG))
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
             .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
             .add(panMainLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(lblBE)
-                    .add(cmdAddBefreiungErlaubnis))
+                    .add(cmdAddBefreiungErlaubnis)
+                    .add(cmdDeleteBefreiungErlaubnis))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        add(panMain, java.awt.BorderLayout.CENTER);
 
+        add(panMain, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     
     private void cboMKSangeschlossenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMKSangeschlossenActionPerformed
@@ -659,8 +920,23 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
         }
         visualizeValidity();
     }//GEN-LAST:event_chkRKvorhandenActionPerformed
-    
-    
+            
+    private void tblBEMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBEMousePressed
+        if (SwingUtilities.isRightMouseButton(evt) && isEditmode()) {
+            Point p = evt.getPoint();
+            int rowNumber = tblBE.rowAtPoint(p);
+            if (tblBE.getSelectionModel().isSelectionEmpty()) {
+                tblBE.getSelectionModel().setSelectionInterval(rowNumber, rowNumber);
+            }
+            updateClipboardMenu();
+            jPopupMenu1.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_tblBEMousePressed
+
+    private void scpBEMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scpBEMousePressed
+        tblBEMousePressed(evt);
+    }//GEN-LAST:event_scpBEMousePressed
+        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cboMKRangeschlossen;
     private javax.swing.JComboBox cboMKSangeschlossen;
@@ -676,8 +952,8 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
     private javax.swing.JCheckBox chkSGvorhanden;
     private javax.swing.JCheckBox chkSKvorhanden;
     private javax.swing.JButton cmdAddBefreiungErlaubnis;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JButton cmdDeleteBefreiungErlaubnis;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JLabel lblAngeschlossen;
     private javax.swing.JLabel lblBE;
@@ -691,9 +967,41 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable,Kass
     private javax.swing.JLabel lblSK;
     private javax.swing.JLabel lblVorhanden1;
     private javax.swing.JLabel lblVorhanden2;
+    private javax.swing.JMenuItem mniCopy;
+    private javax.swing.JMenuItem mniCut;
+    private javax.swing.JMenuItem mniDelete;
+    private javax.swing.JMenuItem mniPaste;
     private javax.swing.JPanel panMain;
     private javax.swing.JScrollPane scpBE;
     private javax.swing.JTable tblBE;
     // End of variables declaration//GEN-END:variables
-    
+
+    class CutAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cutSelectedBE();
+        }
+    }
+
+    class CopyAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            copySelectedBE();
+        }
+    }
+
+    class PasteAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pasteBE();
+        }
+    }
+
+    class DeleteAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            deleteSelectedBE();
+        }
+    }
+
 }
