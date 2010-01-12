@@ -9,11 +9,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.DefaultFeatureCollection;
+import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.FeatureCollectionListener;
+import de.cismet.cismap.commons.features.PostgisFeature;
 import de.cismet.cismap.commons.features.PureNewFeature;
-import de.cismet.cismap.commons.featureservice.DefaultFeatureServiceFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
@@ -286,7 +287,7 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
             ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
         }
-    //tbpMain.remove(0); //PPT ;-)
+        //tbpMain.remove(0); //PPT ;-)
     }
 
     public MappingComponent getMappingComponent() {
@@ -305,8 +306,8 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             lblCoord.setText(MappingComponent.getCoordinateString(x, y));//+ "... " +test);
             PFeature pf = ((SimpleMoveListener) o).getUnderlyingPFeature();
 
-            if (pf != null && pf.getFeature() instanceof DefaultFeatureServiceFeature && pf.getVisible() == true && pf.getParent() != null && pf.getParent().getVisible() == true) {
-                lblInfo.setText(((DefaultFeatureServiceFeature) pf.getFeature()).getObjectName());
+            if (pf != null && pf.getFeature() instanceof PostgisFeature && pf.getVisible() == true && pf.getParent() != null && pf.getParent().getVisible() == true) {
+                lblInfo.setText(((PostgisFeature) pf.getFeature()).getObjectName());
             } else if (pf != null && pf.getFeature() instanceof Flaeche) {
                 String name = "Kassenzeichen: " + ((Flaeche) pf.getFeature()).getKassenzeichen() + "::" + ((Flaeche) pf.getFeature()).getBezeichnung();
                 lblInfo.setText(name);
@@ -342,16 +343,18 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //                        tblOverview.getSelectionModel().removeSelectionInterval(index,index);
 //                    }
 //                } else
-                if (((SelectionListener) o).getClickCount() > 1 && pf.getFeature() instanceof DefaultFeatureServiceFeature) {
+                if (((SelectionListener) o).getClickCount() > 1 && pf.getFeature() instanceof PostgisFeature) {
                     log.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener) o).getClickCount());
-                    DefaultFeatureServiceFeature dfsf = ((DefaultFeatureServiceFeature) pf.getFeature());
+                    PostgisFeature postgisFeature = ((PostgisFeature) pf.getFeature());
                     try {
-                        if (pf.getVisible() == true && pf.getParent().getVisible() == true && dfsf.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
-                            Main.THIS.getKzPanel().gotoKassenzeichen(dfsf.getGroupingKey());//TODO
+                        if (pf.getVisible() == true && pf.getParent().getVisible() == true && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
+                            Main.THIS.getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey());//TODO
                         }
                     } catch (Exception e) {
                         log.info("Fehler beim gotoKassenzeichen", e);
                     }
+
+
                 }
 //            } else if (o instanceof SplitPolygonListener) {
 //                //Muss nix besonderes gemacht werden, weil schon selectPFeatureManually im Listener aufgerufen wird
@@ -370,9 +373,9 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
                 f.setGeometryRemoved(true);
                 f.setGeom_id(-1);
                 f.setGeometry(null);
-            //mappingComp.getFeatureLayer().removeChild(pf);
-            //    mappingComp.getFeatureCollection().removeFeature(f); // wurde schon im Listener erledigt
-            //log.debug("Bezeichnung der zu l\u00F6schenden Fl\u00E4che"+f.getBezeichnung());
+                //mappingComp.getFeatureLayer().removeChild(pf);
+                //    mappingComp.getFeatureCollection().removeFeature(f); // wurde schon im Listener erledigt
+                //log.debug("Bezeichnung der zu l\u00F6schenden Fl\u00E4che"+f.getBezeichnung());
             }
         }
     }
@@ -1338,7 +1341,7 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         Feature f = tableModel.getSelectedFlaeche();
         tableModel.removeSelectedFlaeche();
         mappingComp.getFeatureCollection().removeFeature(f);
-    //mappingComp.selectPFeatureManually(null);
+        //mappingComp.selectPFeatureManually(null);
     }
 
     public void removeFlaeche(Flaeche f) {

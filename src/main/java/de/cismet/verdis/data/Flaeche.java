@@ -1470,6 +1470,11 @@ public class Flaeche implements Cloneable, StyledFeature {
         return kassenzeichen;
     }
 
+    @Override
+    public void setCanBeSelected(boolean canBeSelected) {
+
+    }
+
     public boolean canBeSelected() {
         return true;
     }
