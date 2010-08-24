@@ -21,7 +21,7 @@ import edu.umd.cs.piccolo.nodes.*;
 import edu.umd.cs.piccolox.util.*;
 import edu.umd.cs.piccolo.util.*;
 
-import org.deegree_impl.graphics.transformation.WorldToScreenTransform;
+//import org.deegree_impl.graphics.transformation.WorldToScreenTransform;
 
 /**
  *
