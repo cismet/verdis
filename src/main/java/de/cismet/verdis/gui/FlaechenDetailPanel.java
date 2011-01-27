@@ -1,30 +1,46 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * FlaechenDetailPanel.java
  *
  * Created on 5. Januar 2005, 14:02
  */
-
 package de.cismet.verdis.gui;
-import de.cismet.validation.Validatable;
-import de.cismet.validation.Validator;
-import java.awt.*;
-import javax.swing.*;
-import de.cismet.verdis.data.*;
 import edu.umd.cs.piccolo.PCanvas;
+
+import java.awt.*;
+
 import java.util.Collection;
+
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.*;
 
+import de.cismet.validation.Validatable;
+import de.cismet.validation.Validator;
+
+import de.cismet.verdis.data.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  hell
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
-public class FlaechenDetailPanel extends javax.swing.JPanel implements HyperlinkListener{
+public class FlaechenDetailPanel extends javax.swing.JPanel implements HyperlinkListener {
+
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Color defaultDisabledForeground;
     private Flaeche model;
-    
+
     private Validator valTxtBezeichnung;
     private Validator valTxtGroesseGrafik;
     private Validator valTxtGroesseKorrektur;
@@ -32,179 +48,238 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
     private Validator valTxtErfassungsdatum;
     private Validator valTxtVeranlagungsdatum;
     private Validator valTxtFEB_ID;
-    
-    /** Creates new form FlaechenDetailPanel */
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanFlDetails;
+    private javax.swing.JComboBox cboAnschlussgrad;
+    private javax.swing.JComboBox cboBeschreibung;
+    private javax.swing.JComboBox cboFlaechenart;
+    private javax.swing.JCheckBox chkSperre;
+    private javax.swing.JEditorPane edtQuer;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextPane jTextPane1;
+    private javax.swing.JLabel lblAnschlussgrad;
+    private javax.swing.JLabel lblAnteil;
+    private javax.swing.JLabel lblBemerkung;
+    private javax.swing.JLabel lblBeschreibung;
+    private javax.swing.JLabel lblBezeichnung;
+    private javax.swing.JLabel lblErfassungsadtum;
+    private javax.swing.JLabel lblFEB_ID;
+    private javax.swing.JLabel lblFlaechenart;
+    private javax.swing.JLabel lblGroesseGrafik;
+    private javax.swing.JLabel lblGroesseKorrektur;
+    private javax.swing.JLabel lblSperre;
+    private javax.swing.JLabel lblTeileigentumQuerverweise;
+    private javax.swing.JLabel lblVeranlagungsdatum;
+    private javax.swing.JPanel panFlDetails;
+    private javax.swing.JScrollPane scpBemerkung;
+    private javax.swing.JScrollPane scpQuer;
+    private javax.swing.JTabbedPane tbpDetails;
+    private javax.swing.JTextField txtAnteil;
+    private javax.swing.JTextArea txtBemerkung;
+    private javax.swing.JTextField txtBezeichnung;
+    private javax.swing.JTextField txtErfassungsdatum;
+    private javax.swing.JTextField txtFEB_ID;
+    private javax.swing.JTextField txtGroesseGrafik;
+    private javax.swing.JTextField txtGroesseKorrektur;
+    private javax.swing.JTextField txtSperreBemerkung;
+    private javax.swing.JTextField txtVeranlagungsdatum;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form FlaechenDetailPanel.
+     */
     public FlaechenDetailPanel() {
         initComponents();
-        
-        //txtBezeichnung.setDocument(model.getBezeichnungsModel());
-        defaultDisabledForeground=(Color)(UIManager.getDefaults().get("ComboBox.disabledForeground"));
-        valTxtBezeichnung=new Validator(txtBezeichnung);
-        
-        valTxtGroesseGrafik=new Validator(txtGroesseGrafik);
-        valTxtGroesseKorrektur=new Validator(txtGroesseKorrektur);
-        valTxtAnteil=new Validator(txtAnteil);
-        valTxtErfassungsdatum=new Validator(txtErfassungsdatum);
-        valTxtVeranlagungsdatum=new Validator(txtVeranlagungsdatum);
-        valTxtFEB_ID=new Validator(txtFEB_ID);
+
+        // txtBezeichnung.setDocument(model.getBezeichnungsModel());
+        defaultDisabledForeground = (Color)(UIManager.getDefaults().get("ComboBox.disabledForeground"));
+        valTxtBezeichnung = new Validator(txtBezeichnung);
+
+        valTxtGroesseGrafik = new Validator(txtGroesseGrafik);
+        valTxtGroesseKorrektur = new Validator(txtGroesseKorrektur);
+        valTxtAnteil = new Validator(txtAnteil);
+        valTxtErfassungsdatum = new Validator(txtErfassungsdatum);
+        valTxtVeranlagungsdatum = new Validator(txtVeranlagungsdatum);
+        valTxtFEB_ID = new Validator(txtFEB_ID);
         setEnabled(false);
-        
+
         edtQuer.addHyperlinkListener(this);
         scpQuer.getViewport().setOpaque(false);
         clearDetails();
-        
     }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
     public void hyperlinkUpdate(final HyperlinkEvent e) {
-        Thread t=new Thread() {
-            public void run(){
-                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {        
-                        
-                        Main.THIS.getKzPanel().gotoKassenzeichen(e.getDescription());
-                    }catch(Exception ex) {
-                        log.error("Fehler im Hyperlinken",ex);
+        final Thread t = new Thread() {
+
+                @Override
+                public void run() {
+                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        try {
+                            Main.THIS.getKzPanel().gotoKassenzeichen(e.getDescription());
+                        } catch (Exception ex) {
+                            log.error("Fehler im Hyperlinken", ex);
+                        }
                     }
                 }
-            }
-        };
+            };
         t.setPriority(Thread.NORM_PRIORITY);
         t.start();
     }
-    public void setPCanvas(PCanvas pc){
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  pc  DOCUMENT ME!
+     */
+    public void setPCanvas(final PCanvas pc) {
         this.bpanFlDetails.setPCanvas(pc);
     }
-    
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  flaeche  DOCUMENT ME!
+     */
     public void setDetails(final de.cismet.verdis.data.Flaeche flaeche) {
-        
-        if (flaeche!=null) {
-            model=flaeche;
-            
-            
-            //Bezeichnung
+        if (flaeche != null) {
+            model = flaeche;
+
+            // Bezeichnung
             txtBezeichnung.setDocument((PlainDocument)model.getBezeichnungsModel());
             valTxtBezeichnung.reSetValidator((Validatable)model.getBezeichnungsModel());
-            
-            //Gr��e Grafik
+
+            // Gr��e Grafik
             txtGroesseGrafik.setDocument(model.getGr_GrafikModel());
             valTxtGroesseGrafik.reSetValidator((Validatable)model.getGr_GrafikModel());
-            //log.debug("setDetails");
-            
-            //Gr��e Korrektur
+            // log.debug("setDetails");
+
+            // Gr��e Korrektur
             txtGroesseKorrektur.setDocument(model.getGr_KorrekturModel());
             valTxtGroesseKorrektur.reSetValidator((Validatable)model.getGr_KorrekturModel());
-            
-            //Fl�chenart
-            //Anschlu�grad
-            UIManager.put( "ComboBox.disabledForeground", Color.black );
+
+            // Fl�chenart
+            // Anschlu�grad
+            UIManager.put("ComboBox.disabledForeground", Color.black);
             cboAnschlussgrad.repaint();
             cboFlaechenart.repaint();
             cboBeschreibung.repaint();
-            
+
             cboAnschlussgrad.setModel(model.getGradModel());
             cboFlaechenart.setModel(model.getArtModel());
             cboBeschreibung.setModel(model.getBeschreibungsmodel());
-            
-            //Anteil
+
+            // Anteil
             txtAnteil.setDocument(model.getAnteilModel());
             valTxtAnteil.reSetValidator((Validatable)model.getAnteilModel());
-            
-            //Erfassungsadtum
+
+            // Erfassungsadtum
             txtErfassungsdatum.setDocument(model.getErfassungsdatumModel());
             valTxtErfassungsdatum.reSetValidator((Validatable)model.getErfassungsdatumModel());
-            
-            //Veranlagungsdatum
-            txtVeranlagungsdatum.setDocument(model.getVeranlagungsdatumModel()) ;
+
+            // Veranlagungsdatum
+            txtVeranlagungsdatum.setDocument(model.getVeranlagungsdatumModel());
             valTxtVeranlagungsdatum.reSetValidator((Validatable)model.getVeranlagungsdatumModel());
-            
-            //Bemerkung
+
+            // Bemerkung
             txtBemerkung.setDocument(model.getBemerkungsModel());
-            
-            //Sperre
-           //log.debug("Sperre isEnabled()="+chkSperre.isEnabled());
-            boolean b=chkSperre.isEnabled();
+
+            // Sperre
+            // log.debug("Sperre isEnabled()="+chkSperre.isEnabled());
+            final boolean b = chkSperre.isEnabled();
             this.chkSperre.setModel(model.getSperrenModel());
             chkSperre.setEnabled(b);
-            
-            //FEB ID
+
+            // FEB ID
             txtFEB_ID.setDocument(model.getFeb_IdModel());
             valTxtFEB_ID.reSetValidator((Validatable)model.getFeb_IdModel());
-            
-            //TODO
-            //Sperrenbemerkung
+
+            // TODO
+            // Sperrenbemerkung
             txtSperreBemerkung.setDocument(model.getBem_sperreModel());
-            
+
             if (flaeche.isSperre()) {
             } else {
 //                this.lblSperreBemerkung.setText("");
             }
-            
-            if (flaeche.getGeometry()!=null) {
+
+            if (flaeche.getGeometry() != null) {
                 bpanFlDetails.setBackgroundEnabled(true);
-            } else{
+            } else {
                 bpanFlDetails.setBackgroundEnabled(false);
             }
-            
-            Thread t=new Thread() {
-                
-                public void run() {
-                    //TeileigentumCrossReferences
-                    if (flaeche.getTeileigentumCrossReferences()!=null) {
-                        String html="<html><body><center>";
-                        Collection c=flaeche.getTeileigentumCrossReferences();
-                        for (Object o:c) {
-                            String link=o.toString();
-                            html+="<a href=\""+link+"\"><font size=\"-2\">"+link+"</font></a><br>";
+
+            final Thread t = new Thread() {
+
+                    @Override
+                    public void run() {
+                        // TeileigentumCrossReferences
+                        if (flaeche.getTeileigentumCrossReferences() != null) {
+                            String html = "<html><body><center>";
+                            final Collection c = flaeche.getTeileigentumCrossReferences();
+                            for (final Object o : c) {
+                                final String link = o.toString();
+                                html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
+                            }
+                            html += "</center></body></html>";
+                            final String finalHtml = html;
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        lblTeileigentumQuerverweise.setVisible(true);
+                                        edtQuer.setVisible(true);
+                                        scpQuer.setVisible(true);
+                                        edtQuer.setText(finalHtml);
+                                        edtQuer.setCaretPosition(0);
+                                    }
+                                });
+                        } else {
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        edtQuer.setText("");
+                                        lblTeileigentumQuerverweise.setVisible(false);
+                                        edtQuer.setVisible(false);
+                                        scpQuer.setVisible(false);
+                                    }
+                                });
                         }
-                        html+="</center></body></html>";
-                        final String finalHtml=html;
-                        EventQueue.invokeLater(new Runnable() {
-                            public void run() {
-                                lblTeileigentumQuerverweise.setVisible(true);
-                                edtQuer.setVisible(true);
-                                scpQuer.setVisible(true);
-                                edtQuer.setText(finalHtml);
-                                edtQuer.setCaretPosition(0);
-                                
-                            }
-                        });
-                        
-                    } else {
-                        EventQueue.invokeLater(new Runnable() {
-                            public void run() {
-                                edtQuer.setText("");
-                                lblTeileigentumQuerverweise.setVisible(false);
-                                edtQuer.setVisible(false);
-                                scpQuer.setVisible(false);
-                            }
-                        });
                     }
-                }
-            };
+                };
             t.setPriority(Thread.NORM_PRIORITY);
             t.start();
-            
-            
         } else {
             bpanFlDetails.setBackgroundEnabled(false);
         }
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     public void clearDetails() {
         bpanFlDetails.setBackgroundEnabled(false);
-        
-        //leeres Document das keine �nderungen annimmt selbst wenn die Textfelder mal
+
+        // leeres Document das keine �nderungen annimmt selbst wenn die Textfelder mal
         // nicht disabled sind
-        PlainDocument empty=new PlainDocument() {
-            public void insertString(int offset,String string, AttributeSet attributes) throws BadLocationException {
-                
-            }
-        };
-        
-        DefaultComboBoxModel comboEmpty=new DefaultComboBoxModel();
-        UIManager.put( "ComboBox.disabledForeground", defaultDisabledForeground );
+        final PlainDocument empty = new PlainDocument() {
+
+                @Override
+                public void insertString(final int offset, final String string, final AttributeSet attributes)
+                        throws BadLocationException {
+                }
+            };
+
+        final DefaultComboBoxModel comboEmpty = new DefaultComboBoxModel();
+        UIManager.put("ComboBox.disabledForeground", defaultDisabledForeground);
         txtBezeichnung.setDocument(empty);
-        
+
         txtBemerkung.setDocument(empty);
         txtAnteil.setDocument(empty);
         txtErfassungsdatum.setDocument(empty);
@@ -214,12 +289,11 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         txtSperreBemerkung.setDocument(empty);
         chkSperre.setModel(new DefaultButtonModel());
         chkSperre.setEnabled(cboAnschlussgrad.isEnabled());
-        
+
         cboAnschlussgrad.setModel(comboEmpty);
         cboFlaechenart.setModel(comboEmpty);
         cboBeschreibung.setModel(comboEmpty);
-        
-        
+
         txtFEB_ID.setDocument(empty);
         cboAnschlussgrad.repaint();
         cboFlaechenart.repaint();
@@ -234,11 +308,11 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         lblTeileigentumQuerverweise.setVisible(false);
         edtQuer.setVisible(false);
         scpQuer.setVisible(false);
-        
-        
+
 //        revalidate();
     }
-    public void setEnabled(boolean b) {
+    @Override
+    public void setEnabled(final boolean b) {
         txtAnteil.setEditable(b);
         txtBemerkung.setEditable(b);
         txtBezeichnung.setEditable(b);
@@ -251,7 +325,7 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         cboAnschlussgrad.setEnabled(b);
         cboFlaechenart.setEnabled(b);
         cboBeschreibung.setEnabled(b);
-        //Opacity
+        // Opacity
         txtAnteil.setOpaque(b);
         txtBemerkung.setOpaque(b);
         txtBezeichnung.setOpaque(b);
@@ -261,11 +335,11 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         txtGroesseKorrektur.setOpaque(b);
         txtVeranlagungsdatum.setOpaque(b);
         chkSperre.setOpaque(b);
-        
+
         cboAnschlussgrad.setOpaque(b);
         cboFlaechenart.setOpaque(b);
         cboBeschreibung.setOpaque(b);
-        
+
         this.scpBemerkung.setOpaque(b);
         scpBemerkung.getViewport().setOpaque(b);
         if (b) {
@@ -280,10 +354,9 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
 //        });
         repaint();
     }
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -390,10 +463,12 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
 
         txtGroesseGrafik.setOpaque(false);
         txtGroesseGrafik.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtGroesseGrafikActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    txtGroesseGrafikActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -599,7 +674,8 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
         panFlDetails.add(lblBeschreibung, gridBagConstraints);
 
-        cboBeschreibung.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cboBeschreibung.setModel(new javax.swing.DefaultComboBoxModel(
+                new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -613,50 +689,14 @@ public class FlaechenDetailPanel extends javax.swing.JPanel implements Hyperlink
         tbpDetails.addTab("Details", bpanFlDetails);
 
         add(tbpDetails, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
-    
-    private void txtGroesseGrafikActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGroesseGrafikActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtGroesseGrafikActionPerformed
-    
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanFlDetails;
-    private javax.swing.JComboBox cboAnschlussgrad;
-    private javax.swing.JComboBox cboBeschreibung;
-    private javax.swing.JComboBox cboFlaechenart;
-    private javax.swing.JCheckBox chkSperre;
-    private javax.swing.JEditorPane edtQuer;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JLabel lblAnschlussgrad;
-    private javax.swing.JLabel lblAnteil;
-    private javax.swing.JLabel lblBemerkung;
-    private javax.swing.JLabel lblBeschreibung;
-    private javax.swing.JLabel lblBezeichnung;
-    private javax.swing.JLabel lblErfassungsadtum;
-    private javax.swing.JLabel lblFEB_ID;
-    private javax.swing.JLabel lblFlaechenart;
-    private javax.swing.JLabel lblGroesseGrafik;
-    private javax.swing.JLabel lblGroesseKorrektur;
-    private javax.swing.JLabel lblSperre;
-    private javax.swing.JLabel lblTeileigentumQuerverweise;
-    private javax.swing.JLabel lblVeranlagungsdatum;
-    private javax.swing.JPanel panFlDetails;
-    private javax.swing.JScrollPane scpBemerkung;
-    private javax.swing.JScrollPane scpQuer;
-    private javax.swing.JTabbedPane tbpDetails;
-    private javax.swing.JTextField txtAnteil;
-    private javax.swing.JTextArea txtBemerkung;
-    private javax.swing.JTextField txtBezeichnung;
-    private javax.swing.JTextField txtErfassungsdatum;
-    private javax.swing.JTextField txtFEB_ID;
-    private javax.swing.JTextField txtGroesseGrafik;
-    private javax.swing.JTextField txtGroesseKorrektur;
-    private javax.swing.JTextField txtSperreBemerkung;
-    private javax.swing.JTextField txtVeranlagungsdatum;
-    // End of variables declaration//GEN-END:variables
-    
-}
+    } // </editor-fold>//GEN-END:initComponents
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtGroesseGrafikActionPerformed
+        // TODO add your handling code here:
+    } //GEN-LAST:event_txtGroesseGrafikActionPerformed
+}

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * FlaechenUebersichtsTabellenPanel.java
  *
@@ -7,9 +14,49 @@ package de.cismet.verdis.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolox.event.PNotification;
+import edu.umd.cs.piccolox.event.PNotificationCenter;
+import edu.umd.cs.piccolox.event.PSelectionEventHandler;
+
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.SortOrder;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import java.sql.Connection;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Vector;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.DefaultFeatureCollection;
-import de.cismet.cismap.commons.features.DefaultFeatureServiceFeature;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.FeatureCollectionListener;
@@ -31,147 +78,201 @@ import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 import de.cismet.cismap.commons.retrieval.RetrievalService;
+
 import de.cismet.gui.tools.TableSorter;
-import de.cismet.tools.StaticDecimalTools;
-import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.tools.CurrentStackTrace;
 import de.cismet.tools.NumberStringComparator;
+import de.cismet.tools.StaticDecimalTools;
+
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
+
 import de.cismet.verdis.data.Flaeche;
+
 import de.cismet.verdis.interfaces.FlaechenAuswahlChangedListener;
 import de.cismet.verdis.interfaces.KassenzeichenChangedListener;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolox.event.PNotification;
-import edu.umd.cs.piccolox.event.PNotificationCenter;
-import edu.umd.cs.piccolox.event.PSelectionEventHandler;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.util.Observable;
-import java.util.Vector;
-import java.beans.PropertyChangeListener;
-import java.sql.Connection;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Observer;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.SortOrder;
 
 /**
- * @author  hell
+ * DOCUMENT ME!
+ *
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
-public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel implements KassenzeichenChangedListener, ListSelectionListener, PropertyChangeListener, FeatureCollectionListener, RetrievalListener, Observer {
+public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel implements KassenzeichenChangedListener,
+    ListSelectionListener,
+    PropertyChangeListener,
+    FeatureCollectionListener,
+    RetrievalListener,
+    Observer {
+
+    //~ Instance fields --------------------------------------------------------
+
+    ImageIcon[] waiting = new ImageIcon[32];
+    int waitingCounter = 0;
+    javax.swing.Timer animationTimer = null;
+    // former synchronized
+    // RetrievalListener nur zum Setzten der ProgressB\u00E4llchen
+    HashSet activeRetrievalServices = new HashSet();
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Connection connection;
     private FlaechenUebersichtsTableModel tableModel;
     private Vector auswahlChangedListeners = new Vector();
     private CismapPreferences cismapPrefs;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cmdALB;
+    private javax.swing.JButton cmdAdd;
+    private javax.swing.JButton cmdAddHandle;
+    private javax.swing.JButton cmdAttachPolyToAlphadata;
+    private javax.swing.JButton cmdBack;
+    private javax.swing.JButton cmdForeground;
+    private javax.swing.JButton cmdForward;
+    private javax.swing.JButton cmdFullPoly;
+    private javax.swing.JButton cmdFullPoly1;
+    private javax.swing.JButton cmdJoinPoly;
+    private javax.swing.JButton cmdMoveHandle;
+    private javax.swing.JButton cmdMovePolygon;
+    private javax.swing.JButton cmdNewPoint;
+    private javax.swing.JButton cmdNewPolygon;
+    private javax.swing.JButton cmdPan;
+    private javax.swing.JButton cmdRaisePolygon;
+    private javax.swing.JButton cmdRedo;
+    private javax.swing.JButton cmdRemoveHandle;
+    private javax.swing.JButton cmdRemovePolygon;
+    private javax.swing.JButton cmdRotatePolygon;
+    private javax.swing.JButton cmdSelect;
+    private javax.swing.JButton cmdSnap;
+    private javax.swing.JButton cmdSplitPoly;
+    private javax.swing.JButton cmdUndo;
+    private javax.swing.JButton cmdWmsBackground;
+    private javax.swing.JButton cmdZoom;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator5;
+    private org.jdesktop.swingx.JXTable jxtOverview;
+    private javax.swing.JLabel lblCoord;
+    private javax.swing.JLabel lblInfo;
+    private javax.swing.JLabel lblMeasurement;
+    private javax.swing.JLabel lblScale;
+    private javax.swing.JLabel lblWaiting;
+    private de.cismet.cismap.commons.gui.MappingComponent mappingComp;
+    private javax.swing.JPanel panMap;
+    private javax.swing.JPanel panStatus;
+    private javax.swing.JPopupMenu pomScale;
+    private javax.swing.JSeparator sep2;
+    private javax.swing.JSeparator sep3;
+    private javax.swing.JSeparator sep4;
+    private javax.swing.JTabbedPane tbpMain;
+    private javax.swing.JToolBar tobVerdis;
+    // End of variables declaration//GEN-END:variables
 
-    /** Creates new form FlaechenUebersichtsTabellenPanel */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form FlaechenUebersichtsTabellenPanel.
+     */
     public FlaechenUebersichtsTabellenPanel() {
         initComponents();
-        //featureCollectionAndListModel=new FeatureCollectionAndListModel();
-//        mappingComp.setFeatureCollection(featureCollectionAndListModel);
-//        tblOverview.setSelectionModel(featureCollectionAndListModel);
+        // featureCollectionAndListModel=new FeatureCollectionAndListModel();
+// mappingComp.setFeatureCollection(featureCollectionAndListModel);
+// tblOverview.setSelectionModel(featureCollectionAndListModel);
 
         mappingComp.addPropertyChangeListener(this);
         mappingComp.getFeatureCollection().addFeatureCollectionListener(this);
-        //mappingComp.putInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA, new AttachFeatureListener());
+        // mappingComp.putInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA, new AttachFeatureListener());
 
         mappingComp.setBackgroundEnabled(true);
 
         cmdSelect.setSelected(true);
 
-
 //        CreateGeometryListener g=new CreateGeometryListener(mappingComp,JLabel.class) {
-//           
-//            
+//
+//
 //        };
-        //mappingComp.addInputListener("TIM_EASY_CREATOR",)
+        // mappingComp.addInputListener("TIM_EASY_CREATOR",)
 
-
-
-        //TIM Easy
+        // TIM Easy
         cmdNewPoint.setVisible(true);
 
-
-
-        ((JHistoryButton) cmdForward).setDirection(JHistoryButton.DIRECTION_FORWARD);
-        ((JHistoryButton) cmdBack).setDirection(JHistoryButton.DIRECTION_BACKWARD);
-        ((JHistoryButton) cmdForward).setHistoryModel(mappingComp);
-        ((JHistoryButton) cmdBack).setHistoryModel(mappingComp);
+        ((JHistoryButton)cmdForward).setDirection(JHistoryButton.DIRECTION_FORWARD);
+        ((JHistoryButton)cmdBack).setDirection(JHistoryButton.DIRECTION_BACKWARD);
+        ((JHistoryButton)cmdForward).setHistoryModel(mappingComp);
+        ((JHistoryButton)cmdBack).setHistoryModel(mappingComp);
 
         cmdWmsBackground.setSelected(mappingComp.isBackgroundEnabled());
 
-        PNotificationCenter.defaultCenter().addListener(this,
-                "coordinatesChanged",
-                SimpleMoveListener.COORDINATES_CHANGED,
-                mappingComp.getInputListener(MappingComponent.MOTION));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "coordinatesChanged",
+                    SimpleMoveListener.COORDINATES_CHANGED,
+                    mappingComp.getInputListener(MappingComponent.MOTION));
 
-        PNotificationCenter.defaultCenter().addListener(this,
-                "selectionChanged",
-                PSelectionEventHandler.SELECTION_CHANGED_NOTIFICATION,
-                mappingComp.getInputListener(MappingComponent.SELECT));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "selectionChanged",
-                FeatureMoveListener.SELECTION_CHANGED_NOTIFICATION,
-                mappingComp.getInputListener(MappingComponent.MOVE_POLYGON));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "selectionChanged",
-                SplitPolygonListener.SELECTION_CHANGED,
-                mappingComp.getInputListener(MappingComponent.SPLIT_POLYGON));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "featureDeleteRequested",
-                DeleteFeatureListener.FEATURE_DELETE_REQUEST_NOTIFICATION,
-                mappingComp.getInputListener(MappingComponent.REMOVE_POLYGON));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "attachFeatureRequested",
-                AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
-                mappingComp.getInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "splitPolygon",
-                SplitPolygonListener.SPLIT_FINISHED,
-                mappingComp.getInputListener(MappingComponent.SPLIT_POLYGON));
-        PNotificationCenter.defaultCenter().addListener(this,
-                "joinPolygons",
-                JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
-                mappingComp.getInputListener(MappingComponent.JOIN_POLYGONS));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "selectionChanged",
+                    PSelectionEventHandler.SELECTION_CHANGED_NOTIFICATION,
+                    mappingComp.getInputListener(MappingComponent.SELECT));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "selectionChanged",
+                    FeatureMoveListener.SELECTION_CHANGED_NOTIFICATION,
+                    mappingComp.getInputListener(MappingComponent.MOVE_POLYGON));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "selectionChanged",
+                    SplitPolygonListener.SELECTION_CHANGED,
+                    mappingComp.getInputListener(MappingComponent.SPLIT_POLYGON));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "featureDeleteRequested",
+                    DeleteFeatureListener.FEATURE_DELETE_REQUEST_NOTIFICATION,
+                    mappingComp.getInputListener(MappingComponent.REMOVE_POLYGON));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "attachFeatureRequested",
+                    AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
+                    mappingComp.getInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "splitPolygon",
+                    SplitPolygonListener.SPLIT_FINISHED,
+                    mappingComp.getInputListener(MappingComponent.SPLIT_POLYGON));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    this,
+                    "joinPolygons",
+                    JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
+                    mappingComp.getInputListener(MappingComponent.JOIN_POLYGONS));
 
         tableModel = new FlaechenUebersichtsTableModel(connection, jxtOverview, mappingComp);
 
         jxtOverview.setModel(tableModel);
 //        jxtOverview.setDefaultRenderer(Object.class,tableModel);
 
-        HighlightPredicate errorPredicate = new HighlightPredicate() {
+        final HighlightPredicate errorPredicate = new HighlightPredicate() {
 
-            public boolean isHighlighted(Component renderer, ComponentAdapter componentAdapter) {
-                int displayedIndex = componentAdapter.row;
-                int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
-                return f != null && !f.isValid();
-            }
-        };
-        Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
+                    return (f != null) && !f.isValid();
+                }
+            };
 
+        final Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
 
 //        Highlighter errorHighlighter = new ConditionalHighlighter(Color.RED, Color.WHITE, 0, -1) {
 ////            public java.awt.Component highlight(java.awt.Component renderer, ComponentAdapter adapter) {
@@ -187,18 +288,18 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //            }
 //        };
 
+        final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
-        HighlightPredicate changedPredicate = new HighlightPredicate() {
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
+                    return (f != null) && !f.equals(f.getBackup());
+                }
+            };
 
-            public boolean isHighlighted(Component renderer, ComponentAdapter componentAdapter) {
-                int displayedIndex = componentAdapter.row;
-                int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
-                return f != null && !f.equals(f.getBackup());
-            }
-        };
-
-        Highlighter changedHighlighter = new ColorHighlighter(errorPredicate, null, Color.RED);
+        final Highlighter changedHighlighter = new ColorHighlighter(errorPredicate, null, Color.RED);
 
 //        Highlighter changedHighlighter = new ConditionalHighlighter(null, Color.RED, 0, -1) {
 //
@@ -210,18 +311,18 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //            }
 //        };
 
+        final HighlightPredicate noGeometryPredicate = new HighlightPredicate() {
 
-        HighlightPredicate noGeometryPredicate = new HighlightPredicate() {
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
+                    return (f != null) && (f.getGeometry() == null);
+                }
+            };
 
-            public boolean isHighlighted(Component renderer, ComponentAdapter componentAdapter) {
-                int displayedIndex = componentAdapter.row;
-                int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
-                return f != null && f.getGeometry() == null;
-            }
-        };
-
-        Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
+        final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
 //        Highlighter noGeometryHighlighter = new ConditionalHighlighter(Color.lightGray, null, 0, -1) {
 //
@@ -261,13 +362,17 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         initWaitingIcon();
         setWaiting(false);
 
-        mappingComp.getCamera().addPropertyChangeListener(mappingComp.getCamera().PROPERTY_VIEW_TRANSFORM, new PropertyChangeListener() {
+        mappingComp.getCamera()
+                .addPropertyChangeListener(
+                    mappingComp.getCamera().PROPERTY_VIEW_TRANSFORM,
+                    new PropertyChangeListener() {
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                int sd = (int) (mappingComp.getScaleDenominator() + 0.5);
-                lblScale.setText("1:" + sd);
-            }
-        });
+                        @Override
+                        public void propertyChange(final PropertyChangeEvent evt) {
+                            final int sd = (int)(mappingComp.getScaleDenominator() + 0.5);
+                            lblScale.setText("1:" + sd);
+                        }
+                    });
 
         addScalePopupMenu("1:500", 500);
         addScalePopupMenu("1:7500", 750);
@@ -278,55 +383,74 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         addScalePopupMenu("1:5000", 5000);
         addScalePopupMenu("1:7500", 7500);
         addScalePopupMenu("1:10000", 10000);
-
-        log.debug("Fl\u00E4chen\u00DCbersichtsTabellenPanel als Observer anmelden");
-        ((Observable) mappingComp.getMemUndo()).addObserver(FlaechenUebersichtsTabellenPanel.this);
-        ((Observable) mappingComp.getMemRedo()).addObserver(FlaechenUebersichtsTabellenPanel.this);
-
+        if (log.isDebugEnabled()) {
+            log.debug("Fl\u00E4chen\u00DCbersichtsTabellenPanel als Observer anmelden");
+        }
+        ((Observable)mappingComp.getMemUndo()).addObserver(FlaechenUebersichtsTabellenPanel.this);
+        ((Observable)mappingComp.getMemRedo()).addObserver(FlaechenUebersichtsTabellenPanel.this);
 
         if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
-            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
+            ((DefaultFeatureCollection)mappingComp.getFeatureCollection()).setSingleSelection(true);
         }
-        //tbpMain.remove(0); //PPT ;-)
+        // tbpMain.remove(0); //PPT ;-)
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public MappingComponent getMappingComponent() {
         return mappingComp;
     }
 
-    public void coordinatesChanged(PNotification notification) {
-        Object o = notification.getObject();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void coordinatesChanged(final PNotification notification) {
+        final Object o = notification.getObject();
         if (o instanceof SimpleMoveListener) {
-            double x = ((SimpleMoveListener) o).getXCoord();
-            double y = ((SimpleMoveListener) o).getYCoord();
-            double scale = ((SimpleMoveListener) o).getCurrentOGCScale();
+            final double x = ((SimpleMoveListener)o).getXCoord();
+            final double y = ((SimpleMoveListener)o).getYCoord();
+            final double scale = ((SimpleMoveListener)o).getCurrentOGCScale();
 
-            //double test= mappingComp.getWtst().getSourceX(36)-this.mappingComp.getWtst().getSourceX(0))/mappingComp.getCamera().getViewScale();
-            //scale +" ... "+
-            lblCoord.setText(MappingComponent.getCoordinateString(x, y));//+ "... " +test);
-            PFeature pf = ((SimpleMoveListener) o).getUnderlyingPFeature();
+            // double test=
+            // mappingComp.getWtst().getSourceX(36)-this.mappingComp.getWtst().getSourceX(0))/mappingComp.getCamera().getViewScale();
+            // scale +" ... "+
+            lblCoord.setText(MappingComponent.getCoordinateString(x, y)); // + "... " +test);
+            final PFeature pf = ((SimpleMoveListener)o).getUnderlyingPFeature();
 
-            if (pf != null && pf.getFeature() instanceof PostgisFeature && pf.getVisible() == true && pf.getParent() != null && pf.getParent().getVisible() == true) {
-                lblInfo.setText(((PostgisFeature) pf.getFeature()).getObjectName());
-            } else if (pf != null && pf.getFeature() instanceof Flaeche) {
-                String name = "Kassenzeichen: " + ((Flaeche) pf.getFeature()).getKassenzeichen() + "::" + ((Flaeche) pf.getFeature()).getBezeichnung();
+            if ((pf != null) && (pf.getFeature() instanceof PostgisFeature) && (pf.getVisible() == true)
+                        && (pf.getParent() != null)
+                        && (pf.getParent().getVisible() == true)) {
+                lblInfo.setText(((PostgisFeature)pf.getFeature()).getObjectName());
+            } else if ((pf != null) && (pf.getFeature() instanceof Flaeche)) {
+                final String name = "Kassenzeichen: " + ((Flaeche)pf.getFeature()).getKassenzeichen() + "::"
+                            + ((Flaeche)pf.getFeature()).getBezeichnung();
                 lblInfo.setText(name);
             } else {
                 lblInfo.setText("");
             }
         }
     }
-
-    //Karte
-    //Wird vom Notifier per Reflection aufgerufen
-    //abgelost von featurecollectionlistenermethoiden ganz unten in dieser klasse
-    public void selectionChanged(PNotification notfication) {
-        Object o = notfication.getObject();
-        if (o instanceof SelectionListener || o instanceof FeatureMoveListener || o instanceof SplitPolygonListener) {
-            PNode p = null;
+    /**
+     * Karte Wird vom Notifier per Reflection aufgerufen abgelost von featurecollectionlistenermethoiden ganz unten in
+     * dieser klasse.
+     *
+     * @param  notfication  DOCUMENT ME!
+     */
+    public void selectionChanged(final PNotification notfication) {
+        final Object o = notfication.getObject();
+        if ((o instanceof SelectionListener) || (o instanceof FeatureMoveListener)
+                    || (o instanceof SplitPolygonListener)) {
+            final PNode p = null;
             PFeature pf = null;
             if (o instanceof SelectionListener) {
-                pf = ((SelectionListener) o).getSelectedPFeature();
+                pf = ((SelectionListener)o).getSelectedPFeature();
 //
 //                if (pf!=null && pf.getFeature() instanceof Flaeche|| pf.getFeature() instanceof PureNewFeature) {
 //                    if (((DefaultFeatureCollection)mappingComp.getFeatureCollection()).isSelected(pf.getFeature())) {
@@ -343,18 +467,19 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //                        tblOverview.getSelectionModel().removeSelectionInterval(index,index);
 //                    }
 //                } else
-                if (((SelectionListener) o).getClickCount() > 1 && pf.getFeature() instanceof PostgisFeature) {
-                    log.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener) o).getClickCount());
-                    PostgisFeature postgisFeature = ((PostgisFeature) pf.getFeature());
+                if ((((SelectionListener)o).getClickCount() > 1) && (pf.getFeature() instanceof PostgisFeature)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener)o).getClickCount());
+                    }
+                    final PostgisFeature postgisFeature = ((PostgisFeature)pf.getFeature());
                     try {
-                        if (pf.getVisible() == true && pf.getParent().getVisible() == true && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
-                            Main.THIS.getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey());//TODO
+                        if ((pf.getVisible() == true) && (pf.getParent().getVisible() == true)
+                                    && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
+                            Main.THIS.getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey()); // TODO
                         }
                     } catch (Exception e) {
                         log.info("Fehler beim gotoKassenzeichen", e);
                     }
-
-
                 }
 //            } else if (o instanceof SplitPolygonListener) {
 //                //Muss nix besonderes gemacht werden, weil schon selectPFeatureManually im Listener aufgerufen wird
@@ -362,68 +487,92 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void featureDeleteRequested(PNotification notfication) {
-        Object o = notfication.getObject();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notfication  DOCUMENT ME!
+     */
+    public void featureDeleteRequested(final PNotification notfication) {
+        final Object o = notfication.getObject();
         if (o instanceof DeleteFeatureListener) {
-            DeleteFeatureListener dfl = (DeleteFeatureListener) o;
-            PFeature pf = dfl.getFeatureRequestedForDeletion();
+            final DeleteFeatureListener dfl = (DeleteFeatureListener)o;
+            final PFeature pf = dfl.getFeatureRequestedForDeletion();
             if (pf.getFeature() instanceof Flaeche) {
-                Flaeche f = (Flaeche) (pf.getFeature());
+                final Flaeche f = (Flaeche)(pf.getFeature());
                 f.setRemovedGeometryId(f.getGeom_id());
                 f.setGeometryRemoved(true);
                 f.setGeom_id(-1);
                 f.setGeometry(null);
-                //mappingComp.getFeatureLayer().removeChild(pf);
-                //    mappingComp.getFeatureCollection().removeFeature(f); // wurde schon im Listener erledigt
-                //log.debug("Bezeichnung der zu l\u00F6schenden Fl\u00E4che"+f.getBezeichnung());
+                // mappingComp.getFeatureLayer().removeChild(pf); mappingComp.getFeatureCollection().removeFeature(f);
+                // // wurde schon im Listener erledigt log.debug("Bezeichnung der zu l\u00F6schenden
+                // Fl\u00E4che"+f.getBezeichnung());
             }
         }
     }
 
-    public void attachFeatureRequested(PNotification notification) {
-        Object o = notification.getObject();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void attachFeatureRequested(final PNotification notification) {
+        final Object o = notification.getObject();
         if (o instanceof AttachFeatureListener) {
-            AttachFeatureListener afl = (AttachFeatureListener) o;
-            PFeature pf = afl.getFeatureToAttach();
+            final AttachFeatureListener afl = (AttachFeatureListener)o;
+            final PFeature pf = afl.getFeatureToAttach();
             if (pf.getFeature() instanceof PureNewFeature) {
-                if (tableModel.getSelectedFlaeche().getGeom_id() < 0 && tableModel.getSelectedFlaeche().getGeometry() == null && tableModel.getSelectedFlaeche().isMarkedForDeletion()) {
-                    JOptionPane.showMessageDialog(mappingComp, "Dieser Fl\u00E4che kann im Moment keine Geometrie zugewiesen werden. Bitte zuerst speichern.");
-                } else if (tableModel.getSelectedFlaeche().getGeom_id() < 0 && tableModel.getSelectedFlaeche().getGeometry() == null && !tableModel.getSelectedFlaeche().isMarkedForDeletion()) {
-                    Geometry g = pf.getFeature().getGeometry();
+                if ((tableModel.getSelectedFlaeche().getGeom_id() < 0)
+                            && (tableModel.getSelectedFlaeche().getGeometry() == null)
+                            && tableModel.getSelectedFlaeche().isMarkedForDeletion()) {
+                    JOptionPane.showMessageDialog(
+                        mappingComp,
+                        "Dieser Fl\u00E4che kann im Moment keine Geometrie zugewiesen werden. Bitte zuerst speichern.");
+                } else if ((tableModel.getSelectedFlaeche().getGeom_id() < 0)
+                            && (tableModel.getSelectedFlaeche().getGeometry() == null)
+                            && !tableModel.getSelectedFlaeche().isMarkedForDeletion()) {
+                    final Geometry g = pf.getFeature().getGeometry();
                     mappingComp.getFeatureCollection().removeFeature(pf.getFeature());
                     tableModel.getSelectedFlaeche().setGeometry(g);
                     tableModel.getSelectedFlaeche().setGeometryRemoved(false);
                     mappingComp.getFeatureCollection().addFeature(tableModel.getSelectedFlaeche());
-                    tableModel.getSelectedFlaeche().setGr_grafik(new Integer((int) (tableModel.getSelectedFlaeche().getGeometry().getArea())));
+                    tableModel.getSelectedFlaeche()
+                            .setGr_grafik(new Integer((int)(tableModel.getSelectedFlaeche().getGeometry().getArea())));
                     tableModel.getSelectedFlaeche().setGr_korrektur(tableModel.getSelectedFlaeche().getGr_grafik());
                     tableModel.getSelectedFlaeche().sync();
-                    //Details synchronisieren
+                    // Details synchronisieren
                     fireAuswahlChanged(tableModel.getSelectedFlaeche());
-
-
                 } else {
-                    //Vorhandene Fl\u00E4che wird ausgetauscht
-                    //Hier kommt man niemals rein
+                    // Vorhandene Fl\u00E4che wird ausgetauscht
+                    // Hier kommt man niemals rein
                 }
             } else if (pf.getFeature() instanceof Flaeche) {
-                JOptionPane.showMessageDialog(mappingComp, "Es k\u00F6nnen nur nicht bereits zugeordnete Fl\u00E4chen zugeordnet werden.");
+                JOptionPane.showMessageDialog(
+                    mappingComp,
+                    "Es k\u00F6nnen nur nicht bereits zugeordnete Fl\u00E4chen zugeordnet werden.");
             }
         }
     }
 
-    public void splitPolygon(PNotification notification) {
-        Object o = notification.getObject();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void splitPolygon(final PNotification notification) {
+        final Object o = notification.getObject();
         if (o instanceof SplitPolygonListener) {
-            SplitPolygonListener l = (SplitPolygonListener) o;
-            PFeature pf = l.getFeatureClickedOn();
+            final SplitPolygonListener l = (SplitPolygonListener)o;
+            final PFeature pf = l.getFeatureClickedOn();
             if (pf.isSplittable()) {
-                log.debug("Split");
-                if (pf.getFeature() instanceof Flaeche) {
-                    ((Flaeche) pf.getFeature()).setGeometryRemoved(true);
-                    ((Flaeche) pf.getFeature()).setGeometry(null);
-                    ((Flaeche) pf.getFeature()).setGeom_id(-1);
+                if (log.isDebugEnabled()) {
+                    log.debug("Split");
                 }
-                Feature[] f_arr = pf.split();
+                if (pf.getFeature() instanceof Flaeche) {
+                    ((Flaeche)pf.getFeature()).setGeometryRemoved(true);
+                    ((Flaeche)pf.getFeature()).setGeometry(null);
+                    ((Flaeche)pf.getFeature()).setGeom_id(-1);
+                }
+                final Feature[] f_arr = pf.split();
 
                 mappingComp.getFeatureCollection().removeFeature(pf.getFeature());
                 f_arr[0].setEditable(true);
@@ -435,60 +584,88 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void joinPolygons(PNotification notification) {
-        PFeature one, two;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void joinPolygons(final PNotification notification) {
+        PFeature one;
+        PFeature two;
         one = mappingComp.getSelectedNode();
         two = null;
-        log.debug("");
-        Object o = notification.getObject();
+        if (log.isDebugEnabled()) {
+            log.debug("");
+        }
+        final Object o = notification.getObject();
 
         if (o instanceof JoinPolygonsListener) {
-            JoinPolygonsListener listener = ((JoinPolygonsListener) o);
-            PFeature joinCandidate = listener.getFeatureRequestedForJoin();
-            if (joinCandidate.getFeature() instanceof Flaeche || joinCandidate.getFeature() instanceof PureNewFeature) {
-                int CTRL_MASK = 2; //TODO: HIer noch eine korrekte Konstante verwenden
+            final JoinPolygonsListener listener = ((JoinPolygonsListener)o);
+            final PFeature joinCandidate = listener.getFeatureRequestedForJoin();
+            if ((joinCandidate.getFeature() instanceof Flaeche)
+                        || (joinCandidate.getFeature() instanceof PureNewFeature)) {
+                final int CTRL_MASK = 2; // TODO: HIer noch eine korrekte Konstante verwenden
                 if ((listener.getModifier() & CTRL_MASK) != 0) {
-
-                    if (one != null && joinCandidate != one) {
-                        if (one.getFeature() instanceof PureNewFeature && joinCandidate.getFeature() instanceof Flaeche) {
+                    if ((one != null) && (joinCandidate != one)) {
+                        if ((one.getFeature() instanceof PureNewFeature)
+                                    && (joinCandidate.getFeature() instanceof Flaeche)) {
                             two = one;
 
                             one = joinCandidate;
                             one.setSelected(true);
                             two.setSelected(false);
                             mappingComp.getFeatureCollection().select(one.getFeature());
-                            //tableModel.setSelectedFlaeche((Flaeche)one.getFeature());
-                            fireAuswahlChanged((Flaeche) one.getFeature());
+                            // tableModel.setSelectedFlaeche((Flaeche)one.getFeature());
+                            fireAuswahlChanged((Flaeche)one.getFeature());
                         } else {
                             two = joinCandidate;
                         }
                         try {
-
-                            Geometry backup = one.getFeature().getGeometry();
-                            Geometry newGeom = one.getFeature().getGeometry().union(two.getFeature().getGeometry());
+                            final Geometry backup = one.getFeature().getGeometry();
+                            final Geometry newGeom = one.getFeature()
+                                        .getGeometry()
+                                        .union(two.getFeature().getGeometry());
                             if (newGeom.getGeometryType().equalsIgnoreCase("Multipolygon")) {
-                                JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this), "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.", "Zusammenfassung nicht m\u00F6glich", JOptionPane.WARNING_MESSAGE, null);
+                                JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                    "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.",
+                                    "Zusammenfassung nicht m\u00F6glich",
+                                    JOptionPane.WARNING_MESSAGE,
+                                    null);
                                 return;
                             }
-                            if (newGeom.getGeometryType().equalsIgnoreCase("Polygon") && ((Polygon) newGeom).getNumInteriorRing() > 0) {
-                                JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this), "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.", "Zusammenfassung nicht m\u00F6glich", JOptionPane.WARNING_MESSAGE, null);
+                            if (newGeom.getGeometryType().equalsIgnoreCase("Polygon")
+                                        && (((Polygon)newGeom).getNumInteriorRing() > 0)) {
+                                JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                    "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.",
+                                    "Zusammenfassung nicht m\u00F6glich",
+                                    JOptionPane.WARNING_MESSAGE,
+                                    null);
                                 return;
                             }
-                            if (one != null && two != null && one.getFeature() instanceof Flaeche && two.getFeature() instanceof Flaeche) {
-                                Flaeche fOne = (Flaeche) one.getFeature();
-                                Flaeche fTwo = (Flaeche) two.getFeature();
-                                if (fOne.getArt() != fTwo.getArt() || fOne.getGrad() != fTwo.getGrad()) {
-                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this), "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.", "Zusammenfassung nicht m\u00F6glich", JOptionPane.WARNING_MESSAGE, null);
+                            if ((one != null) && (two != null) && (one.getFeature() instanceof Flaeche)
+                                        && (two.getFeature() instanceof Flaeche)) {
+                                final Flaeche fOne = (Flaeche)one.getFeature();
+                                final Flaeche fTwo = (Flaeche)two.getFeature();
+                                if ((fOne.getArt() != fTwo.getArt()) || (fOne.getGrad() != fTwo.getGrad())) {
+                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                        "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.",
+                                        "Zusammenfassung nicht m\u00F6glich",
+                                        JOptionPane.WARNING_MESSAGE,
+                                        null);
                                     return;
                                 }
-                                //Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
-                                if (fOne.getAnteil() != null || fTwo.getAnteil() != null) {
-                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this), "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.", "Zusammenfassung nicht m\u00F6glich", JOptionPane.WARNING_MESSAGE, null);
+                                // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
+                                if ((fOne.getAnteil() != null) || (fTwo.getAnteil() != null)) {
+                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                        "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.",
+                                        "Zusammenfassung nicht m\u00F6glich",
+                                        JOptionPane.WARNING_MESSAGE,
+                                        null);
                                     return;
                                 }
                                 tableModel.removeFlaeche(fTwo);
-                                fOne.setGr_grafik(new Integer((int) (newGeom.getArea())));
-                                if (fOne.getBemerkung() != null && fOne.getBemerkung().trim().length() > 0) {
+                                fOne.setGr_grafik(new Integer((int)(newGeom.getArea())));
+                                if ((fOne.getBemerkung() != null) && (fOne.getBemerkung().trim().length() > 0)) {
                                     fOne.setBemerkung(fOne.getBemerkung() + "\n");
                                 }
                                 fOne.setBemerkung(fTwo.getJoinBackupString());
@@ -497,49 +674,54 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
                                     fOne.setBem_sperre("JOIN::" + fTwo.getBem_sperre());
                                 }
                                 fOne.sync();
-                                //tableModel.fireSelectionChanged(); TODO
+                                // tableModel.fireSelectionChanged(); TODO
                                 fireAuswahlChanged(fOne);
                             }
                             if (one.getFeature() instanceof Flaeche) {
-                                //Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
-                                ((Flaeche) (one.getFeature())).setGr_grafik(new Integer((int) (newGeom.getArea())));
-                                ((Flaeche) (one.getFeature())).sync();
-                                //tableModel.fireSelectionChanged(); TODO
-                                fireAuswahlChanged((Flaeche) (one.getFeature()));
+                                // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
+                                ((Flaeche)(one.getFeature())).setGr_grafik(new Integer((int)(newGeom.getArea())));
+                                ((Flaeche)(one.getFeature())).sync();
+                                // tableModel.fireSelectionChanged(); TODO
+                                fireAuswahlChanged((Flaeche)(one.getFeature()));
                             }
-
-                            log.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
+                            if (log.isDebugEnabled()) {
+                                log.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
+                            }
                             one.getFeature().setGeometry(newGeom);
                             if (!(one.getFeature().getGeometry().equals(backup))) {
                                 two.removeFromParent();
                                 two = null;
                             }
                             one.visualize();
-
                         } catch (Exception e) {
                             log.error("one: " + one + "\n two: " + two, e);
                         }
                         return;
                     }
                 } else {
-                    PFeature pf = joinCandidate;
+                    final PFeature pf = joinCandidate;
                     if (one != null) {
                         one.setSelected(false);
                     }
                     one = pf;
                     mappingComp.selectPFeatureManually(one);
                     if (one.getFeature() instanceof Flaeche) {
-                        Flaeche f = (Flaeche) one.getFeature();
+                        final Flaeche f = (Flaeche)one.getFeature();
                         mappingComp.getFeatureCollection().select(f);
-                        //tableModel.setSelectedFlaeche(f);
+                        // tableModel.setSelectedFlaeche(f);
                         fireAuswahlChanged(f);
                         try {
-                            makeRowVisible(this.jxtOverview, jxtOverview.getFilters().convertRowIndexToView(tableModel.getIndexOfFlaeche((Flaeche) f)));
+                            makeRowVisible(
+                                this.jxtOverview,
+                                jxtOverview.getFilters().convertRowIndexToView(
+                                    tableModel.getIndexOfFlaeche((Flaeche)f)));
                         } catch (Exception e) {
-                            log.debug("Fehler beim Scrollen der Tabelle", e);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Fehler beim Scrollen der Tabelle", e);
+                            }
                         }
                     } else {
-                        //tableModel.setSelectedFlaeche(null);
+                        // tableModel.setSelectedFlaeche(null);
                         mappingComp.getFeatureCollection().unselectAll();
                         fireAuswahlChanged(null);
                     }
@@ -548,19 +730,33 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    private void makeRowVisible(JTable table, int row) {
-        Rectangle cellRect = table.getCellRect(row, 0, true);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  table  DOCUMENT ME!
+     * @param  row    DOCUMENT ME!
+     */
+    private void makeRowVisible(final JTable table, final int row) {
+        final Rectangle cellRect = table.getCellRect(row, 0, true);
         if (cellRect != null) {
             table.scrollRectToVisible(cellRect);
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public FlaechenUebersichtsTableModel getModel() {
         return this.tableModel;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void undoSelectedFlaeche() {
-        de.cismet.verdis.data.Flaeche f = tableModel.getSelectedFlaeche();
+        final de.cismet.verdis.data.Flaeche f = tableModel.getSelectedFlaeche();
         if (f != null) {
             f.setToBackupFlaeche();
             f.sync();
@@ -570,30 +766,43 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void setConnection(Connection c) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  c  DOCUMENT ME!
+     */
+    public void setConnection(final Connection c) {
         connection = c;
         tableModel.setConnection(connection);
     }
 
-    public void kassenzeichenChanged(String kz) {
+    @Override
+    public void kassenzeichenChanged(final String kz) {
         kassenzeichenChanged(kz, null);
     }
 
-    public void kassenzeichenChanged(String kz, javax.swing.Timer t) {
-        //this.sfViewer=new SimpleFeatureViewer();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kz  DOCUMENT ME!
+     * @param  t   DOCUMENT ME!
+     */
+    public void kassenzeichenChanged(final String kz, final javax.swing.Timer t) {
+        // this.sfViewer=new SimpleFeatureViewer();
         tableModel.kassenzeichenChanged(kz, t);
     }
 
-    //vom ListSelectionModel
+    // vom ListSelectionModel
+    @Override
     public void valueChanged(final ListSelectionEvent ev) {
-        //das war drin: (ev==null||ev.getValueIsAdjusting())&& ::warum ?
-        if (jxtOverview.getSelectedRow() != -1 && jxtOverview.getSelectedRowCount() == 1) {
+        // das war drin: (ev==null||ev.getValueIsAdjusting())&& ::warum ?
+        if ((jxtOverview.getSelectedRow() != -1) && (jxtOverview.getSelectedRowCount() == 1)) {
 //            EventQueue.invokeLater(new Runnable() {
 //                public void run() {
             try {
-                int displayedIndex = jxtOverview.getSelectedRow();
-                int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
+                final int displayedIndex = jxtOverview.getSelectedRow();
+                final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                final Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
 
                 fireAuswahlChanged(f);
                 if (!mappingComp.getFeatureCollection().isSelected(f)) {
@@ -607,15 +816,15 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         } else if (jxtOverview.getSelectedRowCount() > 1) {
 //            EventQueue.invokeLater(new Runnable() {
 //                public void run() {
-            //l\u00F6sche den kram in details
+            // l\u00F6sche den kram in details
             fireAuswahlChanged(null);
-            //aktualisiere die Karte
-            Vector v = new Vector();
-            int[] rows = jxtOverview.getSelectedRows();
+            // aktualisiere die Karte
+            final Vector v = new Vector();
+            final int[] rows = jxtOverview.getSelectedRows();
             for (int i = 0; i < rows.length; ++i) {
-                int displayedIndex = rows[i];
-                int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
+                final int displayedIndex = rows[i];
+                final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                final Flaeche f = getTableModel().getFlaechebyIndex(modelIndex);
                 if (!mappingComp.getFeatureCollection().isSelected(f)) {
                     v.add(f);
                 }
@@ -625,15 +834,12 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             }
 //                }
 //            });
-
         }
-
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -692,17 +898,23 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 
         jButton1.setText("Refresh");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         setLayout(new java.awt.BorderLayout());
 
         panMap.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2), javax.swing.BorderFactory.createEtchedBorder()), javax.swing.BorderFactory.createEmptyBorder(4, 4, 1, 4)));
+        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2),
+                    javax.swing.BorderFactory.createEtchedBorder()),
+                javax.swing.BorderFactory.createEmptyBorder(4, 4, 1, 4)));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         mappingComp.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -712,17 +924,21 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         panStatus.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 1, 1, 1));
         panStatus.setLayout(new java.awt.GridBagLayout());
 
-        cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
+        cmdAdd.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
         cmdAdd.setBorderPainted(false);
         cmdAdd.setFocusPainted(false);
         cmdAdd.setMinimumSize(new java.awt.Dimension(25, 25));
         cmdAdd.setPreferredSize(new java.awt.Dimension(25, 25));
-        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
+        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 0;
@@ -765,10 +981,12 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         lblScale.setComponentPopupMenu(pomScale);
         lblScale.setText("1:???");
         lblScale.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblScaleMousePressed(evt);
-            }
-        });
+
+                @Override
+                public void mousePressed(final java.awt.event.MouseEvent evt) {
+                    lblScaleMousePressed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -792,31 +1010,39 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         tobVerdis.setFloatable(false);
         tobVerdis.setRollover(true);
 
-        cmdFullPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
+        cmdFullPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
         cmdFullPoly.setToolTipText("Zeige alle Flächen");
         cmdFullPoly.setFocusPainted(false);
         cmdFullPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdFullPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdFullPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdFullPoly);
 
-        cmdFullPoly1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"))); // NOI18N
+        cmdFullPoly1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"))); // NOI18N
         cmdFullPoly1.setToolTipText("Zoom zur ausgewählten Fläche");
         cmdFullPoly1.setFocusPainted(false);
         cmdFullPoly1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdFullPoly1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdFullPoly1ActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdFullPoly1);
 
-        cmdBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
+        cmdBack.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
         cmdBack.setToolTipText("Zurück");
         tobVerdis.add(cmdBack);
 
-        cmdForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fwd.png"))); // NOI18N
+        cmdForward.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fwd.png"))); // NOI18N
         cmdForward.setToolTipText("Vor");
         tobVerdis.add(cmdForward);
 
@@ -824,279 +1050,380 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         jSeparator5.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator5);
 
-        cmdWmsBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png"))); // NOI18N
+        cmdWmsBackground.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png")));    // NOI18N
         cmdWmsBackground.setToolTipText("Hintergrund an/aus");
         cmdWmsBackground.setFocusPainted(false);
-        cmdWmsBackground.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
-        cmdWmsBackground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
+        cmdWmsBackground.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
+        cmdWmsBackground.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
         cmdWmsBackground.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdWmsBackgroundActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdWmsBackgroundActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdWmsBackground);
 
-        cmdForeground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png"))); // NOI18N
+        cmdForeground.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png")));    // NOI18N
         cmdForeground.setToolTipText("Vordergrund an/aus");
         cmdForeground.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
         cmdForeground.setFocusable(false);
         cmdForeground.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdForeground.setSelected(true);
-        cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
+        cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         cmdForeground.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdForeground.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdForegroundActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdForegroundActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdForeground);
 
-        cmdSnap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png"))); // NOI18N
+        cmdSnap.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png")));          // NOI18N
         cmdSnap.setToolTipText("Snapping an/aus");
         cmdSnap.setFocusPainted(false);
-        cmdSnap.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
+        cmdSnap.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
         cmdSnap.setSelected(true);
-        cmdSnap.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
+        cmdSnap.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
         cmdSnap.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSnapActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSnapActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSnap);
 
         sep2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         sep2.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep2);
 
-        cmdZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom.png"))); // NOI18N
+        cmdZoom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom.png")));          // NOI18N
         cmdZoom.setToolTipText("Zoomen");
         cmdZoom.setFocusPainted(false);
-        cmdZoom.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
-        cmdZoom.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
+        cmdZoom.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
+        cmdZoom.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
         cmdZoom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdZoomActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdZoomActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdZoom);
 
-        cmdPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2.png"))); // NOI18N
+        cmdPan.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2.png")));          // NOI18N
         cmdPan.setToolTipText("Verschieben");
         cmdPan.setFocusPainted(false);
-        cmdPan.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
-        cmdPan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
+        cmdPan.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
+        cmdPan.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
         cmdPan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdPanActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdPanActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdPan);
 
-        cmdSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png"))); // NOI18N
+        cmdSelect.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png")));          // NOI18N
         cmdSelect.setToolTipText("Auswählen");
         cmdSelect.setFocusPainted(false);
-        cmdSelect.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
+        cmdSelect.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
         cmdSelect.setSelected(true);
-        cmdSelect.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
+        cmdSelect.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
         cmdSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSelectActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSelectActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSelect);
 
-        cmdALB.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png"))); // NOI18N
+        cmdALB.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png")));          // NOI18N
         cmdALB.setToolTipText("ALB");
         cmdALB.setFocusPainted(false);
         cmdALB.setFocusable(false);
         cmdALB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdALB.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
-        cmdALB.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
+        cmdALB.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
+        cmdALB.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
         cmdALB.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdALB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdALBActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdALBActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdALB);
 
-        cmdMovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png"))); // NOI18N
+        cmdMovePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png")));          // NOI18N
         cmdMovePolygon.setToolTipText("Polygon verschieben");
         cmdMovePolygon.setFocusPainted(false);
-        cmdMovePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
-        cmdMovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
+        cmdMovePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
+        cmdMovePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
         cmdMovePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdMovePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdMovePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdMovePolygon);
 
-        cmdNewPolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png"))); // NOI18N
+        cmdNewPolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png")));          // NOI18N
         cmdNewPolygon.setToolTipText("neues Polygon");
         cmdNewPolygon.setFocusPainted(false);
-        cmdNewPolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
-        cmdNewPolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
+        cmdNewPolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
+        cmdNewPolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
         cmdNewPolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewPolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewPolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewPolygon);
 
-        cmdNewPoint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint.png"))); // NOI18N
+        cmdNewPoint.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint.png")));          // NOI18N
         cmdNewPoint.setToolTipText("neuer Punkt");
         cmdNewPoint.setFocusPainted(false);
-        cmdNewPoint.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
-        cmdNewPoint.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
+        cmdNewPoint.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
+        cmdNewPoint.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
         cmdNewPoint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewPointActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewPointActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewPoint);
 
-        cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
+        cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png")));          // NOI18N
         cmdRaisePolygon.setToolTipText("Polygon hochholen");
         cmdRaisePolygon.setFocusPainted(false);
-        cmdRaisePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
-        cmdRaisePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
+        cmdRaisePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
+        cmdRaisePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
         cmdRaisePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRaisePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRaisePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRaisePolygon);
 
-        cmdRemovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png"))); // NOI18N
+        cmdRemovePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png")));          // NOI18N
         cmdRemovePolygon.setToolTipText("Polygon entfernen");
         cmdRemovePolygon.setFocusPainted(false);
-        cmdRemovePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
-        cmdRemovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
+        cmdRemovePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
+        cmdRemovePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
         cmdRemovePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRemovePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRemovePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRemovePolygon);
 
-        cmdAttachPolyToAlphadata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment.png"))); // NOI18N
+        cmdAttachPolyToAlphadata.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment.png")));          // NOI18N
         cmdAttachPolyToAlphadata.setToolTipText("Polygon zuordnen");
         cmdAttachPolyToAlphadata.setFocusPainted(false);
-        cmdAttachPolyToAlphadata.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
-        cmdAttachPolyToAlphadata.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
+        cmdAttachPolyToAlphadata.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
+        cmdAttachPolyToAlphadata.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
         cmdAttachPolyToAlphadata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAttachPolyToAlphadataActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAttachPolyToAlphadataActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdAttachPolyToAlphadata);
 
-        cmdJoinPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly.png"))); // NOI18N
+        cmdJoinPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly.png")));          // NOI18N
         cmdJoinPoly.setToolTipText("Polygone zusammenfassen");
         cmdJoinPoly.setFocusPainted(false);
-        cmdJoinPoly.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
-        cmdJoinPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
+        cmdJoinPoly.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
+        cmdJoinPoly.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
         cmdJoinPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdJoinPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdJoinPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdJoinPoly);
 
-        cmdSplitPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png"))); // NOI18N
+        cmdSplitPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png")));          // NOI18N
         cmdSplitPoly.setToolTipText("Polygon splitten");
         cmdSplitPoly.setFocusPainted(false);
-        cmdSplitPoly.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
-        cmdSplitPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
+        cmdSplitPoly.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
+        cmdSplitPoly.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
         cmdSplitPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSplitPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSplitPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSplitPoly);
 
         sep3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         sep3.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep3);
 
-        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png"))); // NOI18N
+        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png")));          // NOI18N
         cmdMoveHandle.setToolTipText("Handle verschieben");
         cmdMoveHandle.setFocusPainted(false);
-        cmdMoveHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
+        cmdMoveHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
         cmdMoveHandle.setSelected(true);
-        cmdMoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
+        cmdMoveHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
         cmdMoveHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdMoveHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdMoveHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdMoveHandle);
 
-        cmdAddHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle.png"))); // NOI18N
+        cmdAddHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle.png")));          // NOI18N
         cmdAddHandle.setToolTipText("Handle hinzufügen");
         cmdAddHandle.setFocusPainted(false);
-        cmdAddHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
-        cmdAddHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
+        cmdAddHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
+        cmdAddHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
         cmdAddHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdAddHandle);
 
-        cmdRemoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle.png"))); // NOI18N
+        cmdRemoveHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle.png")));          // NOI18N
         cmdRemoveHandle.setToolTipText("Handle entfernen");
         cmdRemoveHandle.setFocusPainted(false);
-        cmdRemoveHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
-        cmdRemoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
+        cmdRemoveHandle.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
+        cmdRemoveHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
         cmdRemoveHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRemoveHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRemoveHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRemoveHandle);
 
-        cmdRotatePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png"))); // NOI18N
+        cmdRotatePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png")));          // NOI18N
         cmdRotatePolygon.setToolTipText("Rotiere Polygon");
         cmdRotatePolygon.setFocusPainted(false);
-        cmdRotatePolygon.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png"))); // NOI18N
-        cmdRotatePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
-        cmdRotatePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
+        cmdRotatePolygon.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png")));          // NOI18N
+        cmdRotatePolygon.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
+        cmdRotatePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
         cmdRotatePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRotatePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRotatePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRotatePolygon);
 
         sep4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         sep4.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep4);
 
-        cmdUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
+        cmdUndo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
         cmdUndo.setToolTipText("Undo");
         cmdUndo.setEnabled(false);
         cmdUndo.setFocusPainted(false);
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdUndoActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdUndoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdUndo);
 
-        cmdRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
+        cmdRedo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
         cmdRedo.setToolTipText("Redo");
         cmdRedo.setEnabled(false);
         cmdRedo.setFocusable(false);
         cmdRedo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdRedo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRedo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRedoActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRedoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRedo);
 
         panMap.add(tobVerdis, java.awt.BorderLayout.NORTH);
@@ -1111,8 +1438,13 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         tbpMain.addTab("Tabelle", jScrollPane1);
 
         add(tbpMain, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
-    private void cmdNewPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPointActionPerformed
+    } // </editor-fold>//GEN-END:initComponents
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdNewPointActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPointActionPerformed
         removeMainGroupSelection();
 //        boolean snapEnab = cismapPrefs.getGlobalPrefs().isSnappingEnabled();
 //        boolean snapVizEnab = cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
@@ -1120,70 +1452,118 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
         cmdNewPoint.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(CreateGeometryListener.POINT);
-    }//GEN-LAST:event_cmdNewPointActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.POINT);
+    } //GEN-LAST:event_cmdNewPointActionPerformed
 
-    private void lblScaleMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblScaleMousePressed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void lblScaleMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblScaleMousePressed
         if (evt.isPopupTrigger()) {
             pomScale.setVisible(true);
         }
-    }//GEN-LAST:event_lblScaleMousePressed
+    }                                                                        //GEN-LAST:event_lblScaleMousePressed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         mappingComp.refresh();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
-    private void cmdRaisePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRaisePolygonActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRaisePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRaisePolygonActionPerformed
         removeMainGroupSelection();
         cmdRaisePolygon.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.RAISE_POLYGON);
+    }                                                                                   //GEN-LAST:event_cmdRaisePolygonActionPerformed
 
-    }//GEN-LAST:event_cmdRaisePolygonActionPerformed
-
-    private void cmdSnapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSnapActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSnapActionPerformed
         cmdSnap.setSelected(!cmdSnap.isSelected());
 //        cismapPrefs.getGlobalPrefs().setSnappingEnabled(cmdSnap.isSelected());
 //        cismapPrefs.getGlobalPrefs().setSnappingPreviewEnabled(cmdSnap.isSelected());
         mappingComp.setSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
+    } //GEN-LAST:event_cmdSnapActionPerformed
 
-    }//GEN-LAST:event_cmdSnapActionPerformed
-
-    private void cmdJoinPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdJoinPolyActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdJoinPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdJoinPolyActionPerformed
         removeMainGroupSelection();
         cmdJoinPoly.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.JOIN_POLYGONS);
-    }//GEN-LAST:event_cmdJoinPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdJoinPolyActionPerformed
 
-    private void cmdAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         try {
             mappingComp.showInternalLayerWidget(!mappingComp.isInternalLayerWidgetVisible(), 500);
         } catch (Throwable t) {
             log.error("Fehler beim Anzeigen des Layersteuerelements", t);
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
 
-    private void cmdSplitPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSplitPolyActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSplitPolyActionPerformed
         removeMainGroupSelection();
         cmdSplitPoly.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
-    }//GEN-LAST:event_cmdSplitPolyActionPerformed
+    }                                                                                //GEN-LAST:event_cmdSplitPolyActionPerformed
 
-    private void cmdAttachPolyToAlphadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
         removeMainGroupSelection();
         cmdAttachPolyToAlphadata.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
-    }//GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
+    }                                                                                            //GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
 
-    private void cmdRemovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemovePolygonActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRemovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemovePolygonActionPerformed
         removeMainGroupSelection();
         cmdRemovePolygon.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.REMOVE_POLYGON);
+    }                                                                                    //GEN-LAST:event_cmdRemovePolygonActionPerformed
 
-    }//GEN-LAST:event_cmdRemovePolygonActionPerformed
-
-    private void cmdNewPolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPolygonActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdNewPolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPolygonActionPerformed
         removeMainGroupSelection();
 //        boolean snapEnab = cismapPrefs.getGlobalPrefs().isSnappingEnabled();
 //        boolean snapVizEnab = cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
@@ -1191,37 +1571,66 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
         cmdNewPolygon.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(CreateGeometryListener.POLYGON);
-    }//GEN-LAST:event_cmdNewPolygonActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.POLYGON);
+    } //GEN-LAST:event_cmdNewPolygonActionPerformed
 
-    private void cmdMovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMovePolygonActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdMovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMovePolygonActionPerformed
         removeMainGroupSelection();
         cmdMovePolygon.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.MOVE_POLYGON);
-    }//GEN-LAST:event_cmdMovePolygonActionPerformed
+    }                                                                                  //GEN-LAST:event_cmdMovePolygonActionPerformed
 
-    private void cmdRemoveHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveHandleActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveHandleActionPerformed
         removeHandleGroupSelection();
         cmdRemoveHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.REMOVE_HANDLE);
-    }//GEN-LAST:event_cmdRemoveHandleActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdRemoveHandleActionPerformed
 
-    private void cmdAddHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddHandleActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddHandleActionPerformed
         removeHandleGroupSelection();
         cmdAddHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
-    }//GEN-LAST:event_cmdAddHandleActionPerformed
+    }                                                                                //GEN-LAST:event_cmdAddHandleActionPerformed
 
-    private void cmdMoveHandleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMoveHandleActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMoveHandleActionPerformed
         removeHandleGroupSelection();
         cmdMoveHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.MOVE_HANDLE);
-    }//GEN-LAST:event_cmdMoveHandleActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdMoveHandleActionPerformed
 
-    private void cmdFullPoly1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPoly1ActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPoly1ActionPerformed
         mappingComp.zoomToSelectedNode();
-    }//GEN-LAST:event_cmdFullPoly1ActionPerformed
+    }                                                                                //GEN-LAST:event_cmdFullPoly1ActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     */
     private void removeMainGroupSelection() {
         cmdSelect.setSelected(false);
         cmdPan.setSelected(false);
@@ -1240,6 +1649,9 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     private void removeHandleGroupSelection() {
         cmdRemoveHandle.setSelected(false);
         cmdAddHandle.setSelected(false);
@@ -1247,13 +1659,23 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         cmdRotatePolygon.setSelected(false);
     }
 
-    private void cmdRotatePolygonActionPerformed(java.awt.event.ActionEvent evt) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) {
         removeHandleGroupSelection();
         cmdRotatePolygon.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.ROTATE_POLYGON);
     }
 
-    private void cmdWmsBackgroundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWmsBackgroundActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdWmsBackgroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWmsBackgroundActionPerformed
         if (mappingComp.isBackgroundEnabled()) {
             mappingComp.setBackgroundEnabled(false);
             cmdWmsBackground.setSelected(false);
@@ -1262,72 +1684,117 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             cmdWmsBackground.setSelected(true);
             mappingComp.queryServices();
         }
+    }                                                                                    //GEN-LAST:event_cmdWmsBackgroundActionPerformed
 
-    }//GEN-LAST:event_cmdWmsBackgroundActionPerformed
-
-    private void cmdSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSelectActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSelectActionPerformed
         removeMainGroupSelection();
         cmdSelect.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.SELECT);
         cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSelectActionPerformed
+    }                                                                             //GEN-LAST:event_cmdSelectActionPerformed
 
-    private void cmdPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPanActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdPanActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPanActionPerformed
         removeMainGroupSelection();
         cmdPan.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.PAN);
+    }                                                                          //GEN-LAST:event_cmdPanActionPerformed
 
-
-    }//GEN-LAST:event_cmdPanActionPerformed
-
-    private void cmdZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdZoomActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdZoomActionPerformed
         removeMainGroupSelection();
         cmdZoom.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.ZOOM);
-    }//GEN-LAST:event_cmdZoomActionPerformed
+    }                                                                           //GEN-LAST:event_cmdZoomActionPerformed
 
-    private void cmdFullPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPolyActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdFullPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPolyActionPerformed
         mappingComp.zoomToFullFeatureCollectionBounds();
-    }//GEN-LAST:event_cmdFullPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdFullPolyActionPerformed
 
-    private void cmdRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRedoActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRedoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRedoActionPerformed
         log.info("REDO");
-        CustomAction a = mappingComp.getMemRedo().getLastAction();
-        log.debug("... Aktion ausf\u00FChren: " + a.info());
+        final CustomAction a = mappingComp.getMemRedo().getLastAction();
+        if (log.isDebugEnabled()) {
+            log.debug("... Aktion ausf\u00FChren: " + a.info());
+        }
         try {
             a.doAction();
         } catch (Exception e) {
             log.error("Error beim Ausf\u00FChren der Aktion", e);
         }
-        CustomAction inverse = a.getInverse();
+        final CustomAction inverse = a.getInverse();
         mappingComp.getMemUndo().addAction(inverse);
-        log.debug("... neue Aktion auf UNDO-Stack: " + inverse);
-        log.debug("... fertig");
-    }//GEN-LAST:event_cmdRedoActionPerformed
+        if (log.isDebugEnabled()) {
+            log.debug("... neue Aktion auf UNDO-Stack: " + inverse);
+            log.debug("... fertig");
+        }
+    }                                                                           //GEN-LAST:event_cmdRedoActionPerformed
 
-    private void cmdUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
         log.info("UNDO");
-        CustomAction a = mappingComp.getMemUndo().getLastAction();
-        log.debug("... Aktion ausf\u00FChren: " + a.info());
+        final CustomAction a = mappingComp.getMemUndo().getLastAction();
+        if (log.isDebugEnabled()) {
+            log.debug("... Aktion ausf\u00FChren: " + a.info());
+        }
         try {
             a.doAction();
         } catch (Exception e) {
             log.error("Error beim Ausf\u00FChren der Aktion", e);
         }
-        CustomAction inverse = a.getInverse();
+        final CustomAction inverse = a.getInverse();
         mappingComp.getMemRedo().addAction(inverse);
-        log.debug("... neue Aktion auf REDO-Stack: " + inverse);
-        log.debug("... fertig");
-    }//GEN-LAST:event_cmdUndoActionPerformed
+        if (log.isDebugEnabled()) {
+            log.debug("... neue Aktion auf REDO-Stack: " + inverse);
+            log.debug("... fertig");
+        }
+    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
 
-    private void cmdALBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdALBActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdALBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdALBActionPerformed
         log.info("ALB");
         removeMainGroupSelection();
         cmdALB.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
-}//GEN-LAST:event_cmdALBActionPerformed
+    }                                                                          //GEN-LAST:event_cmdALBActionPerformed
 
-    private void cmdForegroundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdForegroundActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdForegroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdForegroundActionPerformed
         if (mappingComp.isFeatureCollectionVisible()) {
             mappingComp.setFeatureCollectionVisibility(false);
             cmdForeground.setSelected(false);
@@ -1335,74 +1802,38 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             mappingComp.setFeatureCollectionVisibility(true);
             cmdForeground.setSelected(true);
         }
-}//GEN-LAST:event_cmdForegroundActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdForegroundActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     */
     public void removeSelectedFlaeche() {
-        Feature f = tableModel.getSelectedFlaeche();
+        final Feature f = tableModel.getSelectedFlaeche();
         tableModel.removeSelectedFlaeche();
         mappingComp.getFeatureCollection().removeFeature(f);
-        //mappingComp.selectPFeatureManually(null);
+        // mappingComp.selectPFeatureManually(null);
     }
 
-    public void removeFlaeche(Flaeche f) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  f  DOCUMENT ME!
+     */
+    public void removeFlaeche(final Flaeche f) {
         tableModel.removeFlaeche(f);
         mappingComp.getFeatureCollection().removeFeature(f);
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cmdALB;
-    private javax.swing.JButton cmdAdd;
-    private javax.swing.JButton cmdAddHandle;
-    private javax.swing.JButton cmdAttachPolyToAlphadata;
-    private javax.swing.JButton cmdBack;
-    private javax.swing.JButton cmdForeground;
-    private javax.swing.JButton cmdForward;
-    private javax.swing.JButton cmdFullPoly;
-    private javax.swing.JButton cmdFullPoly1;
-    private javax.swing.JButton cmdJoinPoly;
-    private javax.swing.JButton cmdMoveHandle;
-    private javax.swing.JButton cmdMovePolygon;
-    private javax.swing.JButton cmdNewPoint;
-    private javax.swing.JButton cmdNewPolygon;
-    private javax.swing.JButton cmdPan;
-    private javax.swing.JButton cmdRaisePolygon;
-    private javax.swing.JButton cmdRedo;
-    private javax.swing.JButton cmdRemoveHandle;
-    private javax.swing.JButton cmdRemovePolygon;
-    private javax.swing.JButton cmdRotatePolygon;
-    private javax.swing.JButton cmdSelect;
-    private javax.swing.JButton cmdSnap;
-    private javax.swing.JButton cmdSplitPoly;
-    private javax.swing.JButton cmdUndo;
-    private javax.swing.JButton cmdWmsBackground;
-    private javax.swing.JButton cmdZoom;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator5;
-    private org.jdesktop.swingx.JXTable jxtOverview;
-    private javax.swing.JLabel lblCoord;
-    private javax.swing.JLabel lblInfo;
-    private javax.swing.JLabel lblMeasurement;
-    private javax.swing.JLabel lblScale;
-    private javax.swing.JLabel lblWaiting;
-    private de.cismet.cismap.commons.gui.MappingComponent mappingComp;
-    private javax.swing.JPanel panMap;
-    private javax.swing.JPanel panStatus;
-    private javax.swing.JPopupMenu pomScale;
-    private javax.swing.JSeparator sep2;
-    private javax.swing.JSeparator sep3;
-    private javax.swing.JSeparator sep4;
-    private javax.swing.JTabbedPane tbpMain;
-    private javax.swing.JToolBar tobVerdis;
-    // End of variables declaration//GEN-END:variables
 
+    /**
+     * DOCUMENT ME!
+     */
     public void changeSelectedButtonAccordingToInteractionMode() {
         removeMainGroupSelection();
-        String im = mappingComp.getInteractionMode();
-        log.debug("changeSelectedButtonAccordingToInteractionMode: " + mappingComp.getInteractionMode(), new CurrentStackTrace());
+        final String im = mappingComp.getInteractionMode();
+        if (log.isDebugEnabled()) {
+            log.debug("changeSelectedButtonAccordingToInteractionMode: " + mappingComp.getInteractionMode(),
+                new CurrentStackTrace());
+        }
         if (im.equals(MappingComponent.ZOOM)) {
             cmdZoom.setSelected(true);
         }
@@ -1413,9 +1844,11 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         } else if (im.equals(MappingComponent.SELECT)) {
             cmdSelect.setSelected(true);
         } else if (im.equals(MappingComponent.NEW_POLYGON)) {
-            if (((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(CreateGeometryListener.POINT)) {
+            if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(
+                            CreateGeometryListener.POINT)) {
                 cmdNewPoint.setSelected(true);
-            } else if (((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(CreateGeometryListener.POLYGON)) {
+            } else if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode()
+                        .equals(CreateGeometryListener.POLYGON)) {
                 cmdNewPolygon.setSelected(true);
             } else {
                 cmdSelect.setSelected(true);
@@ -1424,7 +1857,6 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
             cmdSelect.setSelected(true);
         }
 
-
         if (mappingComp.isSnappingEnabled()) {
             cmdSnap.setSelected(true);
         } else {
@@ -1432,20 +1864,34 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void addAuswahlChangedListener(FlaechenAuswahlChangedListener l) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  l  DOCUMENT ME!
+     */
+    public void addAuswahlChangedListener(final FlaechenAuswahlChangedListener l) {
         auswahlChangedListeners.add(l);
-
     }
 
-    public void removeAuswahlChangedListener(FlaechenAuswahlChangedListener l) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  l  DOCUMENT ME!
+     */
+    public void removeAuswahlChangedListener(final FlaechenAuswahlChangedListener l) {
         auswahlChangedListeners.remove(l);
     }
 
-    protected void fireAuswahlChanged(de.cismet.verdis.data.Flaeche f) {
-        java.util.Iterator it = auswahlChangedListeners.iterator();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  f  DOCUMENT ME!
+     */
+    protected void fireAuswahlChanged(final de.cismet.verdis.data.Flaeche f) {
+        final java.util.Iterator it = auswahlChangedListeners.iterator();
         while (it.hasNext()) {
             try {
-                FlaechenAuswahlChangedListener fac = (FlaechenAuswahlChangedListener) it.next();
+                final FlaechenAuswahlChangedListener fac = (FlaechenAuswahlChangedListener)it.next();
                 fac.flaechenAuswahlChanged(f);
             } catch (java.lang.ClassCastException cce) {
                 log.error("FlaechenAuswahlChangedListener nicht vom richtigen Typ.", cce);
@@ -1462,8 +1908,9 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        }
 //    }
 
-    public void setEnabled(boolean b) {
-        //In dieser Methode wird eigentlich vom ReadOnly Mode in den RW Mode geschaltet und umgekehrt
+    @Override
+    public void setEnabled(final boolean b) {
+        // In dieser Methode wird eigentlich vom ReadOnly Mode in den RW Mode geschaltet und umgekehrt
         this.mappingComp.setReadOnly(!b);
 //        boolean snapEnab = b & cismapPrefs.getGlobalPrefs().isSnappingEnabled();
 //        boolean snapVizEnab = b & cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
@@ -1471,7 +1918,7 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
 
         this.cmdMovePolygon.setVisible(b);
-        //this.cmdNewPolygon.setVisible(b);
+        // this.cmdNewPolygon.setVisible(b);
         this.cmdRemovePolygon.setVisible(b);
         this.cmdAttachPolyToAlphadata.setVisible(b);
         this.cmdJoinPoly.setVisible(b);
@@ -1488,38 +1935,45 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         if (!b && !this.cmdZoom.isSelected() && !this.cmdSelect.isSelected() && !cmdPan.isSelected()) {
             cmdSelectActionPerformed(null);
         }
-
-
     }
 
-    public void addNewFlaeche(int art, JComponent parent) {
-        PFeature sole = mappingComp.getSolePureNewFeature();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  art     DOCUMENT ME!
+     * @param  parent  DOCUMENT ME!
+     */
+    public void addNewFlaeche(final int art, final JComponent parent) {
+        final PFeature sole = mappingComp.getSolePureNewFeature();
         Flaeche f = null;
         if (sole == null) {
             f = getModel().addNewFlaeche(art);
         } else {
-            int answer = JOptionPane.showConfirmDialog(parent, "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Fl\u00E4che zugeordnet werden?", "Geometrie verwenden?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            final int answer = JOptionPane.showConfirmDialog(
+                    parent,
+                    "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Fl\u00E4che zugeordnet werden?",
+                    "Geometrie verwenden?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
             f = getModel().addNewFlaeche(art);
             if (answer == JOptionPane.YES_OPTION) {
 //                tableModel.getSelectedFlaeche().setGeometry(sole.getFeature().getGeometry());
 //                sole.setFeature(tableModel.getSelectedFlaeche());
 //                sole.syncGeometry();
 
-                Geometry g = sole.getFeature().getGeometry();
+                final Geometry g = sole.getFeature().getGeometry();
                 mappingComp.getFeatureCollection().removeFeature(sole.getFeature());
                 f.setGeometry(g);
                 f.setEditable(true);
                 f.setGeometryRemoved(false);
                 mappingComp.getFeatureCollection().addFeature(f);
-                f.setGr_grafik(new Integer((int) (f.getGeometry().getArea())));
+                f.setGr_grafik(new Integer((int)(f.getGeometry().getArea())));
                 f.setGr_korrektur(f.getGr_grafik());
                 f.sync();
 
-                //Details synchronisieren
+                // Details synchronisieren
                 mappingComp.getFeatureCollection().select(f);
                 fireAuswahlChanged(f);
-
-
 
 //
 //                mappingComp.refreshHM(sole);
@@ -1531,46 +1985,56 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void setCismapPreferences(CismapPreferences p) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  p  DOCUMENT ME!
+     */
+    public void setCismapPreferences(final CismapPreferences p) {
         cismapPrefs = p;
 //        new Thread() {
 //            public void run() {
         mappingComp.setPreferences(cismapPrefs);
-        //mappingComp.setFeatureCollection(tableModel); DOUBLECHECK
-//        String sMode = cismapPrefs.getGlobalPrefs().getStartMode();
-//        if (sMode.equals(mappingComp.ZOOM)) {
-//            cmdZoomActionPerformed(null);
-//        } else if (sMode.equals(mappingComp.PAN)) {
-//            cmdPanActionPerformed(null);
-//        } else if (sMode.equals(mappingComp.SELECT)) {
-//            cmdSelectActionPerformed(null);
-//        }
-//        mappingComp.gotoInitialBoundingBox();
+        // mappingComp.setFeatureCollection(tableModel); DOUBLECHECK
+// String sMode = cismapPrefs.getGlobalPrefs().getStartMode();
+// if (sMode.equals(mappingComp.ZOOM)) {
+// cmdZoomActionPerformed(null);
+// } else if (sMode.equals(mappingComp.PAN)) {
+// cmdPanActionPerformed(null);
+// } else if (sMode.equals(mappingComp.SELECT)) {
+// cmdSelectActionPerformed(null);
+// }
+// mappingComp.gotoInitialBoundingBox();
         Collection c = mappingComp.getMappingModel().getFeatureServices().values();
-        for (Object featureService : c) {
-            ((RetrievalService) featureService).addRetrievalListener(FlaechenUebersichtsTabellenPanel.this);
+        for (final Object featureService : c) {
+            ((RetrievalService)featureService).addRetrievalListener(FlaechenUebersichtsTabellenPanel.this);
         }
         c = mappingComp.getMappingModel().getRasterServices().values();
-        for (Object rasterService : c) {
-            ((RetrievalService) rasterService).addRetrievalListener(FlaechenUebersichtsTabellenPanel.this);
+        for (final Object rasterService : c) {
+            ((RetrievalService)rasterService).addRetrievalListener(FlaechenUebersichtsTabellenPanel.this);
         }
 //            }
 //        }.start();
-
-
     }
-    ImageIcon[] waiting = new ImageIcon[32];
-    int waitingCounter = 0;
 
+    /**
+     * DOCUMENT ME!
+     */
     private void initWaitingIcon() {
         for (int i = 0; i < 32; ++i) {
-            waiting[i] = new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/wait/wait" + i + ".png"));
+            waiting[i] = new javax.swing.ImageIcon(getClass().getResource(
+                        "/de/cismet/verdis/res/images/statusbar/wait/wait"
+                                + i
+                                + ".png"));
         }
     }
-    javax.swing.Timer animationTimer = null;
-    //former synchronized
 
-    private void setWaiting(boolean wait) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  wait  DOCUMENT ME!
+     */
+    private void setWaiting(final boolean wait) {
         lblWaiting.setVisible(wait);
 //        if (wait&&animationTimer==null) {
 //            java.awt.event.ActionListener iconAnimator = new java.awt.event.ActionListener() {
@@ -1597,10 +2061,11 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 
     /**
      * This method gets called when a bound property is changed.
-     * @param evt A PropertyChangeEvent object describing the event source
-     *   	and the property that has changed.
+     *
+     * @param  evt  A PropertyChangeEvent object describing the event source and the property that has changed.
      */
-    public void propertyChange(java.beans.PropertyChangeEvent evt) {
+    @Override
+    public void propertyChange(final java.beans.PropertyChangeEvent evt) {
 //        if (evt.getPropertyName().equalsIgnoreCase("activityChanged")) {
 //            if (mappingComp.isRunning()) {
 //                setWaiting(true);
@@ -1610,55 +2075,74 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
 //        }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void reEnumerateFlaechen() {
-        TableSorter sort = new TableSorter(tableModel);
+        final TableSorter sort = new TableSorter(tableModel);
         sort.setSortingStatus(3, sort.DESCENDING);
         int counterInt = 0;
         String counterString = null;
         for (int i = 0; i < tableModel.getRowCount(); ++i) {
-            Flaeche f = tableModel.getFlaechebyIndex(sort.getSortedIndex(i));
-            //String newBemerkung=f.getBemerkung()+"\n<HistBez>"+f.getBezeichnung()+"</HistBez>";
-            //f.setBemerkung(newBemerkung.trim());
-            int art = f.getArt();
+            final Flaeche f = tableModel.getFlaechebyIndex(sort.getSortedIndex(i));
+            // String newBemerkung=f.getBemerkung()+"\n<HistBez>"+f.getBezeichnung()+"</HistBez>";
+            // f.setBemerkung(newBemerkung.trim());
+            final int art = f.getArt();
 
             switch (art) {
                 case 1:
-                case 2:
+                case 2: {
                     counterInt++;
                     f.setBezeichnung(new Integer(counterInt).toString());
                     break;
+                }
                 case 3:
                 case 4:
                 case 5:
                 case 6:
-                default:
+                default: {
                     counterString = tableModel.nextFlBez(counterString);
                     f.setBezeichnung(counterString);
+                }
             }
             f.sync();
         }
         tableModel.fireTableDataChanged();
         fireAuswahlChanged(tableModel.getSelectedFlaeche());
         repaint();
-
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public JXTable getJxtOverview() {
         return jxtOverview;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public FlaechenUebersichtsTableModel getTableModel() {
         return tableModel;
     }
 
-    public void featuresRemoved(FeatureCollectionEvent fce) {
+    @Override
+    public void featuresRemoved(final FeatureCollectionEvent fce) {
     }
 
-    public void allFeaturesRemoved(FeatureCollectionEvent fce) {
+    @Override
+    public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
     }
 
-    public void featuresChanged(FeatureCollectionEvent fce) {
-        log.debug("FeatureChanged");
+    @Override
+    public void featuresChanged(final FeatureCollectionEvent fce) {
+        if (log.isDebugEnabled()) {
+            log.debug("FeatureChanged");
+        }
         if (mappingComp.getInteractionMode() == MappingComponent.NEW_POLYGON) {
             refreshMeasurementsInStatus(fce.getEventFeatures());
         } else {
@@ -1666,18 +2150,20 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void featuresAdded(FeatureCollectionEvent fce) {
+    @Override
+    public void featuresAdded(final FeatureCollectionEvent fce) {
     }
 
-    public void featureSelectionChanged(FeatureCollectionEvent fce) {
-        Collection<Feature> cf = fce.getEventFeatures();
+    @Override
+    public void featureSelectionChanged(final FeatureCollectionEvent fce) {
+        final Collection<Feature> cf = fce.getEventFeatures();
         jxtOverview.getSelectionModel().removeListSelectionListener(this);
 
         if (cf != null) {
-            for (Feature f : cf) {
+            for (final Feature f : cf) {
                 if (f instanceof Flaeche) {
-                    int modelIndex = getTableModel().getIndexOfFlaeche((Flaeche) f);
-                    int displayedIndex = jxtOverview.getFilters().convertRowIndexToView(modelIndex);
+                    final int modelIndex = getTableModel().getIndexOfFlaeche((Flaeche)f);
+                    final int displayedIndex = jxtOverview.getFilters().convertRowIndexToView(modelIndex);
                     if (fce.getFeatureCollection().isSelected(f)) {
                         jxtOverview.getSelectionModel().addSelectionInterval(displayedIndex, displayedIndex);
                     } else {
@@ -1693,56 +2179,71 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    public void featureReconsiderationRequested(FeatureCollectionEvent fce) {
+    @Override
+    public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void refreshMeasurementsInStatus() {
-        Collection<Feature> cf = mappingComp.getFeatureCollection().getSelectedFeatures();
+        final Collection<Feature> cf = mappingComp.getFeatureCollection().getSelectedFeatures();
         refreshMeasurementsInStatus(cf);
     }
 
-    public void refreshMeasurementsInStatus(Collection<Feature> cf) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cf  DOCUMENT ME!
+     */
+    public void refreshMeasurementsInStatus(final Collection<Feature> cf) {
         double umfang = 0.0;
         double area = 0.0;
-        for (Feature f : cf) {
-            if (f != null && f.getGeometry() != null) {
+        for (final Feature f : cf) {
+            if ((f != null) && (f.getGeometry() != null)) {
                 area += f.getGeometry().getArea();
                 umfang += f.getGeometry().getLength();
             }
         }
-        if ((area == 0.0 && umfang == 0.0) || cf.size() == 0) {
+        if (((area == 0.0) && (umfang == 0.0)) || (cf.size() == 0)) {
             lblMeasurement.setText("");
         } else {
-            lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(area) + "  Umfang: " + StaticDecimalTools.round(umfang));
+            lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(area) + "  Umfang: "
+                        + StaticDecimalTools.round(umfang));
         }
-
     }
-    //RetrievalListener nur zum Setzten der ProgressB\u00E4llchen
-    HashSet activeRetrievalServices = new HashSet();
 
-    public void retrievalStarted(RetrievalEvent e) {
-        activeRetrievalServices.add(((ServiceLayer) e.getRetrievalService()).getName());
+    @Override
+    public void retrievalStarted(final RetrievalEvent e) {
+        activeRetrievalServices.add(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
-    public void retrievalProgress(RetrievalEvent e) {
+    @Override
+    public void retrievalProgress(final RetrievalEvent e) {
     }
 
-    public void retrievalError(RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+    @Override
+    public void retrievalError(final RetrievalEvent e) {
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
-    public void retrievalComplete(RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+    @Override
+    public void retrievalComplete(final RetrievalEvent e) {
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
-    public void retrievalAborted(RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+    @Override
+    public void retrievalAborted(final RetrievalEvent e) {
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     private void checkProgress() {
         // log.debug(activeRetrievalServices);
         if (activeRetrievalServices.size() > 0) {
@@ -1752,57 +2253,78 @@ public class FlaechenUebersichtsTabellenPanel extends javax.swing.JPanel impleme
         }
     }
 
-    private void addScalePopupMenu(String text, final double scaleDenominator) {
-        JMenuItem jmi = new JMenuItem(text);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  text              DOCUMENT ME!
+     * @param  scaleDenominator  DOCUMENT ME!
+     */
+    private void addScalePopupMenu(final String text, final double scaleDenominator) {
+        final JMenuItem jmi = new JMenuItem(text);
         jmi.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
-                mappingComp.gotoBoundingBoxWithHistory(mappingComp.getBoundingBoxFromScale(scaleDenominator));
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    mappingComp.gotoBoundingBoxWithHistory(mappingComp.getBoundingBoxFromScale(scaleDenominator));
+                }
+            });
         pomScale.add(jmi);
     }
 
+    @Override
     public void featureCollectionChanged() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void update(Observable o, Object arg) {
+    @Override
+    public void update(final Observable o, final Object arg) {
         if (o.equals(mappingComp.getMemUndo())) {
             if (arg.equals(MementoInterface.ACTIVATE) && !cmdUndo.isEnabled()) {
-                log.debug("UNDO-Button aktivieren");
+                if (log.isDebugEnabled()) {
+                    log.debug("UNDO-Button aktivieren");
+                }
                 EventQueue.invokeLater(new Runnable() {
 
-                    public void run() {
-                        cmdUndo.setEnabled(true);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdUndo.setEnabled(true);
+                        }
+                    });
             } else if (arg.equals(MementoInterface.DEACTIVATE) && cmdUndo.isEnabled()) {
-                log.debug("UNDO-Button deaktivieren");
+                if (log.isDebugEnabled()) {
+                    log.debug("UNDO-Button deaktivieren");
+                }
                 EventQueue.invokeLater(new Runnable() {
 
-                    public void run() {
-                        cmdUndo.setEnabled(false);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdUndo.setEnabled(false);
+                        }
+                    });
             }
         } else if (o.equals(mappingComp.getMemRedo())) {
             if (arg.equals(MementoInterface.ACTIVATE) && !cmdRedo.isEnabled()) {
-                log.debug("REDO-Button aktivieren");
+                if (log.isDebugEnabled()) {
+                    log.debug("REDO-Button aktivieren");
+                }
                 EventQueue.invokeLater(new Runnable() {
 
-                    public void run() {
-                        cmdRedo.setEnabled(true);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdRedo.setEnabled(true);
+                        }
+                    });
             } else if (arg.equals(MementoInterface.DEACTIVATE) && cmdRedo.isEnabled()) {
-                log.debug("REDO-Button deaktivieren");
+                if (log.isDebugEnabled()) {
+                    log.debug("REDO-Button deaktivieren");
+                }
                 EventQueue.invokeLater(new Runnable() {
 
-                    public void run() {
-                        cmdRedo.setEnabled(false);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdRedo.setEnabled(false);
+                        }
+                    });
             }
         }
     }

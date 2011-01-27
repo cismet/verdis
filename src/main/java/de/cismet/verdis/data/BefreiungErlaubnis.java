@@ -1,96 +1,115 @@
-/*
- * BefreiungErlaubnis.java
- * Copyright (C) 2005 by:
- *
- *----------------------------
- * cismet GmbH
- * Goebenstrasse 40
- * 66117 Saarbruecken
- * http://www.cismet.de
- *----------------------------
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *----------------------------
- * Author:
- * thorsten.hell@cismet.de
- *----------------------------
- *
- * Created on 13. April 2006, 13:21
- *
- */
-
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.verdis.data;
 
 /**
+ * DOCUMENT ME!
  *
- * @author thorsten.hell@cismet.de
+ * @author   thorsten.hell@cismet.de
+ * @version  $Revision$, $Date$
  */
 public class BefreiungErlaubnis {
-    private int id=-1;
-    private String aktenzeichen="";
-    private String gueltigBis="";
-    /** Creates a new instance of BefreiungErlaubnis */
+
+    //~ Instance fields --------------------------------------------------------
+
+    private int id = -1;
+    private String aktenzeichen = "";
+    private String gueltigBis = "";
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of BefreiungErlaubnis.
+     */
     public BefreiungErlaubnis() {
     }
-    public void fillFromObjectArray(Object[] oa) {
-        id=((Integer)oa[0]);
-        aktenzeichen=oa[1].toString();
-        java.sql.Date d=(java.sql.Date)oa[2];
-        gueltigBis=java.text.DateFormat.getDateInstance().format(d);        
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  oa  DOCUMENT ME!
+     */
+    public void fillFromObjectArray(final Object[] oa) {
+        id = ((Integer)oa[0]);
+        aktenzeichen = oa[1].toString();
+        final java.sql.Date d = (java.sql.Date)oa[2];
+        gueltigBis = java.text.DateFormat.getDateInstance().format(d);
     }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
+    public void setId(final int id) {
         this.id = id;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getAktenzeichen() {
         return aktenzeichen;
     }
 
-    public void setAktenzeichen(String aktenzeichen) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  aktenzeichen  DOCUMENT ME!
+     */
+    public void setAktenzeichen(final String aktenzeichen) {
         this.aktenzeichen = aktenzeichen;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getGueltigBis() {
         return gueltigBis;
     }
 
-    public void setGueltigBis(String gueltigBis) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  gueltigBis  DOCUMENT ME!
+     */
+    public void setGueltigBis(final String gueltigBis) {
         this.gueltigBis = gueltigBis;
     }
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (o instanceof BefreiungErlaubnis) {
-            BefreiungErlaubnis be=(BefreiungErlaubnis)o;
-            return (be.id==id&&be.aktenzeichen.equals(aktenzeichen) && be.gueltigBis.equals(gueltigBis));
-        }
-        else {
+            final BefreiungErlaubnis be = (BefreiungErlaubnis)o;
+            return ((be.id == id) && be.aktenzeichen.equals(aktenzeichen) && be.gueltigBis.equals(gueltigBis));
+        } else {
             return false;
         }
     }
+    @Override
     public Object clone() {
-        BefreiungErlaubnis be=new BefreiungErlaubnis();
-        be.id=id;
-        be.aktenzeichen=aktenzeichen;
-        be.gueltigBis=gueltigBis;
+        final BefreiungErlaubnis be = new BefreiungErlaubnis();
+        be.id = id;
+        be.aktenzeichen = aktenzeichen;
+        be.gueltigBis = gueltigBis;
         return be;
     }
-    
-    
-    
 }

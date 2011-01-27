@@ -1,101 +1,138 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * SimpleDocumentModel.java
  *
  * Created on 24. Januar 2005, 16:26
  */
-
 package de.cismet.verdis.models;
+import java.awt.Component;
+
+import javax.swing.text.*;
+
 import de.cismet.validation.Validatable;
 import de.cismet.validation.ValidationStateChangedListener;
-import java.awt.Component;
-import javax.swing.text.*;
 /**
+ * DOCUMENT ME!
  *
- * @author hell
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
-public class SimpleDocumentModel extends PlainDocument implements Validatable{
-    java.util.Vector listeners=new java.util.Vector();
-    protected String statusDescription="";
-    //Zum \u00DCberschreiben
-    public boolean acceptChanges(String newValue) {
+public class SimpleDocumentModel extends PlainDocument implements Validatable {
+
+    //~ Instance fields --------------------------------------------------------
+
+    protected String statusDescription = "";
+    java.util.Vector listeners = new java.util.Vector();
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Zum \u00DCberschreiben.
+     *
+     * @param   newValue  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean acceptChanges(final String newValue) {
         return true;
     }
-    
-    public void assignValue(String newValue) {
-        
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  newValue  DOCUMENT ME!
+     */
+    public void assignValue(final String newValue) {
     }
-    
-    public void insertNewString(String string, AttributeSet attributes) throws BadLocationException {
-        if (string==null) {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   string      DOCUMENT ME!
+     * @param   attributes  DOCUMENT ME!
+     *
+     * @throws  BadLocationException  DOCUMENT ME!
+     */
+    public void insertNewString(final String string, final AttributeSet attributes) throws BadLocationException {
+        if (string == null) {
             return;
         }
-        super.remove(0,getLength());
-        insertString(0,string,null);
+        super.remove(0, getLength());
+        insertString(0, string, null);
     }
-    
-    
-    
-    public void insertString(int offset,String string, AttributeSet attributes) throws BadLocationException {
-        if (string==null) {
+
+    @Override
+    public void insertString(final int offset, final String string, final AttributeSet attributes)
+            throws BadLocationException {
+        if (string == null) {
             return;
-        }
-        else {
+        } else {
             String newValue;
-            int length = getLength();
+            final int length = getLength();
             if (length == 0) {
                 newValue = string;
-            } 
-            else {
-                String currentContent = getText(0, length);
-                StringBuffer currentBuffer = new StringBuffer(currentContent);
+            } else {
+                final String currentContent = getText(0, length);
+                final StringBuffer currentBuffer = new StringBuffer(currentContent);
                 currentBuffer.insert(offset, string);
                 newValue = currentBuffer.toString();
             }
-            
+
             if (acceptChanges(newValue)) {
                 assignValue(newValue);
-                super.insertString(offset,string,attributes);
+                super.insertString(offset, string, attributes);
             }
-         }
+        }
     }
-    public void remove (int offs,int len) throws BadLocationException {
-        StringBuffer currentBuffer = new StringBuffer(getText(0, getLength()));
-        currentBuffer.delete(offs,offs+len);
-        String newValue=currentBuffer.toString();
+    @Override
+    public void remove(final int offs, final int len) throws BadLocationException {
+        final StringBuffer currentBuffer = new StringBuffer(getText(0, getLength()));
+        currentBuffer.delete(offs, offs + len);
+        final String newValue = currentBuffer.toString();
         if (acceptChanges(newValue)) {
             assignValue(newValue);
-            super.remove(offs,len);
+            super.remove(offs, len);
         }
     }
 
-    public void removeValidationStateChangedListener(de.cismet.validation.ValidationStateChangedListener l) {
+    @Override
+    public void removeValidationStateChangedListener(final de.cismet.validation.ValidationStateChangedListener l) {
         listeners.remove(l);
     }
 
-    public void addValidationStateChangedListener(de.cismet.validation.ValidationStateChangedListener l) {
+    @Override
+    public void addValidationStateChangedListener(final de.cismet.validation.ValidationStateChangedListener l) {
         listeners.add(l);
     }
 
-    public String getValidationMessage(){
+    @Override
+    public String getValidationMessage() {
         return statusDescription;
     }
 
+    @Override
     public int getStatus() {
         return Validatable.VALID;
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     public void fireValidationStateChanged() {
-        java.util.Iterator it=listeners.iterator();
+        final java.util.Iterator it = listeners.iterator();
         while (it.hasNext()) {
-            ValidationStateChangedListener v=(ValidationStateChangedListener)it.next();
+            final ValidationStateChangedListener v = (ValidationStateChangedListener)it.next();
             v.validationStateChanged();
         }
     }
-    
-    public void showAssistent(Component parent) {
-        
+
+    @Override
+    public void showAssistent(final Component parent) {
     }
-
-
-    
 }
