@@ -85,6 +85,25 @@
     <build>
         <finalName>verdis</finalName>
     </build>
+    <profiles>
+      <profile>
+          <id>skip-format</id>
+          <activation>
+              <activeByDefault>true</activeByDefault>
+          </activation>
+          <build>
+              <plugins>
+                  <plugin>
+                      <groupId>triemax</groupId>
+                      <artifactId>jalopy-maven</artifactId>
+                      <configuration>
+                          <skip>true</skip>
+                      </configuration>
+                  </plugin>
+              </plugins>
+          </build>
+      </profile>
+  </profiles>
 </project>
 
 
