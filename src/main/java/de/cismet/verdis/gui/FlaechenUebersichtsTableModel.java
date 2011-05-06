@@ -251,8 +251,10 @@ public class FlaechenUebersichtsTableModel extends AbstractTableModel implements
      */
     private SimpleDbAction getStatement4KassenzeichenGeometry() {
         final SimpleDbAction sdba = new SimpleDbAction();
+        Geometry env=getEnvelope(data);
+        env.setSRID(31466);
         sdba.setStatement("update geom set "
-                    + "geo_field='" + PostGisGeometryFactory.getPostGisCompliantDbString(getEnvelope(data)) + "' "
+                    + "geo_field='" + PostGisGeometryFactory.getPostGisCompliantDbString(env) + "' "
                     + "from kassenzeichen "
                     + "where geom.id=kassenzeichen.geometrie and kassenzeichen.id=" + kassenzeichen);
         sdba.setDescription("Aktualisiere die zusammenfassende Geometrie");

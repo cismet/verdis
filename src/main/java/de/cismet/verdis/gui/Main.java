@@ -83,8 +83,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import java.rmi.Remote;
 
@@ -96,14 +94,10 @@ import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
+import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
-import de.cismet.extensions.timeasy.TimEasyDialog;
-import de.cismet.extensions.timeasy.TimEasyEvent;
-import de.cismet.extensions.timeasy.TimEasyListener;
-import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
 
 import de.cismet.rmplugin.RMPlugin;
 
@@ -340,6 +334,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 
             if (context == null) { // ACHTUNG
                 try {
+                      CismapBroker.getInstance().setMappingComponent(getMappingComponent());
                     if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
                         try {
                             org.apache.log4j.PropertyConfigurator.configure(home + fs + ".verdis" + fs
@@ -750,17 +745,17 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
 
         // TimEasy
-        ((CreateGeometryListener)getFlPanel().getFlOverviewPanel().getMappingComponent().getInputListener(
-                MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(TimEasyPureNewFeature.class);
+//        ((CreateGeometryListener)getFlPanel().getFlOverviewPanel().getMappingComponent().getInputListener(
+//                MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(TimEasyPureNewFeature.class);
         final MappingComponent mapC = getFlPanel().getFlOverviewPanel().getMappingComponent();
-        TimEasyDialog.addTimTimEasyListener(new TimEasyListener() {
-
-                @Override
-                public void timEasyObjectInserted(final TimEasyEvent tee) {
-                    mapC.getFeatureCollection().removeFeature(tee.getPureNewfeature());
-                    mapC.refresh();
-                }
-            });
+//        TimEasyDialog.addTimTimEasyListener(new TimEasyListener() {
+//
+//                @Override
+//                public void timEasyObjectInserted(final TimEasyEvent tee) {
+//                    mapC.getFeatureCollection().removeFeature(tee.getPureNewfeature());
+//                    mapC.refresh();
+//                }
+//            });
         configurationManager.configure(mappingModel);
         mapC.preparationSetMappingModel(mappingModel);
         configurationManager.configure(mapC);
@@ -1531,69 +1526,69 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_menWindowsActionPerformed
+    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menWindowsActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_menWindowsActionPerformed
+    }//GEN-LAST:event_menWindowsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
+    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
-    }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
+    }//GEN-LAST:event_mniResetWindowLayoutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniFlaechenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniFlaechenActionPerformed
+    private void mniFlaechenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniFlaechenActionPerformed
         showOrHideView(vFlaechen);
-    }                                                                               //GEN-LAST:event_mniFlaechenActionPerformed
+    }//GEN-LAST:event_mniFlaechenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDokumenteActionPerformed
+    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDokumenteActionPerformed
         showOrHideView(vDokumente);
-    }                                                                                //GEN-LAST:event_mniDokumenteActionPerformed
+    }//GEN-LAST:event_mniDokumenteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKanalanschlussActionPerformed
+    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKanalanschlussActionPerformed
         showOrHideView(vKanaldaten);
-    }                                                                                     //GEN-LAST:event_mniKanalanschlussActionPerformed
+    }//GEN-LAST:event_mniKanalanschlussActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSummenActionPerformed
+    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSummenActionPerformed
         showOrHideView(vSummen);
-    }                                                                             //GEN-LAST:event_mniSummenActionPerformed
+    }//GEN-LAST:event_mniSummenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichenActionPerformed
+    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichenActionPerformed
         showOrHideView(vKassenzeichen);
-    }                                                                                    //GEN-LAST:event_mniKassenzeichenActionPerformed
+    }//GEN-LAST:event_mniKassenzeichenActionPerformed
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniLoadLayoutActionPerformed
+    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniLoadLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(verdisDirectory);
         fc.setFileFilter(new FileFilter() {
 
@@ -1625,13 +1620,13 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }
-    } //GEN-LAST:event_mniLoadLayoutActionPerformed
+    }//GEN-LAST:event_mniLoadLayoutActionPerformed
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSaveLayoutActionPerformed
+    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSaveLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(verdisDirectory);
         fc.setFileFilter(new FileFilter() {
 
@@ -1663,7 +1658,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 saveLayout(name + ".layout");
             }
         }
-    } //GEN-LAST:event_mniSaveLayoutActionPerformed
+    }//GEN-LAST:event_mniSaveLayoutActionPerformed
 
     /**
      * TODO Bundle Inserting Docking Window functionalty (Sebastian) 24.07.07.
@@ -1863,43 +1858,43 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuChangeUserActionPerformed
+    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuChangeUserActionPerformed
         formWindowOpened(null);
-    }                                                                                 //GEN-LAST:event_mnuChangeUserActionPerformed
+    }//GEN-LAST:event_mnuChangeUserActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
+    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
         cmdNewKassenzeichenActionPerformed(null);
-    }                                                                                       //GEN-LAST:event_mnuNewKassenzeichenActionPerformed
+    }//GEN-LAST:event_mnuNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
+    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditModeActionPerformed
         cmdEditModeActionPerformed(null);
-    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
+    }//GEN-LAST:event_mnuEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuExitActionPerformed
+    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
         dispose();
-    }                                                                           //GEN-LAST:event_mnuExitActionPerformed
+    }//GEN-LAST:event_mnuExitActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowOpened(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowOpened
+    private void formWindowOpened(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         if (!plugin) {
             final Thread t = new Thread(new Runnable() {
 
@@ -1958,7 +1953,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             t.setPriority(Thread.NORM_PRIORITY);
             t.start();
         }
-    } //GEN-LAST:event_formWindowOpened
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * DOCUMENT ME!
@@ -1994,16 +1989,16 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
+    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
         flPanel.reEnumerateFlaechen();
-    }                                                                                         //GEN-LAST:event_cmdRefreshEnumerationActionPerformed
+    }//GEN-LAST:event_cmdRefreshEnumerationActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
+    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
         if ((kzPanel.getShownKassenzeichen() != null) && (kzPanel.getShownKassenzeichen().length() > 0)) {
             try {
                 final String gotoUrl = prefs.getReportUrl() + kzPanel.getShownKassenzeichen();
@@ -2028,23 +2023,23 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 log.error("Fehler beim Anzeigen des VERDIS-Reports", e);
             }
         }
-    }                                                                          //GEN-LAST:event_cmdPdfActionPerformed
+    }//GEN-LAST:event_cmdPdfActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
+    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
         deleteKZ();
-    }                                                                                          //GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
+    }//GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteFlaecheActionPerformed
+    private void cmdPasteFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteFlaecheActionPerformed
         if (clipboard != null) {
             if (clipboard instanceof Flaeche) {
                 final Flaeche clipboardFlaeche = (Flaeche)clipboard;
@@ -2084,14 +2079,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
 //                }
             }
         }
-    } //GEN-LAST:event_cmdPasteFlaecheActionPerformed
+    }//GEN-LAST:event_cmdPasteFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCutFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCutFlaecheActionPerformed
+    private void cmdCutFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutFlaecheActionPerformed
         int answer = JOptionPane.YES_OPTION;
         if (!clipboardPasted) {
             answer = JOptionPane.showConfirmDialog(
@@ -2112,14 +2107,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 this.cmdPasteFlaeche.setEnabled(false);
             }
         }
-    } //GEN-LAST:event_cmdCutFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCutFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
+    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdInfoActionPerformed
 //        String info="Verdis Plugin\n"
 //                + "cismet GmbH\n\n"
 //                + de.cismet.verdis.Version.getVersion()+"\n"
@@ -2146,52 +2141,52 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
         }
         about.setLocationRelativeTo(this);
         about.setVisible(true);
-    } //GEN-LAST:event_cmdInfoActionPerformed
+    }//GEN-LAST:event_cmdInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuInfoActionPerformed
+    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoActionPerformed
         cmdInfoActionPerformed(null);
-    }                                                                           //GEN-LAST:event_mnuInfoActionPerformed
+    }//GEN-LAST:event_mnuInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyReleased(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyReleased
+    private void formKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         // TODO add your handling code here:
-    } //GEN-LAST:event_formKeyReleased
+    }//GEN-LAST:event_formKeyReleased
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyPressed
+    private void formKeyPressed(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
 
         if ((evt.getKeyCode() == KeyEvent.VK_F1) && evt.isControlDown()) {
         }
         // TODO add your handling code here:
-    } //GEN-LAST:event_formKeyPressed
+    }//GEN-LAST:event_formKeyPressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyTyped
-    }                                                              //GEN-LAST:event_formKeyTyped
+    private void formKeyTyped(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
+    }//GEN-LAST:event_formKeyTyped
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPutKassenzeichenToSearchTreeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
+    private void cmdPutKassenzeichenToSearchTreeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
         if ((kzPanel.getShownKassenzeichen() != null) && !kzPanel.getShownKassenzeichen().trim().equals("")) {
             if (log.isDebugEnabled()) {
                 log.debug("Alle verf\u00FCgbaren Suchen:" + context.getSearch().getDataBeans().keySet());
@@ -2220,22 +2215,22 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 log.warn("KassenzeichenSuche (" + kassenzeichenSuche + "@" + domainServer + ") nicht vorhanden!!!");
             }
         }
-    }                                                                                                   //GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
+    }//GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWorkflowActionPerformed
-    }                                                                               //GEN-LAST:event_cmdWorkflowActionPerformed
+    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
+    }//GEN-LAST:event_cmdWorkflowActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         log.info("formWindowClosing");
         if (editmode && !kzPanel.isEmpty()) {
             if (changesPending()) {
@@ -2253,7 +2248,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             }
         }
         closeAllConnections();
-    }                                                                      //GEN-LAST:event_formWindowClosing
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
@@ -2274,15 +2269,15 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosed(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosed
-    }                                                                     //GEN-LAST:event_formWindowClosed
+    private void formWindowClosed(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
+    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -2300,25 +2295,25 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 newKZ();
             }
         }
-    }                                                                                       //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
+    }//GEN-LAST:event_cmdNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
+    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOkActionPerformed
         if (changesPending()) {
             storeChanges();
         }
-    }                                                                         //GEN-LAST:event_cmdOkActionPerformed
+    }//GEN-LAST:event_cmdOkActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
         if (changesPending()) {
             final int answer = JOptionPane.showConfirmDialog(
                     this,
@@ -2336,14 +2331,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             enableEditing(false);
             unlockDataset();
         }
-    }                                                                             //GEN-LAST:event_cmdCancelActionPerformed
+    }//GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
+    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
             if (!editmode && (kzPanel.isEmpty() || lockDataset())) {
                 enableEditing(true);
@@ -2352,14 +2347,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 enableEditing(false);
             }
         }
-    }                                                                               //GEN-LAST:event_cmdEditModeActionPerformed
+    }//GEN-LAST:event_cmdEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCopyFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCopyFlaecheActionPerformed
+    private void cmdCopyFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyFlaecheActionPerformed
         log.fatal("cmdCopyFlaecheActionPerformed");
         int answer = JOptionPane.YES_OPTION;
         if (!clipboardPasted) {
@@ -2380,7 +2375,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 this.cmdPasteFlaeche.setEnabled(false);
             }
         }
-    }                                                                                  //GEN-LAST:event_cmdCopyFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCopyFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2426,22 +2421,22 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTestActionPerformed
-    }                                                                           //GEN-LAST:event_cmdTestActionPerformed
+    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestActionPerformed
+    }//GEN-LAST:event_cmdTestActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTest2ActionPerformed
-    }                                                                            //GEN-LAST:event_cmdTest2ActionPerformed
+    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
+    }//GEN-LAST:event_cmdTest2ActionPerformed
     /**
      * ToDo Threading and Progressbar.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
+    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
             final LagisCrossoverPanel lcp = new LagisCrossoverPanel(prefs.getLagisCrossoverPort(), this);
@@ -2457,14 +2452,14 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
             log.error("Crossover: Fehler im LagIS Crossover", ex);
             // ToDo Meldung an Benutzer
         }
-    }                                                                                     //GEN-LAST:event_cmdLagisCrossoverActionPerformed
+    }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameKZActionPerformed
+    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRenameKZActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -2483,7 +2478,7 @@ public class Main extends javax.swing.JFrame implements PluginSupport, FloatingP
                 renameKZ();
             }
         }
-    }                                                                               //GEN-LAST:event_mnuRenameKZActionPerformed
+    }//GEN-LAST:event_mnuRenameKZActionPerformed
 
     /**
      * DOCUMENT ME!
