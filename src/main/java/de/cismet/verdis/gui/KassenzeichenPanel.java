@@ -1,10 +1,10 @@
 /***************************************************
-*
-* cismet GmbH, Saarbruecken, Germany
-*
-*              ... and it just works.
-*
-****************************************************/
+ *
+ * cismet GmbH, Saarbruecken, Germany
+ *
+ *              ... and it just works.
+ *
+ ****************************************************/
 /*
  * KassenzeichenPanel.java
  *
@@ -35,6 +35,7 @@ import de.cismet.validation.Validator;
 import de.cismet.verdis.data.Kassenzeichen;
 
 import de.cismet.verdis.interfaces.*;
+
 /**
  * DOCUMENT ME!
  *
@@ -44,7 +45,6 @@ import de.cismet.verdis.interfaces.*;
 public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, HistoryModelListener {
 
     //~ Instance fields --------------------------------------------------------
-
     private boolean editmode = false;
     private java.sql.Connection connection;
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
@@ -56,16 +56,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     // PERHAPS BETTER TO GIVE THE SUMMENPANEL THE VIEWOBJECT
     private Main mainApp;
     private DefaultHistoryModel historyModel = new DefaultHistoryModel();
-
     private Validator valTxtErfassungsdatum;
     private Validator valTxtVeranlagungsdatum;
     private Validator valTxtKassenzeichen;
     private JHistoryButton hbBack;
     private JHistoryButton hbFwd;
     private JLabel lblLastModification;
-
     private String requestForSelectionFlaeche;
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JLabel lblBemerkung;
@@ -88,7 +85,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
-
     /**
      * Creates new form KassenzeichenPanel.
      */
@@ -114,7 +110,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     }
 
     //~ Methods ----------------------------------------------------------------
-
     /**
      * DOCUMENT ME!
      *
@@ -146,6 +141,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
             txtBemerkung.setBackground(this.getBackground());
         }
     }
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07 temporary disabled --> handled in Main.java.
      *
@@ -164,6 +160,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     public boolean isLocked() {
         return chkSperre.isSelected();
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -204,6 +201,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
         tmp.add(hbFwd);
         return tmp;
     }
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      */
@@ -460,43 +458,62 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hbBackActionPerformed
+    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hbBackActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_hbBackActionPerformed
+    }//GEN-LAST:event_hbBackActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
+    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
+
+        final boolean oldSperre = kassenzeichenData.isSperre();
+
+        if (chkSperre.isSelected() ) { //&& (oldSperre != chkSperre.isSelected())
+            String answer = null;
+            while ((answer == null) || (answer.trim().length() == 0)) {
+                answer = JOptionPane.showInputDialog(de.cismet.verdis.gui.Main.THIS.getRootPane(),
+                        "Bitte eine Bemerkung zur Sperre angeben.",
+                        kassenzeichenData.getBemerkung_sperre());
+            }
+            kassenzeichenData.setBemerkung_sperre(answer);
+            kassenzeichenData.setSperre(chkSperre.isSelected());
+            kassenzeichenData.updateBemSperreModel();
+        }
+        if (!chkSperre.isSelected()) {
+            kassenzeichenData.setBemerkung_sperre("");
+            kassenzeichenData.setSperre(chkSperre.isSelected());
+            kassenzeichenData.updateBemSperreModel();
+        } 
         mainApp.refreshLeftTitleBarColor();
-    }                                                                             //GEN-LAST:event_chkSperreActionPerformed
+    }//GEN-LAST:event_chkSperreActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchActionPerformed
+    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         this.gotoKassenzeichen(txtSearch.getText());
-    }                                                                             //GEN-LAST:event_txtSearchActionPerformed
+    }//GEN-LAST:event_txtSearchActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtErfassungsdatumActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtErfassungsdatumActionPerformed
-    }                                                                                      //GEN-LAST:event_txtErfassungsdatumActionPerformed
+    private void txtErfassungsdatumActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtErfassungsdatumActionPerformed
+    }//GEN-LAST:event_txtErfassungsdatumActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtKassenzeichenActionPerformed
-    }                                                                                    //GEN-LAST:event_txtKassenzeichenActionPerformed
+    private void txtKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtKassenzeichenActionPerformed
+    }//GEN-LAST:event_txtKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -506,6 +523,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     public static void main(final String[] args) {
         final KassenzeichenPanel p = new KassenzeichenPanel();
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -525,11 +543,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
 
         final java.awt.event.ActionListener timerAction = new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent event) {
-                    txtSearch.setBackground(javax.swing.UIManager.getDefaults().getColor("TextField.background"));
-                }
-            };
+            @Override
+            public void actionPerformed(final java.awt.event.ActionEvent event) {
+                txtSearch.setBackground(javax.swing.UIManager.getDefaults().getColor("TextField.background"));
+            }
+        };
 
         final javax.swing.Timer timer = new javax.swing.Timer(250, timerAction);
         timer.setRepeats(false);
@@ -548,6 +566,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
         this.txtSperreBemerkung.setText("");
         this.chkSperre.setSelected(false);
     }
+
     /**
      * DOCUMENT ME!
      */
@@ -586,6 +605,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
         // Mit History
         gotoKassenzeichen(kassenzeichen, true);
     }
+
     /**
      * former synchronized method.
      *
@@ -617,92 +637,90 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
 
             final Thread t = new Thread() {
 
-                    @Override
-                    public void run() {
-                        try {
-                            if (!txtSearch.getText().equals(kassenzeichen)) {
-                                txtSearch.setText(kassenzeichen);
-                            }
-                            setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                            final Statement stmnt = connection.createStatement();
-                            ResultSet rs = null;
-                            if (kassenzeichen.length() == 6) {
-                                rs = stmnt.executeQuery(
-                                        "select id,datum_erfassung,datum_veranlagung,bemerkung,sperre,bemerkung_sperre,letzte_aenderung_von,letzte_aenderung_ts from kassenzeichen where id/10 ="
-                                                + kassenzeichen);
-                            } else {
-                                rs = stmnt.executeQuery(
-                                        "select id,datum_erfassung,datum_veranlagung,bemerkung,sperre,bemerkung_sperre,letzte_aenderung_von,letzte_aenderung_ts from kassenzeichen where id="
-                                                + kassenzeichen);
-                            }
-                            setCursor(java.awt.Cursor.getDefaultCursor());
-                            if (!rs.next()) {
-                                log.info("nix gefunden");
-                                flashSearchField(java.awt.Color.RED);
-                                // Inserting Docking Window functionalty (Sebastian) 24.07.07
-                                lblLastModification.setToolTipText(null);
-                            } else {
-                                if (isEditmode() && !isEmpty()) {
-                                    unlockDataset();
-                                }
-                                final int cc = rs.getMetaData().getColumnCount();
-                                final Object[] rowdata = new Object[cc];
-                                for (int i = 0; i < cc; ++i) {
-                                    rowdata[i] = rs.getObject(i + 1);
-                                }
-                                kassenzeichenData = new Kassenzeichen();
-                                kassenzeichenData.fillFromObjectArray(rowdata);
-                                kassenzeichenData.backup();
-                                txtKassenzeichen.setDocument(kassenzeichenData.getKassenzeichenModel());
-                                valTxtKassenzeichen.reSetValidator((Validatable)
-                                    kassenzeichenData.getKassenzeichenModel());
-                                txtErfassungsdatum.setDocument(kassenzeichenData.getErfassungsdatumModel());
-                                valTxtErfassungsdatum.reSetValidator((Validatable)
-                                    kassenzeichenData.getErfassungsdatumModel());
-
-                                txtVeranlagungsdatum.setDocument(kassenzeichenData.getVeranlagungsdatumModel());
-                                valTxtVeranlagungsdatum.reSetValidator((Validatable)
-                                    kassenzeichenData.getVeranlagungsdatumModel());
-
-                                txtBemerkung.setDocument(kassenzeichenData.getBemerkungsModel());
-                                final boolean chkSperreIsEnabled = chkSperre.isEnabled();
-                                chkSperre.setModel(kassenzeichenData.getSperrenModel());
-                                chkSperre.setEnabled(chkSperreIsEnabled);
-                                txtSperreBemerkung.setDocument(kassenzeichenData.getBemerkungSperreModel());
-                                // Inserting Docking Window functionalty (Sebastian) 24.07.07
-                                lblLastModification.setToolTipText(kassenzeichenData.getLetzteAenderung());
-
-                                flashSearchField(java.awt.Color.GREEN);
-                                if (historyEnabled) {
-                                    historyModel.addToHistory(kassenzeichen);
-                                }
-                                if (isEditmode()) {
-                                    final boolean worked = lockDataset();
-                                    if (!worked) {
-                                        mainApp.enableEditing(false);
-                                    }
-                                }
-
-                                // Andere Komponenten vom Wechsel der ObjektID in Kenntniss setzen
-                                fireKassenzeichenChanged(kassenzeichenData.getKassenzeichen());
-
-                                // Farbe der Applikation entsprechend der Sperre setzen
-                                mainApp.refreshLeftTitleBarColor();
-                            }
-                        } catch (SQLException sqlEx) {
-                            log.error("Fehler bei der Suche nach Kassenzeichen!", sqlEx);
-                            flashSearchField(java.awt.Color.RED);
+                @Override
+                public void run() {
+                    try {
+                        if (!txtSearch.getText().equals(kassenzeichen)) {
+                            txtSearch.setText(kassenzeichen);
                         }
+                        setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+                        final Statement stmnt = connection.createStatement();
+                        ResultSet rs = null;
+                        if (kassenzeichen.length() == 6) {
+                            rs = stmnt.executeQuery(
+                                    "select id,datum_erfassung,datum_veranlagung,bemerkung,sperre,bemerkung_sperre,letzte_aenderung_von,letzte_aenderung_ts from kassenzeichen where id/10 ="
+                                    + kassenzeichen);
+                        } else {
+                            rs = stmnt.executeQuery(
+                                    "select id,datum_erfassung,datum_veranlagung,bemerkung,sperre,bemerkung_sperre,letzte_aenderung_von,letzte_aenderung_ts from kassenzeichen where id="
+                                    + kassenzeichen);
+                        }
+                        setCursor(java.awt.Cursor.getDefaultCursor());
+                        if (!rs.next()) {
+                            log.info("nix gefunden");
+                            flashSearchField(java.awt.Color.RED);
+                            // Inserting Docking Window functionalty (Sebastian) 24.07.07
+                            lblLastModification.setToolTipText(null);
+                        } else {
+                            if (isEditmode() && !isEmpty()) {
+                                unlockDataset();
+                            }
+                            final int cc = rs.getMetaData().getColumnCount();
+                            final Object[] rowdata = new Object[cc];
+                            for (int i = 0; i < cc; ++i) {
+                                rowdata[i] = rs.getObject(i + 1);
+                            }
+                            kassenzeichenData = new Kassenzeichen();
+                            kassenzeichenData.fillFromObjectArray(rowdata);
+                            kassenzeichenData.backup();
+                            txtKassenzeichen.setDocument(kassenzeichenData.getKassenzeichenModel());
+                            valTxtKassenzeichen.reSetValidator((Validatable) kassenzeichenData.getKassenzeichenModel());
+                            txtErfassungsdatum.setDocument(kassenzeichenData.getErfassungsdatumModel());
+                            valTxtErfassungsdatum.reSetValidator((Validatable) kassenzeichenData.getErfassungsdatumModel());
+
+                            txtVeranlagungsdatum.setDocument(kassenzeichenData.getVeranlagungsdatumModel());
+                            valTxtVeranlagungsdatum.reSetValidator((Validatable) kassenzeichenData.getVeranlagungsdatumModel());
+
+                            txtBemerkung.setDocument(kassenzeichenData.getBemerkungsModel());
+                            final boolean chkSperreIsEnabled = chkSperre.isEnabled();
+                            chkSperre.setModel(kassenzeichenData.getSperrenModel());
+                            
+                            chkSperre.setEnabled(chkSperreIsEnabled);
+                            txtSperreBemerkung.setDocument(kassenzeichenData.getBemerkungSperreModel());
+                            // Inserting Docking Window functionalty (Sebastian) 24.07.07
+                            lblLastModification.setToolTipText(kassenzeichenData.getLetzteAenderung());
+
+                            flashSearchField(java.awt.Color.GREEN);
+                            if (historyEnabled) {
+                                historyModel.addToHistory(kassenzeichen);
+                            }
+                            if (isEditmode()) {
+                                final boolean worked = lockDataset();
+                                if (!worked) {
+                                    mainApp.enableEditing(false);
+                                }
+                            }
+
+                            // Andere Komponenten vom Wechsel der ObjektID in Kenntniss setzen
+                            fireKassenzeichenChanged(kassenzeichenData.getKassenzeichen());
+
+                            // Farbe der Applikation entsprechend der Sperre setzen
+                            mainApp.refreshLeftTitleBarColor();
+                        }
+                    } catch (SQLException sqlEx) {
+                        log.error("Fehler bei der Suche nach Kassenzeichen!", sqlEx);
+                        flashSearchField(java.awt.Color.RED);
                     }
-                };
+                }
+            };
             t.setPriority(Thread.NORM_PRIORITY);
             t.start();
         } else {
             JOptionPane.showMessageDialog(
-                mainApp,
-                "Das Kassenzeichen kann nur gewechselt werden wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
-                "Wechseln nicht m\u00F6glich",
-                JOptionPane.WARNING_MESSAGE);
+                    mainApp,
+                    "Das Kassenzeichen kann nur gewechselt werden wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
+                    "Wechseln nicht m\u00F6glich",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -714,6 +732,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
             return kassenzeichenData.hasChanged();
         }
     }
+
     @Override
     public void enableEditing(final boolean b) {
         if (log.isDebugEnabled()) {
@@ -739,16 +758,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
             Statement stmnt = connection.createStatement();
             ResultSet rs = stmnt.executeQuery(
                     "select class_id,object_id,user_string,additional_info from cs_locks where class_id="
-                            + Main.KASSENZEICHEN_CLASS_ID
-                            + " and object_id="
-                            + object_id);
+                    + Main.KASSENZEICHEN_CLASS_ID
+                    + " and object_id="
+                    + object_id);
             if (!rs.next()) {
                 rs.close();
                 // Kein Eintragvorhanden. Eintrag schreiben
                 stmnt = connection.createStatement();
                 final String locker = "insert into cs_locks (class_id,object_id,user_string,additional_info) values ("
-                            + Main.KASSENZEICHEN_CLASS_ID + "," + object_id + ",'" + userString + "','" + lockNonce
-                            + "')";
+                        + Main.KASSENZEICHEN_CLASS_ID + "," + object_id + ",'" + userString + "','" + lockNonce
+                        + "')";
                 if (log.isDebugEnabled()) {
                     log.debug("lockDataset: " + locker);
                 }
@@ -758,7 +777,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
                 // einen Sperreintrag geschrieben hat
                 stmnt = connection.createStatement();
                 rs = stmnt.executeQuery("select count(*) from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID
-                                + " and object_id=" + object_id);
+                        + " and object_id=" + object_id);
                 if (!rs.next()) {
                     log.fatal("select count(*) hat nichts zur\u00FCckgeliefert.");
                     return false;
@@ -775,20 +794,20 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
                             @Override
                             public void run() {
                                 JOptionPane.showMessageDialog(
-                                    t,
-                                    "Es wurde gleichzeitig versucht einen Datensatz zu sperren. Der kl\u00FCgere gibt nach ;-)",
-                                    "Sperren fehlgeschlagen",
-                                    JOptionPane.WARNING_MESSAGE);
+                                        t,
+                                        "Es wurde gleichzeitig versucht einen Datensatz zu sperren. Der kl\u00FCgere gibt nach ;-)",
+                                        "Sperren fehlgeschlagen",
+                                        JOptionPane.WARNING_MESSAGE);
                             }
                         };
                         stmnt = connection.createStatement();
                         final int ret = stmnt.executeUpdate("delete from cs_locks where class_id="
-                                        + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id
-                                        + " and additional_info='" + lockNonce + "'");
+                                + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id
+                                + " and additional_info='" + lockNonce + "'");
                         stmnt.close();
                         if (ret != 1) {
                             log.warn("Kassenzeichen " + object_id
-                                        + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret);
+                                    + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret);
                         }
 
                         return false;
@@ -809,12 +828,12 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
                     @Override
                     public void run() {
                         JOptionPane.showMessageDialog(
-                            t,
-                            "Der Datensatz wird schon vom Benutzer "
-                                    + user
-                                    + " zum Ver\u00E4ndern gesperrt",
-                            "Kein Editieren m\u00F6glich",
-                            JOptionPane.INFORMATION_MESSAGE);
+                                t,
+                                "Der Datensatz wird schon vom Benutzer "
+                                + user
+                                + " zum Ver\u00E4ndern gesperrt",
+                                "Kein Editieren m\u00F6glich",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
                 };
                 return false;
@@ -824,6 +843,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
             return false;
         }
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -831,7 +851,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
      */
     public void unlockDataset(final String object_id) {
         final String sql = "delete from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id="
-                    + object_id + " and additional_info='" + lockNonce + "'";
+                + object_id + " and additional_info='" + lockNonce + "'";
         log.info("unlockDataset: " + sql);
         try {
             final Statement stmnt = connection.createStatement();
@@ -839,18 +859,20 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
             stmnt.close();
             if (ret != 1) {
                 log.fatal("Kassenzeichen " + object_id
-                            + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret + "(" + sql
-                            + ")");
+                        + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret + "(" + sql
+                        + ")");
             }
         } catch (Exception e) {
             log.fatal("SQL Fehler beim Entsperren (Statement=" + sql + ")", e);
         }
     }
+
     @Override
     public boolean lockDataset() {
         final String object_id = txtKassenzeichen.getText().trim();
         return lockDataset(object_id);
     }
+
     @Override
     public void unlockDataset() {
         final String object_id = txtKassenzeichen.getText().trim();
@@ -881,6 +903,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     public void addKassenzeichenChangedListener(final KassenzeichenChangedListener l) {
         kassenzeichenChangedListeners.add(l);
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -889,6 +912,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     public void removeKassenzeichenChangedListener(final KassenzeichenChangedListener l) {
         kassenzeichenChangedListeners.remove(l);
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -898,7 +922,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
         final java.util.Iterator it = kassenzeichenChangedListeners.iterator();
         while (it.hasNext()) {
             try {
-                final KassenzeichenChangedListener kcl = (KassenzeichenChangedListener)it.next();
+                final KassenzeichenChangedListener kcl = (KassenzeichenChangedListener) it.next();
                 kcl.kassenzeichenChanged(kz);
             } catch (java.lang.ClassCastException cce) {
                 log.error("KassenzeichenChangedListener nicht vom richtigen Typ.", cce);
@@ -913,7 +937,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
                 log.debug("historyChanged:" + historyModel.getCurrentElement().toString());
             }
             if ((historyModel.getCurrentElement() != null)
-                        && (!(historyModel.getCurrentElement().equals(txtSearch.getText())))) {
+                    && (!(historyModel.getCurrentElement().equals(txtSearch.getText())))) {
                 txtSearch.setText(historyModel.getCurrentElement().toString());
 //            new Thread(new Runnable() {
 //                public void run() {
@@ -940,6 +964,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements Storable, 
     public boolean isShrinked() {
         return !(panKZValues.isVisible());
     }
+
     /**
      * DOCUMENT ME!
      *
