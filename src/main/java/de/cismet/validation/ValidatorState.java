@@ -17,12 +17,26 @@
 
 package de.cismet.validation;
 
+import javax.swing.Action;
+
 /**
  *
  * @author jruiz
  */
-public interface Validatable {
+public interface ValidatorState extends Comparable<ValidatorState> {
 
-    public Validator getValidator();
-    
+    public static enum Type {VALID, WARNING, ERROR};
+
+    public Type getType();
+
+    public String getMessage();
+
+    public Action getHintAction();
+
+    public boolean isError();
+
+    public boolean isWarning();
+
+    public boolean isValid();
+
 }

@@ -17,12 +17,18 @@
 
 package de.cismet.validation;
 
+import java.util.Collection;
+
 /**
  *
  * @author jruiz
  */
-public interface Validatable {
+public interface ValidatorDisplay extends ValidatorListener {
 
-    public Validator getValidator();
-    
+    public void addValidator(Validator validator);
+
+    public void removeValidator(Validator validator);
+
+    public Collection<Validator> getValidators();
+
 }

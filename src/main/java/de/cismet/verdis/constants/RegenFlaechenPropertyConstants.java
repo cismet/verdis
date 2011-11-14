@@ -1,0 +1,56 @@
+/*
+ *  Copyright (C) 2011 jruiz
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package de.cismet.verdis.constants;
+
+/**
+ *
+ * @author jruiz
+ */
+public interface RegenFlaechenPropertyConstants {
+
+    public static final String PROP__ID = "id";
+    public static final String PROP__FEB_ID = "feb_id";
+    public static final String PROP__BEMERKUNG = "bemerkung";
+    public static final String PROP__SPERRE = "sperre";
+    public static final String PROP__BEMERKUNG_SPERRE = "bemerkung_sperre";
+    public static final String PROP__FLAECHENBEZEICHNUNG = "flaechenbezeichnung";
+    public static final String PROP__ANTEIL = "anteil";
+    public static final String PROP__DATUM_ERFASSUNG = "datum_erfassung";
+    public static final String PROP__DATUM_VERANLAGUNG = "datum_veranlagung";
+    public static final String PROP__FLAECHENINFO = "flaecheninfo";
+    // +
+    public static final String PROP__FLAECHENINFO__ID = PROP__FLAECHENINFO + ".id";
+    public static final String PROP__FLAECHENINFO__GROESSE_GRAFIK = PROP__FLAECHENINFO + ".groesse_aus_grafik";
+    public static final String PROP__FLAECHENINFO__GROESSE_KORREKTUR = PROP__FLAECHENINFO + ".groesse_korrektur";
+    public static final String PROP__FLAECHENINFO__GEOMETRIE = PROP__FLAECHENINFO + ".geometrie";
+    // ++
+    public static final String PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD = PROP__FLAECHENINFO__GEOMETRIE + ".geo_field";
+    // +
+    public static final String PROP__FLAECHENINFO__ANSCHLUSSGRAD = PROP__FLAECHENINFO + ".anschlussgrad";
+    // ++
+    public static final String PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID = PROP__FLAECHENINFO__ANSCHLUSSGRAD + ".id";
+    public static final String PROP__FLAECHENINFO__ANSCHLUSSGRAD__GRAD = PROP__FLAECHENINFO__ANSCHLUSSGRAD + ".grad";
+    public static final String PROP__FLAECHENINFO__ANSCHLUSSGRAD__ABKUERZUNG = PROP__FLAECHENINFO__ANSCHLUSSGRAD + ".grad_abkuerzung";
+    // +
+    public static final String PROP__FLAECHENINFO__FLAECHENART = PROP__FLAECHENINFO + ".flaechenart";
+    // ++
+    public static final String PROP__FLAECHENINFO__FLAECHENART__ID = PROP__FLAECHENINFO__FLAECHENART + ".id";
+    public static final String PROP__FLAECHENINFO__FLAECHENART__ART = PROP__FLAECHENINFO__FLAECHENART + ".art";
+    public static final String PROP__FLAECHENINFO__FLAECHENART__ABKUERZUNG = PROP__FLAECHENINFO__FLAECHENART + ".art_abkuerzung";
+
+}

@@ -21,8 +21,7 @@ package de.cismet.validation;
  *
  * @author jruiz
  */
-public interface Validatable {
+public interface ValidatorListener {
 
-    public Validator getValidator();
-    
+    public void stateChanged(ValidatorState state);
 }
