@@ -72,6 +72,7 @@ public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
                         notPastableCounter++;
                     }
                 }
+                clipboardFlaecheBeans.clear();
                 if (notPastableCounter < numOfClipBoardItems) {
                     fireClipboardChanged();
                 }
