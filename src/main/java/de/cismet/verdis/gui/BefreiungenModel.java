@@ -7,11 +7,18 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
-import de.cismet.verdis.data.BefreiungErlaubnis;
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+
+import de.cismet.verdis.CidsAppBackend;
+
+import java.sql.Date;
+import org.jdesktop.observablecollections.ObservableList;
+import org.jdesktop.observablecollections.ObservableListListener;
 
 /**
  * DOCUMENT ME!
@@ -19,11 +26,14 @@ import de.cismet.verdis.data.BefreiungErlaubnis;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public class BefreiungenModel extends DefaultTableModel {
+public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore {
 
     //~ Instance fields --------------------------------------------------------
 
-    Vector<BefreiungErlaubnis> data = new Vector<BefreiungErlaubnis>();
+    CidsBean kassenzeichenBean;
+    List<CidsBean> befreiungen;
+
+    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -32,14 +42,6 @@ public class BefreiungenModel extends DefaultTableModel {
      */
     public BefreiungenModel() {
     }
-    /**
-     * Creates a new BefreiungenModel object.
-     *
-     * @param  data  DOCUMENT ME!
-     */
-    public BefreiungenModel(final Vector<BefreiungErlaubnis> data) {
-        this.data = data;
-    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -47,14 +49,16 @@ public class BefreiungenModel extends DefaultTableModel {
     public int getColumnCount() {
         return 2;
     }
+
     @Override
     public int getRowCount() {
-        if (data != null) {
-            return data.size();
+        if (befreiungen != null) {
+            return befreiungen.size();
         } else {
             return 0;
         }
     }
+
     @Override
     public String getColumnName(final int column) {
         if (column == 0) {
@@ -63,36 +67,81 @@ public class BefreiungenModel extends DefaultTableModel {
             return "g\u00FCltig bis";
         }
     }
+
     @Override
     public Object getValueAt(final int row, final int column) {
-        final BefreiungErlaubnis be = data.get(row);
+        final CidsBean be = befreiungen.get(row);
         if (column == 0) {
-            return be.getAktenzeichen();
+            return be.getProperty("aktenzeichen");
         } else {
-            return be.getGueltigBis();
+            return be.getProperty("gueltig_bis");
         }
     }
+
     @Override
     public void setValueAt(final Object value, final int row, final int column) {
-        final BefreiungErlaubnis be = data.get(row);
-        if (column == 0) {
-            be.setAktenzeichen(value.toString());
-        } else {
-            be.setGueltigBis(value.toString());
+        final CidsBean be = befreiungen.get(row);
+        try {
+            if (column == 0) {
+                be.setProperty("aktenzeichen", value.toString());
+            } else {
+                be.setProperty("gueltig_bis", Date.valueOf(value.toString()));
+            }
+        } catch (Exception e) {
+            log.error("Fehler beim Ändern eines Attributes", e);
         }
     }
+
     /**
      * DOCUMENT ME!
      */
     public void addRow() {
-        data.add(new BefreiungErlaubnis());
+        try {
+            befreiungen.add(kassenzeichenBean.createNewCidsBeanFromTableName(
+                    CidsAppBackend.getInstance().getDomain(),
+                    "befreiungerlaubniss"));
+        } catch (Exception e) {
+            log.error("Fehler beim Hinzufuegen einer neuen Befreiung", e);
+        }
         fireTableDataChanged();
     }
-    /**
-     * DOCUMENT ME!
-     */
-    public void removeAll() {
-        data = new Vector<BefreiungErlaubnis>();
+
+
+    @Override
+    public CidsBean getCidsBean() {
+        return kassenzeichenBean;
+    }
+
+    @Override
+    public void setCidsBean(final CidsBean cidsBean) {
+        kassenzeichenBean = cidsBean;
+        if (cidsBean != null) {
+            befreiungen = kassenzeichenBean.getBeanCollectionProperty("kanalanschluss.befreiungenunderlaubnisse");
+            if (befreiungen != null) {
+                ((ObservableList<CidsBean>)befreiungen).addObservableListListener(new ObservableListListener() {
+
+                    @Override
+                    public void listElementsAdded(ObservableList list, int index, int length) {
+                        fireTableDataChanged();
+                    }
+
+                    @Override
+                    public void listElementsRemoved(ObservableList list, int index, List oldElements) {
+                        fireTableDataChanged();
+                    }
+
+                    @Override
+                    public void listElementReplaced(ObservableList list, int index, Object oldElement) {
+                        fireTableDataChanged();
+                    }
+
+                    @Override
+                    public void listElementPropertyChanged(ObservableList list, int index) {
+                        fireTableDataChanged();
+                    }
+                });
+            }
+        }
         fireTableDataChanged();
     }
 }

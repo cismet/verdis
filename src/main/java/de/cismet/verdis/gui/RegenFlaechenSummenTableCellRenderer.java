@@ -21,18 +21,18 @@ import javax.swing.table.*;
  * @author   hell
  * @version  $Revision$, $Date$
  */
-public class SummenTableCellRenderer extends DefaultTableCellRenderer {
+public class RegenFlaechenSummenTableCellRenderer extends DefaultTableCellRenderer {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenSummenTableCellRenderer.class);
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new instance of SummenTableCellRenderer.
      */
-    public SummenTableCellRenderer() {
+    public RegenFlaechenSummenTableCellRenderer() {
         super();
     }
 

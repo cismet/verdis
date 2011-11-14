@@ -1,23 +1,24 @@
 /***************************************************
-*
-* cismet GmbH, Saarbruecken, Germany
-*
-*              ... and it just works.
-*
-****************************************************/
+ *
+ * cismet GmbH, Saarbruecken, Germany
+ *
+ *              ... and it just works.
+ *
+ ****************************************************/
 /*
  * KanaldatenPanel.java
  *
- * Created on 10. April 2006, 09:21
+ * Created on 10. April 2006, 09:21 .
  */
 package de.cismet.verdis.gui;
+
+import de.cismet.cids.custom.util.BindingValidationSupport;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -27,28 +28,29 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
-import java.util.Vector;
+import java.util.List;
+
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import de.cismet.validation.NotValidException;
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.data.BefreiungErlaubnis;
-import de.cismet.verdis.data.Kanalanschluss;
+import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 
-import de.cismet.verdis.interfaces.KassenzeichenChangedListener;
-import de.cismet.verdis.interfaces.Storable;
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.EditModeListener;
+import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import java.awt.datatransfer.StringSelection;
+import java.sql.Date;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  * DOCUMENT ME!
@@ -56,34 +58,27 @@ import de.cismet.verdis.interfaces.Storable;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public class KanaldatenPanel extends javax.swing.JPanel implements Storable, KassenzeichenChangedListener {
+public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
 
     //~ Static fields/initializers ---------------------------------------------
-
     private static final String STRING_CUT = "cut";
     private static final String STRING_COPY = "copy";
     private static final String STRING_PASTE = "paste";
     private static final String STRING_DELETE = "delete";
-
     private static final String SEPARATOR_BE = "\n";
     private static final String SEPARATOR_BE_DATA = "\t";
-
     private static final KeyStroke KEYSTROKE_CUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK);
     private static final KeyStroke KEYSTROKE_COPY = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK);
     private static final KeyStroke KEYSTROKE_PASTE = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK);
     private static final KeyStroke KEYSTROKE_DELETE = javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-
     //~ Instance fields --------------------------------------------------------
-
     private boolean editmode = false;
     private Connection connection;
     private Color myBlue = new java.awt.Color(0, 51, 153);
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private Kanalanschluss kanalanschlussdaten;
     private Main main;
-
     private boolean isClipboardBECutPasted = true;
-
+    private CidsBean kassenzeichenBean;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cboMKRangeschlossen;
     private javax.swing.JComboBox cboMKSangeschlossen;
@@ -121,10 +116,10 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     private javax.swing.JPanel panMain;
     private javax.swing.JScrollPane scpBE;
     private javax.swing.JTable tblBE;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
-
     /**
      * Creates new form KanaldatenPanel.
      */
@@ -133,59 +128,16 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         initComponents();
         clear();
         setEditable(false);
-    }
-//         chkRKvorhanden
-//         chkMKRvorhanden
-//         chkMKSvorhanden
-//         chkSKvorhanden
-//         chkSGvorhanden
-//         chkKKAvorhanden
-//         chkSGentleerung
-//         chkKKAentleerung
-//         chkErlaubnisfreieVersickerung
-//         cboRKangeschlossen
-//         cboMKRangeschlossen
-//         cboMKSangeschlossen
-//         cboSKangeschlossen
-
-    //~ Methods ----------------------------------------------------------------
-
-    @Override
-    public void addStoreChangeStatements(final Vector v) throws NotValidException {
-        kanalanschlussdaten.addStatements(v);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  shrinked  DOCUMENT ME!
-     */
-    public void setShrinked(final boolean shrinked) {
-        panMain.setVisible(shrinked);
-    }
-
-    @Override
-    public void enableEditing(final boolean b) {
-        editmode = b;
-        setEditable(b);
-    }
-
-    @Override
-    public void unlockDataset() {
-    }
-
-    @Override
-    public boolean lockDataset() {
-        return true;
-    }
-
-    @Override
-    public boolean changesPending() {
-        if (kanalanschlussdaten != null) {
-            return kanalanschlussdaten.hasChanged();
-        } else {
-            return false;
+        try {
+            ((DefaultBindableReferenceCombo) cboMKRangeschlossen).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+            ((DefaultBindableReferenceCombo) cboMKSangeschlossen).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+            ((DefaultBindableReferenceCombo) cboRKangeschlossen).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+            ((DefaultBindableReferenceCombo) cboSKangeschlossen).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+        } catch (Exception e) {
+            log.error("Comboboxen sind ohne Funktion.", e);
         }
+
+        BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
 
     /**
@@ -205,9 +157,9 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         cboMKRangeschlossen.setSelectedIndex(-1);
         cboMKSangeschlossen.setSelectedIndex(-1);
         cboSKangeschlossen.setSelectedIndex(-1);
-        if (tblBE.getModel() instanceof BefreiungenModel) {
-            ((BefreiungenModel)tblBE.getModel()).removeAll();
-        }
+//        if (tblBE.getModel() instanceof BefreiungenModel) {
+//            ((BefreiungenModel) tblBE.getModel()).removeAll();
+//        }
         visualizeValidity();
     }
 
@@ -224,18 +176,19 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         chkSKvorhanden.setEnabled(editable);
         chkSGvorhanden.setEnabled(editable);
         chkKKAvorhanden.setEnabled(editable);
+        chkErlaubnisfreieVersickerung.setEnabled(editable);
+        cmdAddBefreiungErlaubnis.setEnabled(editable);
         chkSGentleerung.setEnabled(editable && chkSGvorhanden.isSelected());
         chkKKAentleerung.setEnabled(editable && chkKKAvorhanden.isSelected());
-        chkErlaubnisfreieVersickerung.setEnabled(editable);
         cboRKangeschlossen.setEnabled(editable && chkRKvorhanden.isSelected());
         cboMKRangeschlossen.setEnabled(editable && chkMKRvorhanden.isSelected());
         cboMKSangeschlossen.setEnabled(editable && chkMKSvorhanden.isSelected());
         cboSKangeschlossen.setEnabled(editable && chkSKvorhanden.isSelected());
         tblBE.setEnabled(editable);
-        cmdAddBefreiungErlaubnis.setEnabled(editable);
         updateClipboardMenu();
         visualizeValidity();
     }
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07 temporary disabled --> handled in Main.java.
      *
@@ -265,129 +218,50 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     }
 
     @Override
-    public void kassenzeichenChanged(final String kassenzeichen) {
-        if (log.isDebugEnabled()) {
-            log.debug("Kanaldatenretrieval");
-        }
-        clear();
-        final Thread t = new Thread() {
-
-                @Override
-                public void run() {
-                    try {
-                        final Statement stmnt = connection.createStatement();
-                        ResultSet rs = null;
-                        if (kassenzeichen.length() == 6) {
-                            rs = stmnt.executeQuery(
-                                    "select kanalanschluss.id,rkvorhanden,	mkrvorhanden,	mksvorhanden,	skvorhanden,	rkangeschlossen,	mkrangeschlossen,	mksangeschlossen,	skangeschlossen,	sgvorhanden,	kkavorhanden,	sgentleerung,	kkaentleerung,	evg,	befreiungenunderlaubnisse from kassenzeichen,kanalanschluss where kassenzeichen.kanalanschluss=kanalanschluss.id and kassenzeichen.id/10 ="
-                                            + kassenzeichen);
-                        } else {
-                            rs = stmnt.executeQuery(
-                                    "select kanalanschluss.id,rkvorhanden,	mkrvorhanden,	mksvorhanden,	skvorhanden,	rkangeschlossen,	mkrangeschlossen,	mksangeschlossen,	skangeschlossen,	sgvorhanden,	kkavorhanden,	sgentleerung,	kkaentleerung,	evg,	befreiungenunderlaubnisse from kassenzeichen,kanalanschluss where kassenzeichen.kanalanschluss=kanalanschluss.id and kassenzeichen.id ="
-                                            + kassenzeichen);
-                        }
-
-                        if (!rs.next()) {
-                            log.info("keine Kanaldaten gefunden");
-                            kanalanschlussdaten = new Kanalanschluss();
-                            clear();
-                        } else {
-//                        if (editmode && !isEmpty()) {
-//                            unlockDataset();
-//                        }
-                            int cc = rs.getMetaData().getColumnCount();
-                            final Object[] rowdataKanal = new Object[cc];
-                            for (int i = 0; i < cc; ++i) {
-                                rowdataKanal[i] = rs.getObject(i + 1);
-                            }
-                            kanalanschlussdaten = new Kanalanschluss();
-                            if (kassenzeichen.length() == 6) {
-                                rs = stmnt.executeQuery(
-                                        "select  befreiungerlaubnis.id,befreiungerlaubnis.aktenzeichen,befreiungerlaubnis.gueltig_bis,  from kassenzeichen,kanalanschluss,befreiungerlaubnisArray,befreiungerlaubnis where kassenzeichen.kanalanschluss=kanalanschluss.id and kanalanschluss.befreiungenunderlaubnisse=befreiungerlaubnisarray.kanalanschluss_reference and befreiungerlaubnisarray.befreiungerlaubnis=befreiungerlaubnis.id and  kassenzeichen.id/10 ="
-                                                + kassenzeichen);
-                            } else {
-                                rs = stmnt.executeQuery(
-                                        "select  befreiungerlaubnis.id,befreiungerlaubnis.aktenzeichen,befreiungerlaubnis.gueltig_bis  from kassenzeichen,kanalanschluss,befreiungerlaubnisArray,befreiungerlaubnis where kassenzeichen.kanalanschluss=kanalanschluss.id and kanalanschluss.befreiungenunderlaubnisse=befreiungerlaubnisarray.kanalanschluss_reference and befreiungerlaubnisarray.befreiungerlaubnis=befreiungerlaubnis.id and  kassenzeichen.id ="
-                                                + kassenzeichen);
-                            }
-                            final Vector<BefreiungErlaubnis> befreiungen = new Vector<BefreiungErlaubnis>();
-                            while (rs.next()) {
-                                cc = rs.getMetaData().getColumnCount();
-                                final Object[] rowdataBefreiung = new Object[cc];
-                                for (int i = 0; i < cc; ++i) {
-                                    rowdataBefreiung[i] = rs.getObject(i + 1);
-                                }
-                                final BefreiungErlaubnis be = new BefreiungErlaubnis();
-                                be.fillFromObjectArray(rowdataBefreiung);
-                                befreiungen.add(be);
-                            }
-
-                            kanalanschlussdaten.fillFromObjectArray(rowdataKanal, befreiungen);
-                        }
-                        kanalanschlussdaten.backup();
-                        kanalanschlussdaten.setKassenzeichen(new Integer(kassenzeichen).intValue());
-                        // Models
-                        chkRKvorhanden.setModel(kanalanschlussdaten.getRkVorhandenModel());
-                        chkMKRvorhanden.setModel(kanalanschlussdaten.getMkrVorhandenModel());
-                        chkMKSvorhanden.setModel(kanalanschlussdaten.getMksVorhandenModel());
-                        chkSKvorhanden.setModel(kanalanschlussdaten.getSkVorhandenModel());
-                        chkSGvorhanden.setModel(kanalanschlussdaten.getSgVorhandenModel());
-                        chkKKAvorhanden.setModel(kanalanschlussdaten.getKkaVorhandenModel());
-                        chkSGentleerung.setModel(kanalanschlussdaten.getSgEntleerungModel());
-                        chkKKAentleerung.setModel(kanalanschlussdaten.getKkaEntleerungModel());
-                        chkErlaubnisfreieVersickerung.setModel(kanalanschlussdaten.getEvgModel());
-                        cboRKangeschlossen.setModel(kanalanschlussdaten.getRkAngeschlossenModel());
-                        cboMKRangeschlossen.setModel(kanalanschlussdaten.getMkrAngeschlossenModel());
-                        cboMKSangeschlossen.setModel(kanalanschlussdaten.getMksAngeschlossenModel());
-                        cboSKangeschlossen.setModel(kanalanschlussdaten.getSkAngeschlossenModel());
-                        tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
-                        setEditable(editmode);
-                        visualizeValidity();
-                    } catch (SQLException sqlEx) {
-                        log.error("Fehler bei der Suche nach Kassenzeichen!", sqlEx);
-                    }
-                }
-            };
-        t.setPriority(Thread.NORM_PRIORITY);
-        t.start();
+    public CidsBean getCidsBean() {
+        return kassenzeichenBean;
     }
+
+    @Override
+    public void setCidsBean(final CidsBean cidsBean) {
+        chkSGentleerung.setEnabled(false);
+        chkKKAentleerung.setEnabled(false);
+        cboRKangeschlossen.setEnabled(false);
+        cboMKRangeschlossen.setEnabled(false);
+        cboMKSangeschlossen.setEnabled(false);
+        cboSKangeschlossen.setEnabled(false);
+        cboRKangeschlossen.setSelectedIndex(-1);
+        cboMKRangeschlossen.setSelectedIndex(-1);
+        cboMKSangeschlossen.setSelectedIndex(-1);
+        cboSKangeschlossen.setSelectedIndex(-1);
+
+        final BefreiungenModel m = new BefreiungenModel();
+        tblBE.setModel(m);
+        m.setCidsBean(cidsBean);
+        kassenzeichenBean = cidsBean;
+        bindingGroup.unbind();
+        bindingGroup.bind();
+    }
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      */
     private void visualizeValidity() {
         // TODO UGLY
-        if (main != null) {
-            if ((kanalanschlussdaten == null) || kanalanschlussdaten.isValid()) {
-                // lblTitle.setForeground(Color.white);
-                main.setKanalTitleForeground(Color.BLACK);
-            } else {
-                if (this.isEditmode()) {
-                    // lblTitle.setForeground(Color.YELLOW);
-                    main.setKanalTitleForeground(Color.YELLOW);
-                } else {
-                    // lblTitle.setForeground(Color.red);
-                    main.setKanalTitleForeground(Color.RED);
-                }
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  connectionInfo  DOCUMENT ME!
-     */
-    public void setConnectionInfo(final de.cismet.tools.ConnectionInfo connectionInfo) {
-        try {
-            Class.forName(connectionInfo.getDriver());
-            connection = DriverManager.getConnection(connectionInfo.getUrl(),
-                    connectionInfo.getUser(),
-                    connectionInfo.getPass());
-        } catch (ClassNotFoundException cnfEx) {
-            log.fatal("Datenbanktreiber nicht gefunden!", cnfEx);
-        } catch (java.sql.SQLException sqlEx) {
-            log.fatal("Fehler beim Aufbau der Datenbankverbindung!", sqlEx);
-        }
+// if (main != null) {
+// if ((kanalanschlussdaten == null) || kanalanschlussdaten.isValid()) {
+// // lblTitle.setForeground(Color.white);
+// main.setKanalTitleForeground(Color.BLACK);
+// } else {
+// if (this.isEditmode()) {
+// // lblTitle.setForeground(Color.YELLOW);
+// main.setKanalTitleForeground(Color.YELLOW);
+// } else {
+// // lblTitle.setForeground(Color.red);
+// main.setKanalTitleForeground(Color.RED);
+// }
+// }
+// }
     }
 
     /**
@@ -430,21 +304,21 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
 
         // nur um Editmodus reagieren
         if (isEditmode()) {
-            final Vector<BefreiungErlaubnis> selectedBefreiungen = getSelectedBE();
-            for (final BefreiungErlaubnis selectedBefreiung : selectedBefreiungen) {
-                if (log.isDebugEnabled()) {
-                    log.debug("selectedBefreiung: " + selectedBefreiung);
+            final List<CidsBean> selectedBefreiungen = getSelectedBE();
+            for (final CidsBean selectedBefreiung : selectedBefreiungen) {
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("selectedBefreiung: " + selectedBefreiung);
+                    }
+                    selectedBefreiung.delete();
+                } catch (Exception ex) {
+                    log.error("Fehler beim Löschen einer Befreiung", ex);
                 }
-                kanalanschlussdaten.addBefreiungToDelete(selectedBefreiung);
-                kanalanschlussdaten.getBefreiungen().remove(selectedBefreiung);
             }
-
-            // Tabelle aktualisieren
-            kanalanschlussdaten.updateModels();
-            tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
 
             // Menus aktualisieren
             updateClipboardMenu();
+
         }
     }
 
@@ -472,6 +346,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
                 return true;
             } else { // Kopieren ging schief
                 return false;
+
             }
         }
         return false;
@@ -487,7 +362,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             log.debug("copyBE()");
         }
 
-        // nur um Editmodus reagieren
+//        // nur um Editmodus reagieren
         if (isEditmode()) {
             // ausgeschnittene Daten noch nicht wieder eingefügt?
             if (!isClipboardBECutPasted && (getClipboardBEs().size() > 0)) {
@@ -509,9 +384,9 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
 
             // markierte BE in die Zwischenablage speichern
             final Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            for (final BefreiungErlaubnis befreiung : getSelectedBE()) {
-                clipboardString.append(befreiung.getAktenzeichen() + SEPARATOR_BE_DATA + befreiung.getGueltigBis()
-                            + SEPARATOR_BE);
+            for (final CidsBean befreiung : getSelectedBE()) {
+                clipboardString.append(befreiung.getProperty("aktenzeichen") + SEPARATOR_BE_DATA + befreiung.getProperty("gueltig_bis")
+                        + SEPARATOR_BE);
             }
             systemClipboard.setContents(new StringSelection(clipboardString.toString()), null);
 
@@ -528,35 +403,40 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
      *
      * @return  DOCUMENT ME!
      */
-    private Vector<BefreiungErlaubnis> getClipboardBEs() {
-        final Vector<BefreiungErlaubnis> befreiungen = new Vector<BefreiungErlaubnis>();
-        String data = "";
+    private List<CidsBean> getClipboardBEs() {
+        final List<CidsBean> befreiungen = new ArrayList<CidsBean>();
 
-        //
-        final Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        final Transferable transfer = systemClipboard.getContents(null);
         try {
-            data = (String)transfer.getTransferData(DataFlavor.stringFlavor);
-        } catch (UnsupportedFlavorException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
-            }
-        } catch (IOException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
-            }
-        }
+            String data = "";
 
-        //
-        final String[] befreiungStrings = data.split(SEPARATOR_BE);
-        for (final String befreiungString : befreiungStrings) {
-            final String[] befreiungData = befreiungString.split(SEPARATOR_BE_DATA);
-            if (befreiungData.length == 2) {
-                final BefreiungErlaubnis befreiung = new BefreiungErlaubnis();
-                befreiung.setAktenzeichen(befreiungData[0]);
-                befreiung.setGueltigBis(befreiungData[1]);
-                befreiungen.add(befreiung);
+            final Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            final Transferable transfer = systemClipboard.getContents(null);
+            try {
+                data = (String) transfer.getTransferData(DataFlavor.stringFlavor);
+            } catch (UnsupportedFlavorException ex) {
+                if (log.isDebugEnabled()) {
+                    log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
+                }
+            } catch (IOException ex) {
+                if (log.isDebugEnabled()) {
+                    log.debug("(String)transfer.getTransferData(DataFlavor.stringFlavor)", ex);
+                }
             }
+
+            //
+            final String[] befreiungStrings = data.split(SEPARATOR_BE);
+            for (final String befreiungString : befreiungStrings) {
+                final String[] befreiungData = befreiungString.split(SEPARATOR_BE_DATA);
+                if (befreiungData.length == 2) {
+                    final CidsBean befreiung = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.getInstance().getDomain(),
+                            "befreiungerlaubnis");
+                    befreiung.setProperty("aktenzeichen", befreiungData[0]);
+                    befreiung.setProperty("gueltig_bis", Date.valueOf(befreiungData[1]));
+                    befreiungen.add(befreiung);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Fehler beim lesen der Befreiungen aus der zwischenablage", e);
         }
 
         return befreiungen;
@@ -564,6 +444,8 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     private void pasteBE() {
         if (log.isDebugEnabled()) {
@@ -572,45 +454,40 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
 
         // nur um Editmodus reagieren
         if (isEditmode()) {
-            for (final BefreiungErlaubnis clipboardBefreiung : getClipboardBEs()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("clipboardBefreiung: " + clipboardBefreiung);
+            try {
+                for (final CidsBean clipboardBefreiung : getClipboardBEs()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("clipboardBefreiung: " + clipboardBefreiung);
+                    }
+
+                    final List<CidsBean> list = kassenzeichenBean.getBeanCollectionProperty(
+                            "kanalanschluss.befreiungenunderlaubnisse");
+                    list.add(clipboardBefreiung);
                 }
 
-                // neue BE erzeugen
-                final BefreiungErlaubnis newBefreiung = new BefreiungErlaubnis();
-                // Daten der BE im Zwischenspeicher in neue BE kopieren
-                newBefreiung.setAktenzeichen(clipboardBefreiung.getAktenzeichen());
-                newBefreiung.setGueltigBis(clipboardBefreiung.getGueltigBis());
+                // ausgeschnittene Daten wurden wieder eingefügt
+                if (!isClipboardBECutPasted) {
+                    isClipboardBECutPasted = true;
+                }
 
-                // neue BE einfügen
-                kanalanschlussdaten.getBefreiungen().add(newBefreiung);
+                // Menus aktualisieren
+                updateClipboardMenu();
+            } catch (Exception e) {
+                log.error("Fehler beim Einfügen von Befreiungen aus der Zwischenablage", e);
             }
-
-            // ausgeschnittene Daten wurden wieder eingefügt
-            if (!isClipboardBECutPasted) {
-                isClipboardBECutPasted = true;
-            }
-
-            // Tabelle aktualisieren
-            kanalanschlussdaten.updateModels();
-            tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
-
-            // Menus aktualisieren
-            updateClipboardMenu();
         }
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
      */
-    private Vector<BefreiungErlaubnis> getSelectedBE() {
-        final Vector<BefreiungErlaubnis> befreiungen = new Vector<BefreiungErlaubnis>();
+    private List<CidsBean> getSelectedBE() {
+        final List<CidsBean> befreiungen = new ArrayList<CidsBean>();
+        final List<CidsBean> allBefreiungen = kassenzeichenBean.getBeanCollectionProperty(
+                "kanalanschluss.befreiungenunderlaubnisse");
         final int[] rows = tblBE.getSelectedRows();
         for (final int row : rows) {
-            befreiungen.add(kanalanschlussdaten.getBefreiungen().get(row));
+            befreiungen.add(allBefreiungen.get(row));
         }
         return befreiungen;
     }
@@ -621,6 +498,8 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
+
         jPopupMenu1 = new javax.swing.JPopupMenu();
         mniCut = new javax.swing.JMenuItem();
         mniCopy = new javax.swing.JMenuItem();
@@ -637,10 +516,10 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         chkMKSvorhanden = new javax.swing.JCheckBox();
         chkSKvorhanden = new javax.swing.JCheckBox();
         lblAngeschlossen = new javax.swing.JLabel();
-        cboRKangeschlossen = new javax.swing.JComboBox();
-        cboMKRangeschlossen = new javax.swing.JComboBox();
-        cboMKSangeschlossen = new javax.swing.JComboBox();
-        cboSKangeschlossen = new javax.swing.JComboBox();
+        cboRKangeschlossen = new DefaultBindableReferenceCombo();
+        cboMKRangeschlossen = new DefaultBindableReferenceCombo();
+        cboMKSangeschlossen = new DefaultBindableReferenceCombo();
+        cboSKangeschlossen = new DefaultBindableReferenceCombo();
         lblSG = new javax.swing.JLabel();
         lblVorhanden2 = new javax.swing.JLabel();
         lblEntleerung = new javax.swing.JLabel();
@@ -704,84 +583,105 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         lblVorhanden1.setToolTipText("vorhanden");
 
         chkRKvorhanden.setBorder(null);
-        chkRKvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkRKvorhandenActionPerformed(evt);
-                }
-            });
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.rkvorhanden}"), chkRKvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkRKvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkRKvorhandenActionPerformed(evt);
+            }
+        });
 
         chkMKRvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkMKRvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkMKRvorhandenActionPerformed(evt);
-                }
-            });
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.mkrvorhanden}"), chkMKRvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkMKRvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMKRvorhandenActionPerformed(evt);
+            }
+        });
 
         chkMKSvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkMKSvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkMKSvorhandenActionPerformed(evt);
-                }
-            });
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.mksvorhanden}"), chkMKSvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkMKSvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMKSvorhandenActionPerformed(evt);
+            }
+        });
 
         chkSKvorhanden.setToolTipText("");
         chkSKvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkSKvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkSKvorhandenActionPerformed(evt);
-                }
-            });
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.skvorhanden}"), chkSKvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkSKvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSKvorhandenActionPerformed(evt);
+            }
+        });
 
         lblAngeschlossen.setText("angeschlossen");
 
-        cboRKangeschlossen.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ja", "nein", "fraglich" }));
         cboRKangeschlossen.setFocusable(false);
         cboRKangeschlossen.setMinimumSize(new java.awt.Dimension(55, 16));
         cboRKangeschlossen.setPreferredSize(new java.awt.Dimension(59, 16));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.rkangeschlossen}"), cboRKangeschlossen, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
+
         cboRKangeschlossen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboRKangeschlossenActionPerformed(evt);
+            }
+        });
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboRKangeschlossenActionPerformed(evt);
-                }
-            });
-
-        cboMKRangeschlossen.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ja", "nein", "fraglich" }));
         cboMKRangeschlossen.setFocusable(false);
         cboMKRangeschlossen.setMinimumSize(new java.awt.Dimension(55, 16));
         cboMKRangeschlossen.setPreferredSize(new java.awt.Dimension(59, 16));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.mkrangeschlossen}"), cboMKRangeschlossen, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
+
         cboMKRangeschlossen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboMKRangeschlossenActionPerformed(evt);
+            }
+        });
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboMKRangeschlossenActionPerformed(evt);
-                }
-            });
-
-        cboMKSangeschlossen.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ja", "nein", "fraglich" }));
         cboMKSangeschlossen.setFocusable(false);
         cboMKSangeschlossen.setMinimumSize(new java.awt.Dimension(55, 16));
         cboMKSangeschlossen.setPreferredSize(new java.awt.Dimension(59, 16));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.mksangeschlossen}"), cboMKSangeschlossen, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
+
         cboMKSangeschlossen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboMKSangeschlossenActionPerformed(evt);
+            }
+        });
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboMKSangeschlossenActionPerformed(evt);
-                }
-            });
-
-        cboSKangeschlossen.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ja", "nein", "fraglich" }));
         cboSKangeschlossen.setFocusable(false);
         cboSKangeschlossen.setMinimumSize(new java.awt.Dimension(55, 16));
         cboSKangeschlossen.setPreferredSize(new java.awt.Dimension(59, 16));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.skangeschlossen}"), cboSKangeschlossen, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         lblSG.setText("SG");
         lblSG.setToolTipText("Sickergrube");
@@ -794,70 +694,91 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         lblKKA.setToolTipText("Kleinkläranlage");
 
         chkSGvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkSGvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkSGvorhandenActionPerformed(evt);
-                }
-            });
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.sgvorhanden}"), chkSGvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkSGvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSGvorhandenActionPerformed(evt);
+            }
+        });
 
         chkKKAvorhanden.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chkKKAvorhanden.addActionListener(new java.awt.event.ActionListener() {
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkKKAvorhandenActionPerformed(evt);
-                }
-            });
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.kkavorhanden}"), chkKKAvorhanden, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        chkKKAvorhanden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkKKAvorhandenActionPerformed(evt);
+            }
+        });
 
         chkSGentleerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.sgentleerung}"), chkSGentleerung, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
         chkKKAentleerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.kkaentleerung}"), chkKKAentleerung, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
         chkErlaubnisfreieVersickerung.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kanalanschluss.evg}"), chkErlaubnisfreieVersickerung, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
 
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         scpBE.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         scpBE.addMouseListener(new java.awt.event.MouseAdapter() {
-
-                @Override
-                public void mousePressed(final java.awt.event.MouseEvent evt) {
-                    scpBEMousePressed(evt);
-                }
-            });
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                scpBEMousePressed(evt);
+            }
+        });
 
         tblBE.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][] {},
-                new String[] { "Aktenzeichen", "gültig bis" }) {
+            new Object [][] {
 
-                Class[] types = new Class[] { java.lang.String.class, java.lang.String.class };
+            },
+            new String [] {
+                "Aktenzeichen", "gültig bis"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
 
-                @Override
-                public Class getColumnClass(final int columnIndex) {
-                    return types[columnIndex];
-                }
-            });
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         tblBE.addMouseListener(new java.awt.event.MouseAdapter() {
-
-                @Override
-                public void mousePressed(final java.awt.event.MouseEvent evt) {
-                    tblBEMousePressed(evt);
-                }
-            });
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblBEMousePressed(evt);
+            }
+        });
         scpBE.setViewportView(tblBE);
         // reagieren auf Verändern der Selektion
         tblBE.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-                @Override
-                public void valueChanged(final ListSelectionEvent e) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("selectionChanged");
-                    }
-                    updateClipboardMenu();
-                }
-            });
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                log.debug("selectionChanged");
+                updateClipboardMenu();
+            }
+        });
 
         // registrieren von STRG+X für Ausschneiden
         tblBE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_CUT, STRING_CUT);
@@ -880,194 +801,204 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
         lblEVG.setText("EVG");
         lblEVG.setToolTipText("Erlaubnisfreie Versickerung");
 
-        cmdAddBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
+        cmdAddBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
         cmdAddBefreiungErlaubnis.setFocusPainted(false);
         cmdAddBefreiungErlaubnis.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdAddBefreiungErlaubnisActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdAddBefreiungErlaubnisActionPerformed(evt);
+            }
+        });
 
         cmdDeleteBefreiungErlaubnis.setAction(new DeleteAction());
-        cmdDeleteBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
+        cmdDeleteBefreiungErlaubnis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
         cmdDeleteBefreiungErlaubnis.setEnabled(false);
         cmdDeleteBefreiungErlaubnis.setFocusPainted(false);
 
-        final org.jdesktop.layout.GroupLayout panMainLayout = new org.jdesktop.layout.GroupLayout(panMain);
+        org.jdesktop.layout.GroupLayout panMainLayout = new org.jdesktop.layout.GroupLayout(panMain);
         panMain.setLayout(panMainLayout);
         panMainLayout.setHorizontalGroup(
-            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                panMainLayout.createSequentialGroup().addContainerGap().add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createSequentialGroup().add(lblKKA).add(121, 121, 121)).add(
-                        org.jdesktop.layout.GroupLayout.TRAILING,
-                        panMainLayout.createSequentialGroup().add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING).add(
-                                panMainLayout.createSequentialGroup().add(
-                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                        lblRK).add(lblMKR).add(lblMKS).add(lblSK).add(lblSG).add(
-                                        panMainLayout.createSequentialGroup().add(lblEVG).add(12, 12, 12).add(
-                                            panMainLayout.createParallelGroup(
-                                                org.jdesktop.layout.GroupLayout.LEADING).add(chkRKvorhanden).add(
-                                                chkMKRvorhanden).add(chkMKSvorhanden).add(chkSKvorhanden).add(
-                                                chkSGvorhanden).add(chkKKAvorhanden).add(
-                                                chkErlaubnisfreieVersickerung)))).add(13, 13, 13)).add(
-                                panMainLayout.createSequentialGroup().add(lblVorhanden1).addPreferredGap(
-                                    org.jdesktop.layout.LayoutStyle.RELATED)).add(
-                                panMainLayout.createSequentialGroup().add(lblVorhanden2).addPreferredGap(
-                                    org.jdesktop.layout.LayoutStyle.RELATED))).add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                lblEntleerung).add(lblAngeschlossen).add(
-                                panMainLayout.createSequentialGroup().add(10, 10, 10).add(
-                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                        cboMKRangeschlossen,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-                                        cboRKangeschlossen,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-                                        cboMKSangeschlossen,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-                                        cboSKangeschlossen,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))).add(
-                                panMainLayout.createSequentialGroup().add(10, 10, 10).add(
-                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                        chkKKAentleerung).add(chkSGentleerung)))).add(13, 13, 13))).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    jSeparator4,
-                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createSequentialGroup().add(lblBE).addPreferredGap(
-                            org.jdesktop.layout.LayoutStyle.RELATED,
-                            28,
-                            Short.MAX_VALUE).add(cmdAddBefreiungErlaubnis).addPreferredGap(
-                            org.jdesktop.layout.LayoutStyle.RELATED).add(cmdDeleteBefreiungErlaubnis)).add(
-                        scpBE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        221,
-                        Short.MAX_VALUE)).addContainerGap()));
+            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panMainLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panMainLayout.createSequentialGroup()
+                        .add(lblKKA)
+                        .add(121, 121, 121))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, panMainLayout.createSequentialGroup()
+                        .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(panMainLayout.createSequentialGroup()
+                                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(lblRK)
+                                    .add(lblMKR)
+                                    .add(lblMKS)
+                                    .add(lblSK)
+                                    .add(lblSG)
+                                    .add(panMainLayout.createSequentialGroup()
+                                        .add(lblEVG)
+                                        .add(12, 12, 12)
+                                        .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(chkRKvorhanden)
+                                            .add(chkMKRvorhanden)
+                                            .add(chkMKSvorhanden)
+                                            .add(chkSKvorhanden)
+                                            .add(chkSGvorhanden)
+                                            .add(chkKKAvorhanden)
+                                            .add(chkErlaubnisfreieVersickerung))))
+                                .add(13, 13, 13))
+                            .add(panMainLayout.createSequentialGroup()
+                                .add(lblVorhanden1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                            .add(panMainLayout.createSequentialGroup()
+                                .add(lblVorhanden2)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
+                        .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(lblEntleerung)
+                            .add(lblAngeschlossen)
+                            .add(panMainLayout.createSequentialGroup()
+                                .add(10, 10, 10)
+                                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(cboMKRangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(cboRKangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(cboMKSangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(cboSKangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(panMainLayout.createSequentialGroup()
+                                .add(10, 10, 10)
+                                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(chkKKAentleerung)
+                                    .add(chkSGentleerung))))
+                        .add(13, 13, 13)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panMainLayout.createSequentialGroup()
+                        .add(lblBE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 43, Short.MAX_VALUE)
+                        .add(cmdAddBefreiungErlaubnis)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(cmdDeleteBefreiungErlaubnis))
+                    .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
+                .addContainerGap())
+        );
         panMainLayout.setVerticalGroup(
-            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                panMainLayout.createSequentialGroup().addContainerGap().add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                        lblAngeschlossen).add(lblVorhanden1)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblRK).add(
-                        chkRKvorhanden).add(
-                        cboRKangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblMKR).add(
-                        chkMKRvorhanden).add(
-                        cboMKRangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblMKS).add(
-                        chkMKSvorhanden).add(
-                        cboMKSangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblSK).add(
-                        chkSKvorhanden).add(
-                        cboSKangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).add(8, 8, 8).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createSequentialGroup().add(18, 18, 18).add(lblSG)).add(
-                        panMainLayout.createSequentialGroup().addPreferredGap(
-                            org.jdesktop.layout.LayoutStyle.RELATED).add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                                lblEntleerung).add(lblVorhanden2)).addPreferredGap(
-                            org.jdesktop.layout.LayoutStyle.RELATED).add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                                chkSGvorhanden).add(chkSGentleerung)))).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblKKA).add(
-                            chkKKAvorhanden)).add(chkKKAentleerung)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                        chkErlaubnisfreieVersickerung).add(lblEVG)).addContainerGap(21, Short.MAX_VALUE)).add(
-                jSeparator4,
-                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                243,
-                Short.MAX_VALUE).add(
-                panMainLayout.createSequentialGroup().addContainerGap().add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(lblBE).add(
-                        cmdAddBefreiungErlaubnis).add(cmdDeleteBefreiungErlaubnis)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    scpBE,
-                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                    185,
-                    Short.MAX_VALUE).addContainerGap()));
+            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(panMainLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(lblAngeschlossen)
+                    .add(lblVorhanden1))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(lblRK)
+                    .add(chkRKvorhanden)
+                    .add(cboRKangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(lblMKR)
+                    .add(chkMKRvorhanden)
+                    .add(cboMKRangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(lblMKS)
+                    .add(chkMKSvorhanden)
+                    .add(cboMKSangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(lblSK)
+                    .add(chkSKvorhanden)
+                    .add(cboSKangeschlossen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(8, 8, 8)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panMainLayout.createSequentialGroup()
+                        .add(18, 18, 18)
+                        .add(lblSG))
+                    .add(panMainLayout.createSequentialGroup()
+                        .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(lblEntleerung)
+                            .add(lblVorhanden2))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(chkSGvorhanden)
+                            .add(chkSGentleerung))))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(lblKKA)
+                        .add(chkKKAvorhanden))
+                    .add(chkKKAentleerung))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(chkErlaubnisfreieVersickerung)
+                    .add(lblEVG))
+                .addContainerGap(20, Short.MAX_VALUE))
+            .add(jSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+            .add(panMainLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(lblBE)
+                    .add(cmdAddBefreiungErlaubnis)
+                    .add(cmdDeleteBefreiungErlaubnis))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(scpBE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         add(panMain, java.awt.BorderLayout.CENTER);
-    } // </editor-fold>//GEN-END:initComponents
+
+        bindingGroup.bind();
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboMKSangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboMKSangeschlossenActionPerformed
+    private void cboMKSangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMKSangeschlossenActionPerformed
         visualizeValidity();
-    }                                                                                       //GEN-LAST:event_cboMKSangeschlossenActionPerformed
+    }//GEN-LAST:event_cboMKSangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboMKRangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboMKRangeschlossenActionPerformed
+    private void cboMKRangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMKRangeschlossenActionPerformed
         visualizeValidity();
-    }                                                                                       //GEN-LAST:event_cboMKRangeschlossenActionPerformed
+    }//GEN-LAST:event_cboMKRangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboRKangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboRKangeschlossenActionPerformed
+    private void cboRKangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboRKangeschlossenActionPerformed
         visualizeValidity();
-    }                                                                                      //GEN-LAST:event_cboRKangeschlossenActionPerformed
+    }//GEN-LAST:event_cboRKangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddBefreiungErlaubnisActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddBefreiungErlaubnisActionPerformed
-        kanalanschlussdaten.getBefreiungen().add(new BefreiungErlaubnis());
-        kanalanschlussdaten.updateModels();
-        tblBE.setModel(kanalanschlussdaten.getBefreiungenModel());
-    }                                                                                            //GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
+    private void cmdAddBefreiungErlaubnisActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddBefreiungErlaubnisActionPerformed
+        try {
+            final List<CidsBean> list = kassenzeichenBean.getBeanCollectionProperty(
+                    "kanalanschluss.befreiungenunderlaubnisse");
+            final CidsBean befreiung = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.getInstance().getDomain(),
+                    "befreiungerlaubnis");
+            list.add(befreiung);
+            
+        } catch (Exception e) {
+            log.error("Fehler beim Hinzufügen einer neuen Befreiung", e);
+        }
+    }//GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkKKAvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkKKAvorhandenActionPerformed
+    private void chkKKAvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkKKAvorhandenActionPerformed
         if (chkKKAvorhanden.isSelected() && editmode) {
             chkKKAentleerung.setEnabled(true);
         } else {
@@ -1075,14 +1006,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             chkKKAentleerung.setSelected(false);
         }
         visualizeValidity();
-    }                                                                                   //GEN-LAST:event_chkKKAvorhandenActionPerformed
+    }//GEN-LAST:event_chkKKAvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSGvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSGvorhandenActionPerformed
+    private void chkSGvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSGvorhandenActionPerformed
         if (chkSGvorhanden.isSelected() && editmode) {
             chkSGentleerung.setEnabled(true);
         } else {
@@ -1090,14 +1021,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             chkSGentleerung.setSelected(false);
         }
         visualizeValidity();
-    }                                                                                  //GEN-LAST:event_chkSGvorhandenActionPerformed
+    }//GEN-LAST:event_chkSGvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSKvorhandenActionPerformed
+    private void chkSKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSKvorhandenActionPerformed
         if (chkSKvorhanden.isSelected() && editmode) {
             cboSKangeschlossen.setEnabled(true);
         } else {
@@ -1105,14 +1036,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             cboSKangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }                                                                                  //GEN-LAST:event_chkSKvorhandenActionPerformed
+    }//GEN-LAST:event_chkSKvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkMKSvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkMKSvorhandenActionPerformed
+    private void chkMKSvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMKSvorhandenActionPerformed
         if (chkMKSvorhanden.isSelected() && editmode) {
             cboMKSangeschlossen.setEnabled(true);
         } else {
@@ -1120,14 +1051,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             cboMKSangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }                                                                                   //GEN-LAST:event_chkMKSvorhandenActionPerformed
+    }//GEN-LAST:event_chkMKSvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkMKRvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkMKRvorhandenActionPerformed
+    private void chkMKRvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMKRvorhandenActionPerformed
         if (chkMKRvorhanden.isSelected() && editmode) {
             cboMKRangeschlossen.setEnabled(true);
         } else {
@@ -1135,14 +1066,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             cboMKRangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }                                                                                   //GEN-LAST:event_chkMKRvorhandenActionPerformed
+    }//GEN-LAST:event_chkMKRvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkRKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkRKvorhandenActionPerformed
+    private void chkRKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRKvorhandenActionPerformed
         if (chkRKvorhanden.isSelected() && editmode) {
             cboRKangeschlossen.setEnabled(true);
         } else {
@@ -1150,14 +1081,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             cboRKangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }                                                                                  //GEN-LAST:event_chkRKvorhandenActionPerformed
+    }//GEN-LAST:event_chkRKvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tblBEMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_tblBEMousePressed
+    private void tblBEMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBEMousePressed
         if (SwingUtilities.isRightMouseButton(evt) && isEditmode()) {
             final Point p = evt.getPoint();
             final int rowNumber = tblBE.rowAtPoint(p);
@@ -1167,19 +1098,23 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
             updateClipboardMenu();
             jPopupMenu1.show(evt.getComponent(), evt.getX(), evt.getY());
         }
-    }                                                                     //GEN-LAST:event_tblBEMousePressed
+    }//GEN-LAST:event_tblBEMousePressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void scpBEMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_scpBEMousePressed
+    private void scpBEMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scpBEMousePressed
         tblBEMousePressed(evt);
-    }                                                                     //GEN-LAST:event_scpBEMousePressed
+    }//GEN-LAST:event_scpBEMousePressed
+
+    @Override
+    public void editModeChanged() {
+        setEditable(CidsAppBackend.getInstance().isEditable());
+    }
 
     //~ Inner Classes ----------------------------------------------------------
-
     /**
      * DOCUMENT ME!
      *
@@ -1188,7 +1123,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     class CutAction extends AbstractAction {
 
         //~ Methods ------------------------------------------------------------
-
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void actionPerformed(final ActionEvent e) {
             cutSelectedBE();
@@ -1203,7 +1142,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     class CopyAction extends AbstractAction {
 
         //~ Methods ------------------------------------------------------------
-
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void actionPerformed(final ActionEvent e) {
             copySelectedBE();
@@ -1218,7 +1161,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     class PasteAction extends AbstractAction {
 
         //~ Methods ------------------------------------------------------------
-
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void actionPerformed(final ActionEvent e) {
             pasteBE();
@@ -1233,7 +1180,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements Storable, Kas
     class DeleteAction extends AbstractAction {
 
         //~ Methods ------------------------------------------------------------
-
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void actionPerformed(final ActionEvent e) {
             deleteSelectedBE();

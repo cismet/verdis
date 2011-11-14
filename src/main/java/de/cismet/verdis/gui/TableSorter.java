@@ -10,7 +10,7 @@
  *
  * Created on 12. Januar 2005, 10:27
  */
-package de.cismet.gui.tools;
+package de.cismet.verdis.gui;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -210,8 +210,7 @@ public class TableSorter extends AbstractTableModel {
      * @return  DOCUMENT ME!
      */
     public boolean isSorting() {
-        return (sortingColumns.size() != 0)
-                    & !(((de.cismet.verdis.gui.FlaechenUebersichtsTableModel)tableModel).getTmpNoSort());
+        return sortingColumns.size() != 0;
     }
 
     /**

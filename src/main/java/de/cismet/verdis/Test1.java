@@ -7,10 +7,17 @@
 ****************************************************/
 package de.cismet.verdis;
 
-import java.beans.XMLEncoder;
+import Sirius.navigator.connection.Connection;
+import Sirius.navigator.connection.ConnectionFactory;
+import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.connection.ConnectionSession;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
+import Sirius.server.middleware.types.MetaObject;
+
+import org.apache.commons.beanutils.BeanUtils;
+
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
  * DOCUMENT ME!
@@ -37,23 +44,38 @@ public class Test1 {
      */
     public static void main(final String[] args) {
         try {
-            final TestBean tb2 = new TestBean();
-            tb2.setF1(2.2f);
-            tb2.setI1(2);
-            tb2.setS1("two");
-            tb2.setTb1(null);
-            final TestBean tb1 = new TestBean();
-            tb1.setF1(1.1f);
-            tb1.setI1(1);
-            tb1.setS1("one");
-            tb1.setTb1(tb2);
+            final String callServerURL = "http://localhost:9986/callserver/binary";
+            final String connectionClass = "Sirius.navigator.connection.RESTfulConnection";
+            Log4JQuickConfig.configure4LumbermillOnLocalhost();
 
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final FileOutputStream fos = new FileOutputStream("C:\\test.xml");
-            final XMLEncoder xmlEncoder = new XMLEncoder(fos);
+//            String callServerURL="rmi://localhost/callServer";
+//            String connectionClass="Sirius.navigator.connection.RMIConnection";
+            final Connection connection = ConnectionFactory.getFactory()
+                        .createConnection(connectionClass, callServerURL);
+            ConnectionSession session = null;
+            ConnectionProxy proxy = null;
+            final ConnectionInfo connectionInfo = new ConnectionInfo();
+            connectionInfo.setCallserverURL(callServerURL);
+            connectionInfo.setPassword(new String("sb"));
+            connectionInfo.setUserDomain("VERDIS");
+            connectionInfo.setUsergroup("VORN");
+            connectionInfo.setUsergroupDomain("VERDIS");
+            connectionInfo.setUsername("SteinbacherD102");
 
-            xmlEncoder.writeObject(tb1);
-            xmlEncoder.close();
+            session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
+
+            System.out.println("session created");
+            proxy = ConnectionFactory.getFactory()
+                        .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+
+            System.out.println("connection established");
+            System.out.println("retrieve 6000467");
+            final long l = System.currentTimeMillis();
+            final MetaObject mo = proxy.getMetaObject(6000467, 11, "VERDIS");
+//            MetaObject mo = proxy.getMetaObject(6021737, 11, "VERDIS");
+            System.out.println("dauer:" + (System.currentTimeMillis() - l));
+            System.out.println("retrieved 6000467");
+            System.out.println(mo.getBean().toJSONString());
         } catch (Exception e) {
             e.printStackTrace();
         }

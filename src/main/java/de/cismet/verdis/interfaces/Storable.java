@@ -12,8 +12,6 @@
  */
 package de.cismet.verdis.interfaces;
 
-import de.cismet.validation.NotValidException;
-
 /**
  * DOCUMENT ME!
  *
@@ -46,12 +44,4 @@ public interface Storable {
      * DOCUMENT ME!
      */
     void unlockDataset();
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   v  DOCUMENT ME!
-     *
-     * @throws  NotValidException  DOCUMENT ME!
-     */
-    void addStoreChangeStatements(java.util.Vector v) throws NotValidException;
 }
