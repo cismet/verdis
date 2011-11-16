@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.cismet.verdis.interfaces;
 
+import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cids.custom.util.CidsBeanTableHelper;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -50,6 +50,10 @@ public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionL
 
     public CidsBean createNewBean(final int id) throws Exception;
 
+    public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception;
+
+    public Geometry getGeometry(final CidsBean cidsBean);
+
     public List<CidsBean> getAllBeans();
 
     public List<CidsBean> getSelectedBeans();
@@ -61,5 +65,4 @@ public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionL
     public void selectCidsBean(final CidsBean cidsBean);
 
     public Validator getItemValidator(final CidsBean cidsBean);
-
 }

@@ -1,10 +1,10 @@
 /***************************************************
-*
-* cismet GmbH, Saarbruecken, Germany
-*
-*              ... and it just works.
-*
-****************************************************/
+ *
+ * cismet GmbH, Saarbruecken, Germany
+ *
+ *              ... and it just works.
+ *
+ ****************************************************/
 /*
  *  Copyright (C) 2010 thorsten
  *
@@ -56,6 +56,13 @@ import java.util.Collection;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import de.cismet.validation.ValidatorState;
+import de.cismet.validation.ValidatorStateImpl;
+import de.cismet.validation.validator.CidsBeanValidator;
+import java.awt.event.ActionEvent;
+import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 /**
  * DOCUMENT ME!
@@ -66,11 +73,9 @@ import javax.swing.event.HyperlinkListener;
 public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener, HyperlinkListener, RegenFlaechenPropertyConstants, Validatable {
 
     //~ Instance fields --------------------------------------------------------
-
-    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenDetailsPanel.class);
     private CidsBean flaecheBean;
     private final Validator bindingValidator;
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanRegenFlDetails;
     private javax.swing.JComboBox cboAnschlussgrad;
@@ -108,7 +113,6 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
-
     /**
      * Creates new form RegenFlaechenDetailsPanel.
      */
@@ -118,16 +122,15 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
 
-        ((DefaultBindableReferenceCombo)cboBeschreibung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENBESCHREIBUNG));
-        ((DefaultBindableReferenceCombo)cboAnschlussgrad).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD));
-        ((DefaultBindableReferenceCombo)cboFlaechenart).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART));
+        ((DefaultBindableReferenceCombo) cboBeschreibung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENBESCHREIBUNG));
+        ((DefaultBindableReferenceCombo) cboAnschlussgrad).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD));
+        ((DefaultBindableReferenceCombo) cboFlaechenart).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART));
         setEnabled(false);
 
         edtQuer.addHyperlinkListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
-
     @Override
     public Validator getValidator() {
         // nur BindingValidator notwendig, der TabellenValidator validiert schon alle beans
@@ -147,8 +150,8 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     }
 
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
-         Main.transformToDefaultCrsNeeded(geom);
-         if (cidsBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE) == null) {
+        Main.transformToDefaultCrsNeeded(geom);
+        if (cidsBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE) == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
             cidsBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE, emptyGeoBean);
         }
@@ -157,19 +160,19 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
     private void attachBeanValidators() {
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtBezeichnung);
-        RegenFlaechenTabellenPanel.getValidatorFlaechenBezeichnung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtBezeichnung));
+        getValidatorFlaechenBezeichnung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtBezeichnung));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtGroesseGrafik);
-        RegenFlaechenTabellenPanel.getValidatorGroesseGrafik(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtGroesseGrafik));
+        getValidatorGroesseGrafik(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtGroesseGrafik));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtGroesseKorrektur);
-        RegenFlaechenTabellenPanel.getValidatorGroesseKorrektur(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtGroesseKorrektur));
+        getValidatorGroesseKorrektur(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtGroesseKorrektur));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtAnteil);
-        RegenFlaechenTabellenPanel.getValidatorAnteil(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtAnteil));
+        getValidatorAnteil(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtAnteil));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtErfassungsdatum);
-        RegenFlaechenTabellenPanel.getValidatorDatumErfassung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtErfassungsdatum));
+        getValidatorDatumErfassung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtErfassungsdatum));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungsdatum);
-        RegenFlaechenTabellenPanel.getValidatorDatumVeranlagung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungsdatum));
+        getValidatorDatumVeranlagung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungsdatum));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtFEB_ID);
-        RegenFlaechenTabellenPanel.getValidatorFebId(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtFEB_ID));
+        getValidatorFebId(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtFEB_ID));
     }
 
     /**
@@ -572,9 +575,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     private void chkSperreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
         final boolean sperre = chkSperre.isSelected();
         if (sperre) {
-            String answer = JOptionPane.showInputDialog(Main.THIS.getRootPane(),
-                        "Bitte eine Bemerkung zur Sperre angeben.",
-                        txtSperreBemerkung.getText());
+            final String answer = JOptionPane.showInputDialog(Main.THIS.getRootPane(),
+                    "Bitte eine Bemerkung zur Sperre angeben.",
+                    txtSperreBemerkung.getText());
             if (answer == null) {
                 chkSperre.setSelected(false);
             }
@@ -606,7 +609,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 bpanRegenFlDetails.setBackgroundEnabled(false);
             }
         } catch (Exception e) {
-            log.warn("problem when trying to set background enabled (or not). will turn the background off", e);
+            LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
             bpanRegenFlDetails.setBackgroundEnabled(false);
         }
 
@@ -616,7 +619,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 @Override
                 public void run() {
                     // TeileigentumCrossReferences
-                    Collection crossReference = (Collection)CidsAppBackend.getInstance().getCrossReferencesFor(cidsBean.getMetaObject().getID());
+                    final Collection crossReference = (Collection) CidsAppBackend.getInstance().getCrossReferencesFor(cidsBean.getMetaObject().getID());
                     if (crossReference != null) {
                         String html = "<html><body><center>";
                         for (final Object o : crossReference) {
@@ -708,18 +711,302 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     public void hyperlinkUpdate(final HyperlinkEvent he) {
         final Thread t = new Thread() {
 
-                @Override
-                public void run() {
-                    if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                        try {
-                            Main.THIS.getKzPanel().gotoKassenzeichen(he.getDescription());
-                        } catch (Exception ex) {
-                            log.error("Fehler im Hyperlinken", ex);
+            @Override
+            public void run() {
+                if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Main.THIS.getKzPanel().gotoKassenzeichen(he.getDescription());
+                    } catch (Exception ex) {
+                        LOG.error("Fehler im Hyperlinken", ex);
+                    }
+                }
+            }
+        };
+        t.setPriority(Thread.NORM_PRIORITY);
+        t.start();
+    }
+
+    public static Validator getValidatorFlaechenBezeichnung(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG) {
+
+            @Override
+            protected void init() {
+                addTriggerProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART);
+            }
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final String bezeichnung = (String) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                final int art = (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID) == null) ? 0 : (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                final Action action = new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        final int answer = JOptionPane.showConfirmDialog(
+                                Main.THIS,
+                                "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
+                                "Bezeichnung automatisch setzen",
+                                JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            final CidsBean cidsBean = getCidsBean();
+                            int art;
+                            try {
+                                art = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                            } catch (final NumberFormatException ex) {
+                                art = 0;
+                            }
+                            final String newValue = Main.THIS.getRegenFlaechenTabellenPanel().getValidFlaechenname(art);
+                            try {
+                                cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG, newValue);
+                            } catch (Exception ex) {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("error while setting flaechenbezeichnung", ex);
+                                }
+                            }
+                        }
+                    }
+                };
+
+                boolean numerisch = false;
+                Integer tester = null;
+                try {
+                    tester = Integer.parseInt(bezeichnung);
+                    numerisch = true;
+                } catch (final Exception ex) {
+                    numerisch = false;
+                }
+
+                if ((art == Main.PROPVAL_ART_DACH) || (art == Main.PROPVAL_ART_GRUENDACH)) {
+                    if (!numerisch) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Fl\u00E4chenbezeichnung muss eine Zahl sein.", action);
+                    } else {
+                        if ((tester.intValue() > 1000) || (tester.intValue() < 0)) {
+                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Fl\u00E4chenbezeichnung muss zwischen 0 und 1000 liegen.", action);
+                        }
+                    }
+                } else {
+                    if (bezeichnung != null) {
+                        final int len = bezeichnung.length();
+                        if (numerisch || ((len > 3) || ((len == 3) && (bezeichnung.compareTo("BBB") > 0)))) {
+                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Fl\u00E4chenbezeichnung muss zwischen A und BBB liegen.", action);
                         }
                     }
                 }
-            };
-        t.setPriority(Thread.NORM_PRIORITY);
-        t.start();
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorGroesseGrafik(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final Integer gr_grafik = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
+                final Action action = new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent event) {
+                        final CidsBean cidsBean = getCidsBean();
+                        final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
+
+                        if (Main.THIS.isInEditMode()) {
+                            if (geom != null) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        Main.THIS,
+                                        "Soll die Gr\u00F6\u00DFe aus der Grafik \u00FCbernommen werden?",
+                                        "Gr\u00F6\u00DFe automatisch setzen",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (answer == JOptionPane.YES_OPTION) {
+                                    try {
+                                        final Integer gr_grafik = new Integer((int) (geom.getArea()));
+                                        cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK, gr_grafik);
+                                    } catch (final Exception ex) {
+                                        if (LOG.isDebugEnabled()) {
+                                            LOG.debug("error while setting groesse_aus_grafik", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                if (gr_grafik == null) {
+                    return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
+                }
+                if (geom != null && !gr_grafik.equals(new Integer((int) (geom.getArea())))) {
+                    return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Fl\u00E4che der Geometrie stimmt nicht \u00FCberein (" + ((int) (geom.getArea())) + ")", action);
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorGroesseKorrektur(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR) {
+
+            @Override
+            protected void init() {
+                addTriggerProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+            }
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final Integer gr_grafik = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                final Integer gr_korrektur = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+
+                final Action action = new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent event) {
+                        final CidsBean cidsBean = getCidsBean();
+                        final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
+
+                        if (Main.THIS.isInEditMode()) {
+                            if (geom != null) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        Main.THIS,
+                                        "Soll die Gr\u00F6\u00DFe aus dem Feld \"Gr\u00F6\u00DFe (Grafik)\" \u00FCbernommen werden?",
+                                        "Gr\u00F6\u00DFe automatisch setzen",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (answer == JOptionPane.YES_OPTION) {
+                                    try {
+                                        final Integer gr_grafik = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                                        cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR, gr_grafik);
+                                    } catch (final Exception ex) {
+                                        if (LOG.isDebugEnabled()) {
+                                            LOG.debug("error while setting groesse_korrektur", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                if (gr_grafik == null) {
+                    return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Wert ist leer");
+                } else if (gr_korrektur != null) {
+                    final int diff = gr_korrektur.intValue() - gr_grafik.intValue();
+                    if (Math.abs(diff) > 20) {
+                        return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Differenz zwischen Korrekturwert und Gr\u00F6\u00DFe > 20m.", action);
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorAnteil(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__ANTEIL) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final Float anteil = (Float) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                final Integer gr_grafik = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                final Integer gr_korrektur = (Integer) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+
+                if (anteil != null) {
+                    if ((gr_korrektur != null) && (anteil.intValue() > gr_korrektur.intValue())) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
+                    } else if ((gr_grafik != null) && (anteil.intValue() > gr_grafik.intValue())) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorDatumErfassung(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                // jedes gültige Datum ist valide
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorDatumVeranlagung(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final String veranlagungsdatum = (String) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG);
+
+                if (veranlagungsdatum != null) {
+                    final boolean matches = Pattern.matches(
+                            "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
+                            veranlagungsdatum);
+                    if (!matches) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorFebId(final CidsBean flaecheBean) {
+        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FEB_ID) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final String febId = (String) cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FEB_ID);
+                if (febId == null || febId.trim().isEmpty()) {
+                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                }
+                Integer febIdInt = null;
+                try {
+                    febIdInt = Integer.parseInt(febId);
+                } catch (final Exception ex) {
+                    LOG.debug("error while parsing febId to integer", ex);
+                    return new ValidatorStateImpl(ValidatorState.Type.ERROR, "FEB muss eine Zahl sein.");
+                }
+
+                if ((febIdInt.intValue() < 20000001) || (febIdInt.intValue() > 20200000)) {
+                    return new ValidatorStateImpl(ValidatorState.Type.ERROR, "FEB muss zwischen 20.000.000 und 20.200.000 liegen.");
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
     }
 }

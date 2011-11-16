@@ -41,11 +41,19 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorHelper;
+import de.cismet.validation.ValidatorState;
+import de.cismet.validation.ValidatorStateImpl;
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
+import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import javax.swing.JOptionPane;
+import java.awt.event.ActionEvent;
+import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 /**
  * DOCUMENT ME!
@@ -56,10 +64,9 @@ import de.cismet.verdis.constants.VerdisMetaClassConstants;
 public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener, WDSRPropertyConstants {
 
     //~ Instance fields --------------------------------------------------------
-    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRDetailsPanel.class);
     private CidsBean frontBean = null;
     private final Validator bindingValidator;
-        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanWdsrDetails;
     private javax.swing.JComboBox cboReinigungsklasse;
@@ -109,7 +116,6 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     }
 
     //~ Methods ----------------------------------------------------------------
-
     public Validator getValidator() {
         // nur BindingValidator notwendig, der TabellenValidator validiert schon alle beans
         return bindingValidator;
@@ -117,17 +123,17 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
 
     private void attachBeanValidators() {
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtNummer);
-        WDSRTabellenPanel.getValidatorNummer(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtNummer));
+        getValidatorNummer(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtNummer));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtLaengeGrafik);
-        WDSRTabellenPanel.getValidatorLaengeGrafik(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtLaengeGrafik));
+        getValidatorLaengeGrafik(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtLaengeGrafik));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtLaengeKorrektur);
-        WDSRTabellenPanel.getValidatorLaengeKorrektur(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtLaengeKorrektur));
+        getValidatorLaengeKorrektur(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtLaengeKorrektur));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtErfassungsdatum);
-        WDSRTabellenPanel.getValidatorDatumErfassung(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtErfassungsdatum));
+        getValidatorDatumErfassung(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtErfassungsdatum));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungWD);
-        WDSRTabellenPanel.getValidatorVeranlagungWD(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungWD));
+        getValidatorVeranlagungWD(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungWD));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungSR);
-        WDSRTabellenPanel.getValidatorVeranlagungSR(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungSR));
+        getValidatorVeranlagungSR(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtVeranlagungSR));
     }
 
     /**
@@ -491,14 +497,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     }
 
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
-         Main.transformToDefaultCrsNeeded(geom);
-         if (cidsBean.getProperty(PROP__GEOMETRIE) == null) {
+        Main.transformToDefaultCrsNeeded(geom);
+        if (cidsBean.getProperty(PROP__GEOMETRIE) == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
             cidsBean.setProperty(PROP__GEOMETRIE, emptyGeoBean);
         }
         cidsBean.setProperty(PROP__GEOMETRIE__GEO_FIELD, geom);
     }
-
 
     /**
      * DOCUMENT ME!
@@ -524,7 +529,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 bpanWdsrDetails.setBackgroundEnabled(false);
             }
         } catch (Exception e) {
-            log.warn("problem when trying to set background enabled (or not). will turn the background off", e);
+            LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
             bpanWdsrDetails.setBackgroundEnabled(false);
         }
 
@@ -583,5 +588,250 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     public void setBackgroundPCanvas(final PCanvas pCanvas) {
         pCanvas.setBackground(getBackground());
         bpanWdsrDetails.setPCanvas(pCanvas);
+    }
+
+    public static Validator getValidatorNummer(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__NUMMER) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+//                final String bezeichnung = (String) cidsBean.getProperty(PROP__"flaechenbezeichnung");
+//                final int art = (cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id") == null) ? 0 : (Integer) cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id");
+//
+//                final Action action = new AbstractAction() {
+//
+//                    @Override
+//                    public void actionPerformed(ActionEvent e) {
+//                        final int answer = JOptionPane.showConfirmDialog(
+//                                Main.THIS,
+//                                "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
+//                                "Bezeichnung automatisch setzen",
+//                                JOptionPane.YES_NO_OPTION);
+//                        if (answer == JOptionPane.YES_OPTION) {
+//                            final CidsBean cidsBean = getCidsBean();
+//                            int art;
+//                            try {
+//                                art = (Integer) cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id");
+//                            } catch (final NumberFormatException ex) {
+//                                art = 0;
+//                            }
+//                            final String newValue = Main.THIS.getRegenFlaechenTabellenPanel().getValidFlaechenname(art);
+//                            try {
+//                                cidsBean.setProperty(PROP__"flaechenbezeichnung", newValue);
+//                            } catch (Exception ex) {
+//                                if (log.isDebugEnabled()) {
+//                                    log.debug("error while setting flaechenbezeichnung", ex);
+//                                }
+//                            }
+//                        }
+//                    }
+//                };
+//                boolean numerisch = false;
+//                Integer tester = null;
+//                try {
+//                    tester = Integer.parseInt(bezeichnung);
+//                    numerisch = true;
+//                } catch (final Exception ex) {
+//                    numerisch = false;
+//                }
+//
+//                if ((art == Main.PROPVAL_ART_DACH) || (art == Main.PROPVAL_ART_GRUENDACH)) {
+//                    if (!numerisch) {
+//                        return new ValidatorStateImpl(ValidatorState.ERROR, "Fl\u00E4chenbezeichnung muss eine Zahl sein.", action);
+//                    } else {
+//                        if ((tester.intValue() > 1000) || (tester.intValue() < 0)) {
+//                            return new ValidatorStateImpl(ValidatorState.ERROR, "Fl\u00E4chenbezeichnung muss zwischen 0 und 1000 liegen.", action);
+//                        }
+//                    }
+//                } else {
+//                    if (bezeichnung != null) {
+//                        final int len = bezeichnung.length();
+//                        if (numerisch || ((len > 3) || ((len == 3) && (bezeichnung.compareTo("BBB") > 0)))) {
+//                            return new ValidatorStateImpl(ValidatorState.ERROR, "Fl\u00E4chenbezeichnung muss zwischen A und BBB liegen.", action);
+//                        }
+//                    }
+//                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorLaengeGrafik(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__LAENGE_GRAFIK) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final Integer laenge_grafik = (Integer) cidsBean.getProperty(WDSRPropertyConstants.PROP__LAENGE_GRAFIK);
+                final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+                final Action action = new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent event) {
+                        final CidsBean cidsBean = getCidsBean();
+                        final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+
+                        if (Main.THIS.isInEditMode()) {
+                            if (geom != null) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        Main.THIS,
+                                        "Soll die Länge aus der Grafik \u00FCbernommen werden?",
+                                        "Länge automatisch setzen",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (answer == JOptionPane.YES_OPTION) {
+                                    try {
+                                        final int laenge_grafik = (int) Math.abs(geom.getLength());
+                                        cidsBean.setProperty(WDSRPropertyConstants.PROP__LAENGE_GRAFIK, laenge_grafik);
+                                    } catch (final Exception ex) {
+                                        if (LOG.isDebugEnabled()) {
+                                            LOG.debug("error while setting laenge_grafik", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                if (laenge_grafik == null) {
+                    return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
+                }
+
+                if (geom != null && laenge_grafik != (int) Math.abs(geom.getLength())) {
+                    return new ValidatorStateImpl(ValidatorState.Type.WARNING, "L\u00E4nge der Geometrie stimmt nicht \u00FCberein (" + ((int) (geom.getLength())) + ")", action);
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorLaengeKorrektur(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__LAENGE_KORREKTUR) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                Integer laenge_grafik = (Integer) cidsBean.getProperty(WDSRPropertyConstants.PROP__LAENGE_GRAFIK);
+                final Integer laenge_korrektur = (Integer) cidsBean.getProperty(WDSRPropertyConstants.PROP__LAENGE_KORREKTUR);
+                final Action action = new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent event) {
+                        final CidsBean cidsBean = getCidsBean();
+                        final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+
+                        if (Main.THIS.isInEditMode()) {
+                            if (geom != null) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        Main.THIS,
+                                        "Soll die Länge aus der Grafik \u00FCbernommen werden?",
+                                        "Länge automatisch setzen",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (answer == JOptionPane.YES_OPTION) {
+                                    try {
+                                        final Integer laenge_grafik = (Integer) cidsBean.getProperty(WDSRPropertyConstants.PROP__LAENGE_GRAFIK);
+                                        cidsBean.setProperty(WDSRPropertyConstants.PROP__LAENGE_KORREKTUR, laenge_grafik);
+                                    } catch (final Exception ex) {
+                                        if (LOG.isDebugEnabled()) {
+                                            LOG.debug("error while setting laenge_korrektur", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                if (laenge_korrektur != null) {
+                    if (laenge_grafik == null) {
+                        laenge_grafik = 0;
+                    }
+                    final int diff = laenge_korrektur - laenge_grafik;
+                    if (Math.abs(diff) > 20) {
+                        return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Differenz zwischen Korrekturwert und Länge > 20m.", action);
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorDatumErfassung(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__ERFASSUNGSDATUM) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                // jedes gültige Datum ist valide
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorVeranlagungSR(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__SR_VERANLAGUNG) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final String veranlagungsdatum = (String) cidsBean.getProperty(WDSRPropertyConstants.PROP__SR_VERANLAGUNG);
+
+                if (veranlagungsdatum != null) {
+                    final boolean matches = Pattern.matches(
+                            "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
+                            veranlagungsdatum);
+                    if (!matches) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
+    }
+
+    public static Validator getValidatorVeranlagungWD(final CidsBean frontBean) {
+        return new CidsBeanValidator(frontBean, WDSRPropertyConstants.PROP__WD_VERANLAGUNG) {
+
+            @Override
+            public ValidatorState performValidation() {
+                final CidsBean cidsBean = getCidsBean();
+                if (cidsBean == null) {
+                    return null;
+                }
+
+                final String veranlagungsdatum = (String) cidsBean.getProperty(WDSRPropertyConstants.PROP__WD_VERANLAGUNG);
+
+                if (veranlagungsdatum != null) {
+                    final boolean matches = Pattern.matches(
+                            "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
+                            veranlagungsdatum);
+                    if (!matches) {
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
+                    }
+                }
+                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+            }
+        };
     }
 }

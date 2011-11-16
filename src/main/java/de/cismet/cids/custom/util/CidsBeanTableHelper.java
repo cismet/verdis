@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.cismet.cids.custom.util;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -29,8 +28,6 @@ import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.gui.CidsBeanTableModel;
 import de.cismet.verdis.gui.Main;
-import de.cismet.verdis.gui.RegenFlaechenDetailsPanel;
-import de.cismet.verdis.gui.WDSRDetailsPanel;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,16 +44,14 @@ import org.jdesktop.swingx.JXTable;
 public class CidsBeanTableHelper implements CidsBeanTable {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CidsBeanTableHelper.class);
-
     private int NEW_BEAN_ID = 0;
-    private Map<Integer, CidsBean> beanBackups = new HashMap<Integer, CidsBean>();
-
-    private CidsBeanTable table;
-    private CidsBeanTableModel model;
-    private CidsBeanStore selectedRowListener = null;
-
+    private final Map<Integer, CidsBean> beanBackups = new HashMap<Integer, CidsBean>();
+    private final CidsBeanTable table;
+    private final CidsBeanTableModel model;
     private final AggregatedValidator aggVal = new AggregatedValidator();
     private final HashMap<CidsBean, Validator> beanToValidatorMap = new HashMap<CidsBean, Validator>();
+    private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<CidsBean, CidsFeature>();
+    private CidsBeanStore selectedRowListener = null;
 
     public CidsBeanTableHelper(final CidsBeanTable table, final CidsBeanTableModel model) {
         this.table = table;
@@ -97,7 +92,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     public void clearBackups() {
         beanBackups.clear();
     }
-    
+
     public void backupBean(final CidsBean cidsBean) {
         try {
             final int id = (Integer) cidsBean.getProperty("id");
@@ -114,14 +109,14 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     public void restoreBean(final CidsBean cidsBean) {
         try {
-            final CidsFeature cidsFeature = getCidsFeature(cidsBean, true);
+            final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
 
-            CidsBean backupBean = beanBackups.get((Integer) cidsBean.getProperty("id"));
+            final CidsBean backupBean = beanBackups.get((Integer) cidsBean.getProperty("id"));
             CidsBeanSupport.copyProperties(backupBean, cidsBean);
-            
+
             if (cidsFeature != null) {
                 Main.getMappingComponent().getFeatureCollection().removeFeature(cidsFeature);
-                final CidsFeature backupFeature = getCidsFeature(cidsBean, true);
+                final CidsFeature backupFeature = createCidsFeature(cidsBean, true);
                 Main.getMappingComponent().getFeatureCollection().addFeature(backupFeature);
                 Main.getMappingComponent().getFeatureCollection().select(backupFeature);
             }
@@ -139,7 +134,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             beanToValidatorMap.put(cidsBean, validator);
             aggVal.add(validator);
 
-            CidsFeature cidsFeature = getCidsFeature(cidsBean, true);
+            final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
 
             Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
             Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
@@ -160,12 +155,13 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         }
     }
 
-    public static CidsFeature getCidsFeature(final CidsBean cidsBean, final boolean editable) {
+    public CidsFeature createCidsFeature(final CidsBean cidsBean, final boolean editable) {
         if (cidsBean == null) {
             return null;
         }
-        CidsFeature cidsFeature = new CidsFeature(cidsBean.getMetaObject());
+        final CidsFeature cidsFeature = new CidsFeature(cidsBean.getMetaObject());
         cidsFeature.setEditable(editable);
+        featureMap.put(cidsBean, cidsFeature);
         return cidsFeature;
     }
 
@@ -186,15 +182,12 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         getJXTable().getSelectionModel().removeListSelectionListener(table);
         getJXTable().getSelectionModel().clearSelection();
 
-        final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance()
-                    .getMainMap()
-                    .getFeatureCollection()
-                    .getSelectedFeatures(); // fce.getEventFeatures();
+        final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance().getMainMap().getFeatureCollection().getSelectedFeatures(); // fce.getEventFeatures();
         final Collection<Feature> selectedFlaechenFeatures = new ArrayList<Feature>();
 
         for (final Feature selectedFeature : selectedFeatures) {
             if (selectedFeature instanceof CidsFeature) {
-                final int index = model.getIndexByCidsBean(((CidsFeature)selectedFeature).getMetaObject().getBean());
+                final int index = model.getIndexByCidsBean(((CidsFeature) selectedFeature).getMetaObject().getBean());
                 final int viewIndex = table.getJXTable().convertRowIndexToView(index);
                 table.getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
                 selectedFlaechenFeatures.add(selectedFeature);
@@ -217,6 +210,17 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void featuresChanged(final FeatureCollectionEvent fce) {
+        final Collection<Feature> features = fce.getEventFeatures();
+        for (final Feature feature : features) {
+            if (feature instanceof CidsFeature && featureMap.containsValue((CidsFeature) feature)) {
+                final CidsBean cidsBean = ((CidsFeature) feature).getMetaObject().getBean();
+                try {
+                    table.setGeometry(feature.getGeometry(), cidsBean);
+                } catch (Exception ex) {
+                    LOG.error("error while updating geometry", ex);
+                }
+            }
+        }
     }
 
     @Override
@@ -264,7 +268,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             for (int index = 0; index < selection.length; ++index) {
                 modelSelection[index] = table.getJXTable().convertRowIndexToModel(selection[index]);
                 final CidsBean cb = model.getCidsBeanByIndex(modelSelection[index]);
-                CidsFeature cidsFeature = CidsBeanTableHelper.getCidsFeature(cb, true);
+                final CidsFeature cidsFeature = createCidsFeature(cb, true);
                 selectedFeatures.add(cidsFeature);
             }
 
@@ -311,7 +315,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         if (getJXTable().getSelectedRowCount() <= 0) {
             return cidsBeans;
         } else if (getJXTable().getSelectedRowCount() == 1) {
-            rows = new int[] {getJXTable().getSelectedRow()};
+            rows = new int[]{getJXTable().getSelectedRow()};
         } else {
             rows = getJXTable().getSelectedRows();
         }
@@ -323,14 +327,6 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         return cidsBeans;
     }
 
-    public CidsBean getSelectedBean() {
-        if (getSelectedBeans().size() > 0) {
-            return getSelectedBeans().get(0);
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public void requestFeatureAttach(final Feature feature) {
         if (getJXTable().getSelectedRowCount() == 1) {
@@ -339,11 +335,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 final int selection = getJXTable().getSelectedRow();
                 final int modelSelection = getJXTable().convertRowIndexToModel(selection);
                 final CidsBean selectedBean = model.getCidsBeanByIndex(modelSelection);
-                if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.REGEN) {
-                    RegenFlaechenDetailsPanel.setGeometry(feature.getGeometry(), selectedBean);
-                } else if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.ESW) {
-                    WDSRDetailsPanel.setGeometry(geom, selectedBean);
-                }
+                table.setGeometry(geom, selectedBean);
                 setDetailBean(selectedBean);
                 CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeature(feature);
                 CidsAppBackend.getInstance().setCidsBean(model.getCidsBean());
@@ -412,4 +404,13 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         return aggVal;
     }
 
+    @Override
+    public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception {
+        table.setGeometry(geometry, cidsBean);
+    }
+
+    @Override
+    public Geometry getGeometry(final CidsBean cidsBean) {
+        return table.getGeometry(cidsBean);
+    }
 }
