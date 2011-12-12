@@ -21,7 +21,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
@@ -68,7 +67,10 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void addNewBean() {
         try {
-            addBean(createNewBean());
+            final CidsBean newBean = createNewBean();
+            addBean(newBean);
+            Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
+
         } catch (final Exception ex) {
             LOG.error("error while creating new bean", ex);
         }
@@ -137,7 +139,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
             final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
 
-            Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);            
+            Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
         }
     }
 
@@ -148,7 +150,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 getAllBeans().remove(cidsBean);
                 model.removeCidsBean(cidsBean);
                 unbackupBean(cidsBean);
-                CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(new CidsFeature(cidsBean.getMetaObject()));
+                Main.getMappingComponent().getFeatureCollection().removeFeature(new CidsFeature(cidsBean.getMetaObject()));
             } catch (Exception ex) {
                 LOG.error("error while removing bean", ex);
             }
@@ -215,7 +217,6 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void featuresAdded(final FeatureCollectionEvent fce) {
         if (CidsAppBackend.getInstance().getMode().equals(mode)) {
-            Main.getMappingComponent().getFeatureCollection().select(fce.getEventFeatures());
         }
     }
 

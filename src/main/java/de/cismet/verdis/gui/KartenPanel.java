@@ -55,6 +55,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollection;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.FeatureCollectionListener;
 import de.cismet.cismap.commons.features.PostgisFeature;
@@ -1563,45 +1564,45 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         return kassenzeichenBean;
     }
 
+    private void refreshInMap() {
+        final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
+
+        featureCollection.removeAllFeatures();
+
+        final CidsBean cidsBean = getCidsBean();
+        if (cidsBean != null) {
+            switch (CidsAppBackend.getInstance().getMode()) {
+                case ALLGEMEIN: {
+                    final Feature add = new BeanUpdatingCidsFeature(cidsBean, KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                    featureCollection.addFeature(add);
+                } break;
+                case REGEN: {
+                    final List<CidsBean> flaechen = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                    for (final CidsBean flaeche : flaechen) {
+                        final Feature add = new BeanUpdatingCidsFeature(flaeche, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                        featureCollection.addFeature(add);
+                    }
+                } break;
+                case ESW: {
+                    final List<CidsBean> fronten = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
+                    for (final CidsBean front : fronten) {
+                        final Feature add = new BeanUpdatingCidsFeature(front, WDSRPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                        featureCollection.addFeature(add);
+                    }
+                } break;
+            }
+            mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(), true, mappingComp.isFixedMapScale());
+        }
+    }
+
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
-        if (cidsBean == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("cidsBean was null", new CurrentStackTrace());
-            }
-        }
+        final CidsBean oldCidsBean = kassenzeichenBean;
+
         kassenzeichenBean = cidsBean;
-        mappingComp.getFeatureCollection().removeAllFeatures();
-        if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.ALLGEMEIN) {
-            try {
-                final Feature add = new BeanUpdatingCidsFeature(kassenzeichenBean, KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
-                mappingComp.getFeatureCollection().addFeature(add);
-                mappingComp.zoomToFeatureCollection();
-            } catch (Exception e) {
-                LOG.warn("problem while creating the main cidsfeature out of the kassenzeichen", e);
-            }
-        } else if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.REGEN) {
-            try {
-                final List<CidsBean> flaechen = (List<CidsBean>) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
-                for (final CidsBean flaeche : flaechen) {
-                    final Feature add = new BeanUpdatingCidsFeature(flaeche, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
-                    mappingComp.getFeatureCollection().addFeature(add);
-                }
-                mappingComp.zoomToFeatureCollection();
-            } catch (Exception e) {
-                LOG.warn("problem while creating cidsfeatures out of the flaechen attribute", e);
-            }
-        } else if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.ESW) {
-            try {
-                final List<CidsBean> fronten = (List<CidsBean>) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
-                for (final CidsBean front : fronten) {
-                    final Feature add = new BeanUpdatingCidsFeature(front, WDSRPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
-                    mappingComp.getFeatureCollection().addFeature(add);
-                }
-                mappingComp.zoomToFeatureCollection();
-            } catch (Exception e) {
-                LOG.warn("problem while creating cidsfeatures out of the fronten attribute", e);
-            }
+
+        if (cidsBean == null || !cidsBean.equals(oldCidsBean)) {
+            refreshInMap();
         }
     }
 
@@ -1617,7 +1618,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
     @Override
     public void appModeChanged() {
-        setCidsBean(kassenzeichenBean);
+        refreshInMap();
         lblMeasurement.setText("");
     }
 
