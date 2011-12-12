@@ -164,7 +164,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         jxtOverview.getTableHeader().setReorderingAllowed(false);
         jxtOverview.setSortOrder(1, SortOrder.ASCENDING);
 
-        helper = new CidsBeanTableHelper(this, model);
+        helper = new CidsBeanTableHelper(this, model, CidsAppBackend.Mode.REGEN);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -291,7 +291,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
     }
 
     @Override
-    public CidsBean createNewBean(final int id) throws Exception {
+    public CidsBean createNewBean() throws Exception {
         final Object[] possibleValues = {
             "Dachfl\u00E4che",
             "Gr\u00FCndach",
@@ -323,7 +323,6 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         final CidsBean flaecheninfoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getEmptyInstance().getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
 
-        flaecheBean.setProperty(PROP__ID, id);
         flaecheBean.setProperty(PROP__FLAECHENINFO, flaecheninfoBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE, geomBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__ANSCHLUSSGRAD, anschlussgradBean);
@@ -358,24 +357,6 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
                 }
             }
         }
-        //TODO_ANFANG
-//                f.setContext(this);
-//                f.updateModels();
-//                f.getBezeichnungsModel().addDocumentListener(this);
-//                f.getBemerkungsModel().addDocumentListener(this);
-//                f.getGr_GrafikModel().addDocumentListener(this);
-//                f.getVeranlagungsdatumModel().addDocumentListener(this);
-//                f.getErfassungsdatumModel().addDocumentListener(this);
-//                f.getGr_KorrekturModel().addDocumentListener(this);
-//                f.getGr_KorrekturModel().addDocumentListener(this);
-//                f.getAnteilModel().addDocumentListener(this);
-//                f.getFeb_IdModel().addDocumentListener(this);
-//                f.getSperrenModel().addActionListener(this);
-//                f.getArtModel().addListDataListener(this);
-//                f.getGradModel().addListDataListener(this);
-//                f.backup();
-        //TODO_ENDE
-
         return flaecheBean;
     }
 
@@ -539,9 +520,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
 
     @Override
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.REGEN) {
-            helper.featureSelectionChanged(fce);
-        }
+        helper.featureSelectionChanged(fce);
     }
 
     @Override

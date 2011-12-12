@@ -59,9 +59,7 @@ import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Color;
 import java.awt.Component;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -142,7 +140,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
 
         jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
 
-        helper = new CidsBeanTableHelper(this, model);
+        helper = new CidsBeanTableHelper(this, model, CidsAppBackend.Mode.ESW);
 
         BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
@@ -273,7 +271,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
     }
 
     @Override
-    public CidsBean createNewBean(final int id) throws Exception {
+    public CidsBean createNewBean() throws Exception {
         final MetaClass srMC = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG);
         final MetaClass wdMC = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_WINTERDIENST);
         final String srQuery = "SELECT " + srMC.getID() + ", " + srMC.getPrimaryKey() + " FROM " + srMC.getTableName() + " WHERE schluessel = -100;";
@@ -288,7 +286,6 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         //final CidsBean strasseBean = SessionManager.getProxy().getMetaObject(8, PROP__"strasse".getId(), Main.DOMAIN).getBean();
 
         //cidsBean.setProperty(PROP__"strasse", strasseBean);
-        cidsBean.setProperty(PROP__ID, id);
         cidsBean.setProperty(PROP__GEOMETRIE, geomBean);
         cidsBean.setProperty(PROP__SR_KLASSE_OR, strassenreinigungBean);
         cidsBean.setProperty(PROP__WD_PRIO_OR, winterdienstBean);
@@ -391,9 +388,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
 
     @Override
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.ESW) {
-            helper.featureSelectionChanged(fce);
-        }
+        helper.featureSelectionChanged(fce);
     }
 
     @Override

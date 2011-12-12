@@ -52,10 +52,12 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     private final HashMap<CidsBean, Validator> beanToValidatorMap = new HashMap<CidsBean, Validator>();
     private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<CidsBean, CidsFeature>();
     private CidsBeanStore selectedRowListener = null;
+    private final CidsAppBackend.Mode mode;
 
-    public CidsBeanTableHelper(final CidsBeanTable table, final CidsBeanTableModel model) {
+    public CidsBeanTableHelper(final CidsBeanTable table, final CidsBeanTableModel model, final CidsAppBackend.Mode modus) {
         this.table = table;
         this.model = model;
+        this.mode = modus;
         getJXTable().getSelectionModel().addListSelectionListener(table);
     }
 
@@ -66,7 +68,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void addNewBean() {
         try {
-            addBean(table.createNewBean(getNextNewBeanId()));
+            addBean(createNewBean());
         } catch (final Exception ex) {
             LOG.error("error while creating new bean", ex);
         }
@@ -118,7 +120,6 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 Main.getMappingComponent().getFeatureCollection().removeFeature(cidsFeature);
                 final CidsFeature backupFeature = createCidsFeature(cidsBean, true);
                 Main.getMappingComponent().getFeatureCollection().addFeature(backupFeature);
-                Main.getMappingComponent().getFeatureCollection().select(backupFeature);
             }
         } catch (Exception ex) {
             LOG.error("error while making backup of bean", ex);
@@ -136,8 +137,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
             final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
 
-            Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
-            Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
+            Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);            
         }
     }
 
@@ -167,57 +167,70 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        }
     }
 
     @Override
     public void featureCollectionChanged() {
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        }
     }
 
     @Override
     public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        }
     }
 
     @Override
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        getJXTable().getSelectionModel().removeListSelectionListener(table);
-        getJXTable().getSelectionModel().clearSelection();
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+            getJXTable().getSelectionModel().removeListSelectionListener(table);
+            getJXTable().getSelectionModel().clearSelection();
 
-        final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance().getMainMap().getFeatureCollection().getSelectedFeatures(); // fce.getEventFeatures();
-        final Collection<Feature> selectedFlaechenFeatures = new ArrayList<Feature>();
+            final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance().getMainMap().getFeatureCollection().getSelectedFeatures(); // fce.getEventFeatures();
+            final Collection<Feature> selectedFlaechenFeatures = new ArrayList<Feature>();
 
-        for (final Feature selectedFeature : selectedFeatures) {
-            if (selectedFeature instanceof CidsFeature) {
-                final int index = model.getIndexByCidsBean(((CidsFeature) selectedFeature).getMetaObject().getBean());
-                final int viewIndex = table.getJXTable().convertRowIndexToView(index);
-                table.getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
-                selectedFlaechenFeatures.add(selectedFeature);
+            for (final Feature selectedFeature : selectedFeatures) {
+                if (selectedFeature instanceof CidsFeature) {
+                    final int index = model.getIndexByCidsBean(((CidsFeature) selectedFeature).getMetaObject().getBean());
+                    final int viewIndex = table.getJXTable().convertRowIndexToView(index);
+                    table.getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
+                    selectedFlaechenFeatures.add(selectedFeature);
+                }
             }
-        }
 
-        if (selectedFlaechenFeatures.size() == 1) {
-            setDetailBean(((CidsFeature) selectedFlaechenFeatures.toArray()[0]).getMetaObject().getBean());
-        } else {
-            setDetailBean(null);
-        }
+            if (selectedFlaechenFeatures.size() == 1) {
+                setDetailBean(((CidsFeature) selectedFlaechenFeatures.toArray()[0]).getMetaObject().getBean());
+            } else {
+                setDetailBean(null);
+            }
 
-        getJXTable().getSelectionModel().addListSelectionListener(table);
-        Main.THIS.selectionChanged();
+            getJXTable().getSelectionModel().addListSelectionListener(table);
+            Main.THIS.selectionChanged();
+        }
     }
 
     @Override
     public void featuresAdded(final FeatureCollectionEvent fce) {
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+            Main.getMappingComponent().getFeatureCollection().select(fce.getEventFeatures());
+        }
     }
 
     @Override
     public void featuresChanged(final FeatureCollectionEvent fce) {
-        final Collection<Feature> features = fce.getEventFeatures();
-        for (final Feature feature : features) {
-            if (feature instanceof CidsFeature && featureMap.containsValue((CidsFeature) feature)) {
-                final CidsBean cidsBean = ((CidsFeature) feature).getMetaObject().getBean();
-                try {
-                    table.setGeometry(feature.getGeometry(), cidsBean);
-                } catch (Exception ex) {
-                    LOG.error("error while updating geometry", ex);
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+            final Collection<Feature> features = fce.getEventFeatures();
+            for (final Feature feature : features) {
+                if (feature instanceof CidsFeature && featureMap.containsValue((CidsFeature) feature)) {
+                    final CidsBean cidsBean = ((CidsFeature) feature).getMetaObject().getBean();
+                    try {
+                        table.setGeometry(feature.getGeometry(), cidsBean);
+                    } catch (Exception ex) {
+                        LOG.error("error while updating geometry", ex);
+                    }
                 }
             }
         }
@@ -225,6 +238,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void featuresRemoved(final FeatureCollectionEvent fce) {
+        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        }
     }
 
     /**
@@ -362,8 +377,12 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     }
 
     @Override
-    public CidsBean createNewBean(final int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public CidsBean createNewBean() throws Exception {
+        final int newId = getNextNewBeanId();
+        final CidsBean newBean = table.createNewBean();
+        newBean.setProperty("id", newId);
+        newBean.getMetaObject().setID(newId);
+        return newBean;
     }
 
     @Override

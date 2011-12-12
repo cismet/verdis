@@ -1518,17 +1518,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             one.setSelected(false);
                         }
                         one = pf;
-                        mappingComp.selectPFeatureManually(one);
                         if (one.getFeature() instanceof CidsFeature) {
                             final CidsFeature flaecheFeature = (CidsFeature) one.getFeature();
                             mappingComp.getFeatureCollection().select(flaecheFeature);
-                            try {
-                                //                            makeRowVisible(this.jxtOverview, jxtOverview.getFilters().convertRowIndexToView(tableModel.getIndexOfFlaeche((Flaeche) f)));
-                            } catch (Exception e) {
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("Fehler beim Scrollen der Tabelle", e);
-                                }
-                            }
                         } else {
                             mappingComp.getFeatureCollection().unselectAll();
                         }

@@ -48,7 +48,7 @@ public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionL
 
     public CidsBeanStore getSelectedRowListener();
 
-    public CidsBean createNewBean(final int id) throws Exception;
+    public CidsBean createNewBean() throws Exception;
 
     public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception;
 
