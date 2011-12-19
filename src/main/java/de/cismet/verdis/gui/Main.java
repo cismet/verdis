@@ -114,6 +114,7 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SimpleMoveListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
+import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
@@ -363,11 +364,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         LOG.info("CustomLoggingOn");
                     } catch (Exception ex) {
                         org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource(
-                                "de/cismet/verdis/res/log4j.properties"));
+                                "log4j.properties"));
                     }
                 } else {
                     org.apache.log4j.PropertyConfigurator.configure(getClass().getResource(
-                            "/de/cismet/verdis/res/log4j.properties"));
+                            "log4j.properties"));
                 }
             } catch (Exception e) {
                 LOG.debug("Fehler bei Log4J-Config", e);
@@ -872,6 +873,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         });
         configurationManager.configure(mappingModel);
         mainMap.preparationSetMappingModel(mappingModel);
+        ((NewSimpleInternalLayerWidget)mainMap.getInternalWidget(MappingComponent.LAYERWIDGET)).setMappingModel(mappingModel);
         configurationManager.configure(mainMap);
         mainMap.setMappingModel(mappingModel);
         kartenPanel.changeSelectedButtonAccordingToInteractionMode();
