@@ -101,7 +101,10 @@ import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
+import de.cismet.cismap.commons.features.PostgisFeature;
 import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
+import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
 
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
@@ -116,6 +119,7 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.SimpleMoveListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 
@@ -152,6 +156,7 @@ import de.cismet.verdis.crossover.VerdisCrossover;
 import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.*;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 
 import edu.umd.cs.piccolox.event.PNotificationCenter;
@@ -200,6 +205,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static Main THIS;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
+    private CidsAppBackend.Mode currentMode = null;
     
     //~ Instance fields --------------------------------------------------------
     de.cismet.tools.ConnectionInfo connectionInfo = new de.cismet.tools.ConnectionInfo();
@@ -472,6 +478,18 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             @Override
             public void featuresAdded(FeatureCollectionEvent fce) {
                 refreshItemButtons();
+                for (final Feature feature : fce.getEventFeatures()) {
+                    LOG.fatal(feature.getClass().getCanonicalName());
+                    if (feature instanceof PostgisFeature) {
+                        final PostgisFeature postgisFeature = (PostgisFeature) feature;
+                        LOG.fatal(postgisFeature.getFeatureType());
+                        LOG.fatal(postgisFeature.getObjectName());
+                        if (postgisFeature.getFeatureType().equals("Versiegelte Flächen")) {
+                            //fce.get
+                        }
+                    }
+                }
+        //        CidsAppBackend.getInstance().getMode()
             }
 
             @Override
@@ -1068,7 +1086,44 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
         });
     }
-    private CidsAppBackend.Mode currentMode = null;
+
+    private AbstractFeatureService getFleachenFeatureService() {
+        for (final MapService mapService : mappingModel.getMapServices().values()) {
+            if (checkForFlaechenFeatureService(mapService)) {
+                return (AbstractFeatureService) mapService;
+            }
+        }
+        return null;
+    }
+
+    private static boolean checkForFlaechenFeatureService(final MapService mapService) {
+        if (mapService instanceof SimplePostgisFeatureService) {
+            final AbstractFeatureService featureService = (AbstractFeatureService) mapService;
+            final String name = featureService.getName();
+            if (name.equals("Versiegelte Flächen")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void setPostgisFlaechenSnappable(final boolean snappable) {
+        final AbstractFeatureService featureService = getFleachenFeatureService();
+        if (featureService != null) {
+            setFeaturesSnappable(featureService, snappable);
+        }
+    }
+
+    private static void setFeaturesSnappable(final MapService mapService, final boolean snappable) {
+        final PNode pNode = mapService.getPNode();
+        for (int index = 0; index < pNode.getChildrenCount(); index++) {
+            final PNode child = pNode.getChild(index);
+            if (child instanceof PFeature) {
+                final PFeature pFeature = (PFeature) child;
+                pFeature.setSnappable(snappable);
+            }
+        }
+    }
 
     @Override
     public void appModeChanged() {
@@ -1077,15 +1132,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             saveLayout(FILE_LAYOUT + "." + currentMode.name());
         }
 
-        CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         if (mode.equals(mode.ALLGEMEIN)) {
             setupLayoutInfo();
         } else if (mode.equals(mode.ESW)) {
             setupLayoutWDSR();
-        } else {
+        } else if (mode.equals(mode.REGEN)) {
             setupLayoutRegen();
         }
         currentMode = mode;
+        setPostgisFlaechenSnappable(currentMode.equals(CidsAppBackend.Mode.REGEN));
 
         refreshClipboardButtons();
         refreshItemButtons();
