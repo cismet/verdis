@@ -25,9 +25,12 @@ package de.cismet.verdis.search;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.search.CidsServerSearch;
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.apache.xml.dtm.ref.dom2dtm.DOM2DTM;
 
 
 /**
@@ -64,12 +67,12 @@ public class KassenzeichenSearchStatement extends CidsServerSearch {
         try {
             String sql = "";
             if (searchString.length() == 6) {
-                sql = "SELECT id FROM kassenzeichen WHERE kassenzeichennummer/10 = " + searchString;
+                sql = "SELECT id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + "/10 = " + searchString;
             } else {
-                sql = "SELECT id FROM kassenzeichen WHERE kassenzeichennummer = " + searchString;
+                sql = "SELECT id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + searchString;
             }
 
-            final MetaService ms = (MetaService)getActiveLoaclServers().get("VERDIS");
+            final MetaService ms = (MetaService)getActiveLoaclServers().get(CidsAppBackend.DOMAIN);
 
             final ArrayList<ArrayList> result = ms.performCustomSearch(sql);
 

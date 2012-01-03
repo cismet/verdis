@@ -134,7 +134,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
             // Setze WMS Icon und h\u00E4nge Kassenzeichen an
             ic = new javax.swing.ImageIcon(getClass().getResource(
                         "/de/cismet/verdis/res/images/filetypes/dms_default.png"));
-            urlString = urlString.trim() + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            urlString = urlString.trim() + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
             deletable = false;
         }
         if (typ == 1) {
@@ -251,9 +251,9 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
                 try {
                     final Collection<CidsBean> urls = kassenzeichenBean.getBeanCollectionProperty("dms_urls");
 
-                    final CidsBean dmsUrlCB = CidsBean.createNewCidsBeanFromTableName(Main.DOMAIN, "dms_url");
-                    final CidsBean urlCB = CidsBean.createNewCidsBeanFromTableName(Main.DOMAIN, "url");
-                    final CidsBean urlBaseCB = CidsBean.createNewCidsBeanFromTableName(Main.DOMAIN, "url_base");
+                    final CidsBean dmsUrlCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "dms_url");
+                    final CidsBean urlCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "url");
+                    final CidsBean urlBaseCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "url_base");
 
                     dmsUrlCB.setProperty("name", description);
                     dmsUrlCB.setProperty("typ", Integer.valueOf(1));

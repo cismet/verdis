@@ -493,7 +493,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
         txtKassenzeichen.setEditable(false);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer}"), txtKassenzeichen, org.jdesktop.beansbinding.BeanProperty.create("text"), PROP__KASSENZEICHENNUMMER);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"), txtKassenzeichen, org.jdesktop.beansbinding.BeanProperty.create("text"), PROP__KASSENZEICHENNUMMER);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1000,10 +1000,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                     return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Kassenzeichen leer.");
                 } else {
                     try {
-                        if (((kassenzeichennummer > 6000000) && (kassenzeichennummer < 10000000)) || ((kassenzeichennummer >= 20000000) && (kassenzeichennummer <= 22222222))) {
+                        if ((kassenzeichennummer >= 10000000) && (kassenzeichennummer < 100000000)) {
                             return new ValidatorStateImpl(ValidatorState.Type.VALID);
                         } else {
-                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Kassenzeichen nicht im g\u00FCltigen Bereich.");
+                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Kassenzeichen nicht im g\u00FCltigen Bereich, muss 8-stellig sein.");
                         }
                     } catch (Exception ex) {
                         LOG.debug("KassenzeichenNummer not valid", ex);

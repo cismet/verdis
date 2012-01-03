@@ -180,7 +180,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     //~ Static fields/initializers ---------------------------------------------
     private static boolean noLoginDuringDev = false;
     private static boolean loggedIn = false;
-    public static String DOMAIN = "VERDIS_GRUNDIS";
     public static int KASSENZEICHEN_CLASS_ID = 11;
     public static int GEOM_CLASS_ID = 0;
     public static int DMS_URL_BASE_ID = 1;
@@ -2484,28 +2483,31 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
-        if ((kassenzeichenPanel.getShownKassenzeichen() != null) && (kassenzeichenPanel.getShownKassenzeichen().length() > 0)) {
-            try {
-                final String gotoUrl = prefs.getReportUrl() + kassenzeichenPanel.getShownKassenzeichen();
-                AppletContext appletContext = null;
+        if (kassenzeichenBean != null) {
+            final Integer kassenzeichenOld = (Integer) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
+            if (kassenzeichenOld != null) {
                 try {
-                    appletContext = context.getEnvironment().getAppletContext();
-                } catch (Exception npe) {
-                    // nothing to do
+                    final String gotoUrl = prefs.getReportUrl() + kassenzeichenOld;
+                    AppletContext appletContext = null;
+                    try {
+                        appletContext = context.getEnvironment().getAppletContext();
+                    } catch (Exception npe) {
+                        // nothing to do
+                    }
+                    if (appletContext == null) {
+                        de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
+                    } else {
+                        final java.net.URL u = new java.net.URL(gotoUrl);
+                        appletContext.showDocument(u, "verdisReportFrame");
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Fehler beim Anzeigen des VERDIS-Reports",
+                            "Fehler",
+                            JOptionPane.ERROR_MESSAGE);
+                    LOG.error("Fehler beim Anzeigen des VERDIS-Reports", e);
                 }
-                if (appletContext == null) {
-                    de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
-                } else {
-                    final java.net.URL u = new java.net.URL(gotoUrl);
-                    appletContext.showDocument(u, "verdisReportFrame");
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Fehler beim Anzeigen des VERDIS-Reports",
-                        "Fehler",
-                        JOptionPane.ERROR_MESSAGE);
-                LOG.error("Fehler beim Anzeigen des VERDIS-Reports", e);
             }
         }
     }//GEN-LAST:event_cmdPdfActionPerformed
@@ -2624,12 +2626,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Alle verf\u00FCgbaren Suchen:" + context.getSearch().getDataBeans().keySet());
             }
-            final Object object = context.getSearch().getDataBeans().get(kassenzeichenSuche + "@" + DOMAIN);
+            final Object object = context.getSearch().getDataBeans().get(kassenzeichenSuche + "@" + CidsAppBackend.DOMAIN);
             if (object != null) {
                 final FormDataBean kassenzeichenSucheParam = (FormDataBean) object;
                 kassenzeichenSucheParam.setBeanParameter("Kassenzeichen", kassenzeichenPanel.getShownKassenzeichen());
                 final Vector v = new Vector();
-                final String cid = String.valueOf(this.KASSENZEICHEN_CLASS_ID) + "@" + DOMAIN;
+                final String cid = String.valueOf(this.KASSENZEICHEN_CLASS_ID) + "@" + CidsAppBackend.DOMAIN;
                 v.add(cid);
                 try {
                     if (LOG.isDebugEnabled()) {
@@ -2644,7 +2646,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     kassenzeichenPanel.flashSearchField(java.awt.Color.red);
                 }
             } else {
-                LOG.warn("KassenzeichenSuche (" + kassenzeichenSuche + "@" + DOMAIN + ") nicht vorhanden!!!");
+                LOG.warn("KassenzeichenSuche (" + kassenzeichenSuche + "@" + CidsAppBackend.DOMAIN + ") nicht vorhanden!!!");
             }
         }
     }//GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed

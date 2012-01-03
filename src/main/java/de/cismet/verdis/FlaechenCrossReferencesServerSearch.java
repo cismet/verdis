@@ -18,6 +18,8 @@ package de.cismet.verdis;
 
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,11 +39,11 @@ public class FlaechenCrossReferencesServerSearch extends CidsServerSearch {
 
     public FlaechenCrossReferencesServerSearch(int kzNummer) {
         searchQuery = "SELECT " +
-                "    kassenzeichen1.kassenzeichennummer AS kz1, " +
-                "    flaeche1.id AS fid, " +
-                "    flaeche1.flaechenbezeichnung AS f1, " +
-                "    kassenzeichen2.kassenzeichennummer AS kz2, " +
-                "    flaeche2.flaechenbezeichnung AS f2 " +
+                "    kassenzeichen1." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " AS kz1, " +
+                "    flaeche1." + RegenFlaechenPropertyConstants.PROP__ID + " AS fid, " +
+                "    flaeche1." + RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG + " AS f1, " +
+                "    kassenzeichen2." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " AS kz2, " +
+                "    flaeche2." + RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG + " AS f2 " +
                 "FROM " +
                 "    kassenzeichen AS kassenzeichen1, " +
                 "    kassenzeichen AS kassenzeichen2, " +
@@ -60,12 +62,12 @@ public class FlaechenCrossReferencesServerSearch extends CidsServerSearch {
                 "    flaeche2.flaecheninfo = flaecheninfo2.id AND " +
                 "    flaecheninfo2.id = flaecheninfo1.id AND " +
                 "    NOT flaechen2.kassenzeichen_reference = flaechen1.kassenzeichen_reference AND " +
-                "    kassenzeichen1.kassenzeichennummer = " + kzNummer;
+                "    kassenzeichen1." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kzNummer;
     }
 
     @Override
     public Collection performServerSearch() {
-        final MetaService ms = (MetaService) getActiveLoaclServers().get("VERDIS_GRUNDIS");
+        final MetaService ms = (MetaService) getActiveLoaclServers().get(CidsAppBackend.DOMAIN);
         if (ms != null) {
             try {
                 final ArrayList<ArrayList> lists = ms.performCustomSearch(searchQuery);

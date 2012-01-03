@@ -304,7 +304,7 @@
             <Property name="editable" type="boolean" value="false"/>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="text" source="Form" sourcePath="${cidsBean.kassenzeichennummer}" target="txtKassenzeichen" targetPath="text" updateStrategy="0" immediately="false">
+            <BindingProperty name="text" source="Form" sourcePath="${cidsBean.kassenzeichennummer8}" target="txtKassenzeichen" targetPath="text" updateStrategy="0" immediately="false">
               <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                 <Connection code="PROP__KASSENZEICHENNUMMER" type="code"/>

@@ -56,10 +56,10 @@ public class Test1 {
             ConnectionProxy proxy = null;
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
-            connectionInfo.setPassword(new String("sb"));
-            connectionInfo.setUserDomain("VERDIS");
-            connectionInfo.setUsergroup("VORN");
-            connectionInfo.setUsergroupDomain("VERDIS");
+            connectionInfo.setPassword("sb");
+            connectionInfo.setUserDomain(CidsAppBackend.DOMAIN);
+            connectionInfo.setUsergroup(CidsAppBackend.DOMAIN);
+            connectionInfo.setUsergroupDomain(CidsAppBackend.DOMAIN);
             connectionInfo.setUsername("SteinbacherD102");
 
             session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
@@ -71,8 +71,8 @@ public class Test1 {
             System.out.println("connection established");
             System.out.println("retrieve 6000467");
             final long l = System.currentTimeMillis();
-            final MetaObject mo = proxy.getMetaObject(6000467, 11, "VERDIS");
-//            MetaObject mo = proxy.getMetaObject(6021737, 11, "VERDIS");
+            final MetaObject mo = proxy.getMetaObject(6000467, 11, CidsAppBackend.DOMAIN);
+//            MetaObject mo = proxy.getMetaObject(6021737, 11, CidsAppBackend.DOMAIN);
             System.out.println("dauer:" + (System.currentTimeMillis() - l));
             System.out.println("retrieved 6000467");
             System.out.println(mo.getBean().toJSONString());

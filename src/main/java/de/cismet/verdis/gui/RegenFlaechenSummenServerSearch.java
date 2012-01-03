@@ -18,6 +18,8 @@ package de.cismet.verdis.gui;
 
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +55,7 @@ public class RegenFlaechenSummenServerSearch extends CidsServerSearch {
                 + "    WHERE "
                 + "        anteil IS null AND "
                 + "        flaechen.kassenzeichen_reference = kassenzeichen.id AND "
-                + "        kassenzeichen.kassenzeichennummer = " + Integer.toString(kz) + " AND "
+                + "        kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + Integer.toString(kz) + " AND "
                 + "        flaechen.flaeche = flaeche.id AND "
                 + "        flaeche.flaecheninfo = flaecheninfo.id AND "
                 + "        flaecheninfo.flaechenart = veranlagungsgrundlage.flaechenart AND "
@@ -73,7 +75,7 @@ public class RegenFlaechenSummenServerSearch extends CidsServerSearch {
                 + "    WHERE "
                 + "        anteil IS NOT null AND "
                 + "        flaechen.kassenzeichen_reference = kassenzeichen.id AND "
-                + "        kassenzeichen.kassenzeichennummer = " + Integer.toString(kz) + " AND "
+                + "        kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + Integer.toString(kz) + " AND "
                 + "        flaechen.flaeche = flaeche.id AND "
                 + "        flaeche.flaecheninfo = flaecheninfo.id AND "
                 + "        flaecheninfo.flaechenart = veranlagungsgrundlage.flaechenart AND "
@@ -86,7 +88,7 @@ public class RegenFlaechenSummenServerSearch extends CidsServerSearch {
 
     @Override
     public Collection performServerSearch() {
-        final MetaService ms = (MetaService) getActiveLoaclServers().get("VERDIS_GRUNDIS");
+        final MetaService ms = (MetaService) getActiveLoaclServers().get(CidsAppBackend.DOMAIN);
         if (ms != null) {
             try {
                 final ArrayList<ArrayList> lists = ms.performCustomSearch(searchQuery);

@@ -318,8 +318,8 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         }
 
         final CidsBean flaecheBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE).getEmptyInstance().getBean();
-        final CidsBean anschlussgradBean = SessionManager.getProxy().getMetaObject(1, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD).getId(), Main.DOMAIN).getBean();
-        final CidsBean flaechenartBean = SessionManager.getProxy().getMetaObject(art, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART).getId(), Main.DOMAIN).getBean();
+        final CidsBean anschlussgradBean = SessionManager.getProxy().getMetaObject(1, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD).getId(), CidsAppBackend.DOMAIN).getBean();
+        final CidsBean flaechenartBean = SessionManager.getProxy().getMetaObject(art, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART).getId(), CidsAppBackend.DOMAIN).getBean();
         final CidsBean flaecheninfoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getEmptyInstance().getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
 

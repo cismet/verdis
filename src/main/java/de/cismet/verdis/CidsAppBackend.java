@@ -68,7 +68,7 @@ public class CidsAppBackend implements CidsBeanStore {
     private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             CidsAppBackend.class);
     private static final int KASSENZEICHEN_CLASS_ID = 11;
-    private static final String DOMAIN = "VERDIS_GRUNDIS";
+    public static final String DOMAIN = "VERDIS_GRUNDIS";
     private static CidsAppBackend instance = null;
     private static AppPreferences appprefs;
 
@@ -153,9 +153,9 @@ public class CidsAppBackend implements CidsBeanStore {
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
             connectionInfo.setPassword("sb");
-            connectionInfo.setUserDomain("VERDIS");
+            connectionInfo.setUserDomain(DOMAIN);
             connectionInfo.setUsergroup("VORN");
-            connectionInfo.setUsergroupDomain("VERDIS");
+            connectionInfo.setUsergroupDomain(DOMAIN);
             connectionInfo.setUsername("SteinbacherD102");
 
             ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
@@ -271,7 +271,7 @@ public class CidsAppBackend implements CidsBeanStore {
     }
 
     public CidsBean loadKassenzeichenByNummer(int kassenzeichen) {
-        String query = "SELECT " + KASSENZEICHEN_CLASS_ID + ", id FROM kassenzeichen WHERE kassenzeichennummer = " + kassenzeichen + ";";
+        String query = "SELECT " + KASSENZEICHEN_CLASS_ID + ", id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
 
         try {
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
@@ -471,8 +471,8 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public static void main(final String[] args) throws Exception {
         final long l = System.currentTimeMillis();
-        //final MetaObject mo = CidsAppBackend.getInstance().proxy.getMetaObject(6000467, 11, "VERDIS");
-//            MetaObject mo = proxy.getMetaObject(6021737, 11, "VERDIS");
+        //final MetaObject mo = CidsAppBackend.getInstance().proxy.getMetaObject(6000467, 11, DOMAIN);
+//            MetaObject mo = proxy.getMetaObject(6021737, 11, DOMAIN);
         System.out.println("dauer:" + (System.currentTimeMillis() - l));
         System.out.println("retrieved 6000467");
         // System.out.println(mo.getBean().toJSONString());

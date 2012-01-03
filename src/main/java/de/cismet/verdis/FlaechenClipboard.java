@@ -94,7 +94,7 @@ public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
 
         if (clipboardBean.getProperty(PROP__FLAECHENINFO) != null) {
             int flaecheninfoId = (Integer) clipboardBean.getProperty(PROP__FLAECHENINFO__ID);
-            CidsBean flaecheninfoBean = SessionManager.getProxy().getMetaObject(flaecheninfoId, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getId(), Main.DOMAIN).getBean();
+            CidsBean flaecheninfoBean = SessionManager.getProxy().getMetaObject(flaecheninfoId, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getId(), CidsAppBackend.DOMAIN).getBean();
             pasteBean.setProperty(PROP__FLAECHENINFO, flaecheninfoBean);
         }
 
