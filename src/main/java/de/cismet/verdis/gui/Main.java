@@ -478,7 +478,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             public void featuresAdded(FeatureCollectionEvent fce) {
                 refreshItemButtons();
                 for (final Feature feature : fce.getEventFeatures()) {
-                    LOG.fatal(feature.getClass().getCanonicalName());
                     if (feature instanceof PostgisFeature) {
                         final PostgisFeature postgisFeature = (PostgisFeature) feature;
                         LOG.fatal(postgisFeature.getFeatureType());

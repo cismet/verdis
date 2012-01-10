@@ -959,6 +959,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         removeMainGroupSelection();
         cmdSplitPoly.setSelected(true);
         mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
+        cmdMoveHandleActionPerformed(null);
     }//GEN-LAST:event_cmdSplitPolyActionPerformed
 
     /**
@@ -1564,7 +1565,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         return kassenzeichenBean;
     }
 
-    private void refreshInMap() {
+    private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
 
         featureCollection.removeAllFeatures();
@@ -1591,7 +1592,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     }
                 } break;
             }
-            mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(), true, mappingComp.isFixedMapScale());
+            if (withZoom) {
+                mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(), true, mappingComp.isFixedMapScale());
+            }
         }
     }
 
@@ -1601,9 +1604,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         kassenzeichenBean = cidsBean;
 
-        if (cidsBean == null || !cidsBean.equals(oldCidsBean)) {
-            refreshInMap();
-        }
+        refreshInMap(cidsBean != null && !cidsBean.equals(oldCidsBean));
     }
 
     @Override
@@ -1618,7 +1619,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
     @Override
     public void appModeChanged() {
-        refreshInMap();
+        refreshInMap(true);
         lblMeasurement.setText("");
     }
 

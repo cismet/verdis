@@ -154,6 +154,11 @@
             <artifactId>3aweb</artifactId>
             <version>unknown</version>
         </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swingx</artifactId>
+            <version>0.9.7</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>verdis_grundis_extension</finalName>
