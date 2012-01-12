@@ -193,13 +193,21 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static final int PROPVAL_ART_VERSIEGELTEFLAECHE = 3;
     public static final int PROPVAL_ART_OEKOPFLASTER = 4;
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE = 5;
-    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;    
-    private static final String DIRECTORY_HOME = System.getProperty("user.home");
+    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
+
+    private static final String DIRECTORYPATH_HOME = System.getProperty("user.home");
     private static final String FILESEPARATOR = System.getProperty("file.separator");
-    private static final String DIRECTORY_VERDIS = DIRECTORY_HOME + FILESEPARATOR + ".verdis";
-    private static final String FILE_LAYOUT = DIRECTORY_VERDIS + FILESEPARATOR + "verdis.layout";
-    private static final String FILE_SCREEN = DIRECTORY_VERDIS + FILESEPARATOR + "verdis.screen";
-    private static final String FILE_PLUGINLAYOUT = DIRECTORY_VERDIS + FILESEPARATOR + "plugin.layout";
+    private static final String DIRECTORYEXTENSION = System.getProperty("directory.extension");
+
+    private static final String DIRECTORY_VERDISHOME = ".verdis" + ((DIRECTORYEXTENSION != null) ? DIRECTORYEXTENSION : "");
+    private static final String FILE_LAYOUT = "verdis.layout";
+    private static final String FILE_SCREEN = "verdis.screen";
+    private static final String FILE_PLUGINLAYOUT = "plugin.layout";
+
+    private static final String DIRECTORYPATH_VERDIS = DIRECTORYPATH_HOME + FILESEPARATOR + DIRECTORY_VERDISHOME;
+    private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
+    private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
+    private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
 
     public static Main THIS;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
@@ -364,7 +372,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             try {
                 if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
                     try {
-                        org.apache.log4j.PropertyConfigurator.configure(DIRECTORY_HOME + FILESEPARATOR + ".verdis" + FILESEPARATOR
+                        org.apache.log4j.PropertyConfigurator.configure(DIRECTORYPATH_VERDIS + FILESEPARATOR
                                 + "custom.log4j.properties");
                         LOG.info("CustomLoggingOn");
                     } catch (Exception ex) {
@@ -601,7 +609,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 configurationManager.setFileName("configurationPlugin.xml");
             }
             configurationManager.setClassPathFolder("/verdis/");
-            configurationManager.setFolder(".verdis");
+            configurationManager.setFolder(DIRECTORY_VERDISHOME);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("mc:" + getMappingComponent());
             }
@@ -814,7 +822,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             // Inserting Docking Window functionalty (Sebastian) 24.07.07
 
             // TODO UGLY PERHAPS CENTRAL HANDLer FOR THE CREATION OF CONFIGURATION
-            final File verdisDir = new File(DIRECTORY_VERDIS);
+            final File verdisDir = new File(DIRECTORYPATH_VERDIS);
             if (!verdisDir.exists()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Verdis Directory angelegt");
@@ -901,7 +909,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 MappingComponent.CUSTOM_FEATUREINFO);
         cfil.setFeatureInforetrievalUrl(prefs.getAlbUrl());
 
-        final File dotverdisDir = new File(DIRECTORY_VERDIS);
+        final File dotverdisDir = new File(DIRECTORYPATH_VERDIS);
         dotverdisDir.mkdir();
 
         FlaechenClipboardListener clipboardListener = new FlaechenClipboardListener() {
@@ -1127,7 +1135,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public void appModeChanged() {
         //TODO : alter Kram abspeichern
         if (currentMode != null) {
-            saveLayout(FILE_LAYOUT + "." + currentMode.name());
+            saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
         }
 
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
@@ -1150,7 +1158,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void setupLayoutRegen() {
         CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        String fileName = FILE_LAYOUT + "." + mode.name();
+        String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
             loadLayout(fileName);
         } catch (Exception e) {
@@ -1164,7 +1172,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void setupLayoutWDSR() {
         CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        String fileName = FILE_LAYOUT + "." + mode.name();
+        String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
             loadLayout(fileName);
         } catch (Exception e) {
@@ -1178,7 +1186,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void setupLayoutInfo() {
         CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        String fileName = FILE_LAYOUT + "." + mode.name();
+        String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
             loadLayout(fileName);
         } catch (Exception e) {
@@ -2149,7 +2157,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSaveLayoutActionPerformed
-        final JFileChooser fc = new JFileChooser(DIRECTORY_VERDIS);
+        final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
             @Override
@@ -2229,7 +2237,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Saving Layout.. File does not exit");
                 }
-                final File verdisDir = new File(DIRECTORY_VERDIS);
+                final File verdisDir = new File(DIRECTORYPATH_VERDIS);
                 if (!verdisDir.exists()) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Verdis Directory angelegt");
@@ -3287,7 +3295,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
 
         try {
-            SPLASH = StaticStartupTools.showGhostFrame(FILE_SCREEN, "verdis [Startup]");
+            SPLASH = StaticStartupTools.showGhostFrame(FILEPATH_SCREEN, "verdis [Startup]");
         } catch (Exception e) {
             LOG.warn("Problem beim Darstellen des Pre-Loading-Frame", e);
         }
@@ -3357,7 +3365,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             closeAllConnections();
             // Inserting Docking Window functionalty (Sebastian) 24.07.07
             configurationManager.writeConfiguration();
-            saveLayout(FILE_PLUGINLAYOUT);
+            saveLayout(FILEPATH_PLUGINLAYOUT);
         }
         flaechenClipboard.deleteStoreFile();
     }
@@ -3740,7 +3748,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     @Override
     public void dispose() {
         try {
-            StaticStartupTools.saveScreenshotOfFrame(this, FILE_SCREEN);
+            StaticStartupTools.saveScreenshotOfFrame(this, FILEPATH_SCREEN);
         } catch (Exception ex) {
             LOG.fatal("Fehler beim Capturen des App-Inhaltes", ex);
         }
@@ -3759,7 +3767,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
         // Inserting Docking Window functionalty (Sebastian) 24.07.07
         configurationManager.writeConfiguration();
-        saveLayout(FILE_LAYOUT + "." + currentMode);
+        saveLayout(FILEPATH_LAYOUT + "." + currentMode);
 
         flaechenClipboard.deleteStoreFile();
         System.exit(0);
