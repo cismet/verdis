@@ -19,6 +19,7 @@ import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.plugin.context.*;
 import Sirius.navigator.plugin.interfaces.*;
@@ -26,6 +27,9 @@ import Sirius.navigator.plugin.listener.*;
 import Sirius.navigator.search.dynamic.FormDataBean;
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.DescriptionPane;
+import Sirius.navigator.ui.DescriptionPaneFS;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -35,6 +39,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -96,6 +101,7 @@ import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cismap.commons.CrsTransformer;
@@ -156,6 +162,7 @@ import de.cismet.verdis.crossover.VerdisCrossover;
 import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.*;
+import de.cismet.verdis.search.AlkisLandparcelSearch;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 
@@ -285,6 +292,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private boolean isInit = true;
     private PluginContext context;
     private CidsBean kassenzeichenBean;
+    private JDialog alkisRendererDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
@@ -585,7 +593,18 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 this.context.getEnvironment().getProgressObserver().setProgress(200, "verdis Plugin: Oberfl\u00E4che initialisieren ...");
             }
 
+
             initComponents();
+
+            // dialog for alkis_landparcel
+            DescriptionPane descriptionPane = new DescriptionPaneFS();
+            ComponentRegistry.registerComponents(null, null, null, null, null, null, null, null, null, null, descriptionPane);
+            alkisRendererDialog = new JDialog(Main.THIS, false);
+            alkisRendererDialog.setTitle("Alkis Renderer");
+            alkisRendererDialog.setContentPane(descriptionPane);
+            alkisRendererDialog.setSize(1000, 800);
+            alkisRendererDialog.setLocationRelativeTo(Main.THIS);
+
             // Menu for Navigator
             if (plugin) {
                 final JMenu navigatorMenue = new JMenu("Verdis");
@@ -975,6 +994,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 "joinPolygons",
                 JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
                 getMappingComponent().getInputListener(MappingComponent.JOIN_POLYGONS));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    kartenPanel,
+                    "landparcelSearchGeometryCreated",
+                    CreateGeometryListener.GEOMETRY_CREATED_NOTIFICATION,
+                    getMappingComponent().getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY));
 
         aggValidator.addListener(new ValidatorListener() {
 
@@ -3048,6 +3073,48 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         od.setLocationRelativeTo(this);
         od.setVisible(true);
     }//GEN-LAST:event_mniOptionsActionPerformed
+
+   public void loadAlkisFlurstueck(final Point geom) {
+        new SwingWorker<Integer, Void>() {
+
+            @Override
+            protected Integer doInBackground() throws Exception {
+                final Point transformedPoint = CrsTransformer.transformToGivenCrs(geom, "EPSG:25832");
+                transformedPoint.setSRID(25832);
+                final Collection<Integer> ids = SessionManager.getProxy().customServerSearch(SessionManager.getSession().getUser(), new AlkisLandparcelSearch(transformedPoint));
+                if (ids == null || ids.isEmpty()) {
+                    JOptionPane.showMessageDialog(Main.THIS, "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.", "Keine FLurstücke gefunden.", JOptionPane.INFORMATION_MESSAGE);
+                    return null;
+                } else {
+                    return ids.toArray(new Integer[0])[0];
+                }
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    final Integer id = get();
+                    if (id != null) {
+                        try {
+                            DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+                            descPane.clearBreadCrumb();
+                            descPane.clear();
+                            descPane.gotoMetaObject(ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "alkis_landparcel"), id, "");
+                            if (!alkisRendererDialog.isVisible()) {
+                                alkisRendererDialog.setVisible(true);
+                            }
+                        } catch (Exception ex) {
+                            LOG.error("error while loading renderer", ex);
+                        }
+                    }
+                } catch (Exception ex) {
+                    LOG.error("error while searching flurstueck", ex);
+                }
+            }
+
+        }.execute();
+    }
+
 
     /**
      * DOCUMENT ME!

@@ -30,6 +30,7 @@ package de.cismet.verdis.gui;
 
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 import edu.umd.cs.piccolox.event.PNotification;
@@ -52,6 +53,7 @@ import javax.swing.JOptionPane;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cismap.commons.CrsTransformer;
 
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.Feature;
@@ -63,6 +65,7 @@ import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateSimpleGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.DeleteFeatureListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
@@ -137,6 +140,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JButton cmdRemoveHandle;
     private javax.swing.JButton cmdRemovePolygon;
     private javax.swing.JButton cmdRotatePolygon;
+    private javax.swing.JButton cmdSearchFlurstueck;
     private javax.swing.JButton cmdSelect;
     private javax.swing.JButton cmdSnap;
     private javax.swing.JButton cmdSplitPoly;
@@ -268,6 +272,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdNewLinestring = new javax.swing.JButton();
         cmdNewPoint = new javax.swing.JButton();
         cmdOrthogonalRectangle = new javax.swing.JButton();
+        cmdSearchFlurstueck = new javax.swing.JButton();
         cmdRaisePolygon = new javax.swing.JButton();
         cmdRemovePolygon = new javax.swing.JButton();
         cmdAttachPolyToAlphadata = new javax.swing.JButton();
@@ -566,6 +571,23 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         });
         tobVerdis.add(cmdOrthogonalRectangle);
+
+        cmdSearchFlurstueck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png"))); // NOI18N
+        cmdSearchFlurstueck.setToolTipText("Alkis Renderer");
+        cmdSearchFlurstueck.setFocusPainted(false);
+        cmdSearchFlurstueck.setFocusable(false);
+        cmdSearchFlurstueck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchFlurstueck.setMaximumSize(new java.awt.Dimension(28, 20));
+        cmdSearchFlurstueck.setPreferredSize(new java.awt.Dimension(28, 20));
+        cmdSearchFlurstueck.setRolloverSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+        cmdSearchFlurstueck.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+        cmdSearchFlurstueck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchFlurstueck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdSearchFlurstueckActionPerformed(evt);
+            }
+        });
+        tobVerdis.add(cmdSearchFlurstueck);
 
         cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
         cmdRaisePolygon.setToolTipText("Polygon hochholen");
@@ -1072,6 +1094,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
                 PureNewFeatureWithThickerLineString.class);
     }//GEN-LAST:event_cmdNewLinestringActionPerformed
+
+    private void cmdSearchFlurstueckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
+        removeMainGroupSelection();
+        cmdSearchFlurstueck.setSelected(true);
+        mappingComp.setInteractionMode(MappingComponent.CREATE_SIMPLE_GEOMETRY);
+}//GEN-LAST:event_cmdSearchFlurstueckActionPerformed
+
+    public void landparcelSearchGeometryCreated(final PNotification notification) {
+        final PureNewFeature newFeature = ((CreateSimpleGeometryListener)mappingComp.getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY)).getNewFeature();
+
+        final Point point = newFeature.getGeometry().getInteriorPoint();
+        Main.THIS.loadAlkisFlurstueck(point);
+    }
 
     /**
      * DOCUMENT ME!
