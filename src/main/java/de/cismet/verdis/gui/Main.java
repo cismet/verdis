@@ -468,7 +468,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         CidsAppBackend.getInstance().addCidsBeanStore(regenFlaechenTabellenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kanaldatenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(regenSumPanel);
-
+        
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenPanel);
         CidsAppBackend.getInstance().addEditModeListener(wdsrFrontenDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
@@ -2740,7 +2740,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
-//        throw new UnsupportedOperationException("Not supported yet.");
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -2750,12 +2749,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     storeChanges();
-                    newKZ();
+                    newKassenzeichen();
                 } else if (answer == JOptionPane.NO_OPTION) {
-                    newKZ();
+                    newKassenzeichen();
                 }
             } else {
-                newKZ();
+                newKassenzeichen();
             }
         }
     }//GEN-LAST:event_cmdNewKassenzeichenActionPerformed
@@ -3170,15 +3169,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    public void newKZ() {
-        final String newKZ = JOptionPane.showInputDialog(
+    public void newKassenzeichen() {
+        final String newKassenzeichennummer = JOptionPane.showInputDialog(
                 this,
                 "Geben Sie das neue Kassenzeichen ein:",
                 "Neues Kassenzeichen",
                 JOptionPane.QUESTION_MESSAGE);
-        if (!((newKZ == null) || newKZ.equals(""))) {
+        if (!((newKassenzeichennummer == null) || newKassenzeichennummer.equals(""))) {
             try {
-                final int kzNummer = new Integer(newKZ);
+                final int kzNummer = new Integer(newKassenzeichennummer);
 
                 new SwingWorker<Void, Void>() {
 
@@ -3196,13 +3195,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         }
 
                         unlockDataset();
-                        if (lockDataset(newKZ)) {
-                            final CidsBean kassenzeichen = createNewKz(kzNummer);
+                        if (lockDataset(newKassenzeichennummer)) {
+                            final CidsBean kassenzeichen = createNewKassenzeichen(kzNummer);
                             kassenzeichen.persist();
 
-                            unlockDataset(newKZ);
-                            kassenzeichenPanel.setKZSearchField(newKZ);
-                            kassenzeichenPanel.gotoKassenzeichen(newKZ);
+                            unlockDataset(newKassenzeichennummer);
+                            kassenzeichenPanel.setKZSearchField(newKassenzeichennummer);
+                            kassenzeichenPanel.gotoKassenzeichen(newKassenzeichennummer);
 
                             enableEditing(true);
                         } else {
@@ -3230,7 +3229,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
-    private CidsBean createNewKz(int nummer) throws Exception {
+    private CidsBean createNewKassenzeichen(int nummer) throws Exception {
         final Calendar cal = Calendar.getInstance();
         final java.sql.Date erfassungsdatum = new java.sql.Date(cal.getTimeInMillis());
         cal.add(Calendar.MONTH, 1);
@@ -3247,6 +3246,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final CidsBean kanalanschluss = kanalanschlussMo.getBean();
         final CidsBean geomBean = geomMo.getBean();
 
+        //TODO sobald die FEBs auf 8-stellige kassenzeichen umgestellt worden sind, kann diese zeile rausfliegen
+        // sie dient nur dazu, dass bei neuen kassenzeichen der link zu dem pdf nicht aufs leere zeigt
+        kassenzeichen.setProperty("kassenzeichennummer", nummer);
+        //--
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER, nummer);
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS, kanalanschluss);
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__DATUM_VERANLAGUNG, veranlagungsdatum);
