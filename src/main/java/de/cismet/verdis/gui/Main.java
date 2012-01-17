@@ -3246,10 +3246,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final CidsBean kanalanschluss = kanalanschlussMo.getBean();
         final CidsBean geomBean = geomMo.getBean();
 
-        //TODO sobald die FEBs auf 8-stellige kassenzeichen umgestellt worden sind, kann diese zeile rausfliegen
-        // sie dient nur dazu, dass bei neuen kassenzeichen der link zu dem pdf nicht aufs leere zeigt
-        kassenzeichen.setProperty("kassenzeichennummer", nummer);
-        //--
+        //TODO sobald die FEBs und DMS auf 8-stellige kassenzeichen umgestellt worden sind, kann diese zeile rausfliegen
+        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD, nummer);
+       //--
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER, nummer);
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS, kanalanschluss);
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__DATUM_VERANLAGUNG, veranlagungsdatum);

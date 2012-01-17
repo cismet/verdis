@@ -29,7 +29,7 @@ public interface KassenzeichenPropertyConstants {
     public static final String PROP__GEOMETRIE = "geometrie";
     public static final String PROP__GEOMETRIE__GEO_FIELD = PROP__GEOMETRIE + ".geo_field";
     public static final String PROP__KASSENZEICHENNUMMER = "kassenzeichennummer8";
-    public static final String PROP__KASSENZEICHENNUMMER_OLD = "kassenzeichennummer7";
+    public static final String PROP__KASSENZEICHENNUMMER_OLD = "kassenzeichennummer";
     public static final String PROP__KANALANSCHLUSS = "kanalanschluss";
     public static final String PROP__DATUM_VERANLAGUNG = "datum_veranlagung";
     public static final String PROP__DATUM_ERFASSUNG = "datum_erfassung";
