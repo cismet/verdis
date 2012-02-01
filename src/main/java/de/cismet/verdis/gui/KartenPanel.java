@@ -28,77 +28,47 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import edu.umd.cs.piccolox.event.PNotification;
-
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.CrsTransformer;
-
 import de.cismet.cismap.commons.ServiceLayer;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollection;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.cismap.commons.features.FeatureCollectionListener;
-import de.cismet.cismap.commons.features.PostgisFeature;
-import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateSimpleGeometryListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.DeleteFeatureListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.SimpleMoveListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.actions.CustomAction;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.memento.MementoInterface;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
-
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
-
 import de.cismet.gui.tools.PureNewFeatureWithThickerLineString;
 import de.cismet.tools.CurrentStackTrace;
-
 import de.cismet.tools.StaticDecimalTools;
-
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
-
 import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
 import de.cismet.verdis.constants.WDSRPropertyConstants;
 import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Event;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.Date;
-import java.util.ArrayList;
+import java.util.*;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 /**
  * DOCUMENT ME!
@@ -1105,7 +1075,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final PureNewFeature newFeature = ((CreateSimpleGeometryListener)mappingComp.getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY)).getNewFeature();
 
         final Point point = newFeature.getGeometry().getInteriorPoint();
-        Main.THIS.loadAlkisFlurstueck(point);
+        Main.getCurrentInstance().loadAlkisFlurstueck(point);
     }
 
     /**
@@ -1369,12 +1339,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     area += f.getGeometry().getArea();
                     umfang += f.getGeometry().getLength();
                 }
-            }
+            }                    
             if ((area == 0.0 && umfang == 0.0) || cf.isEmpty()) {
                 lblMeasurement.setText("");
             } else {
-                lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(area) + "  Umfang: "
-                        + StaticDecimalTools.round(umfang));
+                // vor dem runden erst zweistellig abschneiden (damit nicht aufgerundet wird)
+                final double areadd = ((double)(Math.ceil(area * 100))) / 100;
+                final double umfangdd = ((double)(Math.ceil(umfang * 100))) / 100;
+                lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(areadd) + "  Umfang: "
+                        + StaticDecimalTools.round(umfangdd));
             }
         } else if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ESW)) {
             double length = 0.0;
@@ -1383,7 +1356,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     length += f.getGeometry().getLength();
                 }
             }
-            lblMeasurement.setText("L\u00E4nge: " + StaticDecimalTools.round(length));
+            // vor dem runden erst zweistellig abschneiden (damit nicht aufgerundet wird)
+            final double lengthdd = ((double)(Math.ceil(length * 100))) / 100;
+            lblMeasurement.setText("L\u00E4nge: " + StaticDecimalTools.round(lengthdd));
         }
     }
 
@@ -1508,7 +1483,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         return;
                                     }
 
-                                    Main.THIS.getRegenFlaechenTabellenPanel().removeBean(cbTwo);
+                                    Main.getCurrentInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
 
                                     cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK, new Integer((int) (newGeom.getArea())));
 
@@ -1708,7 +1683,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     try {
                         if (pf.getVisible() == true && pf.getParent().getVisible() == true
                                 && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
-                            Main.THIS.getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey());
+                            Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey());
                         }
                     } catch (Exception e) {
                         LOG.info("Fehler beim gotoKassenzeichen", e);
