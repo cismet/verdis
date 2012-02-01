@@ -17,17 +17,17 @@
 
 package de.cismet.verdis;
 
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
 import Sirius.navigator.connection.SessionManager;
 import de.cismet.cids.custom.util.CidsBeanSupport;
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
 public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
     
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FlaechenClipboard.class);
-    private static RegenFlaechenTabellenPanel flaechenTable = Main.THIS.getRegenFlaechenTabellenPanel();
+    private static RegenFlaechenTabellenPanel flaechenTable = Main.getCurrentInstance().getRegenFlaechenTabellenPanel();
 
     private Collection<CidsBean> clipboardFlaecheBeans = new ArrayList<CidsBean>();
     private List<FlaechenClipboardListener> listeners = new ArrayList<FlaechenClipboardListener>();
@@ -191,7 +191,7 @@ public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
         int answer = JOptionPane.YES_OPTION;
         if (isCutted && clipboardFlaecheBeans != null) {
             answer = JOptionPane.showConfirmDialog(
-                    Main.THIS,
+                    Main.getCurrentInstance(),
                     "In der Verdis-Zwischenablage befinden sich noch Daten die\nausgeschnitten und noch nicht wieder eingef\u00FCgt wurden.\nMöchten Sie diese Daten jetzt verwerfen ?",
                     "Ausschneiden",
                     JOptionPane.YES_NO_OPTION,

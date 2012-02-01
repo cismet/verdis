@@ -28,15 +28,10 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.WDSRPropertyConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cids.custom.util.BindingValidationSupport;
-
-import edu.umd.cs.piccolo.PCanvas;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 import de.cismet.validation.Validator;
@@ -45,15 +40,16 @@ import de.cismet.validation.ValidatorState;
 import de.cismet.validation.ValidatorStateImpl;
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
 import de.cismet.validation.validator.CidsBeanValidator;
-
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import javax.swing.JOptionPane;
+import de.cismet.verdis.constants.WDSRPropertyConstants;
+import edu.umd.cs.piccolo.PCanvas;
 import java.awt.event.ActionEvent;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 
 /**
  * DOCUMENT ME!
@@ -680,10 +676,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                         final CidsBean cidsBean = getCidsBean();
                         final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
 
-                        if (Main.THIS.isInEditMode()) {
+                        if (Main.getCurrentInstance().isInEditMode()) {
                             if (geom != null) {
                                 final int answer = JOptionPane.showConfirmDialog(
-                                        Main.THIS,
+                                        Main.getCurrentInstance(),
                                         "Soll die Länge aus der Grafik \u00FCbernommen werden?",
                                         "Länge automatisch setzen",
                                         JOptionPane.YES_NO_OPTION);
@@ -733,10 +729,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                         final CidsBean cidsBean = getCidsBean();
                         final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
 
-                        if (Main.THIS.isInEditMode()) {
+                        if (Main.getCurrentInstance().isInEditMode()) {
                             if (geom != null) {
                                 final int answer = JOptionPane.showConfirmDialog(
-                                        Main.THIS,
+                                        Main.getCurrentInstance(),
                                         "Soll die Länge aus der Grafik \u00FCbernommen werden?",
                                         "Länge automatisch setzen",
                                         JOptionPane.YES_NO_OPTION);

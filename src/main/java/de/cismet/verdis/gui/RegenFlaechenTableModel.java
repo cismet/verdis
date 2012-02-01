@@ -23,11 +23,10 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import javax.swing.ImageIcon;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * DOCUMENT ME!
@@ -40,57 +39,47 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel implements Regen
     //~ Instance fields --------------------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTableModel.class);
-    
-    private String[] columnNames = {
-            " ",
-            "Bezeichnung",
-            " ",
-            "Gr\u00F6\u00DFe in m²",
-            "Fl\u00E4chenart",
-            "Anschlu\u00DFgrad"
-        };
-    private ImageIcon mult = new javax.swing.ImageIcon(getClass().getResource(
+    private static ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
-    private ImageIcon edited = new javax.swing.ImageIcon(getClass().getResource(
+    private static ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/edited.png"));
-    private ImageIcon warn = new javax.swing.ImageIcon(getClass().getResource(
+    private static ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/warn.png"));
-
-    //~ Methods ----------------------------------------------------------------
-
-    @Override
-    public String getBeansProperty() {
-        return KassenzeichenPropertyConstants.PROP__FLAECHEN;
+            
+    private static final String[] COLUMN_NAMES = {
+        " ",
+        "Bezeichnung",
+        " ",
+        "Gr\u00F6\u00DFe in m²",
+        "Fl\u00E4chenart",
+        "Anschlu\u00DFgrad"
+    };
+    
+    private static final Class[] COLUMN_CLASSES = {
+        Icon.class,
+        String.class,
+        javax.swing.Icon.class,
+        String.class,
+        String.class,
+        String.class        
+    };
+    
+    public RegenFlaechenTableModel() {
+        super(COLUMN_NAMES, COLUMN_CLASSES);
     }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(final int column) {
-        return columnNames[column];
-    }
-
-    @Override
-    public Class getColumnClass(final int column) {
-        if ((column == 0) || (column == 2)) {
-            return javax.swing.Icon.class;
-        } else {
-            return String.class;
-        }
-    }
-
+    
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
-        final CidsBean cidsBean = (CidsBean) getCidsBeans().get(rowIndex);
+        final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
+        if (cidsBean == null) {
+            return null;
+        }
         if (columnIndex == 0) {
             if (cidsBean.getProperty(PROP__ANTEIL) != null) {
-                return mult;
+                return MULT_IMAGE;
             }
             if ((cidsBean.getProperty(PROP__SPERRE) instanceof Boolean) && (Boolean)cidsBean.getProperty(PROP__SPERRE)) {
-                return warn;
+                return WARN_IMAGE;
             }
             return null;
         } // Bezeichnungsspalte
@@ -103,7 +92,7 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel implements Regen
             if (!((cidsBean.getProperty(PROP__FLAECHENINFO__GROESSE_KORREKTUR) == null)
                             || cidsBean.getProperty(PROP__FLAECHENINFO__GROESSE_KORREKTUR).equals(
                                 cidsBean.getProperty(PROP__FLAECHENINFO__GROESSE_GRAFIK)))) {
-                return edited;
+                return EDITED_IMAGE;
             } else {
                 return null;
             }

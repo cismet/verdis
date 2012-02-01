@@ -28,41 +28,31 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cids.custom.util.BindingValidationSupport;
-
-import edu.umd.cs.piccolo.PCanvas;
-
-import java.awt.Color;
-
-import javax.swing.UIManager;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
-import de.cismet.validation.Validatable;
-import de.cismet.validation.Validator;
-import de.cismet.validation.ValidatorHelper;
+import de.cismet.validation.*;
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
-
+import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import java.util.Collection;
-import javax.swing.JOptionPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import de.cismet.validation.ValidatorState;
-import de.cismet.validation.ValidatorStateImpl;
-import de.cismet.validation.validator.CidsBeanValidator;
+import edu.umd.cs.piccolo.PCanvas;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * DOCUMENT ME!
@@ -575,7 +565,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     private void chkSperreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
         final boolean sperre = chkSperre.isSelected();
         if (sperre) {
-            final String answer = JOptionPane.showInputDialog(Main.THIS.getRootPane(),
+            final String answer = JOptionPane.showInputDialog(Main.getCurrentInstance().getRootPane(),
                     "Bitte eine Bemerkung zur Sperre angeben.",
                     txtSperreBemerkung.getText());
             if (answer == null) {
@@ -715,7 +705,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
             public void run() {
                 if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Main.THIS.getKzPanel().gotoKassenzeichen(he.getDescription());
+                        Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(he.getDescription());
                     } catch (Exception ex) {
                         LOG.error("Fehler im Hyperlinken", ex);
                     }
@@ -748,7 +738,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         final int answer = JOptionPane.showConfirmDialog(
-                                Main.THIS,
+                                Main.getCurrentInstance(),
                                 "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
                                 "Bezeichnung automatisch setzen",
                                 JOptionPane.YES_NO_OPTION);
@@ -760,7 +750,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                             } catch (final NumberFormatException ex) {
                                 art = 0;
                             }
-                            final String newValue = Main.THIS.getRegenFlaechenTabellenPanel().getValidFlaechenname(art);
+                            final String newValue = Main.getCurrentInstance().getRegenFlaechenTabellenPanel().getValidFlaechenname(art);
                             try {
                                 cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG, newValue);
                             } catch (Exception ex) {
@@ -821,10 +811,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                         final CidsBean cidsBean = getCidsBean();
                         final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
 
-                        if (Main.THIS.isInEditMode()) {
+                        if (Main.getCurrentInstance().isInEditMode()) {
                             if (geom != null) {
                                 final int answer = JOptionPane.showConfirmDialog(
-                                        Main.THIS,
+                                        Main.getCurrentInstance(),
                                         "Soll die Gr\u00F6\u00DFe aus der Grafik \u00FCbernommen werden?",
                                         "Gr\u00F6\u00DFe automatisch setzen",
                                         JOptionPane.YES_NO_OPTION);
@@ -879,10 +869,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                         final CidsBean cidsBean = getCidsBean();
                         final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
 
-                        if (Main.THIS.isInEditMode()) {
+                        if (Main.getCurrentInstance().isInEditMode()) {
                             if (geom != null) {
                                 final int answer = JOptionPane.showConfirmDialog(
-                                        Main.THIS,
+                                        Main.getCurrentInstance(),
                                         "Soll die Gr\u00F6\u00DFe aus dem Feld \"Gr\u00F6\u00DFe (Grafik)\" \u00FCbernommen werden?",
                                         "Gr\u00F6\u00DFe automatisch setzen",
                                         JOptionPane.YES_NO_OPTION);

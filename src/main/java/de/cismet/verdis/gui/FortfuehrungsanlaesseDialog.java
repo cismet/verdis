@@ -17,14 +17,19 @@
 package de.cismet.verdis.gui;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import java.awt.Cursor;
+import java.awt.Frame;
 import java.util.Calendar;
 import java.util.Date;
-import javax.swing.DefaultListModel;
-import javax.swing.UnsupportedLookAndFeelException;
+import java.util.List;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import org.apache.log4j.Logger;
 import org.openide.util.Exceptions;
 
@@ -34,29 +39,52 @@ import org.openide.util.Exceptions;
  */
 public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     
-    private static Logger LOG = Logger.getLogger(FortfuehrungsanlaesseDialog.class);
+    private static final Logger LOG = Logger.getLogger(FortfuehrungsanlaesseDialog.class);
 
+    private static FortfuehrungsanlaesseDialog INSTANCE;
+    
+    private boolean lockDateButtons = false;
+        
     /**
      * Creates new form FortfuehrungsanlaesseDialog
      */
-    public FortfuehrungsanlaesseDialog(java.awt.Frame parent, boolean modal) {
+    private FortfuehrungsanlaesseDialog(Frame parent, boolean modal) {
         super(parent, modal);
-        initComponents();        
         
-        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        initComponents();        
+
+        jXTable1.setModel(new FortfuehrungenTableModel());
+        
+        
+        jXTable1.getColumnModel().getColumn(0).setCellRenderer(jXTable1.getDefaultRenderer(String.class));
+        jXTable1.getColumnModel().getColumn(1).setCellRenderer(jXTable1.getDefaultRenderer(String.class));
+        jXTable1.getColumnModel().getColumn(2).setCellRenderer(jXTable1.getDefaultRenderer(String.class));
+
+        jXTable1.getColumnModel().getColumn(0).setPreferredWidth(100);
+        jXTable1.getColumnModel().getColumn(1).setPreferredWidth(150);
+        jXTable1.getColumnModel().getColumn(2).setPreferredWidth(200);
+
+        jXTable1.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jXTable1.setDragEnabled(false);
+
+        jXTable1.getTableHeader().setResizingAllowed(true);
+        jXTable1.getTableHeader().setReorderingAllowed(false);
+        //jXTable1.setSortOrder(1, SortOrder.ASCENDING);        
+        
+        jXTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
 
         // If cell selection is enabled, both row and column change events are fired
-                if (e.getSource() == jTable1.getSelectionModel() && jTable1.getRowSelectionAllowed()) {
-                    int first = e.getFirstIndex();
-                    int last = e.getLastIndex();
+                if (e.getSource() == jXTable1.getSelectionModel() && jXTable1.getRowSelectionAllowed()) {
                     fortfuehrungsTableListSelectionChanged(e);
                 }
 
             }
         });
+        
+        jProgressBar1.setVisible(false);
     }
 
     /**
@@ -74,22 +102,23 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         panPeriod = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
-        jXDatePicker2 = new org.jdesktop.swingx.JXDatePicker();
+        dpiFrom = new org.jdesktop.swingx.JXDatePicker();
+        dpiTo = new org.jdesktop.swingx.JXDatePicker();
         jPanel2 = new javax.swing.JPanel();
         btnThisWeek = new javax.swing.JToggleButton();
         btnLastWeek = new javax.swing.JToggleButton();
         btnThisMonth = new javax.swing.JToggleButton();
         btnLastMonth = new javax.swing.JToggleButton();
         jPanel7 = new javax.swing.JPanel();
+        btnRefreshAnlaesse = new javax.swing.JButton();
         panMasterDetail = new javax.swing.JPanel();
         panMaster = new javax.swing.JPanel();
-        btnRefreshAnlaesse = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jXTable1 = new org.jdesktop.swingx.JXTable();
+        jProgressBar1 = new javax.swing.JProgressBar();
         panDetail = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        labDokumentLink = new javax.swing.JLabel();
+        lblDokumentLink = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -102,6 +131,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         setTitle(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.title")); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
+        jPanel1.setPreferredSize(new java.awt.Dimension(800, 643));
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         panPeriod.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.panPeriod.border.title"))); // NOI18N
@@ -109,43 +139,46 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 5);
         panPeriod.add(jLabel1, gridBagConstraints);
 
         jLabel2.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 5);
         panPeriod.add(jLabel2, gridBagConstraints);
 
-        jXDatePicker1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+        dpiFrom.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jXDatePicker1PropertyChange(evt);
+                dpiFromPropertyChange(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        panPeriod.add(jXDatePicker1, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 5, 10);
+        panPeriod.add(dpiFrom, gridBagConstraints);
 
-        jXDatePicker2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+        dpiTo.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jXDatePicker2PropertyChange(evt);
+                dpiToPropertyChange(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        panPeriod.add(jXDatePicker2, gridBagConstraints);
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 5, 10);
+        panPeriod.add(dpiTo, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 3, 5, 5));
 
@@ -186,10 +219,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         jPanel2.add(btnLastMonth);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 10);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         panPeriod.add(jPanel2, gridBagConstraints);
 
         jPanel7.setPreferredSize(new java.awt.Dimension(50, 10));
@@ -202,15 +236,32 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 10, Short.MAX_VALUE)
+            .addGap(0, 84, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 1.0;
         panPeriod.add(jPanel7, gridBagConstraints);
+
+        btnRefreshAnlaesse.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.btnRefreshAnlaesse.text")); // NOI18N
+        btnRefreshAnlaesse.setEnabled(false);
+        btnRefreshAnlaesse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshAnlaesseActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 10, 10);
+        panPeriod.add(btnRefreshAnlaesse, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -225,45 +276,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         panMaster.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.panMaster.border.title"))); // NOI18N
         panMaster.setLayout(new java.awt.GridBagLayout());
 
-        btnRefreshAnlaesse.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.btnRefreshAnlaesse.text")); // NOI18N
-        btnRefreshAnlaesse.setEnabled(false);
-        btnRefreshAnlaesse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefreshAnlaesseActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 20;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
-        panMaster.add(btnRefreshAnlaesse, gridBagConstraints);
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Datum", "Name", "Typ", "Beschreibung"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane3.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(jXTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -271,8 +284,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        panMaster.add(jScrollPane3, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 10, 10);
+        panMaster.add(jScrollPane1, gridBagConstraints);
+
+        jProgressBar1.setIndeterminate(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 10);
+        panMaster.add(jProgressBar1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -282,6 +303,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         panMasterDetail.add(panMaster, gridBagConstraints);
+        panMaster.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.panMaster.AccessibleContext.accessibleName")); // NOI18N
 
         panDetail.setBorder(null);
         panDetail.setMinimumSize(new java.awt.Dimension(250, 137));
@@ -292,15 +314,15 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.jPanel3.border.title"))); // NOI18N
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        labDokumentLink.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.labDokumentLink.text")); // NOI18N
-        labDokumentLink.setEnabled(false);
+        lblDokumentLink.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.lblDokumentLink.text")); // NOI18N
+        lblDokumentLink.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jPanel3.add(labDokumentLink, gridBagConstraints);
+        jPanel3.add(lblDokumentLink, gridBagConstraints);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -331,6 +353,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         lstKassenzeichen.setModel(new DefaultListModel());
         lstKassenzeichen.setEnabled(false);
+        lstKassenzeichen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lstKassenzeichenMouseClicked(evt);
+            }
+        });
         lstKassenzeichen.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lstKassenzeichenValueChanged(evt);
@@ -350,6 +377,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         jButton1.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.jButton1.text")); // NOI18N
         jButton1.setEnabled(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -437,10 +469,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         final Date fromDate = calendar.getTime();
         
-        jXDatePicker1.setDate(fromDate);
-        jXDatePicker2.setDate(toDate);
+        try {
+            lockDateButtons = true;
+            dpiFrom.setDate(fromDate);
+            dpiTo.setDate(toDate);
+        } finally {
+            lockDateButtons = false;
+        }
         
         periodChanged();
+        refreshFortfuehrungsList();
     }//GEN-LAST:event_btnThisWeekActionPerformed
 
     private void btnLastWeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastWeekActionPerformed
@@ -452,10 +490,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         calendar.add(Calendar.DATE, -7);
         final Date fromDate = calendar.getTime();
         
-        jXDatePicker1.setDate(fromDate);
-        jXDatePicker2.setDate(toDate);
+        try {
+            lockDateButtons = true;
+            dpiFrom.setDate(fromDate);
+            dpiTo.setDate(toDate);
+        } finally {
+            lockDateButtons = false;
+        }
         
         periodChanged();
+        refreshFortfuehrungsList();        
     }//GEN-LAST:event_btnLastWeekActionPerformed
 
     private void btnThisMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThisMonthActionPerformed
@@ -466,10 +510,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         calendar.set(Calendar.DAY_OF_MONTH, 1);        
         final Date fromDate = calendar.getTime();
         
-        jXDatePicker1.setDate(fromDate);
-        jXDatePicker2.setDate(toDate);
+        try {
+            lockDateButtons = true;
+            dpiFrom.setDate(fromDate);
+            dpiTo.setDate(toDate);
+        } finally {
+            lockDateButtons = false;
+        }
         
         periodChanged();
+        refreshFortfuehrungsList();
     }//GEN-LAST:event_btnThisMonthActionPerformed
 
     private void btnLastMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastMonthActionPerformed
@@ -481,19 +531,29 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         calendar.add(Calendar.MONTH, -1);        
         final Date fromDate = calendar.getTime();
         
-        jXDatePicker1.setDate(fromDate);
-        jXDatePicker2.setDate(toDate);
+        try {
+            lockDateButtons = true;
+            dpiFrom.setDate(fromDate);
+            dpiTo.setDate(toDate);
+        } finally {
+            lockDateButtons = false;
+        }
         
         periodChanged();
+        refreshFortfuehrungsList();
     }//GEN-LAST:event_btnLastMonthActionPerformed
 
-    private void jXDatePicker1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jXDatePicker1PropertyChange
-        manualPeriodChangePerformed();
-    }//GEN-LAST:event_jXDatePicker1PropertyChange
+    private void dpiFromPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dpiFromPropertyChange
+        if (!lockDateButtons) {
+            manualPeriodChangePerformed();
+        }
+    }//GEN-LAST:event_dpiFromPropertyChange
 
-    private void jXDatePicker2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jXDatePicker2PropertyChange
-        manualPeriodChangePerformed();
-    }//GEN-LAST:event_jXDatePicker2PropertyChange
+    private void dpiToPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dpiToPropertyChange
+        if (!lockDateButtons) {
+            manualPeriodChangePerformed();
+        }
+    }//GEN-LAST:event_dpiToPropertyChange
 
     private void btnCloseDialogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseDialogActionPerformed
         dispose();
@@ -503,73 +563,33 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         jButton1.setEnabled(!lstKassenzeichen.getSelectionModel().isSelectionEmpty());
     }//GEN-LAST:event_lstKassenzeichenValueChanged
 
-    private void refreshKassenzeichenList() {
-        ((DefaultListModel) lstKassenzeichen.getModel()).removeAllElements();
-        final int selectedRow = jTable1.getSelectedRow() + 1;
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        gotoSelectedKassenzeichen();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
-        if (selectedRow > 0 && selectedRow <= jTable1.getRowCount()) {
-            labDokumentLink.setText("<html><a href=\"http://server/ffax.pdf\">fortfuehrungsanlass_" + selectedRow + ".pdf</a>");         
-            setDetailEnabled(true);
-        } else {
-            labDokumentLink.setText("");
-            setDetailEnabled(false);
+    private void lstKassenzeichenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstKassenzeichenMouseClicked
+        if(evt.getClickCount() == 2) {
+            if (lstKassenzeichen.getSelectedValue() != null) {
+                gotoSelectedKassenzeichen();
+            }
+        }
+    }//GEN-LAST:event_lstKassenzeichenMouseClicked
+
+    private void gotoSelectedKassenzeichen() {
+        final int kassenzeichennummer = (Integer) lstKassenzeichen.getSelectedValue();
+        CidsAppBackend.getInstance().retrieveKassenzeichenByNummer(kassenzeichennummer);
+    }
+    
+    private void setKassenzeichenBeans(List<CidsBean> kassenzeichenBeans) {
+        final DefaultListModel kassenzeichenListModel = (DefaultListModel) lstKassenzeichen.getModel();
+        kassenzeichenListModel.removeAllElements();
+        
+        if (kassenzeichenBeans != null) {
+            for (CidsBean kassenzeichenBean : kassenzeichenBeans) {
+                kassenzeichenListModel.addElement(kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));            
+            }
         }
         
-        switch (selectedRow) {
-            case 1: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("61004629");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("61004729");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("61004829");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("61004929");
-            }
-            break;
-            case 2: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004329");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004429");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004529");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004629");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004729");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004829");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("62004929");
-            }
-            break;
-            case 3: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("63004129");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("63004229");
-            }
-            break;
-            case 4: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("64004429");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("64004529");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("64004829");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("64004929");
-            }
-            break;
-            case 5: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("65004129");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("65004229");
-            }
-            break;
-            case 6: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("66004629");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("66004729");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("66004929");
-            }
-            break;
-            case 7: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("67004529");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("67004729");
-            }
-            break;
-            case 8: {
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004129");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004229");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004329");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004429");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004529");
-                ((DefaultListModel) lstKassenzeichen.getModel()).addElement("68004629");
-            } break;
-        }
     }
     
     private void manualPeriodChangePerformed() {
@@ -577,64 +597,95 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         periodChanged();
     }
     
-    private void fortfuehrungsTableListSelectionChanged(ListSelectionEvent e) {
-        refreshKassenzeichenList();
+    private void fortfuehrungsTableListSelectionChanged(ListSelectionEvent e) {        
+        final int selectedIndex = jXTable1.getSelectedRow();               
+        final CidsBean selectedFortfuehrungBean;
+        if (selectedIndex >= 0) {
+            final int rowIndex = jXTable1.convertRowIndexToModel(selectedIndex);      
+            selectedFortfuehrungBean = ((FortfuehrungenTableModel) jXTable1.getModel()).getCidsBeanByIndex(rowIndex);
+        } else {
+            selectedFortfuehrungBean = null;
+        }
+        if (selectedFortfuehrungBean != null) {        
+            final List<CidsBean> kassenzeichenBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__KASSENZEICHEN);                
+            setDetailEnabled(true);
+            setKassenzeichenBeans(kassenzeichenBeans);
+            setDokumentLink((String) selectedFortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DOKUMENTURL));
+        } else {
+            setDetailEnabled(false);
+            setKassenzeichenBeans(null);
+            setDokumentLink(null);
+        }        
+    }
+    
+    private void setDokumentLink(final String dokumentUrl) {
+        if (dokumentUrl != null) {
+            lblDokumentLink.setText("<html><a href=\"" + dokumentUrl + "\">Dokument im Browser anzeigen</a>");
+            lblDokumentLink.setToolTipText(dokumentUrl);
+            lblDokumentLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        } else {
+            lblDokumentLink.setText("");
+            lblDokumentLink.setToolTipText(null);
+            lblDokumentLink.setCursor(Cursor.getDefaultCursor());
+        }
     }
     
     private void periodChanged() {
-        final boolean anlaesseEnabled = jXDatePicker1.getDate() != null && jXDatePicker2.getDate() != null;
+        final boolean anlaesseEnabled = dpiFrom.getDate() != null && dpiTo.getDate() != null;
         btnRefreshAnlaesse.setEnabled(anlaesseEnabled);
-        jTable1.setEnabled(anlaesseEnabled);
+        jXTable1.setEnabled(anlaesseEnabled);
     }    
     
     private void refreshFortfuehrungsList() {
-        jTable1.getSelectionModel().clearSelection();
-        ((DefaultTableModel) jTable1.getModel()).getDataVector().clear();
-        
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 1", "", "Beschreibung 1" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 2", "", "Beschreibung 2" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 3", "", "Beschreibung 3" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 4", "", "Beschreibung 4" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 5", "", "Beschreibung 5" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 6", "", "Beschreibung 6" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 7", "", "Beschreibung 7" });
-        ((DefaultTableModel) jTable1.getModel()).addRow(new Object[] { "01.01.1970", "Fortführungsanlass 8", "", "Beschreibung 8" });
+        new SwingWorker<List<CidsBean>, Void>() {
+
+            @Override
+            protected List<CidsBean> doInBackground() throws Exception {
+                btnRefreshAnlaesse.setEnabled(false);
+                jProgressBar1.setVisible(true);
+                final CidsAppBackend be = CidsAppBackend.getInstance();
+                
+                return be.loadFortfuehrungBeansByDates(dpiFrom.getDate(), dpiTo.getDate());
+            }
+
+            @Override
+            protected void done() {
+                List<CidsBean> cidsBeans = null;
+                try {
+                    cidsBeans = get();
+                    
+                    jXTable1.getSelectionModel().clearSelection();
+                    ((CidsBeanTableModel) jXTable1.getModel()).setCidsBeans(cidsBeans);
+                } catch (Exception ex) {
+                    LOG.error("error while loading fortfuehrung beans", ex);
+                }
+                btnRefreshAnlaesse.setEnabled(true);
+                jProgressBar1.setVisible(false);
+                
+                if (cidsBeans == null || cidsBeans.isEmpty()) {
+                    JOptionPane.showMessageDialog(rootPane, "<html>Es konnten keine Fortführungsfälle<br/>für den gewählten Zeitraum gefunden werden.", "keine Fortführungsfälle gefunden", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }                                    
+        }.execute();        
     }
     
     private void setDetailEnabled(final boolean enabled) {
         lstKassenzeichen.setEnabled(enabled);
-        labDokumentLink.setEnabled(enabled);
+        lblDokumentLink.setEnabled(enabled);
     }
+    
+    public static FortfuehrungsanlaesseDialog getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new FortfuehrungsanlaesseDialog(Main.getCurrentInstance(), false);
+            INSTANCE.setLocationRelativeTo(Main.getCurrentInstance());
+        }
+        return INSTANCE;
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /*
-         * Set the Nimbus look and feel
-         */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FortfuehrungsanlaesseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FortfuehrungsanlaesseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FortfuehrungsanlaesseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FortfuehrungsanlaesseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
         /*
          * Create and display the dialog
@@ -662,6 +713,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
             }
         });
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCloseDialog;
     private javax.swing.JToggleButton btnLastMonth;
@@ -670,6 +722,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private javax.swing.JToggleButton btnThisMonth;
     private javax.swing.JToggleButton btnThisWeek;
     private javax.swing.ButtonGroup buttonGroup1;
+    private org.jdesktop.swingx.JXDatePicker dpiFrom;
+    private org.jdesktop.swingx.JXDatePicker dpiTo;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -680,16 +734,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable1;
-    private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
-    private org.jdesktop.swingx.JXDatePicker jXDatePicker2;
-    private javax.swing.JLabel labDokumentLink;
+    private org.jdesktop.swingx.JXTable jXTable1;
+    private javax.swing.JLabel lblDokumentLink;
     private javax.swing.JList lstKassenzeichen;
     private javax.swing.JPanel panDetail;
     private javax.swing.JPanel panMaster;
     private javax.swing.JPanel panMasterDetail;
     private javax.swing.JPanel panPeriod;
     // End of variables declaration//GEN-END:variables
+
 }

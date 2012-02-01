@@ -32,7 +32,7 @@ import org.jdesktop.swingx.JXTable;
  *
  * @author jruiz
  */
-public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionListener, CidsBeanStore, FeatureAttacher, Validatable {
+public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionListener, FeatureAttacher, Validatable {
 
     public void addNewBean();
 
@@ -61,6 +61,8 @@ public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionL
     public CidsBeanTableHelper getTableHelper();
 
     public JXTable getJXTable();
+    
+    public void setCidsBeans(final List<CidsBean> cidsBeans);
 
     public void selectCidsBean(final CidsBean cidsBean);
 

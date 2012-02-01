@@ -23,9 +23,8 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.WDSRPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.verdis.constants.WDSRPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -36,45 +35,25 @@ import de.cismet.cids.dynamics.CidsBean;
 public class WDSRTableModel extends CidsBeanTableModel implements WDSRPropertyConstants {
 
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTableModel.class);
-
-    //~ Methods ----------------------------------------------------------------
-
-    @Override
-    public String getBeansProperty() {
-        return KassenzeichenPropertyConstants.PROP__FRONTEN;
+    
+    private static final String[] COLUMN_NAMES = {
+        "Nummer",
+        "Länge",
+        "Straßenreinigung",
+        "Winterdienst"
+    };
+    
+    private static final Class[] COLUMN_CLASSES = {
+        Integer.class,
+        Float.class,
+        String.class,
+        String.class        
+    };
+    
+    public WDSRTableModel() {
+        super(COLUMN_NAMES, COLUMN_CLASSES);
     }
-
-    @Override
-    public int getColumnCount() {
-        return 4;
-    }
-
-    @Override
-    public String getColumnName(final int i) {
-        if (i == 0) {
-            return "Nummer";
-        } else if (i == 1) {
-            return "Länge";
-        } else if (i == 2) {
-            return "Straßenreinigung";
-        } else {
-            return "Winterdienst";
-        }
-    }
-
-    @Override
-    public Class<?> getColumnClass(final int i) {
-        if (i == 0) {
-            return Integer.class;
-        } else if (i == 1) {
-            return Float.class;
-        } else if (i == 2) {
-            return String.class;
-        } else {
-            return String.class;
-        }
-    }
-
+    
     @Override
     public boolean isCellEditable(final int i, final int i1) {
         return false;
@@ -82,7 +61,10 @@ public class WDSRTableModel extends CidsBeanTableModel implements WDSRPropertyCo
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        final CidsBean cidsBean = getCidsBeans().get(row);
+        final CidsBean cidsBean = getCidsBeanByIndex(row);
+        if (cidsBean == null) {
+            return null;
+        }
         if (column == 0) {
             try {
                 return (Integer)cidsBean.getProperty(PROP__NUMMER);

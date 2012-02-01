@@ -23,37 +23,24 @@
  */
 package de.cismet.verdis;
 
-import Sirius.navigator.connection.Connection;
-import Sirius.navigator.connection.ConnectionFactory;
-import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.connection.ConnectionSession;
-import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
-
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.util.collections.MultiMap;
-
-import java.awt.Frame;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.SwingWorker;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
-
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.data.AppPreferences;
-import java.util.Collection;
+import java.awt.Frame;
+import java.util.*;
+import javax.swing.SwingWorker;
 
 
 /**
@@ -270,7 +257,7 @@ public class CidsAppBackend implements CidsBeanStore {
         }.execute();
     }
 
-    public CidsBean loadKassenzeichenByNummer(int kassenzeichen) {
+    public CidsBean loadKassenzeichenByNummer(final int kassenzeichen) {
         String query = "SELECT " + KASSENZEICHEN_CLASS_ID + ", id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
 
         try {
@@ -287,6 +274,31 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    public List<CidsBean> loadFortfuehrungBeansByDates(final Date fromDate, final Date toDate) {
+        final String query = "SELECT "
+                + "   31, "
+                + "   id FROM fortfuehrung "
+                + "WHERE "
+                + "   fortfuehrung.abgearbeitet IS FALSE AND "
+                + "   fortfuehrung.datum BETWEEN '" + fromDate + "' AND '" + toDate + "';";        
+
+        try {
+            final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
+            if (mos == null || mos.length < 1) {
+                return null;
+            } else {
+                final List<CidsBean> cbs = new ArrayList<CidsBean>();
+                for (final MetaObject mo : mos) {
+                    cbs.add(mo.getBean());
+                }
+                return cbs;
+            }
+        } catch (ConnectionException ex) {
+            log.error("error during retrieval of object", ex);
+            return null;
+        }
+    }
+    
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;

@@ -28,50 +28,41 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import de.cismet.cids.custom.util.CidsBeanTableHelper;
-import java.util.List;
-import javax.swing.event.ListSelectionEvent;
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.SortOrder;
-
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.ListSelectionModel;
-
 import de.cismet.cids.dynamics.CidsBean;
-
+import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
-
 import de.cismet.cismap.navigatorplugin.CidsFeature;
-
 import de.cismet.tools.NumberStringComparator;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
-
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import edu.umd.cs.piccolox.event.PNotification;
+import java.awt.Color;
+import java.awt.Component;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.*;
 
 /**
  * DOCUMENT ME!
@@ -79,11 +70,13 @@ import javax.swing.JOptionPane;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, RegenFlaechenPropertyConstants {
+public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, RegenFlaechenPropertyConstants, CidsBeanStore {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTabellenPanel.class);
     //~ Instance fields --------------------------------------------------------
     private final CidsBeanTableHelper helper;
+    private CidsBean cidsBean;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTable jxtOverview;
@@ -301,7 +294,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
             "st\u00E4dtische Stra\u00DFenfl\u00E4che (\u00D6kopflaster)"
         };
         final Object selectedValue = JOptionPane.showInputDialog(
-                Main.THIS,
+                Main.getCurrentInstance(),
                 "W\u00E4hlen Sie die Art der neuen Fl\u00E4che aus",
                 "Neue Fl\u00E4che",
                 JOptionPane.QUESTION_MESSAGE,
@@ -336,7 +329,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if (sole != null && sole.getFeature().getGeometry() instanceof Polygon) {
             final int answer = JOptionPane.showConfirmDialog(
-                    Main.THIS,
+                    Main.getCurrentInstance(),
                     "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Fl\u00E4che zugeordnet werden?",
                     "Geometrie verwenden?",
                     JOptionPane.YES_NO_OPTION,
@@ -540,12 +533,24 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
 
     @Override
     public CidsBean getCidsBean() {
-        return helper.getCidsBean();
+        return cidsBean;
     }
 
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
-        helper.setCidsBean(cidsBean);
+        this.cidsBean = cidsBean;
+        
+        final String prop = KassenzeichenPropertyConstants.PROP__FLAECHEN;
+        if ((cidsBean != null) && (cidsBean.getProperty(prop) instanceof List)) {
+            setCidsBeans((List<CidsBean>) cidsBean.getProperty(prop));
+        } else {
+            setCidsBeans(new ArrayList<CidsBean>());            
+        }        
+    }
+    
+    @Override
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        helper.setCidsBeans(cidsBeans);
     }
 
     @Override

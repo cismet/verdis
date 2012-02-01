@@ -28,7 +28,6 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.WDSRPropertyConstants;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -36,33 +35,30 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import de.cismet.cids.custom.util.BindingValidationSupport;
 import de.cismet.cids.custom.util.CidsBeanTableHelper;
-
-import javax.swing.event.ListSelectionEvent;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
-
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
-
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.constants.WDSRPropertyConstants;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Color;
 import java.awt.Component;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
-
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -75,11 +71,13 @@ import org.jdesktop.swingx.decorator.Highlighter;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, WDSRPropertyConstants {
+public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, WDSRPropertyConstants, CidsBeanStore {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTabellenPanel.class);
     //~ Instance fields --------------------------------------------------------
     private final CidsBeanTableHelper helper;
+    private CidsBean cidsBean;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTable jxtOverview;
@@ -295,7 +293,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if (sole != null && sole.getFeature().getGeometry() instanceof LineString) {
             final int answer = JOptionPane.showConfirmDialog(
-                    Main.THIS,
+                    Main.getCurrentInstance(),
                     "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Front zugeordnet werden?",
                     "Geometrie verwenden?",
                     JOptionPane.YES_NO_OPTION,
@@ -408,12 +406,24 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
 
     @Override
     public CidsBean getCidsBean() {
-        return (helper == null) ? null : helper.getCidsBean();
+        return cidsBean;
     }
 
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
-        helper.setCidsBean(cidsBean);
+        this.cidsBean = cidsBean;
+        
+        final String prop = KassenzeichenPropertyConstants.PROP__FRONTEN;
+        if ((cidsBean != null) && (cidsBean.getProperty(prop) instanceof List)) {
+            setCidsBeans((List<CidsBean>) cidsBean.getProperty(prop));
+        } else {
+            setCidsBeans(new ArrayList<CidsBean>());            
+        }        
+    }
+    
+    @Override
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        helper.setCidsBeans(cidsBeans);
     }
 
     @Override

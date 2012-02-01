@@ -28,11 +28,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.gui.CidsBeanTableModel;
 import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.interfaces.CidsBeanTable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.swing.event.ListSelectionEvent;
 import org.jdesktop.swingx.JXTable;
 
@@ -130,7 +126,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void addBean(final CidsBean cidsBean) {
-        if (model.getCidsBean() != null) {
+        if (model.getCidsBeans() != null) {
             backupBean(cidsBean);
             model.addCidsBean(cidsBean);
             final Validator validator = getItemValidator(cidsBean);
@@ -210,7 +206,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             }
 
             getJXTable().getSelectionModel().addListSelectionListener(table);
-            Main.THIS.selectionChanged();
+            Main.getCurrentInstance().selectionChanged();
         }
     }
 
@@ -300,26 +296,23 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 setDetailBean(null);
             }
 
-            Main.THIS.selectionChanged();
+            Main.getCurrentInstance().selectionChanged();
         }
     }
 
     @Override
-    public CidsBean getCidsBean() {
-        return model.getCidsBean();
-    }
-
-    @Override
-    public void setCidsBean(final CidsBean cidsBean) {
-        model.setCidsBean(cidsBean);
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        model.setCidsBeans(cidsBeans);
         beanToValidatorMap.clear();
         aggVal.clear();
         clearBackups();
-        for (final CidsBean tableBean : model.getCidsBeans()) {
-            final Validator validator = getItemValidator(tableBean);
-            beanToValidatorMap.put(tableBean, validator);
-            aggVal.add(validator);
-            backupBean(tableBean);
+        if (cidsBeans != null) {
+            for (final CidsBean tableBean : cidsBeans) {
+                final Validator validator = getItemValidator(tableBean);
+                beanToValidatorMap.put(tableBean, validator);
+                aggVal.add(validator);
+                backupBean(tableBean);
+            }
         }
     }
 
@@ -354,7 +347,6 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 table.setGeometry(geom, selectedBean);
                 setDetailBean(selectedBean);
                 CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeature(feature);
-                CidsAppBackend.getInstance().setCidsBean(model.getCidsBean());
             } catch (Exception exception) {
                 LOG.error("error when trying to attach new feature to existing bean", exception);
             }

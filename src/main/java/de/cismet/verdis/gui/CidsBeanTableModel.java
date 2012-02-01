@@ -18,8 +18,6 @@
 package de.cismet.verdis.gui;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
@@ -27,37 +25,50 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author jruiz
  */
-public abstract class CidsBeanTableModel extends AbstractTableModel implements CidsBeanStore {
+public abstract class CidsBeanTableModel extends AbstractTableModel {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CidsBeanTableModel.class);
 
-    public abstract String getBeansProperty();
+    private List<CidsBean> cidsBeans;
+    private final String[] columnNames;
+    private final Class[] columnClasses;
 
+    protected CidsBeanTableModel(final String[] columnNames, final Class[] columnClasses) {
+        this.columnNames = columnNames;
+        this.columnClasses = columnClasses;
+        
+    }
+    
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    public String getColumnName(final int column) {
+        return columnNames[column];
+    }
+
+    @Override
+    public Class getColumnClass(final int column) {
+        return columnClasses[column];
+    }    
+            
     public List<CidsBean> getCidsBeans() {
-        String prop = getBeansProperty();
-        if ((kassenzeichenBean != null) && (kassenzeichenBean.getProperty(prop) instanceof List)) {
-            return (List)kassenzeichenBean.getProperty(prop);
-        } else {
-            return new ArrayList<CidsBean>();
-        }
+        return cidsBeans;
     }
 
-    private CidsBean kassenzeichenBean;
-
-    @Override
-    public CidsBean getCidsBean() {
-        return kassenzeichenBean;
-    }
-
-    @Override
-    public void setCidsBean(final CidsBean cidsBean) {
-        kassenzeichenBean = cidsBean;
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        this.cidsBeans = cidsBeans;
         fireTableDataChanged();
     }
 
     @Override
     public int getRowCount() {
-        return getCidsBeans().size();
+        if (cidsBeans == null) {
+            return 0;
+        }
+        return cidsBeans.size();
     }
 
     /**
@@ -68,8 +79,11 @@ public abstract class CidsBeanTableModel extends AbstractTableModel implements C
      * @return  DOCUMENT ME!
      */
     public CidsBean getCidsBeanByIndex(final int modelIndex) {
+        if (cidsBeans == null) {
+            return null;
+        }
         try {
-            return (CidsBean) getCidsBeans().get(modelIndex);
+            return (CidsBean) cidsBeans.get(modelIndex);
         } catch (Exception e) {
             LOG.debug("CidsBean at index " + modelIndex + " not found. will return null", e);
             return null;
@@ -84,8 +98,11 @@ public abstract class CidsBeanTableModel extends AbstractTableModel implements C
      * @return  DOCUMENT ME!
      */
     public int getIndexByCidsBean(final CidsBean cidsBean) {
+        if (cidsBeans == null) {
+            return -1;
+        }
         try {
-            return getCidsBeans().indexOf(cidsBean);
+            return cidsBeans.indexOf(cidsBean);
         } catch (Exception e) {
             LOG.error("error in getIndexByCidsBean(). will return -1", e);
             return -1;
@@ -93,8 +110,10 @@ public abstract class CidsBeanTableModel extends AbstractTableModel implements C
     }
 
     public void addCidsBean(CidsBean cidsBean) {
-        getCidsBeans().add(cidsBean);
-        fireTableDataChanged();
+        if (cidsBeans != null) {
+            cidsBeans.add(cidsBean);
+            fireTableDataChanged();
+        }
     }
 
     public void removeCidsBean(CidsBean cidsBean) {
