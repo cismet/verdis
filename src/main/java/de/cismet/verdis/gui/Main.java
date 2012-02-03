@@ -12,43 +12,95 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.FlaechenClipboardListener;
-import de.cismet.verdis.FlaechenClipboard;
-import Sirius.navigator.connection.Connection;
-import Sirius.navigator.connection.ConnectionFactory;
-import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.connection.ConnectionSession;
-import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
-import Sirius.navigator.plugin.context.*;
+import Sirius.navigator.plugin.context.PluginContext;
 import Sirius.navigator.plugin.interfaces.*;
-import Sirius.navigator.plugin.listener.*;
+import Sirius.navigator.plugin.listener.MetaNodeSelectionListener;
 import Sirius.navigator.search.dynamic.FormDataBean;
-import Sirius.navigator.types.iterator.*;
-import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.types.iterator.AttributeRestriction;
+import Sirius.navigator.types.iterator.ComplexAttributeRestriction;
+import Sirius.navigator.types.iterator.SingleAttributeIterator;
+import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
 import Sirius.server.middleware.types.MetaObject;
-
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
+import de.cismet.cismap.commons.CrsTransformer;
+import de.cismet.cismap.commons.features.*;
+import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
+import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
+import de.cismet.cismap.commons.gui.MappingComponent;
+import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
+import de.cismet.cismap.commons.gui.piccolo.PFeature;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
+import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
+import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.cismap.commons.rasterservice.MapService;
+import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
+import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
+import de.cismet.extensions.timeasy.TimEasyDialog;
+import de.cismet.extensions.timeasy.TimEasyEvent;
+import de.cismet.extensions.timeasy.TimEasyListener;
+import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
+import de.cismet.lookupoptions.gui.OptionsClient;
+import de.cismet.lookupoptions.gui.OptionsDialog;
+import de.cismet.rmplugin.RMPlugin;
+import de.cismet.tools.StaticDebuggingTools;
+import de.cismet.tools.configuration.Configurable;
+import de.cismet.tools.configuration.ConfigurationManager;
+import de.cismet.tools.gui.Static2DTools;
+import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.tools.gui.startup.StaticStartupTools;
+import de.cismet.validation.Validator;
+import de.cismet.validation.ValidatorListener;
+import de.cismet.validation.ValidatorState;
+import de.cismet.validation.validator.AggregatedValidator;
+import de.cismet.verdis.AppModeListener;
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.FlaechenClipboard;
+import de.cismet.verdis.FlaechenClipboardListener;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.crossover.VerdisCrossover;
+import de.cismet.verdis.data.AppPreferences;
+import de.cismet.verdis.interfaces.CidsBeanTable;
+import de.cismet.verdis.interfaces.Storable;
+import de.cismet.verdis.search.AlkisLandparcelSearch;
 import edu.umd.cs.piccolo.PCanvas;
-
-import net.infonode.docking.DockingWindow;
-import net.infonode.docking.RootWindow;
-import net.infonode.docking.SplitWindow;
-import net.infonode.docking.TabWindow;
-import net.infonode.docking.View;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolox.event.PNotification;
+import edu.umd.cs.piccolox.event.PNotificationCenter;
+import edu.umd.cs.piccolox.event.PSelectionEventHandler;
+import java.applet.AppletContext;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.prefs.Preferences;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import net.infonode.docking.*;
 import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
@@ -60,116 +112,13 @@ import net.infonode.docking.util.StringViewMap;
 import net.infonode.gui.componentpainter.AlphaGradientComponentPainter;
 import net.infonode.gui.componentpainter.GradientComponentPainter;
 import net.infonode.util.Direction;
-
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.JXLoginPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
 import org.jdesktop.swingx.auth.LoginService;
-
-//TODO instead of giving a reference of main to the widgets so they can change icons and othe docking stuff
 import org.jdesktop.swingx.error.ErrorInfo;
-
 import org.jdom.Element;
-
-import java.applet.AppletContext;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import java.net.InetSocketAddress;
-
-
-import java.util.*;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-
-import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
-import de.cismet.cismap.commons.CrsTransformer;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
-import de.cismet.cismap.commons.features.PostgisFeature;
-import de.cismet.cismap.commons.features.PureNewFeature;
-import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
-import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
-
-import de.cismet.cismap.commons.gui.MappingComponent;
-import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
-import de.cismet.cismap.commons.gui.piccolo.PFeature;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.DeleteFeatureListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.SimpleMoveListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
-import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
-import de.cismet.cismap.commons.interaction.CismapBroker;
-import de.cismet.cismap.commons.rasterservice.MapService;
-import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
-import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
-
-import de.cismet.extensions.timeasy.TimEasyDialog;
-import de.cismet.extensions.timeasy.TimEasyEvent;
-import de.cismet.extensions.timeasy.TimEasyListener;
-import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
-
-import de.cismet.lookupoptions.gui.OptionsClient;
-import de.cismet.lookupoptions.gui.OptionsDialog;
-import de.cismet.rmplugin.RMPlugin;
-
-import de.cismet.tools.StaticDebuggingTools;
-
-import de.cismet.tools.configuration.Configurable;
-import de.cismet.tools.configuration.ConfigurationManager;
-
-import de.cismet.tools.gui.Static2DTools;
-import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
-import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.tools.gui.startup.StaticStartupTools;
-import de.cismet.validation.Validator;
-import de.cismet.validation.ValidatorListener;
-import de.cismet.validation.ValidatorState;
-import de.cismet.validation.validator.AggregatedValidator;
-
-import de.cismet.verdis.AppModeListener;
-
-import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
-
-import de.cismet.verdis.crossover.VerdisCrossover;
-
-import de.cismet.verdis.data.AppPreferences;
-
-import de.cismet.verdis.interfaces.*;
-import de.cismet.verdis.search.AlkisLandparcelSearch;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolox.event.PNotification;
-
-import edu.umd.cs.piccolox.event.PNotificationCenter;
-import edu.umd.cs.piccolox.event.PSelectionEventHandler;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 /**
  * DOCUMENT ME!
@@ -216,7 +165,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
     private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
 
-    public static Main THIS;
+    private static Main THIS;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
     private CidsAppBackend.Mode currentMode = null;
@@ -302,6 +251,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton cmdDeleteKassenzeichen;
     private javax.swing.JButton cmdDownloads;
     private javax.swing.JButton cmdEditMode;
+    private javax.swing.JButton cmdFortfuehrung;
     private javax.swing.JButton cmdInfo;
     private javax.swing.JButton cmdLagisCrossover;
     private javax.swing.JButton cmdNewKassenzeichen;
@@ -1518,6 +1468,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdLagisCrossover = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
+        cmdFortfuehrung = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -1838,6 +1789,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdDownloads.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdDownloads.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tobVerdis.add(cmdDownloads);
+
+        cmdFortfuehrung.setText("Fortführung");
+        cmdFortfuehrung.setFocusable(false);
+        cmdFortfuehrung.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdFortfuehrung.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdFortfuehrung.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdFortfuehrungActionPerformed(evt);
+            }
+        });
+        if (StaticDebuggingTools.checkHomeForFile("cismetVerdisFortfuehrungOn")) {                     // NOI18N
+            cmdFortfuehrung.setVisible(true);
+        } else {
+            cmdFortfuehrung.setVisible(false);
+        }
+        tobVerdis.add(cmdFortfuehrung);
 
         getContentPane().add(tobVerdis, java.awt.BorderLayout.NORTH);
 
@@ -3072,6 +3039,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         od.setLocationRelativeTo(this);
         od.setVisible(true);
     }//GEN-LAST:event_mniOptionsActionPerformed
+
+    private void cmdFortfuehrungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFortfuehrungActionPerformed
+        FortfuehrungsanlaesseDialog.getInstance().setVisible(true);
+    }//GEN-LAST:event_cmdFortfuehrungActionPerformed
 
    public void loadAlkisFlurstueck(final Point geom) {
         new SwingWorker<Integer, Void>() {
