@@ -1092,11 +1092,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdOrthogonalRectangle.setSelected(false);
         cmdRemovePolygon.setSelected(false);
         cmdAttachPolyToAlphadata.setSelected(false);
-        cmdOrthogonalRectangle.setSelected(false);
         cmdSplitPoly.setSelected(false);
         cmdJoinPoly.setSelected(false);
         cmdRaisePolygon.setSelected(false);
         cmdALB.setSelected(false);
+        cmdSearchFlurstueck.setSelected(false);
     }
 
     /**
