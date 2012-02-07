@@ -993,7 +993,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             cb.setModel(WAIT_MODEL);
             cb.setEnabled(false);
             
-            final MetaObject[] mos = ObjectRendererUtils.getLightweightMetaObjectsForQuery(
+            final MetaObject[] mos = CidsAppBackend.getLightweightMetaObjectsForQuery(
                 CidsAppBackend.DOMAIN,
                 "satzung",
                 query,

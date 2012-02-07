@@ -26,13 +26,16 @@ package de.cismet.verdis;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.newuser.User;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.util.collections.MultiMap;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -586,5 +589,37 @@ public class CidsAppBackend implements CidsBeanStore {
         return proxy.getSession();
     }
 
+    public static MetaObject[] getLightweightMetaObjectsForQuery(final String domainName,
+            final String tabName,
+            final String query,
+            final String[] fields,
+            AbstractAttributeRepresentationFormater formatter) {
+        if (formatter == null) {
+            formatter = new AbstractAttributeRepresentationFormater() {
+
+                    @Override
+                    public String getRepresentation() {
+                        final StringBuffer sb = new StringBuffer();
+                        for (final String attribute : fields) {
+                            sb.append(getAttribute(attribute.toLowerCase())).append(" ");
+                        }
+                        return sb.toString().trim();
+                    }
+                };
+        }
+        try {
+            final User user = SessionManager.getSession().getUser();
+            final MetaClass mc = ClassCacheMultiple.getMetaClass(domainName, tabName);
+            if (mc != null) {
+                return SessionManager.getProxy()
+                            .getLightweightMetaObjectsByQuery(mc.getID(), user, query, fields, formatter);
+            } else {
+                log.error("Can not find MetaClass for Tablename: " + tabName);
+            }
+        } catch (Exception ex) {
+            log.error(ex, ex);
+        }
+        return new MetaObject[0];
+    }    
 
 }
