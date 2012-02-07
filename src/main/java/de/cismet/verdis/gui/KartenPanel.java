@@ -53,10 +53,7 @@ import de.cismet.tools.gui.historybutton.JHistoryButton;
 import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import de.cismet.verdis.constants.WDSRPropertyConstants;
+import de.cismet.verdis.constants.*;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Event;
@@ -1597,7 +1594,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 case ESW: {
                     final List<CidsBean> fronten = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
                     for (final CidsBean front : fronten) {
-                        final Feature add = new BeanUpdatingCidsFeature(front, WDSRPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                        final Feature add = new BeanUpdatingCidsFeature(front, FrontinfoPropertyConstants.PROP__GEOMETRIE + PropertyConstants.DOT + GeomPropertyConstants.PROP__GEO_FIELD);
                         featureCollection.addFeature(add);
                     }
                 } break;

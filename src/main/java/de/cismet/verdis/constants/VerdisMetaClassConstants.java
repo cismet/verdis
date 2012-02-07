@@ -31,6 +31,7 @@ public interface VerdisMetaClassConstants {
     public static final String MC_FLAECHENINFO = "flaecheninfo";
     public static final String MC_FRONTINFO = "frontinfo";
     public static final String MC_STRASSE = "strasse";
+    public static final String MC_SATZUNG = "satzung";
     public static final String MC_STRASSENREINIGUNG = "strassenreinigung";
     public static final String MC_WINTERDIENST = "winterdienst";
     public static final String MC_ANSCHLUSSSTATUS = "anschlussstatus";

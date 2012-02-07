@@ -474,6 +474,15 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    public MetaObject getVerdisMetaObject(final int objectId, final int classtId) {
+        try {
+            return proxy.getMetaObject(objectId, classtId, DOMAIN);
+        } catch (ConnectionException ex) {
+            log.error("error in retrieving the metaobject " + objectId + " of classid " + classtId, ex);
+            return null;
+        }
+    }
+    
     /**
      * DOCUMENT ME!
      *

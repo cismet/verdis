@@ -36,7 +36,7 @@ import javax.swing.JOptionPane;
  *
  * @author jruiz
  */
-public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
+public class FlaechenClipboard  {
     
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FlaechenClipboard.class);
     private static RegenFlaechenTabellenPanel flaechenTable = Main.getCurrentInstance().getRegenFlaechenTabellenPanel();
@@ -89,22 +89,22 @@ public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
         CidsBean pasteBean = CidsBeanSupport.cloneCidsBean(clipboardBean);
 
         final int id = flaechenTable.getTableHelper().getNextNewBeanId();
-        pasteBean.setProperty(PROP__ID, id);
+        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
-        if (clipboardBean.getProperty(PROP__FLAECHENINFO) != null) {
-            int flaecheninfoId = (Integer) clipboardBean.getProperty(PROP__FLAECHENINFO__ID);
+        if (clipboardBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO) != null) {
+            int flaecheninfoId = (Integer) clipboardBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
             CidsBean flaecheninfoBean = SessionManager.getProxy().getMetaObject(flaecheninfoId, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getId(), CidsAppBackend.DOMAIN).getBean();
-            pasteBean.setProperty(PROP__FLAECHENINFO, flaecheninfoBean);
+            pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
         }
 
-        pasteBean.setProperty(PROP__BEMERKUNG, null);
-        pasteBean.setProperty(PROP__FLAECHENBEZEICHNUNG, flaechenTable.getValidFlaechenname((Integer) clipboardBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID)));
+        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG, null);
+        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG, flaechenTable.getValidFlaechenname((Integer) clipboardBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID)));
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
+        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
-        pasteBean.setProperty(PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
+        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
 
         return pasteBean;
     }
@@ -115,8 +115,8 @@ public class FlaechenClipboard implements RegenFlaechenPropertyConstants {
         }
 
         for (final CidsBean flaecheBean : flaechenTable.getAllBeans()) {
-            final int id = (Integer) flaecheBean.getProperty(PROP__FLAECHENINFO__ID);
-            final int ownId = (Integer) clipboardFlaecheBean.getProperty(PROP__FLAECHENINFO__ID);
+            final int id = (Integer) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+            final int ownId = (Integer) clipboardFlaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
             if (id == ownId) {
                 return false;
             }

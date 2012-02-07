@@ -25,7 +25,7 @@ import java.util.Date;
  *
  * @author jruiz
  */
-public class FortfuehrungenTableModel extends CidsBeanTableModel implements FortfuehrungPropertyConstants {
+public class FortfuehrungenTableModel extends CidsBeanTableModel {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FortfuehrungenTableModel.class);
 
@@ -47,13 +47,13 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel implements Fort
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
-        if (cidsBean == null) {
+        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);
+        if (fortfuehrungBean == null) {
             return null;
         }
         if (columnIndex == 0) {
             try {                
-                final Date date = (Date) cidsBean.getProperty(PROP__DATUM);
+                final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DATUM);
                 if (date != null) {
                     return DateFormat.getInstance().format(date);
                 } else {
@@ -65,14 +65,14 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel implements Fort
             }            
         }  else if (columnIndex == 1) {
             try {
-                return (String) cidsBean.getProperty(PROP__ANLASS_NAME);
+                return (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS_NAME);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
             }            
         } else if (columnIndex == 2) {
             try {
-                return (String) cidsBean.getProperty(PROP__BESCHREIBUNG);
+                return (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BESCHREIBUNG);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";

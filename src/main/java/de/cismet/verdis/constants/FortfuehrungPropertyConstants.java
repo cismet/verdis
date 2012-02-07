@@ -21,9 +21,7 @@ package de.cismet.verdis.constants;
  *
  * @author jruiz
  */
-public interface FortfuehrungPropertyConstants {
-
-    public static final String PROP__ID = "id";
+public interface FortfuehrungPropertyConstants extends PropertyConstants {
 
     public static final String PROP__DATUM = "datum";
     public static final String PROP__ANLASS = "anlass";
@@ -31,6 +29,6 @@ public interface FortfuehrungPropertyConstants {
     public static final String PROP__KASSENZEICHEN = "kassenzeichen";
     public static final String PROP__DOKUMENTURL = "url_dokument";
     
-    public static final String PROP__ANLASS_NAME = PROP__ANLASS + "." + "name";
+    public static final String PROP__ANLASS_NAME = PROP__ANLASS + DOT + "name";
     
 }

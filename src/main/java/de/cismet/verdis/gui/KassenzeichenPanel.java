@@ -12,36 +12,28 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.cids.custom.util.BindingValidationSupport;
-import java.awt.Color;
-
-import java.util.*;
-
-import javax.swing.*;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
-
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
-import de.cismet.validation.Validatable;
-import de.cismet.validation.Validator;
-import de.cismet.validation.ValidatorHelper;
-import de.cismet.validation.ValidatorState;
-import de.cismet.validation.ValidatorStateImpl;
+import de.cismet.validation.*;
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
 import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.validation.validator.CidsBeanValidator;
-
 import de.cismet.verdis.AppModeListener;
-
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 
 /**
@@ -54,7 +46,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         CidsBeanStore,
         AppModeListener,
         EditModeListener,
-        KassenzeichenPropertyConstants,
         Validatable{
 
     //~ Instance fields --------------------------------------------------------
@@ -493,7 +484,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
         txtKassenzeichen.setEditable(false);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"), txtKassenzeichen, org.jdesktop.beansbinding.BeanProperty.create("text"), PROP__KASSENZEICHENNUMMER);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"), txtKassenzeichen, org.jdesktop.beansbinding.BeanProperty.create("text"), KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

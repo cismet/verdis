@@ -23,14 +23,12 @@
  */
 package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
+import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
+import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
-
-import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
-
-import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
-import de.cismet.verdis.constants.WDSRPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -38,7 +36,7 @@ import de.cismet.verdis.constants.WDSRPropertyConstants;
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FrontinfoFeatureRenderer extends CustomCidsFeatureRenderer implements WDSRPropertyConstants {
+public class FrontinfoFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -46,14 +44,12 @@ public class FrontinfoFeatureRenderer extends CustomCidsFeatureRenderer implemen
     boolean wd = false;
     boolean sr = false;
 
-    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void assign() {
-        sr = cidsBean.getProperty(PROP__SR_KLASSE_OR) != null;
-        wd = cidsBean.getProperty(PROP__WD_PRIO_OR) != null;
+        sr = cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR) != null;
+        wd = cidsBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR) != null;
     }
 
     @Override

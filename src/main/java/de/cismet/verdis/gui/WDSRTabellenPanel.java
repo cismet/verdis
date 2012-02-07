@@ -46,9 +46,9 @@ import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import de.cismet.verdis.constants.WDSRPropertyConstants;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Color;
@@ -71,7 +71,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, WDSRPropertyConstants, CidsBeanStore {
+public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, CidsBeanStore {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTabellenPanel.class);
     //~ Instance fields --------------------------------------------------------
@@ -231,8 +231,8 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                                 final int laenge = (int) Math.abs(geom.getLength());
                                 Main.getMappingComponent().getFeatureCollection().removeFeature(pf.getFeature());
                                 setGeometry(geom, selectedBean);
-                                selectedBean.setProperty(PROP__LAENGE_GRAFIK, laenge);
-                                selectedBean.setProperty(PROP__LAENGE_KORREKTUR, laenge);
+                                selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
+                                selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
                                 final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean, true);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
                             } catch (Exception ex) {
@@ -252,7 +252,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
     public int getValidNummer() {
         int highestNummer = 0;
         for (CidsBean flaecheBean : getAllBeans()) {
-            final Integer nummer = (Integer) flaecheBean.getProperty(PROP__NUMMER);
+            final Integer nummer = (Integer) flaecheBean.getProperty(FrontinfoPropertyConstants.PROP__NUMMER);
             if (nummer == null) {
                 break;
             }
@@ -281,14 +281,14 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         final CidsBean winterdienstBean = SessionManager.getProxy().getMetaObjectByQuery(wdQuery, 0)[0].getBean();
 
 
-        //final CidsBean strasseBean = SessionManager.getProxy().getMetaObject(8, PROP__"strasse".getId(), Main.DOMAIN).getBean();
+        //final CidsBean strasseBean = SessionManager.getProxy().getVerdisMetaObject(8, PROP__"strasse".getId(), Main.DOMAIN).getBean();
 
         //cidsBean.setProperty(PROP__"strasse", strasseBean);
-        cidsBean.setProperty(PROP__GEOMETRIE, geomBean);
-        cidsBean.setProperty(PROP__SR_KLASSE_OR, strassenreinigungBean);
-        cidsBean.setProperty(PROP__WD_PRIO_OR, winterdienstBean);
-        cidsBean.setProperty(PROP__NUMMER, getValidNummer());
-        cidsBean.setProperty(PROP__ERFASSUNGSDATUM, new Date(Calendar.getInstance().getTime().getTime()));
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, geomBean);
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR, strassenreinigungBean);
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR, winterdienstBean);
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(Calendar.getInstance().getTime().getTime()));
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if (sole != null && sole.getFeature().getGeometry() instanceof LineString) {
@@ -303,10 +303,10 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                     final Geometry geom = sole.getFeature().getGeometry();
                     // größe berechnen und zuweisen
                     final int laenge = (int) Math.abs(geom.getLength());
-                    cidsBean.setProperty(PROP__LAENGE_GRAFIK, laenge);
-                    cidsBean.setProperty(PROP__LAENGE_KORREKTUR, laenge);
+                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
+                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
                     setGeometry(geom, cidsBean);
-                    cidsBean.setProperty(PROP__NUMMER, getValidNummer());
+                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
 
                     // unzugeordnete Geometrie aus Karte entfernen
                     Main.getMappingComponent().getFeatureCollection().removeFeature(sole.getFeature());

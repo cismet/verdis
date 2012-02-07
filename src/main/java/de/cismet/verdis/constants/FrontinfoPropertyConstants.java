@@ -21,9 +21,8 @@ package de.cismet.verdis.constants;
  *
  * @author jruiz
  */
-public interface WDSRPropertyConstants {
+public interface FrontinfoPropertyConstants extends PropertyConstants {
 
-    public static final String PROP__ID = "id";
     public static final String PROP__LAENGE_GRAFIK = "laenge_grafik";
     public static final String PROP__LAENGE_KORREKTUR = "laenge_korrektur";
     public static final String PROP__NUMMER = "nummer";
@@ -31,17 +30,17 @@ public interface WDSRPropertyConstants {
     public static final String PROP__SR_VERANLAGUNG = "sr_veranlagung";
     public static final String PROP__WD_VERANLAGUNG = "wd_veranlagung";
     public static final String PROP__GEOMETRIE = "geometrie";
-    // +
-    public static final String PROP__GEOMETRIE__GEO_FIELD = PROP__GEOMETRIE + ".geo_field";
+    public static final String PROP__STRASSE = "strasse";
+
     // +
     public static final String PROP__SR_KLASSE_OR = "sr_klasse_or";
     // ++
-    public static final String PROP__SR_KLASSE_OR__KEY = PROP__SR_KLASSE_OR + ".key";
-    public static final String PROP__SR_KLASSE_OR__SCHLUESSEL = PROP__SR_KLASSE_OR + ".schluessel";
+    public static final String PROP__SR_KLASSE_OR__KEY = PROP__SR_KLASSE_OR + DOT + "key";
+    public static final String PROP__SR_KLASSE_OR__SCHLUESSEL = PROP__SR_KLASSE_OR + DOT + "schluessel";
     // +
     public static final String PROP__WD_PRIO_OR = "wd_prio_or";
     // ++
-    public static final String PROP__WD_PRIO_OR__KEY = PROP__WD_PRIO_OR + ".key";
-    public static final String PROP__WD_PRIO_OR__SCHLUESSEL = PROP__WD_PRIO_OR + ".schluessel";
+    public static final String PROP__WD_PRIO_OR__KEY = PROP__WD_PRIO_OR + DOT + "key";
+    public static final String PROP__WD_PRIO_OR__SCHLUESSEL = PROP__WD_PRIO_OR + DOT + "schluessel";
 
 }

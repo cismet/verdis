@@ -24,7 +24,7 @@
 package de.cismet.verdis.gui;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.constants.WDSRPropertyConstants;
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -32,7 +32,7 @@ import de.cismet.verdis.constants.WDSRPropertyConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTableModel extends CidsBeanTableModel implements WDSRPropertyConstants {
+public class WDSRTableModel extends CidsBeanTableModel {
 
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTableModel.class);
     
@@ -61,27 +61,27 @@ public class WDSRTableModel extends CidsBeanTableModel implements WDSRPropertyCo
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        final CidsBean cidsBean = getCidsBeanByIndex(row);
-        if (cidsBean == null) {
+        final CidsBean frontBean = getCidsBeanByIndex(row);
+        if (frontBean == null) {
             return null;
         }
         if (column == 0) {
             try {
-                return (Integer)cidsBean.getProperty(PROP__NUMMER);
+                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__NUMMER);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1;
             }
         } else if (column == 1) {
             try {
-                return (Integer)cidsBean.getProperty(PROP__LAENGE_KORREKTUR);
+                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1f;
             }
         } else if (column == 2) {
             try {
-                final Object o = cidsBean.getProperty(PROP__SR_KLASSE_OR__KEY);
+                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY);
                 return (o == null) ? "" : o.toString();
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
@@ -89,7 +89,7 @@ public class WDSRTableModel extends CidsBeanTableModel implements WDSRPropertyCo
             }
         } else {
             try {
-                final Object o = cidsBean.getProperty(PROP__WD_PRIO_OR__KEY);
+                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY);
                 return (o == null) ? "" : o.toString();
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);

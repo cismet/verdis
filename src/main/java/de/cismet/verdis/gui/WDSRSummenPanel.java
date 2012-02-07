@@ -28,10 +28,10 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.verdis.constants.WDSRPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -43,7 +43,7 @@ import javax.swing.table.DefaultTableModel;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore, WDSRPropertyConstants {
+public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore {
     private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CidsBean kassenzeichenBean;
 
@@ -156,10 +156,10 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
                 SumHashMap wdHash = new SumHashMap();
 
                 for (CidsBean front : fronten) {
-                    String srKey = front.getProperty(PROP__SR_KLASSE_OR__KEY) + "-" + front.getProperty(PROP__SR_KLASSE_OR__SCHLUESSEL);
-                    Integer laenge = (Integer) front.getProperty(PROP__LAENGE_KORREKTUR);
+                    String srKey = front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY) + "-" + front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__SCHLUESSEL);
+                    Integer laenge = (Integer) front.getProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
                     srHash.add(srKey, laenge);
-                    String wdKey = front.getProperty(PROP__WD_PRIO_OR__KEY) + "-" + front.getProperty(PROP__WD_PRIO_OR__SCHLUESSEL);
+                    String wdKey = front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY) + "-" + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__SCHLUESSEL);
                     wdHash.add(wdKey, laenge);
                 }
 
