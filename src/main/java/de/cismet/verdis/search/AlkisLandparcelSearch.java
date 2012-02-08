@@ -68,7 +68,7 @@ public class AlkisLandparcelSearch extends CidsServerSearch {
                     + "   geom.id = alkis_landparcel.geometrie AND "
                     + "   ST_Within(GeomFromText('" + pointGeometry.toText() + "', " + pointGeometry.getSRID() + "), geom.geo_field)";
 
-            getLog().fatal(sql);
+            getLog().debug(sql);
             final MetaService metaService = (MetaService)getActiveLoaclServers().get("WUNDA_BLAU");
             final ArrayList<ArrayList> result = metaService.performCustomSearch(sql);
 
