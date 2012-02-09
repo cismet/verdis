@@ -336,6 +336,17 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
 
     @Override
     public void removeBean(final CidsBean cidsBean) {
+        if (cidsBean != null) {
+            final CidsBean geomBean = (CidsBean) cidsBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE);
+            try {
+                if (geomBean != null) {
+                    geomBean.delete();
+                }
+                cidsBean.delete();
+            } catch (final Exception ex) {
+                LOG.error("error while removing frontbean", ex);
+            }
+        }
         helper.removeBean(cidsBean);
     }
 

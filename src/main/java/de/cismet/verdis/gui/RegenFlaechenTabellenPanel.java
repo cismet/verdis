@@ -45,6 +45,7 @@ import de.cismet.tools.NumberStringComparator;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
@@ -463,6 +464,13 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
 
     @Override
     public void removeBean(final CidsBean cidsBean) {
+        if (cidsBean != null) {
+            try {
+                cidsBean.delete();
+            } catch (final Exception ex) {
+                LOG.error("error while removing flaechebean", ex);
+            }
+        }
         helper.removeBean(cidsBean);
     }
 

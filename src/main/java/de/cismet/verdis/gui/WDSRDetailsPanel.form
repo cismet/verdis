@@ -162,7 +162,7 @@
               <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
             </BindingProperty>
-            <BindingProperty name="enabled" source="jComboBox2" sourcePath="${selectedItem == null &amp;&amp; enabled}" target="cboReinigungsklasse" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="cbLageSr" sourcePath="${selectedItem == null &amp;&amp; enabled}" target="cboReinigungsklasse" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
@@ -279,7 +279,7 @@
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
               <Property name="name" type="java.lang.String" value="veranlagung_wd"/>
             </BindingProperty>
-            <BindingProperty name="enabled" source="jComboBox1" sourcePath="${selectedItem == null &amp;&amp; enabled}" target="cboWinterdienstPrio" targetPath="enabled" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="enabled" source="cbLageWd" sourcePath="${selectedItem == null &amp;&amp; enabled}" target="cboWinterdienstPrio" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
@@ -430,10 +430,10 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel3">
+        <Component class="javax.swing.JLabel" name="labLageSr">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.jLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.labLageSr.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -442,9 +442,9 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JComboBox" name="jComboBox1">
+        <Component class="javax.swing.JComboBox" name="cbLageWd">
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbLageWdActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -452,9 +452,9 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JComboBox" name="jComboBox2">
+        <Component class="javax.swing.JComboBox" name="cbLageSr">
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbLageSrActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -462,10 +462,10 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel4">
+        <Component class="javax.swing.JLabel" name="labLageWd">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.jLabel4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.labLageWd.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>

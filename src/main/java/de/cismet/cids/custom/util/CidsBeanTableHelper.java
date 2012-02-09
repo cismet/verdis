@@ -63,8 +63,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void addNewBean() {
         try {
-            final CidsBean newBean = createNewBean();
-            addBean(newBean);
+            final CidsBean newBean = table.createNewBean();
+            table.addBean(newBean);
             Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
 
         } catch (final Exception ex) {
@@ -75,7 +75,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void removeSelectedBeans() {
         for (CidsBean cidsBean : table.getSelectedBeans()) {
-            removeBean(cidsBean);
+            table.removeBean(cidsBean);
             aggVal.remove(beanToValidatorMap.get(cidsBean));
             beanToValidatorMap.remove(cidsBean);
         }
