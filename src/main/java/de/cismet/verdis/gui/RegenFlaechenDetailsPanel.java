@@ -587,7 +587,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         if (cidsBean != null && cidsBean.equals(flaecheBean)) {
             return;
         }
+        
         bindingGroup.unbind();
+        setEnabled(cidsBean != null);
         flaecheBean = cidsBean;
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         bindingGroup.bind();
@@ -645,7 +647,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
     @Override
     public void editModeChanged() {
-        setEnabled(CidsAppBackend.getInstance().isEditable());
+        setEnabled(CidsAppBackend.getInstance().isEditable() && getCidsBean() != null);
     }
 
     @Override

@@ -662,9 +662,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
 
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
-        frontBean = cidsBean;
-//        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         bindingGroup.unbind();
+        frontBean = cidsBean;        
+        setEnabled(cidsBean != null);
+//        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         bindingGroup.bind();
 
         try {
@@ -683,7 +684,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
 
     @Override
     public void editModeChanged() {
-        setEnabled(CidsAppBackend.getInstance().isEditable());
+        setEnabled(CidsAppBackend.getInstance().isEditable() && getCidsBean() != null);
     }
 
     @Override
