@@ -1087,8 +1087,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void cmdSearchKassenzeichenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
         removeMainGroupSelection();
         cmdSearchKassenzeichen.setSelected(true);
-        KassenzeichenGeomSearchDialog.getInstance();
-        mappingComp.setInteractionMode(MappingComponent.CREATE_SEARCH_POLYGON);                
+        //KassenzeichenGeomSearchDialog.getInstance();
+        //mappingComp.setInteractionMode(MappingComponent.CREATE_SEARCH_POLYGON);                
     }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
 
     public void simpleGeometryCreated(final PNotification notification) {
