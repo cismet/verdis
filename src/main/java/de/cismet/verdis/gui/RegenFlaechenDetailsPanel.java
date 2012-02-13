@@ -588,10 +588,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
             return;
         }
         
-        bindingGroup.unbind();
-        setEnabled(cidsBean != null);
+        setEnabled(CidsAppBackend.getInstance().isEditable() && cidsBean != null);
         flaecheBean = cidsBean;
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
+        bindingGroup.unbind();
         bindingGroup.bind();
 
         try {

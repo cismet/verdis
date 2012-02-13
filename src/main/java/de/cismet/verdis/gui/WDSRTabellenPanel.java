@@ -233,7 +233,9 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
                                 selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
-                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean, true);
+                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean);
+                                final boolean editable = CidsAppBackend.getInstance().isEditable();
+                                cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
                             } catch (Exception ex) {
                                 LOG.error("error while attaching feature", ex);

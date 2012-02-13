@@ -542,6 +542,20 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSearchFlurstueckActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="cmdSearchKassenzeichen">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Suche"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSearchKassenzeichenActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="cmdSearchKassenzeichen.setVisible(StaticDebuggingTools.checkHomeForFile(&quot;cismetKassenzeichenGeomSearchOn&quot;));"/>
+              </AuxValues>
+            </Component>
             <Component class="javax.swing.JButton" name="cmdRaisePolygon">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">

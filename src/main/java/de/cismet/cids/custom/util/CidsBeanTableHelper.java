@@ -109,14 +109,14 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     public void restoreBean(final CidsBean cidsBean) {
         try {
-            final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
+            final CidsFeature cidsFeature = createCidsFeature(cidsBean);
 
             final CidsBean backupBean = beanBackups.get((Integer) cidsBean.getProperty("id"));
             CidsBeanSupport.copyProperties(backupBean, cidsBean);
 
             if (cidsFeature != null) {
                 Main.getMappingComponent().getFeatureCollection().removeFeature(cidsFeature);
-                final CidsFeature backupFeature = createCidsFeature(cidsBean, true);
+                final CidsFeature backupFeature = createCidsFeature(cidsBean);
                 Main.getMappingComponent().getFeatureCollection().addFeature(backupFeature);
             }
         } catch (Exception ex) {
@@ -133,7 +133,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             beanToValidatorMap.put(cidsBean, validator);
             aggVal.add(validator);
 
-            final CidsFeature cidsFeature = createCidsFeature(cidsBean, true);
+            final CidsFeature cidsFeature = createCidsFeature(cidsBean);
 
             Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
         }
@@ -153,12 +153,12 @@ public class CidsBeanTableHelper implements CidsBeanTable {
         }
     }
 
-    public CidsFeature createCidsFeature(final CidsBean cidsBean, final boolean editable) {
+    public CidsFeature createCidsFeature(final CidsBean cidsBean) {
         if (cidsBean == null) {
             return null;
         }
         final CidsFeature cidsFeature = new CidsFeature(cidsBean.getMetaObject());
-        cidsFeature.setEditable(editable);
+        cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
         featureMap.put(cidsBean, cidsFeature);
         return cidsFeature;
     }
@@ -200,7 +200,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             }
 
             if (selectedFlaechenFeatures.size() == 1) {
-                setDetailBean(((CidsFeature) selectedFlaechenFeatures.toArray()[0]).getMetaObject().getBean());
+                final CidsFeature feature = (CidsFeature) selectedFlaechenFeatures.toArray()[0];
+                setDetailBean(feature.getMetaObject().getBean());
             } else {
                 setDetailBean(null);
             }
@@ -280,7 +281,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             for (int index = 0; index < selection.length; ++index) {
                 modelSelection[index] = table.getJXTable().convertRowIndexToModel(selection[index]);
                 final CidsBean cb = model.getCidsBeanByIndex(modelSelection[index]);
-                final CidsFeature cidsFeature = createCidsFeature(cb, true);
+                final CidsFeature cidsFeature = createCidsFeature(cb);
                 selectedFeatures.add(cidsFeature);
             }
 

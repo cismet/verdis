@@ -206,7 +206,9 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(PROP__FLAECHENINFO__GROESSE_GRAFIK, groesse);
                                 selectedBean.setProperty(PROP__FLAECHENINFO__GROESSE_KORREKTUR, groesse);
-                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean, true);
+                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean);
+                                final boolean editable = CidsAppBackend.getInstance().isEditable();
+                                cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
                             } catch (Exception ex) {
                                 LOG.error("error while attaching feature", ex);

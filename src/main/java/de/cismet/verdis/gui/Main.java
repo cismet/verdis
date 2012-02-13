@@ -947,7 +947,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         PNotificationCenter.defaultCenter()
                 .addListener(
                     kartenPanel,
-                    "landparcelSearchGeometryCreated",
+                    "simpleGeometryCreated",
                     CreateGeometryListener.GEOMETRY_CREATED_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY));
 
@@ -2964,6 +2964,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             setGeometry(geom);
             getMappingComponent().getFeatureCollection().removeFeature(feature);
             final Feature add = new BeanUpdatingCidsFeature(kassenzeichenBean, KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+            final boolean editable = CidsAppBackend.getInstance().isEditable();
+            add.setEditable(editable);
             getMappingComponent().getFeatureCollection().addFeature(add);
         } catch (Exception ex) {
             LOG.error("error while setting geometrie to kassenzeichen bean", ex);
@@ -3084,7 +3086,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         }.execute();
     }
-
+            
 
     /**
      * DOCUMENT ME!

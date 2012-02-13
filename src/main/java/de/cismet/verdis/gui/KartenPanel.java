@@ -45,8 +45,10 @@ import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
+import de.cismet.cismap.tools.gui.CidsBeanDropJPopupMenuButton;
 import de.cismet.gui.tools.PureNewFeatureWithThickerLineString;
 import de.cismet.tools.CurrentStackTrace;
+import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.StaticDecimalTools;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
@@ -108,6 +110,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JButton cmdRemovePolygon;
     private javax.swing.JButton cmdRotatePolygon;
     private javax.swing.JButton cmdSearchFlurstueck;
+    private javax.swing.JButton cmdSearchKassenzeichen;
     private javax.swing.JButton cmdSelect;
     private javax.swing.JButton cmdSnap;
     private javax.swing.JButton cmdSplitPoly;
@@ -240,6 +243,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdNewPoint = new javax.swing.JButton();
         cmdOrthogonalRectangle = new javax.swing.JButton();
         cmdSearchFlurstueck = new javax.swing.JButton();
+        cmdSearchKassenzeichen = new javax.swing.JButton();
         cmdRaisePolygon = new javax.swing.JButton();
         cmdRemovePolygon = new javax.swing.JButton();
         cmdAttachPolyToAlphadata = new javax.swing.JButton();
@@ -555,6 +559,18 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         });
         tobVerdis.add(cmdSearchFlurstueck);
+
+        cmdSearchKassenzeichen.setVisible(StaticDebuggingTools.checkHomeForFile("cismetKassenzeichenGeomSearchOn"));
+        cmdSearchKassenzeichen.setText("Suche");
+        cmdSearchKassenzeichen.setFocusable(false);
+        cmdSearchKassenzeichen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchKassenzeichen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdSearchKassenzeichenActionPerformed(evt);
+            }
+        });
+        tobVerdis.add(cmdSearchKassenzeichen);
 
         cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
         cmdRaisePolygon.setToolTipText("Polygon hochholen");
@@ -1068,11 +1084,20 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         mappingComp.setInteractionMode(MappingComponent.CREATE_SIMPLE_GEOMETRY);
 }//GEN-LAST:event_cmdSearchFlurstueckActionPerformed
 
-    public void landparcelSearchGeometryCreated(final PNotification notification) {
-        final PureNewFeature newFeature = ((CreateSimpleGeometryListener)mappingComp.getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY)).getNewFeature();
+    private void cmdSearchKassenzeichenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
+        removeMainGroupSelection();
+        cmdSearchKassenzeichen.setSelected(true);
+        KassenzeichenGeomSearchDialog.getInstance();
+        mappingComp.setInteractionMode(MappingComponent.CREATE_SEARCH_POLYGON);                
+    }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
 
-        final Point point = newFeature.getGeometry().getInteriorPoint();
-        Main.getCurrentInstance().loadAlkisFlurstueck(point);
+    public void simpleGeometryCreated(final PNotification notification) {
+        final PureNewFeature newFeature = ((CreateSimpleGeometryListener)mappingComp.getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY)).getNewFeature();
+        
+        if (cmdSearchFlurstueck.isSelected()) {
+            final Point point = newFeature.getGeometry().getInteriorPoint();
+            Main.getCurrentInstance().loadAlkisFlurstueck(point);            
+        }
     }
 
     /**
@@ -1094,6 +1119,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRaisePolygon.setSelected(false);
         cmdALB.setSelected(false);
         cmdSearchFlurstueck.setSelected(false);
+        cmdSearchKassenzeichen.setSelected(false);
     }
 
     /**
@@ -1574,6 +1600,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
     private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
+        final boolean editable = CidsAppBackend.getInstance().isEditable();
 
         featureCollection.removeAllFeatures();
 
@@ -1582,12 +1609,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             switch (CidsAppBackend.getInstance().getMode()) {
                 case ALLGEMEIN: {
                     final Feature add = new BeanUpdatingCidsFeature(cidsBean, KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                    add.setEditable(editable);
                     featureCollection.addFeature(add);
                 } break;
                 case REGEN: {
                     final List<CidsBean> flaechen = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
                     for (final CidsBean flaeche : flaechen) {
                         final Feature add = new BeanUpdatingCidsFeature(flaeche, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                        add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
                 } break;
@@ -1595,6 +1624,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     final List<CidsBean> fronten = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
                     for (final CidsBean front : fronten) {
                         final Feature add = new BeanUpdatingCidsFeature(front, FrontinfoPropertyConstants.PROP__GEOMETRIE + PropertyConstants.DOT + GeomPropertyConstants.PROP__GEO_FIELD);
+                        add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
                 } break;
@@ -1620,10 +1650,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final List<Feature> all = mappingComp.getFeatureCollection().getAllFeatures();
         for (final Feature f : all) {
             f.setEditable(b);
-        }
+        }        
         CidsAppBackend.getInstance().getMainMap().setReadOnly(!b);
     }
-
+    
     @Override
     public void appModeChanged() {
         refreshInMap(true);
@@ -1728,8 +1758,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 final Feature[] f_arr = pf.split();
                 if (f_arr != null) {
                     mappingComp.getFeatureCollection().removeFeature(pf.getFeature());
-                    f_arr[0].setEditable(true);
-                    f_arr[1].setEditable(true);
+                    final boolean editable = CidsAppBackend.getInstance().isEditable();
+                    f_arr[0].setEditable(editable);
+                    f_arr[1].setEditable(editable);
                     mappingComp.getFeatureCollection().addFeature(f_arr[0]);
                     mappingComp.getFeatureCollection().addFeature(f_arr[1]);
                     cmdAttachPolyToAlphadataActionPerformed(null);
