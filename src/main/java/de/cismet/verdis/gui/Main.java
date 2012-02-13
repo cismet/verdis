@@ -963,6 +963,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         aggValidator.add(wdsrFrontenTabellenPanel.getValidator());
         aggValidator.add(regenFlaechenDetailsPanel.getValidator());
         aggValidator.add(wdsrFrontenDetailsPanel.getValidator());
+        
+        setPostgisFlaechenSnappable(true);
     }
 
     public void attachFeatureRequested(final PNotification notification) {
@@ -1122,7 +1124,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             setupLayoutRegen();
         }
         currentMode = mode;
-        setPostgisFlaechenSnappable(currentMode.equals(CidsAppBackend.Mode.REGEN));
 
         refreshClipboardButtons();
         refreshItemButtons();
