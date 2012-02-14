@@ -14,57 +14,66 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cismet.cids.custom.util;
+package de.cismet.verdis.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
+import de.cismet.cids.custom.util.CidsBeanSupport;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
+import de.cismet.cismap.commons.features.FeatureCollectionListener;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.gui.CidsBeanTableModel;
-import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.FeatureAttacher;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import java.util.*;
+import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.jdesktop.swingx.JXTable;
 
 /**
  *
  * @author jruiz
  */
-public class CidsBeanTableHelper implements CidsBeanTable {
+public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTable, FeatureCollectionListener, ListSelectionListener, FeatureAttacher {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CidsBeanTableHelper.class);
-    private int NEW_BEAN_ID = 0;
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(AbstractCidsBeanTable.class);
+    
     private final Map<Integer, CidsBean> beanBackups = new HashMap<Integer, CidsBean>();
-    private final CidsBeanTable table;
-    private final CidsBeanTableModel model;
     private final AggregatedValidator aggVal = new AggregatedValidator();
     private final HashMap<CidsBean, Validator> beanToValidatorMap = new HashMap<CidsBean, Validator>();
     private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<CidsBean, CidsFeature>();
+    private final JXTable jxTable = new JXTable();
+    private final CidsAppBackend.Mode modus;
+    private final CidsBeanTableModel model;   
+    
     private CidsBeanStore selectedRowListener = null;
-    private final CidsAppBackend.Mode mode;
+    private int newBeanId = 0;    
 
-    public CidsBeanTableHelper(final CidsBeanTable table, final CidsBeanTableModel model, final CidsAppBackend.Mode modus) {
-        this.table = table;
+    public AbstractCidsBeanTable(final CidsAppBackend.Mode modus, final CidsBeanTableModel model) {
+        this.modus = modus;
         this.model = model;
-        this.mode = modus;
-        getJXTable().getSelectionModel().addListSelectionListener(table);
+        
+        init();
+    }
+    
+    private void init() {
+        jxTable.getSelectionModel().addListSelectionListener(this);
     }
 
     public int getNextNewBeanId() {
-        return --NEW_BEAN_ID;
+        return --newBeanId;
     }
 
     @Override
     public void addNewBean() {
         try {
-            final CidsBean newBean = table.createNewBean();
-            table.addBean(newBean);
+            final CidsBean newBean = createNewBean();
+            addBean(newBean);
             Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
 
         } catch (final Exception ex) {
@@ -74,8 +83,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void removeSelectedBeans() {
-        for (CidsBean cidsBean : table.getSelectedBeans()) {
-            table.removeBean(cidsBean);
+        for (CidsBean cidsBean : getSelectedBeans()) {
+            removeBean(cidsBean);
             aggVal.remove(beanToValidatorMap.get(cidsBean));
             beanToValidatorMap.remove(cidsBean);
         }
@@ -83,7 +92,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void restoreSelectedBeans() {
-        final Collection<CidsBean> cidsBeans = table.getSelectedBeans();
+        final Collection<CidsBean> cidsBeans = getSelectedBeans();
         for (final CidsBean cidsBean : cidsBeans) {
             restoreBean(cidsBean);
         }
@@ -165,26 +174,26 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
         }
     }
 
     @Override
     public void featureCollectionChanged() {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
         }
     }
 
     @Override
     public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
         }
     }
 
     @Override
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
-            getJXTable().getSelectionModel().removeListSelectionListener(table);
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
+            getJXTable().getSelectionModel().removeListSelectionListener(this);
             getJXTable().getSelectionModel().clearSelection();
 
             final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance().getMainMap().getFeatureCollection().getSelectedFeatures(); // fce.getEventFeatures();
@@ -193,8 +202,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
             for (final Feature selectedFeature : selectedFeatures) {
                 if (selectedFeature instanceof CidsFeature) {
                     final int index = model.getIndexByCidsBean(((CidsFeature) selectedFeature).getMetaObject().getBean());
-                    final int viewIndex = table.getJXTable().convertRowIndexToView(index);
-                    table.getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
+                    final int viewIndex = getJXTable().convertRowIndexToView(index);
+                    getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
                     selectedFlaechenFeatures.add(selectedFeature);
                 }
             }
@@ -206,26 +215,26 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 setDetailBean(null);
             }
 
-            getJXTable().getSelectionModel().addListSelectionListener(table);
+            getJXTable().getSelectionModel().addListSelectionListener(this);
             Main.getCurrentInstance().selectionChanged();
         }
     }
 
     @Override
     public void featuresAdded(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
         }
     }
 
     @Override
     public void featuresChanged(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
             final Collection<Feature> features = fce.getEventFeatures();
             for (final Feature feature : features) {
                 if (feature instanceof CidsFeature && featureMap.containsValue((CidsFeature) feature)) {
                     final CidsBean cidsBean = ((CidsFeature) feature).getMetaObject().getBean();
                     try {
-                        table.setGeometry(feature.getGeometry(), cidsBean);
+                        setGeometry(feature.getGeometry(), cidsBean);
                     } catch (Exception ex) {
                         LOG.error("error while updating geometry", ex);
                     }
@@ -236,7 +245,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
 
     @Override
     public void featuresRemoved(final FeatureCollectionEvent fce) {
-        if (CidsAppBackend.getInstance().getMode().equals(mode)) {
+        if (CidsAppBackend.getInstance().getMode().equals(modus)) {
         }
     }
 
@@ -274,24 +283,24 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     @Override
     public void valueChanged(final ListSelectionEvent ev) {
         if (!((ev == null) || ev.getValueIsAdjusting())) {
-            final int[] selection = table.getJXTable().getSelectedRows();
+            final int[] selection = getJXTable().getSelectedRows();
             final int[] modelSelection = new int[selection.length];
             final ArrayList<Feature> selectedFeatures = new ArrayList<Feature>(selection.length);
 
             for (int index = 0; index < selection.length; ++index) {
-                modelSelection[index] = table.getJXTable().convertRowIndexToModel(selection[index]);
+                modelSelection[index] = getJXTable().convertRowIndexToModel(selection[index]);
                 final CidsBean cb = model.getCidsBeanByIndex(modelSelection[index]);
                 final CidsFeature cidsFeature = createCidsFeature(cb);
                 selectedFeatures.add(cidsFeature);
             }
 
             // Kartenselektion
-            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeatureCollectionListener(table);
+            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeatureCollectionListener(this);
             CidsAppBackend.getInstance().getMainMap().getFeatureCollection().select(selectedFeatures);
-            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeatureCollectionListener(table);
+            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeatureCollectionListener(this);
 
             // DetailPanel --> nur setzen wenn # selektierte zeilen==1
-            if (table.getJXTable().getSelectedRowCount() == 1) {
+            if (getJXTable().getSelectedRowCount() == 1) {
                 setDetailBean(model.getCidsBeanByIndex(modelSelection[0]));
             } else {
                 setDetailBean(null);
@@ -345,7 +354,7 @@ public class CidsBeanTableHelper implements CidsBeanTable {
                 final int selection = getJXTable().getSelectedRow();
                 final int modelSelection = getJXTable().convertRowIndexToModel(selection);
                 final CidsBean selectedBean = model.getCidsBeanByIndex(modelSelection);
-                table.setGeometry(geom, selectedBean);
+                setGeometry(geom, selectedBean);
                 setDetailBean(selectedBean);
                 CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeature(feature);
             } catch (Exception exception) {
@@ -371,26 +380,8 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     }
 
     @Override
-    public CidsBean createNewBean() throws Exception {
-        final int newId = getNextNewBeanId();
-        final CidsBean newBean = table.createNewBean();
-        newBean.setProperty("id", newId);
-        newBean.getMetaObject().setID(newId);
-        return newBean;
-    }
-
-    @Override
-    public CidsBeanTableHelper getTableHelper() {
+    public AbstractCidsBeanTable getTableHelper() {
         return this;
-    }
-
-    @Override
-    public final JXTable getJXTable() {
-        return table.getJXTable();
-    }
-
-    public CidsBeanTableModel getTableModel() {
-        return model;
     }
 
     @Override
@@ -408,22 +399,25 @@ public class CidsBeanTableHelper implements CidsBeanTable {
     }
 
     @Override
-    public Validator getItemValidator(final CidsBean cidsBean) {
-        return table.getItemValidator(cidsBean);
-    }
-
-    @Override
-    public Validator getValidator() {
+    public final Validator getValidator() {
         return aggVal;
     }
 
-    @Override
-    public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception {
-        table.setGeometry(geometry, cidsBean);
+    protected final CidsBeanTableModel getModel() {
+        return model;
     }
+    
+    protected final JXTable getJXTable() {
+        return jxTable;
+    }
+    
+    public abstract CidsBean createNewBean() throws Exception;    
 
-    @Override
-    public Geometry getGeometry(final CidsBean cidsBean) {
-        return table.getGeometry(cidsBean);
-    }
+    public abstract void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception;
+
+    public abstract Geometry getGeometry(final CidsBean cidsBean);    
+    
+    public abstract Validator getItemValidator(final CidsBean cidsBean);    
+    
+    
 }

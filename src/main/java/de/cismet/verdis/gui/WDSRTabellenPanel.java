@@ -34,11 +34,8 @@ import Sirius.server.middleware.types.MetaObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import de.cismet.cids.custom.util.BindingValidationSupport;
-import de.cismet.cids.custom.util.CidsBeanTableHelper;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
@@ -48,8 +45,8 @@ import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.PropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import de.cismet.verdis.interfaces.CidsBeanTable;
 import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Color;
 import java.awt.Component;
@@ -58,8 +55,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -71,11 +66,10 @@ import org.jdesktop.swingx.decorator.Highlighter;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, CidsBeanStore {
+public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBeanStore {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTabellenPanel.class);
     //~ Instance fields --------------------------------------------------------
-    private final CidsBeanTableHelper helper;
     private CidsBean cidsBean;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -89,17 +83,17 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
      * Creates new form TabellenPanel.
      */
     public WDSRTabellenPanel() {
-        final WDSRTableModel model = new WDSRTableModel();
+        super(CidsAppBackend.Mode.ESW, new WDSRTableModel());
 
         initComponents();
-        jxtOverview.setModel(model);
+        jxtOverview.setModel(getModel());
         final HighlightPredicate errorPredicate = new HighlightPredicate() {
 
             @Override
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 return getItemValidator(cidsBean).getState().isError();
             }
         };
@@ -112,7 +106,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 if (cidsBean != null) {
                     return cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
                 } else {
@@ -129,16 +123,14 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 return getGeometry(cidsBean) == null;
             }
         };
 
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
-
-        helper = new CidsBeanTableHelper(this, model, CidsAppBackend.Mode.ESW);
+        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);       
 
         BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
@@ -156,11 +148,6 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         return aggVal;
     }
 
-    @Override
-    public Validator getValidator() {
-        return helper.getValidator();
-    }
-
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
@@ -171,7 +158,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jxtOverview = new org.jdesktop.swingx.JXTable();
+        jxtOverview = getJXTable();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -179,22 +166,10 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
 
         jxtOverview.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        final org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create(
-                "${cidsBean}");
-        final org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings
-                    .createJTableBinding(
-                        org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                        this,
-                        eLProperty,
-                        jxtOverview);
+        org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create("${cidsBean}");
+        org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, jxtOverview);
         bindingGroup.addBinding(jTableBinding);
-        jTableBinding.bind();
-        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${selectedRow}"),
-                jxtOverview,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedElement"));
+        jTableBinding.bind();org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${selectedRow}"), jxtOverview, org.jdesktop.beansbinding.BeanProperty.create("selectedElement"));
         bindingGroup.addBinding(binding);
 
         jScrollPane1.setViewportView(jxtOverview);
@@ -202,12 +177,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         bindingGroup.bind();
-    } // </editor-fold>//GEN-END:initComponents
-
-    @Override
-    public CidsBeanTableHelper getTableHelper() {
-        return helper;
-    }
+    }// </editor-fold>//GEN-END:initComponents
 
     public void attachFeatureRequested(final PNotification notification) {
         final Object o = notification.getObject();
@@ -233,7 +203,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
                                 selectedBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
-                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean);
+                                final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
@@ -274,23 +244,28 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
     public CidsBean createNewBean() throws Exception {
         final MetaClass srMC = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG);
         final MetaClass wdMC = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_WINTERDIENST);
+        
         final String srQuery = "SELECT " + srMC.getID() + ", " + srMC.getPrimaryKey() + " FROM " + srMC.getTableName() + " WHERE schluessel = -100;";
         final String wdQuery = "SELECT " + wdMC.getID() + ", " + wdMC.getPrimaryKey() + " FROM " + wdMC.getTableName() + " WHERE schluessel = -200;";
 
-        final CidsBean cidsBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO).getEmptyInstance().getBean();
+        final CidsBean frontinfoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO).getEmptyInstance().getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
         final CidsBean strassenreinigungBean = SessionManager.getProxy().getMetaObjectByQuery(srQuery, 0)[0].getBean();
         final CidsBean winterdienstBean = SessionManager.getProxy().getMetaObjectByQuery(wdQuery, 0)[0].getBean();
 
 
+        final int newId = getNextNewBeanId();
+        frontinfoBean.setProperty(PropertyConstants.PROP__ID, newId);
+        frontinfoBean.getMetaObject().setID(newId);
+        
         //final CidsBean strasseBean = SessionManager.getProxy().getVerdisMetaObject(8, PROP__"strasse".getId(), Main.DOMAIN).getBean();
 
         //cidsBean.setProperty(PROP__"strasse", strasseBean);
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, geomBean);
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR, strassenreinigungBean);
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR, winterdienstBean);
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(Calendar.getInstance().getTime().getTime()));
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, geomBean);
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR, strassenreinigungBean);
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR, winterdienstBean);
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(Calendar.getInstance().getTime().getTime()));
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if (sole != null && sole.getFeature().getGeometry() instanceof LineString) {
@@ -305,10 +280,10 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                     final Geometry geom = sole.getFeature().getGeometry();
                     // größe berechnen und zuweisen
                     final int laenge = (int) Math.abs(geom.getLength());
-                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
-                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
-                    setGeometry(geom, cidsBean);
-                    cidsBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
+                    frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
+                    frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
+                    setGeometry(geom, frontinfoBean);
+                    frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, getValidNummer());
 
                     // unzugeordnete Geometrie aus Karte entfernen
                     Main.getMappingComponent().getFeatureCollection().removeFeature(sole.getFeature());
@@ -317,23 +292,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                 }
             }
         }
-        return cidsBean;
-    }
-
-    // komplettes CidsBeanTable interface wird vom Helper übernommen
-    @Override
-    public void addNewBean() {
-        helper.addNewBean();
-    }
-
-    @Override
-    public void removeSelectedBeans() {
-        helper.removeSelectedBeans();
-    }
-
-    @Override
-    public void addBean(final CidsBean cidsBean) {
-        helper.addBean(cidsBean);
+        return frontinfoBean;
     }
 
     @Override
@@ -349,72 +308,7 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
                 LOG.error("error while removing frontbean", ex);
             }
         }
-        helper.removeBean(cidsBean);
-    }
-
-    @Override
-    public void restoreSelectedBeans() {
-        helper.restoreSelectedBeans();
-    }
-
-    @Override
-    public void setSelectedRowListener(final CidsBeanStore selectedRowListener) {
-        helper.setSelectedRowListener(selectedRowListener);
-    }
-
-    @Override
-    public CidsBeanStore getSelectedRowListener() {
-        return helper.getSelectedRowListener();
-    }
-
-    @Override
-    public List<CidsBean> getSelectedBeans() {
-        return helper.getSelectedBeans();
-    }
-
-    @Override
-    public JXTable getJXTable() {
-        return jxtOverview;
-    }
-
-    @Override
-    public void featuresAdded(final FeatureCollectionEvent fce) {
-        helper.featuresAdded(fce);
-    }
-
-    @Override
-    public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
-        helper.allFeaturesRemoved(fce);
-    }
-
-    @Override
-    public void featuresRemoved(final FeatureCollectionEvent fce) {
-        helper.featuresRemoved(fce);
-    }
-
-    @Override
-    public void featuresChanged(final FeatureCollectionEvent fce) {
-        helper.featuresChanged(fce);
-    }
-
-    @Override
-    public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        helper.featureSelectionChanged(fce);
-    }
-
-    @Override
-    public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
-        helper.featureReconsiderationRequested(fce);
-    }
-
-    @Override
-    public void featureCollectionChanged() {
-        helper.featureCollectionChanged();
-    }
-
-    @Override
-    public void valueChanged(final ListSelectionEvent e) {
-        helper.valueChanged(e);
+        super.removeBean(cidsBean);
     }
 
     @Override
@@ -434,26 +328,6 @@ public class WDSRTabellenPanel extends javax.swing.JPanel implements CidsBeanTab
         }        
     }
     
-    @Override
-    public void setCidsBeans(final List<CidsBean> cidsBeans) {
-        helper.setCidsBeans(cidsBeans);
-    }
-
-    @Override
-    public void requestFeatureAttach(final Feature f) {
-        helper.requestFeatureAttach(f);
-    }
-
-    @Override
-    public List<CidsBean> getAllBeans() {
-        return helper.getAllBeans();
-    }
-
-    @Override
-    public void selectCidsBean(final CidsBean cidsBean) {
-        helper.selectCidsBean(cidsBean);
-    }
-
     @Override
     public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception {
         WDSRDetailsPanel.setGeometry(geometry, cidsBean);

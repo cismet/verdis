@@ -32,11 +32,8 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
-import de.cismet.cids.custom.util.CidsBeanTableHelper;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
@@ -45,11 +42,10 @@ import de.cismet.tools.NumberStringComparator;
 import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.PropertyConstants;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import de.cismet.verdis.interfaces.CidsBeanTable;
 import edu.umd.cs.piccolox.event.PNotification;
 import java.awt.Color;
 import java.awt.Component;
@@ -61,8 +57,6 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.*;
 
 /**
@@ -71,11 +65,11 @@ import org.jdesktop.swingx.decorator.*;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements CidsBeanTable, RegenFlaechenPropertyConstants, CidsBeanStore {
+public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements RegenFlaechenPropertyConstants, CidsBeanStore {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTabellenPanel.class);
+    
     //~ Instance fields --------------------------------------------------------
-    private final CidsBeanTableHelper helper;
     private CidsBean cidsBean;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -88,18 +82,18 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
      * Creates new form RegenFlaechenTabellenPanel.
      */
     public RegenFlaechenTabellenPanel() {
-        final RegenFlaechenTableModel model = new RegenFlaechenTableModel();
-
+        super(CidsAppBackend.Mode.REGEN, new RegenFlaechenTableModel());
+        
         initComponents();
 
-        jxtOverview.setModel(model);
+        jxtOverview.setModel(getModel());
         final HighlightPredicate errorPredicate = new HighlightPredicate() {
 
             @Override
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 return getItemValidator(cidsBean).getState().isError();
             }
         };
@@ -112,7 +106,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 if (cidsBean != null) {
                     return cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
                 } else {
@@ -129,7 +123,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
             public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                 final int displayedIndex = componentAdapter.row;
                 final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                 return getGeometry(cidsBean) == null;
             }
         };
@@ -157,8 +151,6 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         jxtOverview.getTableHeader().setResizingAllowed(false);
         jxtOverview.getTableHeader().setReorderingAllowed(false);
         jxtOverview.setSortOrder(1, SortOrder.ASCENDING);
-
-        helper = new CidsBeanTableHelper(this, model, CidsAppBackend.Mode.REGEN);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -169,8 +161,9 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         jScrollPane1 = new javax.swing.JScrollPane();
-        jxtOverview = new org.jdesktop.swingx.JXTable();
+        jxtOverview = getJXTable();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -180,7 +173,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         jScrollPane1.setViewportView(jxtOverview);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
-    } // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     public void attachFeatureRequested(final PNotification notification) {
         final Object o = notification.getObject();
@@ -206,7 +199,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(PROP__FLAECHENINFO__GROESSE_GRAFIK, groesse);
                                 selectedBean.setProperty(PROP__FLAECHENINFO__GROESSE_KORREKTUR, groesse);
-                                final CidsFeature cidsFeature = helper.createCidsFeature(selectedBean);
+                                final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
@@ -237,18 +230,14 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         return aggVal;
     }
 
-    @Override
-    public Validator getValidator() {
-        return helper.getValidator();
-    }
-
+    
     public void reEnumerateFlaechen() {
-        final TableSorter sort = new TableSorter(helper.getTableModel());
+        final TableSorter sort = new TableSorter(getModel());
         sort.setSortingStatus(3, TableSorter.DESCENDING);
         int counterInt = 0;
         String counterString = null;
-        for (int i = 0; i < helper.getTableModel().getRowCount(); ++i) {
-            final CidsBean flaecheBean = helper.getTableModel().getCidsBeanByIndex(sort.getSortedIndex(i));
+        for (int i = 0; i < getModel().getRowCount(); ++i) {
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(i));
             if (flaecheBean != null) {
                 final int art = (Integer) flaecheBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID);
                 switch (art) {
@@ -275,15 +264,10 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
                         }
                     }
                 }
-                helper.getTableModel().fireTableDataChanged();
+                getModel().fireTableDataChanged();
                 repaint();
             }
         }
-    }
-
-    @Override
-    public CidsBeanTableHelper getTableHelper() {
-        return helper;
     }
 
     @Override
@@ -319,6 +303,10 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         final CidsBean flaecheninfoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getEmptyInstance().getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
 
+        final int newId = getNextNewBeanId();
+        flaecheBean.setProperty(PropertyConstants.PROP__ID, newId);
+        flaecheBean.getMetaObject().setID(newId);
+        
         flaecheBean.setProperty(PROP__FLAECHENINFO, flaecheninfoBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE, geomBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__ANSCHLUSSGRAD, anschlussgradBean);
@@ -448,22 +436,6 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
         return "A";
     }
 
-    // komplettes CidsBeanTable interface wird vom Helper übernommen
-    @Override
-    public void addNewBean() {
-        helper.addNewBean();
-    }
-
-    @Override
-    public void removeSelectedBeans() {
-        helper.removeSelectedBeans();
-    }
-
-    @Override
-    public void addBean(final CidsBean cidsBean) {
-        helper.addBean(cidsBean);
-    }
-
     @Override
     public void removeBean(final CidsBean cidsBean) {
         if (cidsBean != null) {
@@ -473,72 +445,7 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
                 LOG.error("error while removing flaechebean", ex);
             }
         }
-        helper.removeBean(cidsBean);
-    }
-
-    @Override
-    public void restoreSelectedBeans() {
-        helper.restoreSelectedBeans();
-    }
-
-    @Override
-    public void setSelectedRowListener(final CidsBeanStore selectedRowListener) {
-        helper.setSelectedRowListener(selectedRowListener);
-    }
-
-    @Override
-    public CidsBeanStore getSelectedRowListener() {
-        return helper.getSelectedRowListener();
-    }
-
-    @Override
-    public List<CidsBean> getSelectedBeans() {
-        return helper.getSelectedBeans();
-    }
-
-    @Override
-    public JXTable getJXTable() {
-        return jxtOverview;
-    }
-
-    @Override
-    public void featuresAdded(final FeatureCollectionEvent fce) {
-        helper.featuresAdded(fce);
-    }
-
-    @Override
-    public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
-        helper.allFeaturesRemoved(fce);
-    }
-
-    @Override
-    public void featuresRemoved(final FeatureCollectionEvent fce) {
-        helper.featuresRemoved(fce);
-    }
-
-    @Override
-    public void featuresChanged(final FeatureCollectionEvent fce) {
-        helper.featuresChanged(fce);
-    }
-
-    @Override
-    public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        helper.featureSelectionChanged(fce);
-    }
-
-    @Override
-    public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
-        helper.featureReconsiderationRequested(fce);
-    }
-
-    @Override
-    public void featureCollectionChanged() {
-        helper.featureCollectionChanged();
-    }
-
-    @Override
-    public void valueChanged(final ListSelectionEvent e) {
-        helper.valueChanged(e);
+        super.removeBean(cidsBean);
     }
 
     @Override
@@ -557,26 +464,6 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
             setCidsBeans(new ArrayList<CidsBean>());            
         }        
     }
-    
-    @Override
-    public void setCidsBeans(final List<CidsBean> cidsBeans) {
-        helper.setCidsBeans(cidsBeans);
-    }
-
-    @Override
-    public void requestFeatureAttach(final Feature f) {
-        helper.requestFeatureAttach(f);
-    }
-
-    @Override
-    public List<CidsBean> getAllBeans() {
-        return helper.getAllBeans();
-    }
-
-    @Override
-    public void selectCidsBean(final CidsBean cidsBean) {
-        helper.selectCidsBean(cidsBean);
-    }
 
     @Override
     public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception {
@@ -587,4 +474,5 @@ public class RegenFlaechenTabellenPanel extends javax.swing.JPanel implements Ci
     public Geometry getGeometry(final CidsBean cidsBean) {
         return RegenFlaechenDetailsPanel.getGeometry(cidsBean);
     }
+    
 }

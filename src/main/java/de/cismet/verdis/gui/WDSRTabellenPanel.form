@@ -47,6 +47,9 @@
             <BindingProperty name="elements" source="Form" sourcePath="${cidsBean}" target="jxtOverview" targetPath="elements" updateStrategy="0" immediately="true"/>
             <BindingProperty name="selectedElement" source="Form" sourcePath="${selectedRow}" target="jxtOverview" targetPath="selectedElement" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="getJXTable()"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

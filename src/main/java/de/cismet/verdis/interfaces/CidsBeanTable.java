@@ -16,23 +16,17 @@
  */
 package de.cismet.verdis.interfaces;
 
-import com.vividsolutions.jts.geom.Geometry;
-import de.cismet.cids.custom.util.CidsBeanTableHelper;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.features.FeatureCollectionListener;
 import de.cismet.validation.Validatable;
-import de.cismet.validation.Validator;
-import de.cismet.verdis.FeatureAttacher;
+import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import java.util.List;
-import javax.swing.event.ListSelectionListener;
-import org.jdesktop.swingx.JXTable;
 
 /**
  *
  * @author jruiz
  */
-public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionListener, FeatureAttacher, Validatable {
+public interface CidsBeanTable extends Validatable {
 
     public void addNewBean();
 
@@ -48,23 +42,14 @@ public interface CidsBeanTable extends FeatureCollectionListener, ListSelectionL
 
     public CidsBeanStore getSelectedRowListener();
 
-    public CidsBean createNewBean() throws Exception;
-
-    public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception;
-
-    public Geometry getGeometry(final CidsBean cidsBean);
-
     public List<CidsBean> getAllBeans();
 
     public List<CidsBean> getSelectedBeans();
 
-    public CidsBeanTableHelper getTableHelper();
+    public AbstractCidsBeanTable getTableHelper();
 
-    public JXTable getJXTable();
-    
     public void setCidsBeans(final List<CidsBean> cidsBeans);
 
     public void selectCidsBean(final CidsBean cidsBean);
 
-    public Validator getItemValidator(final CidsBean cidsBean);
 }
