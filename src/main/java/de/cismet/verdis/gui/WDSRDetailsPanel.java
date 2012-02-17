@@ -48,6 +48,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.constants.*;
 import edu.umd.cs.piccolo.PCanvas;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -122,6 +123,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         cbLageSr.setVisible(isDeveloper);
         labLageWd.setVisible(isDeveloper);
         cbLageWd.setVisible(isDeveloper);
+        
+        cbLageSr.setRenderer(new SatzungsComboBoxRenderer("manuelle Auswahl der Straßenreinigung"));
+        cbLageWd.setRenderer(new SatzungsComboBoxRenderer("manuelle Auswahl des Winterdienstes"));
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -553,6 +557,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             final String tabStrasse = VerdisMetaClassConstants.MC_STRASSE;
             final String fldId = PropertyConstants.PROP__ID;
             final String fldStrasse = "strasse";
+            final String fldStrName = "name";
             final String fldSrBem = "sr_bem";
             final String fldSrKey = "key";
             final String fldSrName = "name";
@@ -566,7 +571,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     "    " + tabSatzung + "." + fldId + ", " +
                     "    " + tabSatzung + "." + fldSrBem + " AS bem, " +
                     "    " + tabSatzung + "." + fldSrKlasse + " AS sr_klasse, " +
-                    "    " + tabStrassenreinigung + "." + fldSrKey + ", " +
+                    "    " + tabStrasse + "." + fldStrName + " AS str, " +
+                    "    " + tabStrassenreinigung + "." + fldSrKey + " AS key, " +
                     "    " + tabStrassenreinigung + "." + fldSrName + " AS name " +
                     "FROM  " +
                     "    " + tabStrasse + ", " +
@@ -576,13 +582,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     "    " + tabStrasse + "." + fldId + " = " + strasseId + " AND " +
                     "    " + tabSatzung + "." + fldStrasse + " = " + tabStrasse + "." + fldId + " AND " +
                     "    " + tabStrassenreinigung + "." + fldId + " = " + tabSatzung + "." + fldSrKlasse + ";",
-                    new String[] { "name", "bem", "sr_klasse" }));               
+                    new String[] { "key", "bem", "sr_klasse", "str" }));               
 
             CismetThreadPool.execute(new SatzungsComboModelWorker(cbLageWd, "SELECT " +
                     "    " + tabSatzung + "." + fldId + ", " +
                     "    " + tabSatzung + "." + fldWdBem + " AS bem, " +
                     "    " + tabSatzung + "." + fldWdPrio + " AS wd_prio, " +
-                    "    " + tabWinterdienst + "." + fldWdKey + ", " +
+                    "    " + tabStrasse + "." + fldStrName + " AS str, " +
+                    "    " + tabWinterdienst + "." + fldWdKey + " AS key, " +
                     "    " + tabWinterdienst + "." + fldWdName + " AS name " +
                     "FROM  " +
                     "    " + tabStrasse + ", " +
@@ -592,7 +599,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     "    " + tabStrasse + "." + fldId + " = " + strasseId + " AND " +
                     "    " + tabSatzung + "." + fldStrasse + " = " + tabStrasse + "." + fldId + " AND " +
                     "    " + tabWinterdienst + "." + fldId + " = " + tabSatzung + "." + fldWdPrio + ";",
-                    new String[] { "name", "bem", "wd_prio" }));                  
+                    new String[] { "key", "bem", "wd_prio", "str" }));                  
         }
         
     }//GEN-LAST:event_cboStrasseActionPerformed
@@ -600,8 +607,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private void cbLageSrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbLageSrActionPerformed
         final CidsBean wdsrBean = getCidsBean();
         if (wdsrBean != null) {
-            final MetaObject selectedMo = ((MetaObject) cbLageSr.getModel().getSelectedItem());
-            if (selectedMo != null) {
+            final Object selectedObject = cbLageSr.getModel().getSelectedItem();
+            if (selectedObject != null && selectedObject instanceof  MetaObject) {
+                final MetaObject selectedMo = (MetaObject) selectedObject;
                 final CidsBean selectedCb = selectedMo.getBean();                        
                 final CidsBean srBean = (CidsBean) selectedCb.getProperty("sr_klasse");
                 try {
@@ -616,8 +624,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private void cbLageWdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbLageWdActionPerformed
         final CidsBean wdsrBean = getCidsBean();
         if (wdsrBean != null) {
-            final MetaObject selectedMo = ((MetaObject) cbLageWd.getModel().getSelectedItem());
-            if (selectedMo != null) {
+            final Object selectedObject = cbLageWd.getModel().getSelectedItem();
+            if (selectedObject != null && selectedObject instanceof  MetaObject) {
+                final MetaObject selectedMo = (MetaObject) selectedObject;
                 final CidsBean selectedCb = selectedMo.getBean();                        
                 final CidsBean wdBean = (CidsBean) selectedCb.getProperty("wd_prio");
                 try {
@@ -673,6 +682,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 bpanWdsrDetails.setBackgroundEnabled(true);
             } else {
                 bpanWdsrDetails.setBackgroundEnabled(false);
+            }
+            if (cidsBean == null) {
+                cbLageSr.setSelectedItem(null);
+                cbLageWd.setSelectedItem(null);
             }
         } catch (Exception e) {
             LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
@@ -1009,7 +1022,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
 
                     @Override
                     public String getRepresentation() {
-                        return String.valueOf(getAttribute("name") + " | " + getAttribute("bem"));
+                        final String str = (String) getAttribute("str");
+                        final String bem = (String) getAttribute("bem");
+                        final String key = (String) getAttribute("key");
+                        
+                        final String representation = ((bem == null) ? str : bem) + " (" + key + ")";
+                        
+                        return String.valueOf(representation);
                     }
                 });
             
@@ -1037,4 +1056,27 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             }
         }
     }        
+    
+    class SatzungsComboBoxRenderer extends DefaultListCellRenderer {
+        
+        private final String nullText;
+        
+        public SatzungsComboBoxRenderer(final String nullText) {
+            this.nullText = nullText;
+        }
+
+        @Override
+        public Component getListCellRendererComponent(
+                                        JList list,
+                                        Object value,
+                                        int index,
+                                        boolean isSelected,
+                                        boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value == null) {
+                setText(nullText);
+            }
+            return this;
+        }
+    }
 }
