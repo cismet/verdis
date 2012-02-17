@@ -12,7 +12,10 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.*;
+import Sirius.navigator.connection.Connection;
+import Sirius.navigator.connection.ConnectionFactory;
+import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.plugin.context.PluginContext;
 import Sirius.navigator.plugin.interfaces.*;
@@ -31,7 +34,6 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
@@ -78,24 +80,27 @@ import de.cismet.verdis.data.AppPreferences;
 import de.cismet.verdis.interfaces.CidsBeanTable;
 import de.cismet.verdis.interfaces.Storable;
 import de.cismet.verdis.search.AlkisLandparcelSearch;
+import de.cismet.verdis.search.GeomServerSearch;
+import de.cismet.verdis.search.KassenzeichenGeomSearch;
+import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 import edu.umd.cs.piccolox.event.PSelectionEventHandler;
 import java.applet.AppletContext;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.*;
 import java.util.prefs.Preferences;
 import javax.swing.*;
@@ -150,6 +155,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static final int PROPVAL_ART_OEKOPFLASTER = 4;
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE = 5;
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
+    public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
+    public static final String FLURSTUECK_SEARCH_GEOMETRY_LISTENER = "FLURSTUECK_SEARCH_GEOMETRY_LISTENER";
 
     private static final String DIRECTORYPATH_HOME = System.getProperty("user.home");
     private static final String FILESEPARATOR = System.getProperty("file.separator");
@@ -965,6 +972,54 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         aggValidator.add(wdsrFrontenDetailsPanel.getValidator());
         
         setPostgisFlaechenSnappable(true);
+        
+        initGeomServerSearches();                
+    }
+    
+    private void initGeomServerSearches() {
+        final ServerSearchCreateSearchGeometryListener kassenzeichenSearchGeometryListener = new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(), new KassenzeichenGeomSearch());
+        CidsAppBackend.getInstance().getMainMap().addCustomInputListener(KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER, kassenzeichenSearchGeometryListener);
+        CidsAppBackend.getInstance().getMainMap().putCursor(KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));        
+        kassenzeichenSearchGeometryListener.addPropertyChangeListener(KassenzeichenGeomSearchDialog.getInstance());        
+        
+        final ServerSearchCreateSearchGeometryListener flurstueckSearchGeometryListener = new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(), new AlkisLandparcelSearch());
+        CidsAppBackend.getInstance().getMainMap().addCustomInputListener(FLURSTUECK_SEARCH_GEOMETRY_LISTENER, flurstueckSearchGeometryListener);
+        CidsAppBackend.getInstance().getMainMap().putCursor(FLURSTUECK_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));        
+        flurstueckSearchGeometryListener.setMode(CreateGeometryListener.POINT);
+        flurstueckSearchGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                final String propName = evt.getPropertyName();
+
+                if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(propName)) {
+                } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(propName)) {
+                    final Collection<Integer> ids = (Collection<Integer>) evt.getNewValue();
+                    if (ids == null || ids.isEmpty()) {
+                        JOptionPane.showMessageDialog(Main.THIS, "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.", "Keine FLurstücke gefunden.", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        final Integer id = ids.iterator().next();
+                        if (id != null) {
+                            try {
+                                DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+                                descPane.clearBreadCrumb();
+                                descPane.clear();
+                                descPane.gotoMetaObject(ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "alkis_landparcel"), id, "");
+                                if (!alkisRendererDialog.isVisible()) {
+                                    alkisRendererDialog.setVisible(true);
+                                }
+                            } catch (Exception ex) {
+                                // TODO fehlerdialog
+                                LOG.error("error while loading renderer", ex);
+                            }
+                        }
+                    }                    
+                } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
+                    LOG.error("error while searching flurstueck", (Exception) evt.getNewValue());
+                }
+            }
+        });        
+        
     }
 
     public void attachFeatureRequested(final PNotification notification) {
@@ -3046,48 +3101,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void cmdFortfuehrungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFortfuehrungActionPerformed
         FortfuehrungsanlaesseDialog.getInstance().setVisible(true);
     }//GEN-LAST:event_cmdFortfuehrungActionPerformed
-
-   public void loadAlkisFlurstueck(final Point geom) {
-        new SwingWorker<Integer, Void>() {
-
-            @Override
-            protected Integer doInBackground() throws Exception {
-                final Point transformedPoint = CrsTransformer.transformToGivenCrs(geom, "EPSG:25832");
-                transformedPoint.setSRID(25832);
-                final Collection<Integer> ids = SessionManager.getProxy().customServerSearch(SessionManager.getSession().getUser(), new AlkisLandparcelSearch(transformedPoint));
-                if (ids == null || ids.isEmpty()) {
-                    JOptionPane.showMessageDialog(Main.THIS, "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.", "Keine FLurstücke gefunden.", JOptionPane.INFORMATION_MESSAGE);
-                    return null;
-                } else {
-                    return ids.toArray(new Integer[0])[0];
-                }
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    final Integer id = get();
-                    if (id != null) {
-                        try {
-                            DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-                            descPane.clearBreadCrumb();
-                            descPane.clear();
-                            descPane.gotoMetaObject(ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "alkis_landparcel"), id, "");
-                            if (!alkisRendererDialog.isVisible()) {
-                                alkisRendererDialog.setVisible(true);
-                            }
-                        } catch (Exception ex) {
-                            LOG.error("error while loading renderer", ex);
-                        }
-                    }
-                } catch (Exception ex) {
-                    LOG.error("error while searching flurstueck", ex);
-                }
-            }
-
-        }.execute();
-    }
-            
 
     /**
      * DOCUMENT ME!

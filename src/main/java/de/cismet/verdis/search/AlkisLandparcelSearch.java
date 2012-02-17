@@ -24,10 +24,7 @@
 package de.cismet.verdis.search;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
-import Sirius.server.search.CidsServerSearch;
 import com.vividsolutions.jts.geom.Point;
-import de.cismet.cismap.commons.CrsTransformer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -38,28 +35,18 @@ import java.util.Collection;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class AlkisLandparcelSearch extends CidsServerSearch {
+public class AlkisLandparcelSearch extends GeomServerSearch {
 
-    //~ Instance fields --------------------------------------------------------
-
-    private final Point pointGeometry;
-
-    //~ Constructors -----------------------------------------------------------
-
-    /**
-     * Creates a new KassenzeichenSearchStatement object.
-     *
-     * @param  searchString  DOCUMENT ME!
-     */
-    public AlkisLandparcelSearch(final Point pointGeometry) {
-        this.pointGeometry = pointGeometry;
+    @Override
+    public String getCrs() {
+        return "EPSG:25832";
     }
-
-    //~ Methods ----------------------------------------------------------------
-
+    
     @Override
     public Collection performServerSearch() {
         try {
+            final Point pointGeometry = (Point) getGeometry();
+            
             final String sql = "SELECT alkis_landparcel.id "
                     + "FROM "
                     + "   alkis_landparcel, "
