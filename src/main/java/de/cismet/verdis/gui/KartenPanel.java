@@ -71,6 +71,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.plaf.basic.BasicToggleButtonUI;
 
 /**
  * DOCUMENT ME!
@@ -91,36 +92,36 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cmdALB;
+    private javax.swing.JToggleButton cmdALB;
     private javax.swing.JButton cmdAdd;
-    private javax.swing.JButton cmdAddHandle;
-    private javax.swing.JButton cmdAttachPolyToAlphadata;
+    private javax.swing.JToggleButton cmdAddHandle;
+    private javax.swing.JToggleButton cmdAttachPolyToAlphadata;
     private javax.swing.JButton cmdBack;
     private javax.swing.JButton cmdForeground;
     private javax.swing.JButton cmdForward;
     private javax.swing.JButton cmdFullPoly;
     private javax.swing.JButton cmdFullPoly1;
-    private javax.swing.JButton cmdJoinPoly;
-    private javax.swing.JButton cmdMoveHandle;
-    private javax.swing.JButton cmdMovePolygon;
-    private javax.swing.JButton cmdNewLinestring;
-    private javax.swing.JButton cmdNewPoint;
-    private javax.swing.JButton cmdNewPolygon;
-    private javax.swing.JButton cmdOrthogonalRectangle;
-    private javax.swing.JButton cmdPan;
-    private javax.swing.JButton cmdRaisePolygon;
+    private javax.swing.JToggleButton cmdJoinPoly;
+    private javax.swing.JToggleButton cmdMoveHandle;
+    private javax.swing.JToggleButton cmdMovePolygon;
+    private javax.swing.JToggleButton cmdNewLinestring;
+    private javax.swing.JToggleButton cmdNewPoint;
+    private javax.swing.JToggleButton cmdNewPolygon;
+    private javax.swing.JToggleButton cmdOrthogonalRectangle;
+    private javax.swing.JToggleButton cmdPan;
+    private javax.swing.JToggleButton cmdRaisePolygon;
     private javax.swing.JButton cmdRedo;
-    private javax.swing.JButton cmdRemoveHandle;
-    private javax.swing.JButton cmdRemovePolygon;
-    private javax.swing.JButton cmdRotatePolygon;
-    private javax.swing.JButton cmdSearchFlurstueck;
+    private javax.swing.JToggleButton cmdRemoveHandle;
+    private javax.swing.JToggleButton cmdRemovePolygon;
+    private javax.swing.JToggleButton cmdRotatePolygon;
+    private javax.swing.JToggleButton cmdSearchFlurstueck;
     private javax.swing.JButton cmdSearchKassenzeichen;
-    private javax.swing.JButton cmdSelect;
-    private javax.swing.JButton cmdSnap;
-    private javax.swing.JButton cmdSplitPoly;
+    private javax.swing.JToggleButton cmdSelect;
+    private javax.swing.JToggleButton cmdSnap;
+    private javax.swing.JToggleButton cmdSplitPoly;
     private javax.swing.JButton cmdUndo;
-    private javax.swing.JButton cmdWmsBackground;
-    private javax.swing.JButton cmdZoom;
+    private javax.swing.JToggleButton cmdWmsBackground;
+    private javax.swing.JToggleButton cmdZoom;
     private javax.swing.ButtonGroup handleGroup;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
@@ -153,7 +154,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     public KartenPanel() {
         initComponents();
-        
+
         ((JPopupMenuButton)cmdSearchKassenzeichen).setPopupMenu(popMenSearch);                
 
         CidsAppBackend.getInstance().setMainMap(mappingComp);
@@ -163,8 +164,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         // mappingComp.putInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA, new AttachFeatureListener());
 
         mappingComp.setBackgroundEnabled(true);
-
-        cmdSelect.setSelected(true);
 
 //        CreateGeometryListener g=new CreateGeometryListener(mappingComp,JLabel.class) {
 //
@@ -269,31 +268,31 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdBack = new JHistoryButton();
         cmdForward = new JHistoryButton();
         jSeparator5 = new javax.swing.JSeparator();
-        cmdWmsBackground = new javax.swing.JButton();
+        cmdWmsBackground = new javax.swing.JToggleButton();
         cmdForeground = new javax.swing.JButton();
-        cmdSnap = new javax.swing.JButton();
+        cmdSnap = new javax.swing.JToggleButton();
         sep2 = new javax.swing.JSeparator();
-        cmdZoom = new javax.swing.JButton();
-        cmdPan = new javax.swing.JButton();
-        cmdSelect = new javax.swing.JButton();
-        cmdALB = new javax.swing.JButton();
-        cmdMovePolygon = new javax.swing.JButton();
-        cmdNewPolygon = new javax.swing.JButton();
-        cmdNewLinestring = new javax.swing.JButton();
-        cmdNewPoint = new javax.swing.JButton();
-        cmdOrthogonalRectangle = new javax.swing.JButton();
-        cmdSearchFlurstueck = new javax.swing.JButton();
+        cmdZoom = new javax.swing.JToggleButton();
+        cmdPan = new javax.swing.JToggleButton();
+        cmdSelect = new javax.swing.JToggleButton();
+        cmdALB = new javax.swing.JToggleButton();
+        cmdMovePolygon = new javax.swing.JToggleButton();
+        cmdNewPolygon = new javax.swing.JToggleButton();
+        cmdNewLinestring = new javax.swing.JToggleButton();
+        cmdNewPoint = new javax.swing.JToggleButton();
+        cmdOrthogonalRectangle = new javax.swing.JToggleButton();
+        cmdSearchFlurstueck = new javax.swing.JToggleButton();
         cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER, mappingComp, null);
-        cmdRaisePolygon = new javax.swing.JButton();
-        cmdRemovePolygon = new javax.swing.JButton();
-        cmdAttachPolyToAlphadata = new javax.swing.JButton();
-        cmdJoinPoly = new javax.swing.JButton();
-        cmdSplitPoly = new javax.swing.JButton();
+        cmdRaisePolygon = new javax.swing.JToggleButton();
+        cmdRemovePolygon = new javax.swing.JToggleButton();
+        cmdAttachPolyToAlphadata = new javax.swing.JToggleButton();
+        cmdJoinPoly = new javax.swing.JToggleButton();
+        cmdSplitPoly = new javax.swing.JToggleButton();
         sep3 = new javax.swing.JSeparator();
-        cmdMoveHandle = new javax.swing.JButton();
-        cmdAddHandle = new javax.swing.JButton();
-        cmdRemoveHandle = new javax.swing.JButton();
-        cmdRotatePolygon = new javax.swing.JButton();
+        cmdMoveHandle = new javax.swing.JToggleButton();
+        cmdAddHandle = new javax.swing.JToggleButton();
+        cmdRemoveHandle = new javax.swing.JToggleButton();
+        cmdRotatePolygon = new javax.swing.JToggleButton();
         sep4 = new javax.swing.JSeparator();
         cmdUndo = new javax.swing.JButton();
         cmdRedo = new javax.swing.JButton();
@@ -312,19 +311,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         searchGroup.add(mniSearchRectangle1);
         mniSearchRectangle1.setSelected(true);
         mniSearchRectangle1.setText("Rechteck");
-        mniSearchRectangle1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/rectangle.png"))); // NOI18N
+        mniSearchRectangle1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rectangleSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchRectangle1);
 
         mniSearchPolygon1.setAction(searchPolygonAction);
         searchGroup.add(mniSearchPolygon1);
         mniSearchPolygon1.setText("Polygon");
-        mniSearchPolygon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/polygon.png"))); // NOI18N
+        mniSearchPolygon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchPolygon1);
 
         mniSearchEllipse1.setAction(searchEllipseAction);
         searchGroup.add(mniSearchEllipse1);
         mniSearchEllipse1.setText("Ellipse / Kreis");
-        mniSearchEllipse1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ellipse.png"))); // NOI18N
+        mniSearchEllipse1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/ellipseSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchEllipse1);
 
         setLayout(new java.awt.BorderLayout());
@@ -414,11 +413,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         tobVerdis.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         tobVerdis.setFloatable(false);
-        tobVerdis.setRollover(true);
 
         cmdFullPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
         cmdFullPoly.setToolTipText("Zeige alle Flächen");
+        cmdFullPoly.setBorderPainted(false);
+        cmdFullPoly.setContentAreaFilled(false);
         cmdFullPoly.setFocusPainted(false);
+        cmdFullPoly.setFocusable(false);
         cmdFullPoly.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdFullPolyActionPerformed(evt);
@@ -428,7 +429,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         cmdFullPoly1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"))); // NOI18N
         cmdFullPoly1.setToolTipText("Zoom zur ausgewählten Fläche");
+        cmdFullPoly1.setBorderPainted(false);
+        cmdFullPoly1.setContentAreaFilled(false);
         cmdFullPoly1.setFocusPainted(false);
+        cmdFullPoly1.setFocusable(false);
         cmdFullPoly1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdFullPoly1ActionPerformed(evt);
@@ -438,10 +442,18 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         cmdBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
         cmdBack.setToolTipText("Zurück");
+        cmdBack.setBorderPainted(false);
+        cmdBack.setContentAreaFilled(false);
+        cmdBack.setFocusPainted(false);
+        cmdBack.setFocusable(false);
         tobVerdis.add(cmdBack);
 
         cmdForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fwd.png"))); // NOI18N
         cmdForward.setToolTipText("Vor");
+        cmdForward.setBorderPainted(false);
+        cmdForward.setContentAreaFilled(false);
+        cmdForward.setFocusPainted(false);
+        cmdForward.setFocusable(false);
         tobVerdis.add(cmdForward);
 
         jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -450,7 +462,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         cmdWmsBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png"))); // NOI18N
         cmdWmsBackground.setToolTipText("Hintergrund an/aus");
+        cmdWmsBackground.setBorderPainted(false);
+        cmdWmsBackground.setContentAreaFilled(false);
         cmdWmsBackground.setFocusPainted(false);
+        cmdWmsBackground.setFocusable(false);
         cmdWmsBackground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
         cmdWmsBackground.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -462,6 +477,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdForeground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png"))); // NOI18N
         cmdForeground.setToolTipText("Vordergrund an/aus");
         cmdForeground.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
+        cmdForeground.setBorderPainted(false);
+        cmdForeground.setContentAreaFilled(false);
+        cmdForeground.setFocusPainted(false);
         cmdForeground.setFocusable(false);
         cmdForeground.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdForeground.setSelected(true);
@@ -475,9 +493,12 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(cmdForeground);
 
         cmdSnap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png"))); // NOI18N
-        cmdSnap.setToolTipText("Snapping an/aus");
-        cmdSnap.setFocusPainted(false);
         cmdSnap.setSelected(true);
+        cmdSnap.setToolTipText("Snapping an/aus");
+        cmdSnap.setBorderPainted(false);
+        cmdSnap.setContentAreaFilled(false);
+        cmdSnap.setFocusPainted(false);
+        cmdSnap.setFocusable(false);
         cmdSnap.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
         cmdSnap.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -490,10 +511,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         sep2.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep2);
 
+        mainGroup.add(cmdZoom);
         cmdZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom.png"))); // NOI18N
         cmdZoom.setToolTipText("Zoomen");
-        mainGroup.add(cmdZoom);
+        cmdZoom.setBorderPainted(false);
+        cmdZoom.setContentAreaFilled(false);
         cmdZoom.setFocusPainted(false);
+        cmdZoom.setFocusable(false);
         cmdZoom.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
         cmdZoom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -502,11 +526,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdZoom);
 
+        mainGroup.add(cmdPan);
         cmdPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2.png"))); // NOI18N
         cmdPan.setToolTipText("Verschieben");
-        mainGroup.add(cmdPan);
+        cmdPan.setBorderPainted(false);
+        cmdPan.setContentAreaFilled(false);
         cmdPan.setFocusPainted(false);
+        cmdPan.setFocusable(false);
         cmdPan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
+        cmdPan.setVerifyInputWhenFocusTarget(false);
         cmdPan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdPanActionPerformed(evt);
@@ -514,11 +542,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdPan);
 
-        cmdSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png"))); // NOI18N
-        cmdSelect.setToolTipText("Auswählen");
         mainGroup.add(cmdSelect);
-        cmdSelect.setFocusPainted(false);
+        cmdSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png"))); // NOI18N
         cmdSelect.setSelected(true);
+        cmdSelect.setToolTipText("Auswählen");
+        cmdSelect.setBorderPainted(false);
+        cmdSelect.setContentAreaFilled(false);
+        cmdSelect.setFocusPainted(false);
+        cmdSelect.setFocusable(false);
         cmdSelect.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
         cmdSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -527,9 +558,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdSelect);
 
+        mainGroup.add(cmdALB);
         cmdALB.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png"))); // NOI18N
         cmdALB.setToolTipText("ALB");
-        mainGroup.add(cmdALB);
+        cmdALB.setBorderPainted(false);
+        cmdALB.setContentAreaFilled(false);
         cmdALB.setFocusPainted(false);
         cmdALB.setFocusable(false);
         cmdALB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -542,10 +575,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdALB);
 
+        mainGroup.add(cmdMovePolygon);
         cmdMovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png"))); // NOI18N
         cmdMovePolygon.setToolTipText("Polygon verschieben");
-        mainGroup.add(cmdMovePolygon);
+        cmdMovePolygon.setBorderPainted(false);
+        cmdMovePolygon.setContentAreaFilled(false);
         cmdMovePolygon.setFocusPainted(false);
+        cmdMovePolygon.setFocusable(false);
         cmdMovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
         cmdMovePolygon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -554,10 +590,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdMovePolygon);
 
+        mainGroup.add(cmdNewPolygon);
         cmdNewPolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png"))); // NOI18N
         cmdNewPolygon.setToolTipText("neues Polygon");
-        mainGroup.add(cmdNewPolygon);
+        cmdNewPolygon.setBorderPainted(false);
+        cmdNewPolygon.setContentAreaFilled(false);
         cmdNewPolygon.setFocusPainted(false);
+        cmdNewPolygon.setFocusable(false);
         cmdNewPolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
         cmdNewPolygon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -566,9 +605,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdNewPolygon);
 
+        mainGroup.add(cmdNewLinestring);
         cmdNewLinestring.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newLine.png"))); // NOI18N
         cmdNewLinestring.setToolTipText("neue Linie");
-        mainGroup.add(cmdNewLinestring);
+        cmdNewLinestring.setBorderPainted(false);
+        cmdNewLinestring.setContentAreaFilled(false);
         cmdNewLinestring.setFocusPainted(false);
         cmdNewLinestring.setFocusable(false);
         cmdNewLinestring.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -581,10 +622,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdNewLinestring);
 
+        mainGroup.add(cmdNewPoint);
         cmdNewPoint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint.png"))); // NOI18N
         cmdNewPoint.setToolTipText("neuer Punkt");
-        mainGroup.add(cmdNewPoint);
+        cmdNewPoint.setBorderPainted(false);
+        cmdNewPoint.setContentAreaFilled(false);
         cmdNewPoint.setFocusPainted(false);
+        cmdNewPoint.setFocusable(false);
         cmdNewPoint.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
         cmdNewPoint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -593,9 +637,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdNewPoint);
 
+        mainGroup.add(cmdOrthogonalRectangle);
         cmdOrthogonalRectangle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck.png"))); // NOI18N
         cmdOrthogonalRectangle.setToolTipText("Rechteckige Fläche");
-        mainGroup.add(cmdOrthogonalRectangle);
+        cmdOrthogonalRectangle.setBorderPainted(false);
+        cmdOrthogonalRectangle.setContentAreaFilled(false);
         cmdOrthogonalRectangle.setFocusPainted(false);
         cmdOrthogonalRectangle.setFocusable(false);
         cmdOrthogonalRectangle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -610,9 +656,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdOrthogonalRectangle);
 
+        mainGroup.add(cmdSearchFlurstueck);
         cmdSearchFlurstueck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png"))); // NOI18N
         cmdSearchFlurstueck.setToolTipText("Alkis Renderer");
-        mainGroup.add(cmdSearchFlurstueck);
+        cmdSearchFlurstueck.setBorderPainted(false);
+        cmdSearchFlurstueck.setContentAreaFilled(false);
         cmdSearchFlurstueck.setFocusPainted(false);
         cmdSearchFlurstueck.setFocusable(false);
         cmdSearchFlurstueck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -628,12 +676,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(cmdSearchFlurstueck);
 
         cmdSearchKassenzeichen.setAction(searchAction);
-        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/pluginSearchRectangle.png"))); // NOI18N
-        cmdSearchKassenzeichen.setToolTipText("Meta-Search");
+        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
+        cmdSearchKassenzeichen.setToolTipText("Kassenzeichen-Suche");
+        cmdSearchKassenzeichen.setBorderPainted(false);
         mainGroup.add(cmdSearchKassenzeichen);
+        cmdSearchKassenzeichen.setContentAreaFilled(false);
         cmdSearchKassenzeichen.setFocusPainted(false);
         cmdSearchKassenzeichen.setFocusable(false);
         cmdSearchKassenzeichen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"))); // NOI18N
         cmdSearchKassenzeichen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -644,10 +695,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             tobVerdis.add(cmdSearchKassenzeichen);
         }
 
+        mainGroup.add(cmdRaisePolygon);
         cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
         cmdRaisePolygon.setToolTipText("Polygon hochholen");
-        mainGroup.add(cmdRaisePolygon);
+        cmdRaisePolygon.setBorderPainted(false);
+        cmdRaisePolygon.setContentAreaFilled(false);
         cmdRaisePolygon.setFocusPainted(false);
+        cmdRaisePolygon.setFocusable(false);
         cmdRaisePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
         cmdRaisePolygon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -656,10 +710,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdRaisePolygon);
 
+        mainGroup.add(cmdRemovePolygon);
         cmdRemovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png"))); // NOI18N
         cmdRemovePolygon.setToolTipText("Polygon entfernen");
-        mainGroup.add(cmdRemovePolygon);
+        cmdRemovePolygon.setBorderPainted(false);
+        cmdRemovePolygon.setContentAreaFilled(false);
         cmdRemovePolygon.setFocusPainted(false);
+        cmdRemovePolygon.setFocusable(false);
         cmdRemovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
         cmdRemovePolygon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -668,10 +725,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdRemovePolygon);
 
+        mainGroup.add(cmdAttachPolyToAlphadata);
         cmdAttachPolyToAlphadata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment.png"))); // NOI18N
         cmdAttachPolyToAlphadata.setToolTipText("Polygon zuordnen");
-        mainGroup.add(cmdAttachPolyToAlphadata);
+        cmdAttachPolyToAlphadata.setBorderPainted(false);
+        cmdAttachPolyToAlphadata.setContentAreaFilled(false);
         cmdAttachPolyToAlphadata.setFocusPainted(false);
+        cmdAttachPolyToAlphadata.setFocusable(false);
         cmdAttachPolyToAlphadata.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
         cmdAttachPolyToAlphadata.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -680,10 +740,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdAttachPolyToAlphadata);
 
+        mainGroup.add(cmdJoinPoly);
         cmdJoinPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly.png"))); // NOI18N
         cmdJoinPoly.setToolTipText("Polygone zusammenfassen");
-        mainGroup.add(cmdJoinPoly);
+        cmdJoinPoly.setBorderPainted(false);
+        cmdJoinPoly.setContentAreaFilled(false);
         cmdJoinPoly.setFocusPainted(false);
+        cmdJoinPoly.setFocusable(false);
         cmdJoinPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
         cmdJoinPoly.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -692,10 +755,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdJoinPoly);
 
+        mainGroup.add(cmdSplitPoly);
         cmdSplitPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png"))); // NOI18N
         cmdSplitPoly.setToolTipText("Polygon splitten");
-        mainGroup.add(cmdSplitPoly);
+        cmdSplitPoly.setBorderPainted(false);
+        cmdSplitPoly.setContentAreaFilled(false);
         cmdSplitPoly.setFocusPainted(false);
+        cmdSplitPoly.setFocusable(false);
         cmdSplitPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
         cmdSplitPoly.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -708,11 +774,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         sep3.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep3);
 
-        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png"))); // NOI18N
-        cmdMoveHandle.setToolTipText("Handle verschieben");
         handleGroup.add(cmdMoveHandle);
-        cmdMoveHandle.setFocusPainted(false);
+        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png"))); // NOI18N
         cmdMoveHandle.setSelected(true);
+        cmdMoveHandle.setToolTipText("Handle verschieben");
+        cmdMoveHandle.setBorderPainted(false);
+        cmdMoveHandle.setContentAreaFilled(false);
+        cmdMoveHandle.setFocusPainted(false);
+        cmdMoveHandle.setFocusable(false);
         cmdMoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
         cmdMoveHandle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -721,10 +790,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdMoveHandle);
 
+        handleGroup.add(cmdAddHandle);
         cmdAddHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle.png"))); // NOI18N
         cmdAddHandle.setToolTipText("Handle hinzufügen");
-        handleGroup.add(cmdAddHandle);
+        cmdAddHandle.setBorderPainted(false);
+        cmdAddHandle.setContentAreaFilled(false);
         cmdAddHandle.setFocusPainted(false);
+        cmdAddHandle.setFocusable(false);
         cmdAddHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
         cmdAddHandle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -733,10 +805,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdAddHandle);
 
+        handleGroup.add(cmdRemoveHandle);
         cmdRemoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle.png"))); // NOI18N
         cmdRemoveHandle.setToolTipText("Handle entfernen");
-        handleGroup.add(cmdRemoveHandle);
+        cmdRemoveHandle.setBorderPainted(false);
+        cmdRemoveHandle.setContentAreaFilled(false);
         cmdRemoveHandle.setFocusPainted(false);
+        cmdRemoveHandle.setFocusable(false);
         cmdRemoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
         cmdRemoveHandle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -745,10 +820,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         });
         tobVerdis.add(cmdRemoveHandle);
 
+        handleGroup.add(cmdRotatePolygon);
         cmdRotatePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png"))); // NOI18N
         cmdRotatePolygon.setToolTipText("Rotiere Polygon");
-        handleGroup.add(cmdRotatePolygon);
+        cmdRotatePolygon.setBorderPainted(false);
+        cmdRotatePolygon.setContentAreaFilled(false);
         cmdRotatePolygon.setFocusPainted(false);
+        cmdRotatePolygon.setFocusable(false);
         cmdRotatePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
         cmdRotatePolygon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -763,8 +841,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         cmdUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
         cmdUndo.setToolTipText("Undo");
+        cmdUndo.setBorderPainted(false);
+        cmdUndo.setContentAreaFilled(false);
         cmdUndo.setEnabled(false);
         cmdUndo.setFocusPainted(false);
+        cmdUndo.setFocusable(false);
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -774,7 +855,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(cmdUndo);
 
         cmdRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
+        cmdRedo.setBorderPainted(false);
+        cmdRedo.setContentAreaFilled(false);
         cmdRedo.setEnabled(false);
+        cmdRedo.setFocusPainted(false);
         cmdRedo.setFocusable(false);
         cmdRedo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdRedo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -869,9 +953,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSnapActionPerformed
-        cmdSnap.setSelected(!cmdSnap.isSelected());
-        // cismapPrefs.getGlobalPrefs().setSnappingEnabled(cmdSnap.isSelected());
-        // cismapPrefs.getGlobalPrefs().setSnappingPreviewEnabled(cmdSnap.isSelected());
         mappingComp.setSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
@@ -882,169 +963,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdZoomActionPerformed
-        removeMainGroupSelection();
-        cmdZoom.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.ZOOM);
-    }//GEN-LAST:event_cmdZoomActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdPanActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPanActionPerformed
-        removeMainGroupSelection();
-        cmdPan.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.PAN);
-    }//GEN-LAST:event_cmdPanActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSelectActionPerformed
-        removeMainGroupSelection();
-        cmdSelect.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.SELECT);
-        cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSelectActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdALBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdALBActionPerformed
-        removeMainGroupSelection();
-        cmdALB.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
-    }//GEN-LAST:event_cmdALBActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdMovePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMovePolygonActionPerformed
-        removeMainGroupSelection();
-        cmdMovePolygon.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.MOVE_POLYGON);
-    }//GEN-LAST:event_cmdMovePolygonActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdNewPolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPolygonActionPerformed
-        // final boolean snapEnab = cismapPrefs.getGlobalPrefs().isSnappingEnabled();
-        // final boolean snapVizEnab = cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
-        // mappingComp.setSnappingEnabled(snapEnab);
-        // mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
-        removeMainGroupSelection();
-        cmdNewPolygon.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(PureNewFeature.class);
-    }//GEN-LAST:event_cmdNewPolygonActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdNewPointActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPointActionPerformed
-        // final boolean snapEnab = cismapPrefs.getGlobalPrefs().isSnappingEnabled();
-        // final boolean snapVizEnab = cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
-        // mappingComp.setSnappingEnabled(snapEnab);
-        // mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
-        removeMainGroupSelection();
-        cmdNewPoint.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.POINT);
-    }//GEN-LAST:event_cmdNewPointActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdOrthogonalRectangleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
-        removeMainGroupSelection();
-        cmdOrthogonalRectangle.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.RECTANGLE_FROM_LINE);
-    }//GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdRaisePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRaisePolygonActionPerformed
-        removeMainGroupSelection();
-        cmdRaisePolygon.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.RAISE_POLYGON);
-    }//GEN-LAST:event_cmdRaisePolygonActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdRemovePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemovePolygonActionPerformed
-        removeMainGroupSelection();
-        cmdRemovePolygon.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.REMOVE_POLYGON);
-    }//GEN-LAST:event_cmdRemovePolygonActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
-        removeMainGroupSelection();
-        cmdAttachPolyToAlphadata.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
-    }//GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdJoinPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdJoinPolyActionPerformed
-        removeMainGroupSelection();
-        cmdJoinPoly.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.JOIN_POLYGONS);
-    }//GEN-LAST:event_cmdJoinPolyActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSplitPolyActionPerformed
-        removeMainGroupSelection();
-        cmdSplitPoly.setSelected(true);
-        mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
-        cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSplitPolyActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
     private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMoveHandleActionPerformed
-        removeHandleGroupSelection();
-        cmdMoveHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.MOVE_HANDLE);
     }//GEN-LAST:event_cmdMoveHandleActionPerformed
 
@@ -1054,8 +973,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddHandleActionPerformed
-        removeHandleGroupSelection();
-        cmdAddHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
     }//GEN-LAST:event_cmdAddHandleActionPerformed
 
@@ -1065,8 +982,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveHandleActionPerformed
-        removeHandleGroupSelection();
-        cmdRemoveHandle.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.REMOVE_HANDLE);
     }//GEN-LAST:event_cmdRemoveHandleActionPerformed
 
@@ -1076,8 +991,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRotatePolygonActionPerformed
-        removeHandleGroupSelection();
-        cmdRotatePolygon.setSelected(true);
         mappingComp.setHandleInteractionMode(MappingComponent.ROTATE_POLYGON);
     }//GEN-LAST:event_cmdRotatePolygonActionPerformed
 
@@ -1129,18 +1042,122 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
     }//GEN-LAST:event_cmdRedoActionPerformed
 
+    private void popMenSearchPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
+    }//GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
+
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewLinestringActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewLinestringActionPerformed
-        // final boolean snapEnab = cismapPrefs.getGlobalPrefs().isSnappingEnabled();
-        // final boolean snapVizEnab = cismapPrefs.getGlobalPrefs().isSnappingPreviewEnabled();
-        // mappingComp.setSnappingEnabled(snapEnab);
-        // mappingComp.setVisualizeSnappingEnabled(snapVizEnab);
-        removeMainGroupSelection();
-        cmdNewLinestring.setSelected(true);
+    private void cmdSplitPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSplitPolyActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
+        cmdMoveHandleActionPerformed(null);
+    }//GEN-LAST:event_cmdSplitPolyActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdJoinPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdJoinPolyActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.JOIN_POLYGONS);
+    }//GEN-LAST:event_cmdJoinPolyActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAttachPolyToAlphadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
+    }//GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRemovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemovePolygonActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.REMOVE_POLYGON);
+    }//GEN-LAST:event_cmdRemovePolygonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRaisePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRaisePolygonActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.RAISE_POLYGON);
+    }//GEN-LAST:event_cmdRaisePolygonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdNewPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPointActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
+        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+                CreateGeometryListener.POINT);
+    }//GEN-LAST:event_cmdNewPointActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPanActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.PAN);
+    }//GEN-LAST:event_cmdPanActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSelectActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SELECT);
+        cmdMoveHandleActionPerformed(null);
+    }//GEN-LAST:event_cmdSelectActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdALBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdALBActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
+        cmdALB.isSelected();
+    }//GEN-LAST:event_cmdALBActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdMovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMovePolygonActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.MOVE_POLYGON);
+    }//GEN-LAST:event_cmdMovePolygonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdNewPolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPolygonActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
+        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+                CreateGeometryListener.POLYGON);
+        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(PureNewFeature.class);
+    }//GEN-LAST:event_cmdNewPolygonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdNewLinestringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewLinestringActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
         ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
                 CreateGeometryListener.LINESTRING);
@@ -1148,49 +1165,33 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 PureNewFeatureWithThickerLineString.class);
     }//GEN-LAST:event_cmdNewLinestringActionPerformed
 
-    private void cmdSearchFlurstueckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
-        removeMainGroupSelection();
-        cmdSearchFlurstueck.setSelected(true);
-        mappingComp.setInteractionMode(Main.FLURSTUECK_SEARCH_GEOMETRY_LISTENER);
-}//GEN-LAST:event_cmdSearchFlurstueckActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdOrthogonalRectangleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
+        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+                CreateGeometryListener.RECTANGLE_FROM_LINE);
+    }//GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
 
-    private void popMenSearchPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
-    }//GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
+    private void cmdSearchFlurstueckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
+        mappingComp.setInteractionMode(Main.FLURSTUECK_SEARCH_GEOMETRY_LISTENER);
+    }//GEN-LAST:event_cmdSearchFlurstueckActionPerformed
 
     private void cmdSearchKassenzeichenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
-    }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
+
+   }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
      */
-    private void removeMainGroupSelection() {
-        cmdSelect.setSelected(false);
-        cmdPan.setSelected(false);
-        cmdZoom.setSelected(false);
-        cmdMovePolygon.setSelected(false);
-        cmdNewPolygon.setSelected(false);
-        cmdNewLinestring.setSelected(false);
-        cmdNewPoint.setSelected(false);
-        cmdOrthogonalRectangle.setSelected(false);
-        cmdRemovePolygon.setSelected(false);
-        cmdAttachPolyToAlphadata.setSelected(false);
-        cmdSplitPoly.setSelected(false);
-        cmdJoinPoly.setSelected(false);
-        cmdRaisePolygon.setSelected(false);
-        cmdALB.setSelected(false);
-        cmdSearchFlurstueck.setSelected(false);
-        cmdSearchKassenzeichen.setSelected(false);
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void removeHandleGroupSelection() {
-        cmdRemoveHandle.setSelected(false);
-        cmdAddHandle.setSelected(false);
-        cmdMoveHandle.setSelected(false);
-        cmdRotatePolygon.setSelected(false);
-    }
+    private void cmdZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdZoomActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.ZOOM);
+    }//GEN-LAST:event_cmdZoomActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1393,9 +1394,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     @Override
     public void setEnabled(final boolean b) {
         this.cmdMovePolygon.setVisible(b);
-//        this.cmdNewPolygon.setVisible(b);
-//        this.cmdNewLinestring.setVisible(b);
-//        this.cmdNewPoint.setVisible(b);
         this.cmdRemovePolygon.setVisible(b);
         this.cmdAttachPolyToAlphadata.setVisible(b);
         this.cmdJoinPoly.setVisible(b);
@@ -1721,7 +1719,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     }
 
     public void changeSelectedButtonAccordingToInteractionMode() {
-        removeMainGroupSelection();
         final String im = mappingComp.getInteractionMode();
         if (LOG.isDebugEnabled()) {
             LOG.debug("changeSelectedButtonAccordingToInteractionMode: " + mappingComp.getInteractionMode(),
@@ -1847,16 +1844,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
 
                                         if (mniSearchRectangle1.isSelected()) {
-                                            cmdSearchKassenzeichen.setSelected(true);
+                                            mainGroup.clearSelection();
+                                            cmdSearchKassenzeichen.setSelected(true);                                            
                                             ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
                                                     Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
                                                 CreateGeometryListener.RECTANGLE);
                                         } else if (mniSearchPolygon1.isSelected()) {
+                                            mainGroup.clearSelection();
                                             cmdSearchKassenzeichen.setSelected(true);
                                             ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
                                                     Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
                                                 CreateGeometryListener.POLYGON);
                                         } else if (mniSearchEllipse1.isSelected()) {
+                                            mainGroup.clearSelection();
                                             cmdSearchKassenzeichen.setSelected(true);
                                             ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
                                                     Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
@@ -1881,20 +1881,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("searchRectangleAction");                                                      // NOI18N
                             }
-                            cmdSearchKassenzeichen.setSelected(true);
-                            mniSearchRectangle1.setSelected(true);
-                            cmdSearchKassenzeichen.setIcon(
-                                new javax.swing.ImageIcon(getClass().getResource("/images/pluginSearchRectangle.png"))); // NOI18N
+                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"))); // NOI18N
+
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);                                            
+                            
                             EventQueue.invokeLater(new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                            ServerSearchCreateSearchGeometryListener.RECTANGLE);
-                                    }
-                                });
+                                @Override
+                                public void run() {
+                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                        ServerSearchCreateSearchGeometryListener.RECTANGLE);
+                                }
+                            });
                         }
                     });
             }
@@ -1911,20 +1913,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("searchPolygonAction");                                                      // NOI18N
                             }
-                            cmdSearchKassenzeichen.setSelected(true);
-                            mniSearchPolygon1.setSelected(true);
-                            cmdSearchKassenzeichen.setIcon(
-                                new javax.swing.ImageIcon(getClass().getResource("/images/pluginSearchPolygon.png"))); // NOI18N
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);                                            
+                            
+                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon.png"))); // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon_selected.png"))); // NOI18N
+                            
                             EventQueue.invokeLater(new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                            ServerSearchCreateSearchGeometryListener.POLYGON);
-                                    }
-                                });
+                                @Override
+                                public void run() {
+                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                        ServerSearchCreateSearchGeometryListener.POLYGON);
+                                }
+                            });
                         }
                     });
             }
@@ -1941,20 +1945,23 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("searchEllipseAction");                                                      // NOI18N
                             }
-                            cmdSearchKassenzeichen.setSelected(true);
-                            mniSearchEllipse1.setSelected(true);
-                            cmdSearchKassenzeichen.setIcon(
-                            new javax.swing.ImageIcon(getClass().getResource("/images/pluginSearchEllipse.png"))); // NOI18N
-                                EventQueue.invokeLater(new Runnable() {
+                            
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);                                            
+                            
+                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse.png"))); // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse_selected.png"))); // NOI18N
 
-                                    @Override
-                                    public void run() {
-                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                            ServerSearchCreateSearchGeometryListener.ELLIPSE);
-                                    }
-                                });
+                            EventQueue.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                        ServerSearchCreateSearchGeometryListener.ELLIPSE);
+                                }
+                            });
                         }
                     });
             }

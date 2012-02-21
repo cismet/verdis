@@ -28,7 +28,7 @@
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Rechteck"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/rectangle.png"/>
+              <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/rectangleSearch.png"/>
             </Property>
           </Properties>
         </MenuItem>
@@ -42,7 +42,7 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Polygon"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/polygon.png"/>
+              <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/polygonSearch.png"/>
             </Property>
           </Properties>
         </MenuItem>
@@ -56,7 +56,7 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Ellipse / Kreis"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/ellipse.png"/>
+              <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/ellipseSearch.png"/>
             </Property>
           </Properties>
         </MenuItem>
@@ -265,7 +265,6 @@
               </Border>
             </Property>
             <Property name="floatable" type="boolean" value="false"/>
-            <Property name="rollover" type="boolean" value="true"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
@@ -281,7 +280,10 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fullPoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Zeige alle Fl&#xe4;chen"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdFullPolyActionPerformed"/>
@@ -293,7 +295,10 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Zoom zur ausgew&#xe4;hlten Fl&#xe4;che"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdFullPoly1ActionPerformed"/>
@@ -305,9 +310,13 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/back.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Zur&#xfc;ck"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JHistoryButton();"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JHistoryButton()"/>
               </AuxValues>
             </Component>
             <Component class="javax.swing.JButton" name="cmdForward">
@@ -316,9 +325,13 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fwd.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Vor"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JHistoryButton();"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JHistoryButton()"/>
               </AuxValues>
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator5">
@@ -329,13 +342,16 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdWmsBackground">
+            <Component class="javax.swing.JToggleButton" name="cmdWmsBackground">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/map.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Hintergrund an/aus"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/map_on.png"/>
                 </Property>
@@ -355,6 +371,9 @@
                     <EmptyBorder bottom="1" left="3" right="3" top="1"/>
                   </Border>
                 </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="selected" type="boolean" value="true"/>
@@ -367,14 +386,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdForegroundActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdSnap">
+            <Component class="javax.swing.JToggleButton" name="cmdSnap">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/snap.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Snapping an/aus"/>
-                <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="selected" type="boolean" value="true"/>
+                <Property name="toolTipText" type="java.lang.String" value="Snapping an/aus"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/snap_selected.png"/>
                 </Property>
@@ -391,16 +413,19 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdZoom">
+            <Component class="javax.swing.JToggleButton" name="cmdZoom">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/zoom.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Zoomen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/zoom_selected.png"/>
                 </Property>
@@ -409,35 +434,42 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdZoomActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdPan">
+            <Component class="javax.swing.JToggleButton" name="cmdPan">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/move2.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Verschieben"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/move2_selected.png"/>
                 </Property>
+                <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdPanActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdSelect">
+            <Component class="javax.swing.JToggleButton" name="cmdSelect">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/select.png"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Ausw&#xe4;hlen"/>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="mainGroup"/>
                 </Property>
-                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/select.png"/>
+                </Property>
                 <Property name="selected" type="boolean" value="true"/>
+                <Property name="toolTipText" type="java.lang.String" value="Ausw&#xe4;hlen"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/select_selected.png"/>
                 </Property>
@@ -446,15 +478,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSelectActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdALB">
+            <Component class="javax.swing.JToggleButton" name="cmdALB">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/alb.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="ALB"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -467,16 +501,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdALBActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdMovePolygon">
+            <Component class="javax.swing.JToggleButton" name="cmdMovePolygon">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/movePoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygon verschieben"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"/>
                 </Property>
@@ -485,16 +522,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdMovePolygonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdNewPolygon">
+            <Component class="javax.swing.JToggleButton" name="cmdNewPolygon">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/newPoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="neues Polygon"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"/>
                 </Property>
@@ -503,15 +543,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdNewPolygonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdNewLinestring">
+            <Component class="javax.swing.JToggleButton" name="cmdNewLinestring">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/newLine.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="neue Linie"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -524,16 +566,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdNewLinestringActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdNewPoint">
+            <Component class="javax.swing.JToggleButton" name="cmdNewPoint">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/newPoint.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="neuer Punkt"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"/>
                 </Property>
@@ -542,15 +587,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdNewPointActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdOrthogonalRectangle">
+            <Component class="javax.swing.JToggleButton" name="cmdOrthogonalRectangle">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/rechtwDreieck.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Rechteckige Fl&#xe4;che"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -569,15 +616,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdOrthogonalRectangleActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdSearchFlurstueck">
+            <Component class="javax.swing.JToggleButton" name="cmdSearchFlurstueck">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/alk.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Alkis Renderer"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -602,15 +651,20 @@
                   <Connection code="searchAction" type="code"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/pluginSearchRectangle.png"/>
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Meta-Search"/>
+                <Property name="toolTipText" type="java.lang.String" value="Kassenzeichen-Suche"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="mainGroup"/>
                 </Property>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"/>
+                </Property>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
@@ -622,16 +676,19 @@
                 <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="if (StaticDebuggingTools.checkHomeForFile(&quot;cismetVerdisTest&quot;)) {"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdRaisePolygon">
+            <Component class="javax.swing.JToggleButton" name="cmdRaisePolygon">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/raisePoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygon hochholen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"/>
                 </Property>
@@ -640,16 +697,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdRaisePolygonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdRemovePolygon">
+            <Component class="javax.swing.JToggleButton" name="cmdRemovePolygon">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/removePoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygon entfernen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"/>
                 </Property>
@@ -658,16 +718,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdRemovePolygonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdAttachPolyToAlphadata">
+            <Component class="javax.swing.JToggleButton" name="cmdAttachPolyToAlphadata">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/polygonAttachment.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygon zuordnen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"/>
                 </Property>
@@ -676,16 +739,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdAttachPolyToAlphadataActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdJoinPoly">
+            <Component class="javax.swing.JToggleButton" name="cmdJoinPoly">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/joinPoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygone zusammenfassen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"/>
                 </Property>
@@ -694,16 +760,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdJoinPolyActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdSplitPoly">
+            <Component class="javax.swing.JToggleButton" name="cmdSplitPoly">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="mainGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/splitPoly.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Polygon splitten"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="mainGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"/>
                 </Property>
@@ -720,17 +789,20 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdMoveHandle">
+            <Component class="javax.swing.JToggleButton" name="cmdMoveHandle">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/moveHandle.png"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Handle verschieben"/>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="handleGroup"/>
                 </Property>
-                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/moveHandle.png"/>
+                </Property>
                 <Property name="selected" type="boolean" value="true"/>
+                <Property name="toolTipText" type="java.lang.String" value="Handle verschieben"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"/>
                 </Property>
@@ -739,16 +811,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdMoveHandleActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdAddHandle">
+            <Component class="javax.swing.JToggleButton" name="cmdAddHandle">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="handleGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/addHandle.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Handle hinzuf&#xfc;gen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="handleGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"/>
                 </Property>
@@ -757,16 +832,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdAddHandleActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdRemoveHandle">
+            <Component class="javax.swing.JToggleButton" name="cmdRemoveHandle">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="handleGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/removeHandle.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Handle entfernen"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="handleGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"/>
                 </Property>
@@ -775,16 +853,19 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdRemoveHandleActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdRotatePolygon">
+            <Component class="javax.swing.JToggleButton" name="cmdRotatePolygon">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="handleGroup"/>
+                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/rotate16.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Rotiere Polygon"/>
-                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="handleGroup"/>
-                </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"/>
                 </Property>
@@ -807,8 +888,11 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/undo.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Undo"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
@@ -820,7 +904,10 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/redo.png"/>
                 </Property>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
                 <Property name="enabled" type="boolean" value="false"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
