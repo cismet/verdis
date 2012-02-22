@@ -28,8 +28,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 
 /**
@@ -43,52 +42,92 @@ public class KassenzeichenGeomSearch extends GeomServerSearch {
     @Override
     public Collection performServerSearch() {
         final Geometry searchGeometry = getGeometry();
+        
         if (searchGeometry != null) {
-            try {            
-                final String sql = "SELECT " +
+                final String sqlKassenzeichenGeom = "SELECT " +
+                    "    DISTINCT " + VerdisMetaClassConstants.MC_KASSENZEICHEN + "." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " AS kassenzeichennumer " + 
+                    "FROM " +
+                    "    " + VerdisMetaClassConstants.MC_KASSENZEICHEN + " AS kassenzeichen, " +
+                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom " +
+                    "WHERE " +                        
+                    "    kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IS NOT NULL AND " +
+                    "    geom.id = kassenzeichen.geometrie AND " +
+                    "    ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom.geo_field) " +            
+                    "    ORDER BY kassenzeichennumer ASC;";
+
+                final String sqlFlaechenGeom = "SELECT " +
                     "    DISTINCT " + VerdisMetaClassConstants.MC_KASSENZEICHEN + "." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " AS kassenzeichennumer " + 
                     "FROM " +
                     "    " + VerdisMetaClassConstants.MC_KASSENZEICHEN + " AS kassenzeichen, " +
                     "    flaechen AS flaechen, " +
                     "    " + VerdisMetaClassConstants.MC_FLAECHE + " AS flaeche, " +
                     "    " + VerdisMetaClassConstants.MC_FLAECHENINFO + " AS flaecheninfo, " +
+                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom " +
+                    "WHERE " +                        
+                    "    kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IS NOT NULL AND " +
+                    "    flaechen.kassenzeichen_reference = kassenzeichen.id AND " +
+                    "    flaechen.flaeche = flaeche.id AND " +
+                    "    flaeche.flaecheninfo = flaecheninfo.id AND " +
+                    "    geom.id = flaecheninfo.geometrie AND " +
+                    "    ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom.geo_field) " +            
+                    "    ORDER BY kassenzeichennumer ASC;";
+                
+                final String sqlFrontenGeom = "SELECT " +
+                    "    DISTINCT " + VerdisMetaClassConstants.MC_KASSENZEICHEN + "." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " AS kassenzeichennumer " + 
+                    "FROM " +
+                    "    " + VerdisMetaClassConstants.MC_KASSENZEICHEN + " AS kassenzeichen, " +
                     "    fronten AS fronten, " +
                     "    " + VerdisMetaClassConstants.MC_FRONTINFO + " AS frontinfo, " +
-                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom_kz, " +
-                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom_fl, " +
-                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom_fr " +
+                    "    " + VerdisMetaClassConstants.MC_GEOM + " AS geom " +
                     "WHERE " +                        
                     "    kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IS NOT NULL AND " +
                     "    fronten.kassenzeichen_reference = kassenzeichen.id AND " +
                     "    fronten.frontinfo = frontinfo.id AND " +
-                    "    flaechen.kassenzeichen_reference = kassenzeichen.id AND " +
-                    "    flaechen.flaeche = flaeche.id AND " +
-                    "    flaeche.flaecheninfo = flaecheninfo.id AND " +
-                    "    geom_kz.id = kassenzeichen.geometrie AND " +
-                    "    geom_fl.id = flaecheninfo.geometrie AND " +
-                    "    geom_fr.id = frontinfo.geometrie AND (	 " +
-                    "        ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom_kz.geo_field) OR " +            
-                    "        ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom_fr.geo_field) OR " +            
-                    "        ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom_fl.geo_field) " +            
-                    "    ) " +            
+                    "    geom.id = frontinfo.geometrie AND  " +
+                    "    ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom.geo_field) " +            
                     "    ORDER BY kassenzeichennumer ASC;";
-
-                getLog().debug(sql);
+                
                 final MetaService metaService = (MetaService) getActiveLoaclServers().get(CidsAppBackend.DOMAIN);
-                final ArrayList<ArrayList> result = metaService.performCustomSearch(sql);
-
-                final ArrayList<Integer> ids = new ArrayList<Integer>();
-                for (final ArrayList fields : result) {
-                    ids.add((Integer)fields.get(0));
+                
+                // ids der kassenzeichen sammeln
+                final Set<Integer> idSet = new HashSet<Integer>();
+                
+                getLog().debug(sqlKassenzeichenGeom);
+                try {
+                    for (final ArrayList fields : metaService.performCustomSearch(sqlKassenzeichenGeom)) {
+                        idSet.add((Integer) fields.get(0));
+                    }
+                } catch (Exception ex) {
+                    getLog().error("problem during kassenzeichen geom search", ex);
                 }
-                return ids;
-            } catch (Exception ex) {
-                getLog().error("problem during kassenzeichen geom search", ex);
-                return null;
-            }
+                
+                getLog().debug(sqlFlaechenGeom);
+                try {
+                    for (final ArrayList fields : metaService.performCustomSearch(sqlFlaechenGeom)) {
+                        idSet.add((Integer) fields.get(0));
+                    }
+                } catch (Exception ex) {
+                    getLog().error("problem during flaechen geom search", ex);
+                }
+                
+                getLog().debug(sqlFrontenGeom);
+                try {
+                    for (final ArrayList fields : metaService.performCustomSearch(sqlFrontenGeom)) {
+                        idSet.add((Integer) fields.get(0));
+                    }
+                } catch (Exception ex) {
+                    getLog().error("problem during fronten geom search", ex);
+                }
+                
+                // ids der Kassenzeichen sortieren
+                final List<Integer> sortedIdList = Arrays.asList(idSet.toArray(new Integer[0]));
+                Collections.sort(sortedIdList);
+                                
+                //
+                return sortedIdList;
         } else {
             getLog().info("searchGeometry is null, geom search is not possible");
-            return null;
         }
+        return null;
     }
 }
