@@ -52,7 +52,8 @@ public class KassenzeichenGeomSearch extends GeomServerSearch {
                     "WHERE " +                        
                     "    kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IS NOT NULL AND " +
                     "    geom.id = kassenzeichen.geometrie AND " +
-                    "    ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom.geo_field) " +            
+                    "    ST_Intersects(GeomFromText('" + searchGeometry.toText() + "', " + searchGeometry.getSRID() + "), geom.geo_field) AND " +            
+                    "    GeometryType(geom.geo_field) = 'POINT' " +            
                     "    ORDER BY kassenzeichennumer ASC;";
 
                 final String sqlFlaechenGeom = "SELECT " +
