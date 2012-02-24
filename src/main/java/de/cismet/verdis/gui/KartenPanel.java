@@ -691,9 +691,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 cmdSearchKassenzeichenActionPerformed(evt);
             }
         });
-        if (StaticDebuggingTools.checkHomeForFile("cismetVerdisTest")) {
-            tobVerdis.add(cmdSearchKassenzeichen);
-        }
+        tobVerdis.add(cmdSearchKassenzeichen);
 
         mainGroup.add(cmdRaisePolygon);
         cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
