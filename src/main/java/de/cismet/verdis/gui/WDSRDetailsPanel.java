@@ -118,12 +118,6 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         ((DefaultBindableReferenceCombo) cboReinigungsklasse).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG));
         ((DefaultBindableReferenceCombo) cboWinterdienstPrio).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_WINTERDIENST));
         
-        final boolean isDeveloper = StaticDebuggingTools.checkHomeForFile("cismetVerdisTest");
-        labLageSr.setVisible(isDeveloper);
-        cbLageSr.setVisible(isDeveloper);
-        labLageWd.setVisible(isDeveloper);
-        cbLageWd.setVisible(isDeveloper);
-        
         cbLageSr.setRenderer(new SatzungsComboBoxRenderer("manuelle Auswahl der Straßenreinigung"));
         cbLageWd.setRenderer(new SatzungsComboBoxRenderer("manuelle Auswahl des Winterdienstes"));
     }
