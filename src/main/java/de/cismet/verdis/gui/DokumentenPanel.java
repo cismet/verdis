@@ -104,8 +104,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
             final Collection<CidsBean> urls = (Collection)kassenzeichenBean.getProperty("dms_urls");
 
             for (final CidsBean url : urls) {
-                // easy-Archiv (typ = 0) ausschließen
-                if (url.getProperty("typ") == null || (Integer) url.getProperty("typ") == 1) {
+                if (url.getProperty("typ") == null || (Integer) url.getProperty("typ") <= 1) {
                     addNewDocPanel(ac, url);
                 }
             }
@@ -123,7 +122,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
     public DocPanel addNewDocPanel(final AppletContext ac, final CidsBean cb) {
         final String name = (String)cb.getProperty("name");
 
-//        final int typ = (Integer)cb.getProperty("typ");
+        final int typ = (Integer)cb.getProperty("typ");
         final String protPrefix = (String)cb.getProperty("url_id.url_base_id.prot_prefix");
         final String server = (String)cb.getProperty("url_id.url_base_id.server");
         final String path = (String)cb.getProperty("url_id.url_base_id.path");
@@ -131,16 +130,16 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
         String urlString = protPrefix + server + path + objectName;
 
         log.info("AddNewDocPanel: " + urlString);
-        ImageIcon ic;
-        boolean deletable;
-//        if (typ == 0) {
-//            // Setze WMS Icon und h\u00E4nge Kassenzeichen an
-//            ic = new javax.swing.ImageIcon(getClass().getResource(
-//                        "/de/cismet/verdis/res/images/filetypes/dms_default.png"));
-//            urlString = urlString.trim() + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
-//            deletable = false;
-//        }
-//        if (typ == 1) {
+        ImageIcon ic = null;
+        boolean deletable = false;
+        if (typ == 0) {
+            // Setze WMS Icon und h\u00E4nge Kassenzeichen an
+            ic = new javax.swing.ImageIcon(getClass().getResource(
+                        "/de/cismet/verdis/res/images/filetypes/dms_default.png"));
+            urlString = urlString.trim() + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
+            deletable = false;
+        }
+        if (typ >= 1) {
             // Setze das Icon nach der Dateiendung
             final int pPos = urlString.lastIndexOf(".");
             final String type = urlString.substring(pPos + 1, urlString.length()).toLowerCase();
@@ -157,7 +156,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
                 ic = new javax.swing.ImageIcon(getClass().getResource(
                             "/de/cismet/verdis/res/images/filetypes/dms_default.png"));
             }
-//        }
+        }
 
         final DocPanel dp = new DocPanel();
         dp.setAplettContext(ac);
