@@ -39,6 +39,8 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cismap.commons.CrsTransformer;
+import de.cismet.cismap.commons.MappingModelEvent;
+import de.cismet.cismap.commons.MappingModelListener;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
@@ -974,7 +976,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         setPostgisFlaechenSnappable(true);
         
         initGeomServerSearches();                
-    }
+    }    
     
     private void initGeomServerSearches() {
         final ServerSearchCreateSearchGeometryListener kassenzeichenSearchGeometryListener = new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(), new KassenzeichenGeomSearch());
@@ -1133,7 +1135,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
         return null;
     }
-
+    
     private static boolean checkForFlaechenFeatureService(final MapService mapService) {
         if (mapService instanceof SimplePostgisFeatureService) {
             final AbstractFeatureService featureService = (AbstractFeatureService) mapService;
@@ -1144,8 +1146,27 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
         return false;
     }
-
     private void setPostgisFlaechenSnappable(final boolean snappable) {
+        // falls neue dazu kommen
+        mappingModel.addMappingModelListener(new MappingModelListener() {
+
+            @Override
+            public void mapServiceLayerStructureChanged(MappingModelEvent mme) {
+            }
+
+            @Override
+            public void mapServiceAdded(MapService mapService) {
+                if (checkForFlaechenFeatureService(mapService)) {
+                    setFeaturesSnappable(mapService, snappable);
+                }
+            }
+
+            @Override
+            public void mapServiceRemoved(MapService mapService) {
+            }
+        });        
+        
+        //für schon vorhandene
         final AbstractFeatureService featureService = getFleachenFeatureService();
         if (featureService != null) {
             setFeaturesSnappable(featureService, snappable);
@@ -1153,12 +1174,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     }
 
     private static void setFeaturesSnappable(final MapService mapService, final boolean snappable) {
-        final PNode pNode = mapService.getPNode();
-        for (int index = 0; index < pNode.getChildrenCount(); index++) {
-            final PNode child = pNode.getChild(index);
-            if (child instanceof PFeature) {
-                final PFeature pFeature = (PFeature) child;
-                pFeature.setSnappable(snappable);
+        if (mapService != null) {
+            final PNode pNode = mapService.getPNode();
+            if (pNode != null) {
+                for (int index = 0; index < pNode.getChildrenCount(); index++) {
+                    final PNode child = pNode.getChild(index);
+                    if (child != null && child instanceof PFeature) {
+                        final PFeature pFeature = (PFeature) child;
+                        pFeature.setSnappable(snappable);
+                    }
+                }
             }
         }
     }
