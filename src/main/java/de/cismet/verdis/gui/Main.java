@@ -953,12 +953,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 "joinPolygons",
                 JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
                 getMappingComponent().getInputListener(MappingComponent.JOIN_POLYGONS));
-        PNotificationCenter.defaultCenter()
-                .addListener(
-                    kartenPanel,
-                    "simpleGeometryCreated",
-                    CreateGeometryListener.GEOMETRY_CREATED_NOTIFICATION,
-                    getMappingComponent().getInputListener(MappingComponent.CREATE_SIMPLE_GEOMETRY));
 
         aggValidator.addListener(new ValidatorListener() {
 
