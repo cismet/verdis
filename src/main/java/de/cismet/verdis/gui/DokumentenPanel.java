@@ -104,9 +104,9 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
             final Collection<CidsBean> urls = (Collection)kassenzeichenBean.getProperty("dms_urls");
 
             for (final CidsBean url : urls) {
-                if (url.getProperty("typ") == null || (Integer) url.getProperty("typ") <= 1) {
+//                if (url.getProperty("typ") != null && (Integer) url.getProperty("typ") != 0) {
                     addNewDocPanel(ac, url);
-                }
+//                }
             }
         }
     }

@@ -158,7 +158,9 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
         });
         pmnLink.add(mniDelete);
 
-        setMaximumSize(new java.awt.Dimension(100, 100));
+        setMaximumSize(new java.awt.Dimension(100, 50));
+        setMinimumSize(new java.awt.Dimension(100, 50));
+        setPreferredSize(new java.awt.Dimension(100, 50));
         setLayout(new java.awt.BorderLayout());
 
         lblIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
