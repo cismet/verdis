@@ -16,17 +16,18 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.connection.SessionManager;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.constants.GeomPropertyConstants;
+import de.cismet.verdis.search.KassenzeichenGeomSearch;
 import java.awt.Cursor;
 import java.awt.Frame;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -115,7 +116,6 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         panMaster = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jXTable1 = new org.jdesktop.swingx.JXTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
         panDetail = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         lblDokumentLink = new javax.swing.JLabel();
@@ -125,7 +125,10 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         lstKassenzeichen = new javax.swing.JList();
         jButton1 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
         btnCloseDialog = new javax.swing.JButton();
+        jProgressBar1 = new javax.swing.JProgressBar();
+        jPanel9 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.title")); // NOI18N
@@ -268,7 +271,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(panPeriod, gridBagConstraints);
 
         panMasterDetail.setLayout(new java.awt.GridBagLayout());
@@ -276,24 +279,17 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         panMaster.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.panMaster.border.title"))); // NOI18N
         panMaster.setLayout(new java.awt.GridBagLayout());
 
+        jXTable1.setEnabled(false);
         jScrollPane1.setViewportView(jXTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 10, 10, 10);
         panMaster.add(jScrollPane1, gridBagConstraints);
-
-        jProgressBar1.setIndeterminate(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 10);
-        panMaster.add(jProgressBar1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -412,7 +408,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(panMasterDetail, gridBagConstraints);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -431,6 +427,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 1;
         jPanel1.add(jPanel6, gridBagConstraints);
 
+        jPanel8.setLayout(new java.awt.GridBagLayout());
+
         btnCloseDialog.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.btnCloseDialog.text")); // NOI18N
         btnCloseDialog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -438,11 +436,49 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel8.add(btnCloseDialog, gridBagConstraints);
+
+        jProgressBar1.setIndeterminate(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        jPanel8.add(jProgressBar1, gridBagConstraints);
+
+        jPanel9.setOpaque(false);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 647, Short.MAX_VALUE)
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 28, Short.MAX_VALUE)
+        );
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel8.add(jPanel9, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jPanel1.add(btnCloseDialog, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(jPanel8, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -451,7 +487,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(jPanel1, gridBagConstraints);
 
         pack();
@@ -580,13 +616,13 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         CidsAppBackend.getInstance().retrieveKassenzeichenByNummer(kassenzeichennummer);
     }
     
-    private void setKassenzeichenBeans(List<CidsBean> kassenzeichenBeans) {
+    private void setKassenzeichenNummern(Set<Integer> kassenzeichennummern) {
         final DefaultListModel kassenzeichenListModel = (DefaultListModel) lstKassenzeichen.getModel();
         kassenzeichenListModel.removeAllElements();
         
-        if (kassenzeichenBeans != null) {
-            for (CidsBean kassenzeichenBean : kassenzeichenBeans) {
-                kassenzeichenListModel.addElement(kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));            
+        if (kassenzeichennummern != null) {
+            for (Integer kassenzeichennummer : kassenzeichennummern) {
+                kassenzeichenListModel.addElement(kassenzeichennummer);            
             }
         }
         
@@ -606,14 +642,58 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         } else {
             selectedFortfuehrungBean = null;
         }
-        if (selectedFortfuehrungBean != null) {        
-            final List<CidsBean> kassenzeichenBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__KASSENZEICHEN);                
-            setDetailEnabled(true);
-            setKassenzeichenBeans(kassenzeichenBeans);
-            setDokumentLink((String) selectedFortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DOKUMENTURL));
+        if (selectedFortfuehrungBean != null) {      
+            new SwingWorker<Set<Integer>, Void>() {
+
+                @Override
+                protected Set<Integer> doInBackground() throws Exception {                
+                    lstKassenzeichen.setEnabled(false);
+                    jProgressBar1.setVisible(true);
+                    final List<CidsBean> geomBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__GEOMETRIEN);
+                    final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
+                    final Set<Integer> kassenzeichennummern = new HashSet<Integer>();
+                    for (final CidsBean geomBean : geomBeans) {
+                        if (geomBean != null) {
+                            try {
+                                geomSearch.setGeometry((Geometry) geomBean.getProperty(GeomPropertyConstants.PROP__GEO_FIELD));
+                                kassenzeichennummern.addAll((Collection<Integer>) SessionManager.getProxy().customServerSearch(SessionManager.getSession().getUser(), geomSearch));
+                            } catch (final Exception ex) {
+                                LOG.error("fehler beim suchen von kassenzeichen über eine geometrie", ex);
+                            }
+                        }
+                    }
+                    return kassenzeichennummern;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final Set<Integer> kassenzeichennummern = get();
+                        setDetailEnabled(true);
+                        setKassenzeichenNummern(kassenzeichennummern);
+                        
+                        final CidsBean urlBean = (CidsBean) selectedFortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DOKUMENTURL);
+                        final String protPrefix = (String)urlBean.getProperty("url_base_id.prot_prefix");
+                        final String server = (String)urlBean.getProperty("url_base_id.server");
+                        final String path = (String)urlBean.getProperty("url_base_id.path");
+                        final String objectName = (String)urlBean.getProperty("object_name");
+                        String urlString = protPrefix + server + path + objectName;      
+                        setDokumentLink(urlString);
+                    } catch (final Exception ex) {
+                        setKassenzeichenNummern(null);
+                        LOG.fatal("", ex);
+                    }
+                    lstKassenzeichen.setEnabled(true);
+                    jProgressBar1.setVisible(false);
+                }
+
+
+            }.execute();                
+                        
+            
         } else {
             setDetailEnabled(false);
-            setKassenzeichenBeans(null);
+            setKassenzeichenNummern(null);
             setDokumentLink(null);
         }        
     }
@@ -643,6 +723,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
             protected List<CidsBean> doInBackground() throws Exception {
                 btnRefreshAnlaesse.setEnabled(false);
                 jProgressBar1.setVisible(true);
+                jXTable1.setEnabled(false);
                 final CidsAppBackend be = CidsAppBackend.getInstance();
                 
                 return be.loadFortfuehrungBeansByDates(dpiFrom.getDate(), dpiTo.getDate());
@@ -660,6 +741,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                     LOG.error("error while loading fortfuehrung beans", ex);
                 }
                 btnRefreshAnlaesse.setEnabled(true);
+                jXTable1.setEnabled(true);
                 jProgressBar1.setVisible(false);
                 
                 if (cidsBeans == null || cidsBeans.isEmpty()) {
@@ -734,6 +816,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

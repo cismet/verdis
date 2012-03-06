@@ -31,8 +31,8 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
 
     private static final String[] COLUMN_NAMES = {
         "Datum",
-        "Typ",
-        "Beschreibung"
+        "Art",
+        ""
     };
     
     private static final Class[] COLUMN_CLASSES = {
@@ -53,7 +53,7 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
         }
         if (columnIndex == 0) {
             try {                
-                final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DATUM);
+                final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
                 if (date != null) {
                     return DateFormat.getInstance().format(date);
                 } else {
@@ -72,7 +72,13 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             }            
         } else if (columnIndex == 2) {
             try {
-                return (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BESCHREIBUNG);
+                final String flurstueck_alt = (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__FLURSTUECK_ALT);
+                final String flurstueck_neu = (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__FLURSTUECK_NEU);
+                if (flurstueck_alt.equals(flurstueck_neu)) {
+                    return flurstueck_alt;
+                } else {
+                    return flurstueck_alt + " => " + flurstueck_neu;
+                }
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";

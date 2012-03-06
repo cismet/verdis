@@ -23,11 +23,12 @@ package de.cismet.verdis.constants;
  */
 public interface FortfuehrungPropertyConstants extends PropertyConstants {
 
-    public static final String PROP__DATUM = "datum";
+    public static final String PROP__BEGINN = "beginn";
     public static final String PROP__ANLASS = "anlass";
-    public static final String PROP__BESCHREIBUNG = "beschreibung";
-    public static final String PROP__KASSENZEICHEN = "kassenzeichen";
-    public static final String PROP__DOKUMENTURL = "url_dokument";
+    public static final String PROP__FLURSTUECK_ALT = "flurstueck_alt";
+    public static final String PROP__FLURSTUECK_NEU = "flurstueck_neu";
+    public static final String PROP__GEOMETRIEN = "geometrien";
+    public static final String PROP__DOKUMENTURL = "dokument";
     
     public static final String PROP__ANLASS_NAME = PROP__ANLASS + DOT + "name";
     
