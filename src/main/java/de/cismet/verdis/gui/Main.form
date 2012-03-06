@@ -703,7 +703,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdFortfuehrungActionPerformed"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="if (StaticDebuggingTools.checkHomeForFile(&quot;cismetVerdisFortfuehrungOn&quot;)) {                     // NOI18N&#xa;    cmdFortfuehrung.setVisible(true);&#xa;} else {&#xa;    cmdFortfuehrung.setVisible(false);&#xa;}"/>
+            <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="if (StaticDebuggingTools.checkHomeForFile(&quot;cismetVerdisTest&quot;)) {                     // NOI18N&#xa;    cmdFortfuehrung.setVisible(true);&#xa;} else {&#xa;    cmdFortfuehrung.setVisible(false);&#xa;}"/>
           </AuxValues>
         </Component>
       </SubComponents>

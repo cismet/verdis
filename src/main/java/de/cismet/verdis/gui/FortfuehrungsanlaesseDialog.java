@@ -651,6 +651,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                     jProgressBar1.setVisible(true);
                     final List<CidsBean> geomBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__GEOMETRIEN);
                     final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
+                    LOG.fatal(selectedFortfuehrungBean.getProperty("geometrien").getClass());
                     final Set<Integer> kassenzeichennummern = new HashSet<Integer>();
                     for (final CidsBean geomBean : geomBeans) {
                         if (geomBean != null) {

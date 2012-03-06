@@ -1874,7 +1874,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 cmdFortfuehrungActionPerformed(evt);
             }
         });
-        if (StaticDebuggingTools.checkHomeForFile("cismetVerdisFortfuehrungOn")) {                     // NOI18N
+        if (StaticDebuggingTools.checkHomeForFile("cismetVerdisTest")) {                     // NOI18N
             cmdFortfuehrung.setVisible(true);
         } else {
             cmdFortfuehrung.setVisible(false);

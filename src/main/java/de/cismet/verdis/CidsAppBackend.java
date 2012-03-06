@@ -57,7 +57,6 @@ public class CidsAppBackend implements CidsBeanStore {
     //~ Static fields/initializers ---------------------------------------------
     private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             CidsAppBackend.class);
-    private static final int KASSENZEICHEN_CLASS_ID = 11;
     public static final String DOMAIN = "VERDIS_GRUNDIS";
     private static CidsAppBackend instance = null;
     private static AppPreferences appprefs;
@@ -261,9 +260,9 @@ public class CidsAppBackend implements CidsBeanStore {
     }
 
     public CidsBean loadKassenzeichenByNummer(final int kassenzeichen) {
-        String query = "SELECT " + KASSENZEICHEN_CLASS_ID + ", id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
-
         try {
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");        
+            String query = "SELECT " + mcKassenzeichen.getId() + ", id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
             if (mos == null || mos.length < 1) {
                 return null;
@@ -278,14 +277,16 @@ public class CidsAppBackend implements CidsBeanStore {
     }
 
     public List<CidsBean> loadFortfuehrungBeansByDates(final Date fromDate, final Date toDate) {
-        final String query = "SELECT "
-                + "   31, "
-                + "   id FROM fortfuehrung "
-                + "WHERE "
-                + "   fortfuehrung.ist_abgearbeitet IS FALSE AND "
-                + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";        
+        
 
         try {
+            final MetaClass mcFortfuehrung = ClassCacheMultiple.getMetaClass(DOMAIN, "fortfuehrung");        
+            final String query = "SELECT "
+                    + "   " + mcFortfuehrung.getId() + ", "
+                    + "   id FROM fortfuehrung "
+                    + "WHERE "
+                    + "   fortfuehrung.ist_abgearbeitet IS FALSE AND "
+                    + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";        
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
             if (mos == null || mos.length < 1) {
                 return null;
@@ -470,7 +471,8 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public HistoryObject[] getHistory(final int kassenzeichenId, final int howMuch) {
         try {
-            return proxy.getHistory(KASSENZEICHEN_CLASS_ID, kassenzeichenId, DOMAIN, SessionManager.getSession().getUser(), howMuch);
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");                    
+            return proxy.getHistory(mcKassenzeichen.getId(), kassenzeichenId, DOMAIN, SessionManager.getSession().getUser(), howMuch);
         } catch (ConnectionException ex) {
             log.error("error in retrieving the history og " + kassenzeichenId, ex);
             return null;
@@ -501,7 +503,7 @@ public class CidsAppBackend implements CidsBeanStore {
         System.out.println("retrieved 6000467");
         // System.out.println(mo.getBean().toJSONString());
         final HistoryObject[] hoA = CidsAppBackend.getInstance().proxy.getHistory(
-                KASSENZEICHEN_CLASS_ID,
+                11,
                 6000467,
                 DOMAIN,
                 SessionManager.getSession().getUser(),
