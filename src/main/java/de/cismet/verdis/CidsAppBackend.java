@@ -286,7 +286,6 @@ public class CidsAppBackend implements CidsBeanStore {
                     + "   " + mcFortfuehrung.getId() + ", "
                     + "   id FROM fortfuehrung "
                     + "WHERE "
-                    + "   fortfuehrung.ist_abgearbeitet IS FALSE AND "
                     + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";        
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
             if (mos == null || mos.length < 1) {

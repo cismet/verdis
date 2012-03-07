@@ -26,13 +26,17 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
 import de.cismet.verdis.constants.GeomPropertyConstants;
 import de.cismet.verdis.search.KassenzeichenGeomSearch;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Frame;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.openide.util.Exceptions;
 
 /**
@@ -55,6 +59,9 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         
         initComponents();        
 
+        final Highlighter istAbgearbeitetHighlighter = new IstAbgearbeitetHighlighter();
+        jXTable1.setHighlighters(istAbgearbeitetHighlighter);
+        
         jXTable1.setModel(new FortfuehrungenTableModel());
         
         
@@ -125,6 +132,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         lstKassenzeichen = new javax.swing.JList();
         jButton1 = new javax.swing.JButton();
+        cbxAbgearbeitet = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         btnCloseDialog = new javax.swing.JButton();
@@ -347,7 +355,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         panDetail.add(jPanel3, gridBagConstraints);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.jPanel4.border.title"))); // NOI18N
@@ -397,8 +405,22 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
         panDetail.add(jPanel4, gridBagConstraints);
+
+        cbxAbgearbeitet.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.cbxAbgearbeitet.text")); // NOI18N
+        cbxAbgearbeitet.setEnabled(false);
+        cbxAbgearbeitet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxAbgearbeitetActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        panDetail.add(cbxAbgearbeitet, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -626,6 +648,19 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_lblDokumentLinkMouseClicked
 
+    private void cbxAbgearbeitetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxAbgearbeitetActionPerformed
+        try {
+            final int displayedIndex = jXTable1.getSelectedRow();
+            final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
+            final CidsBean selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getCidsBeanByIndex(modelIndex);
+            selectedFortfuehrungBean.setProperty(FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET, cbxAbgearbeitet.isSelected());
+            selectedFortfuehrungBean.persist();
+            jXTable1.repaint();
+        } catch (Exception ex) {
+            LOG.error("fehler beim setzen von ist_abgearbeitet", ex);
+        }
+    }//GEN-LAST:event_cbxAbgearbeitetActionPerformed
+
     private void gotoSelectedKassenzeichen() {
         final int kassenzeichennummer = (Integer) lstKassenzeichen.getSelectedValue();
         CidsAppBackend.getInstance().retrieveKassenzeichenByNummer(kassenzeichennummer);
@@ -663,6 +698,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                 @Override
                 protected Set<Integer> doInBackground() throws Exception {                
                     lstKassenzeichen.setEnabled(false);
+                    cbxAbgearbeitet.setEnabled(false);
                     jProgressBar1.setVisible(true);
                     final List<CidsBean> geomBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__GEOMETRIEN);
                     final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
@@ -686,6 +722,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                         final Set<Integer> kassenzeichennummern = get();
                         setDetailEnabled(true);
                         setKassenzeichenNummern(kassenzeichennummern);
+                        cbxAbgearbeitet.setSelected((Boolean) selectedFortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET));
                         
                         final CidsBean urlBean = (CidsBean) selectedFortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__DOKUMENTURL);
                         final String protPrefix = (String)urlBean.getProperty("url_base_id.prot_prefix");
@@ -696,9 +733,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                         setDokumentLink(urlString);
                     } catch (final Exception ex) {
                         setKassenzeichenNummern(null);
+                        cbxAbgearbeitet.setSelected(false);
                         LOG.fatal("", ex);
                     }
                     lstKassenzeichen.setEnabled(true);
+                    cbxAbgearbeitet.setEnabled(true);
                     jProgressBar1.setVisible(false);
                 }
 
@@ -709,6 +748,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         } else {
             setDetailEnabled(false);
             setKassenzeichenNummern(null);
+            cbxAbgearbeitet.setSelected(false);
             setDokumentLink(null);
         }        
     }
@@ -768,6 +808,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     
     private void setDetailEnabled(final boolean enabled) {
         lstKassenzeichen.setEnabled(enabled);
+        cbxAbgearbeitet.setEnabled(enabled);
         lblDokumentLink.setEnabled(enabled);
     }
     
@@ -819,6 +860,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private javax.swing.JToggleButton btnThisMonth;
     private javax.swing.JToggleButton btnThisWeek;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox cbxAbgearbeitet;
     private org.jdesktop.swingx.JXDatePicker dpiFrom;
     private org.jdesktop.swingx.JXDatePicker dpiTo;
     private javax.swing.JButton jButton1;
@@ -845,4 +887,32 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panPeriod;
     // End of variables declaration//GEN-END:variables
 
+    
+    private class IstAbgearbeitetHighlighter implements Highlighter {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public Component highlight(final Component renderer, final ComponentAdapter adapter) {
+            final int displayedIndex = adapter.row;
+            final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
+            final CidsBean cidsBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getCidsBeanByIndex(modelIndex);
+            final boolean istAbgearbeitet = (Boolean) cidsBean.getProperty(FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET);
+            renderer.setEnabled(!istAbgearbeitet);
+            return renderer;
+        }
+
+        @Override
+        public void addChangeListener(final ChangeListener l) {
+        }
+
+        @Override
+        public void removeChangeListener(final ChangeListener l) {
+        }
+
+        @Override
+        public ChangeListener[] getChangeListeners() {
+            return new ChangeListener[0];
+        }
+    }    
 }

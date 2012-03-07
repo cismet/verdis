@@ -29,7 +29,8 @@ public interface FortfuehrungPropertyConstants extends PropertyConstants {
     public static final String PROP__FLURSTUECK_NEU = "flurstueck_neu";
     public static final String PROP__GEOMETRIEN = "geometrien";
     public static final String PROP__DOKUMENTURL = "dokument";
-    
+    public static final String PROP__IST_ABGEARBEITET = "ist_abgearbeitet";
+            
     public static final String PROP__ANLASS_NAME = PROP__ANLASS + DOT + "name";
     
 }

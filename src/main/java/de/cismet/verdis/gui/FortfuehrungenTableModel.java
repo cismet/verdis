@@ -38,7 +38,7 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
     private static final Class[] COLUMN_CLASSES = {
         String.class,
         String.class,
-        String.class        
+        String.class
     };
     
     public FortfuehrungenTableModel() {
@@ -47,10 +47,10 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);
+        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);        
         if (fortfuehrungBean == null) {
             return null;
-        }
+        }        
         if (columnIndex == 0) {
             try {                
                 final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
@@ -86,5 +86,5 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
         }
         return null;        
     }
-    
+        
 }
