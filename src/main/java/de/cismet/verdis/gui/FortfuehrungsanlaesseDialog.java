@@ -20,6 +20,7 @@ import Sirius.navigator.connection.SessionManager;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.vividsolutions.jts.geom.Geometry;
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.tools.BrowserLauncher;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
@@ -239,7 +240,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 84, Short.MAX_VALUE)
+            .addGap(0, 88, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -312,6 +313,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         lblDokumentLink.setText(org.openide.util.NbBundle.getMessage(FortfuehrungsanlaesseDialog.class, "FortfuehrungsanlaesseDialog.lblDokumentLink.text")); // NOI18N
         lblDokumentLink.setEnabled(false);
+        lblDokumentLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblDokumentLinkMouseClicked(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -457,11 +463,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 647, Short.MAX_VALUE)
+            .addGap(0, 634, Short.MAX_VALUE)
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 28, Short.MAX_VALUE)
+            .addGap(0, 30, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -611,6 +617,15 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_lstKassenzeichenMouseClicked
 
+    private void lblDokumentLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDokumentLinkMouseClicked
+        final String url = lblDokumentLink.getToolTipText();
+        try {
+            BrowserLauncher.openURL(url);
+        } catch (Exception ex) {
+            LOG.error("fehler beim öffnen der url", ex);
+        }
+    }//GEN-LAST:event_lblDokumentLinkMouseClicked
+
     private void gotoSelectedKassenzeichen() {
         final int kassenzeichennummer = (Integer) lstKassenzeichen.getSelectedValue();
         CidsAppBackend.getInstance().retrieveKassenzeichenByNummer(kassenzeichennummer);
@@ -651,7 +666,6 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                     jProgressBar1.setVisible(true);
                     final List<CidsBean> geomBeans = (List<CidsBean>) selectedFortfuehrungBean.getBeanCollectionProperty(FortfuehrungPropertyConstants.PROP__GEOMETRIEN);
                     final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
-                    LOG.fatal(selectedFortfuehrungBean.getProperty("geometrien").getClass());
                     final Set<Integer> kassenzeichennummern = new HashSet<Integer>();
                     for (final CidsBean geomBean : geomBeans) {
                         if (geomBean != null) {

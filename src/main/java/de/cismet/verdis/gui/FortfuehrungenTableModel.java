@@ -18,7 +18,7 @@ package de.cismet.verdis.gui;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -55,7 +55,7 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             try {                
                 final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
                 if (date != null) {
-                    return DateFormat.getInstance().format(date);
+                    return new SimpleDateFormat("dd.MM.yyyy").format(date);
                 } else {
                     return "";
                 }

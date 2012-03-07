@@ -116,6 +116,7 @@ public class CidsAppBackend implements CidsBeanStore {
             this.proxy = proxy;
             if (!SessionManager.isInitialized()) {
                 SessionManager.init(proxy);
+                ClassCacheMultiple.setInstance(domain);
             }
 
         } catch (Throwable e) {
