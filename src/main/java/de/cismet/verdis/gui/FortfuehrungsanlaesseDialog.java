@@ -663,7 +663,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
     private void gotoSelectedKassenzeichen() {
         final int kassenzeichennummer = (Integer) lstKassenzeichen.getSelectedValue();
-        CidsAppBackend.getInstance().retrieveKassenzeichenByNummer(kassenzeichennummer);
+        Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(Integer.toString(kassenzeichennummer));
     }
     
     private void setKassenzeichenNummern(Set<Integer> kassenzeichennummern) {
@@ -706,7 +706,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                     for (final CidsBean geomBean : geomBeans) {
                         if (geomBean != null) {
                             try {
-                                geomSearch.setGeometry((Geometry) geomBean.getProperty(GeomPropertyConstants.PROP__GEO_FIELD));
+                                final Geometry geom = (Geometry) geomBean.getProperty(GeomPropertyConstants.PROP__GEO_FIELD);
+                                geomSearch.setGeometry(geom);
                                 kassenzeichennummern.addAll((Collection<Integer>) SessionManager.getProxy().customServerSearch(SessionManager.getSession().getUser(), geomSearch));
                             } catch (final Exception ex) {
                                 LOG.error("fehler beim suchen von kassenzeichen über eine geometrie", ex);
