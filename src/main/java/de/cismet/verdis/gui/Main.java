@@ -2558,10 +2558,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
-            final Integer kassenzeichenOld = (Integer) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
-            if (kassenzeichenOld != null) {
+            final Integer kassenzeichen = (Integer) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            if (kassenzeichen != null) {
                 try {
-                    final String gotoUrl = prefs.getReportUrl() + kassenzeichenOld;
+                    final String gotoUrl = prefs.getReportUrl() + kassenzeichen;
                     AppletContext appletContext = null;
                     try {
                         appletContext = context.getEnvironment().getAppletContext();
