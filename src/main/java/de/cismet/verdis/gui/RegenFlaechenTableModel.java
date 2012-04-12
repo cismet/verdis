@@ -23,10 +23,12 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -36,38 +38,46 @@ import javax.swing.ImageIcon;
  */
 public class RegenFlaechenTableModel extends CidsBeanTableModel implements RegenFlaechenPropertyConstants {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTableModel.class);
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            RegenFlaechenTableModel.class);
     private static ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
     private static ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/edited.png"));
     private static ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/warn.png"));
-            
+
     private static final String[] COLUMN_NAMES = {
-        " ",
-        "Bezeichnung",
-        " ",
-        "Gr\u00F6\u00DFe in m²",
-        "Fl\u00E4chenart",
-        "Anschlu\u00DFgrad"
-    };
-    
+            " ",
+            "Bezeichnung",
+            " ",
+            "Gr\u00F6\u00DFe in m²",
+            "Fl\u00E4chenart",
+            "Anschlu\u00DFgrad"
+        };
+
     private static final Class[] COLUMN_CLASSES = {
-        Icon.class,
-        String.class,
-        javax.swing.Icon.class,
-        String.class,
-        String.class,
-        String.class        
-    };
-    
+            Icon.class,
+            String.class,
+            javax.swing.Icon.class,
+            String.class,
+            String.class,
+            String.class
+        };
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new RegenFlaechenTableModel object.
+     */
     public RegenFlaechenTableModel() {
         super(COLUMN_NAMES, COLUMN_CLASSES);
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
         final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
@@ -78,7 +88,8 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel implements Regen
             if (cidsBean.getProperty(PROP__ANTEIL) != null) {
                 return MULT_IMAGE;
             }
-            if ((cidsBean.getProperty(PROP__SPERRE) instanceof Boolean) && (Boolean)cidsBean.getProperty(PROP__SPERRE)) {
+            if ((cidsBean.getProperty(PROP__SPERRE) instanceof Boolean)
+                        && (Boolean)cidsBean.getProperty(PROP__SPERRE)) {
                 return WARN_IMAGE;
             }
             return null;

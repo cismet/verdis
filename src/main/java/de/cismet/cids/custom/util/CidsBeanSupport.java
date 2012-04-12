@@ -1,37 +1,61 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2011 jruiz
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.cismet.cids.custom.util;
 
 import com.vividsolutions.jts.geom.Geometry;
-import de.cismet.cids.dynamics.CidsBean;
+
 import java.sql.Date;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public class CidsBeanSupport {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CidsBeanSupport.class);
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public static CidsBean cloneCidsBean(final CidsBean cidsBean) throws Exception {
         if (cidsBean == null) {
             return null;
@@ -41,8 +65,16 @@ public class CidsBeanSupport {
         return cloneBean;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceBean  DOCUMENT ME!
+     * @param   targetBean  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public static void copyProperties(final CidsBean sourceBean, final CidsBean targetBean) throws Exception {
-        if (sourceBean == null || targetBean == null) {
+        if ((sourceBean == null) || (targetBean == null)) {
             return;
         }
 
@@ -50,7 +82,7 @@ public class CidsBeanSupport {
             final Object o = sourceBean.getProperty(propName);
 
             if (propName.toLowerCase().equals("id")) {
-                int id = (Integer) sourceBean.getProperty("id");
+                final int id = (Integer)sourceBean.getProperty("id");
                 targetBean.setProperty("id", id);
                 targetBean.getMetaObject().setID(id);
             } else if (o instanceof CidsBean) {
@@ -76,7 +108,7 @@ public class CidsBeanSupport {
             } else if (o instanceof Integer) {
                 targetBean.setProperty(propName, new Integer(o.toString()));
             } else if (o instanceof Date) {
-                targetBean.setProperty(propName, ((Date) o).clone());
+                targetBean.setProperty(propName, ((Date)o).clone());
             } else if (o instanceof String) {
                 targetBean.setProperty(propName, o);
             } else {

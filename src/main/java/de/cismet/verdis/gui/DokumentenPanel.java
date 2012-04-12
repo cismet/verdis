@@ -42,6 +42,9 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 
 /**
@@ -105,7 +108,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
 
             for (final CidsBean url : urls) {
 //                if (url.getProperty("typ") != null && (Integer) url.getProperty("typ") != 0) {
-                    addNewDocPanel(ac, url);
+                addNewDocPanel(ac, url);
 //                }
             }
         }
@@ -136,7 +139,8 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
             // Setze WMS Icon und h\u00E4nge Kassenzeichen an
             ic = new javax.swing.ImageIcon(getClass().getResource(
                         "/de/cismet/verdis/res/images/filetypes/dms_default.png"));
-            urlString = urlString.trim() + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
+            urlString = urlString.trim()
+                        + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD);
             deletable = false;
         }
         if (typ >= 1) {
@@ -194,14 +198,13 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         panDocs = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
         panDocs.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         add(panDocs, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -253,9 +256,13 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
                 try {
                     final Collection<CidsBean> urls = kassenzeichenBean.getBeanCollectionProperty("dms_urls");
 
-                    final CidsBean dmsUrlCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "dms_url");
-                    final CidsBean urlCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "url");
-                    final CidsBean urlBaseCB = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.DOMAIN, "url_base");
+                    final CidsBean dmsUrlCB = CidsBean.createNewCidsBeanFromTableName(
+                            VerdisConstants.DOMAIN,
+                            "dms_url");
+                    final CidsBean urlCB = CidsBean.createNewCidsBeanFromTableName(VerdisConstants.DOMAIN, "url");
+                    final CidsBean urlBaseCB = CidsBean.createNewCidsBeanFromTableName(
+                            VerdisConstants.DOMAIN,
+                            "url_base");
 
                     dmsUrlCB.setProperty("name", description);
                     dmsUrlCB.setProperty("typ", Integer.valueOf(1));

@@ -7,6 +7,11 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import org.jdesktop.observablecollections.ObservableList;
+import org.jdesktop.observablecollections.ObservableListListener;
+
+import java.sql.Date;
+
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
@@ -15,10 +20,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.CidsAppBackend;
-
-import java.sql.Date;
-import org.jdesktop.observablecollections.ObservableList;
-import org.jdesktop.observablecollections.ObservableListListener;
 
 /**
  * DOCUMENT ME!
@@ -106,7 +107,6 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
         fireTableDataChanged();
     }
 
-
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;
@@ -120,26 +120,30 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
             if (befreiungen != null) {
                 ((ObservableList<CidsBean>)befreiungen).addObservableListListener(new ObservableListListener() {
 
-                    @Override
-                    public void listElementsAdded(ObservableList list, int index, int length) {
-                        fireTableDataChanged();
-                    }
+                        @Override
+                        public void listElementsAdded(final ObservableList list, final int index, final int length) {
+                            fireTableDataChanged();
+                        }
 
-                    @Override
-                    public void listElementsRemoved(ObservableList list, int index, List oldElements) {
-                        fireTableDataChanged();
-                    }
+                        @Override
+                        public void listElementsRemoved(final ObservableList list,
+                                final int index,
+                                final List oldElements) {
+                            fireTableDataChanged();
+                        }
 
-                    @Override
-                    public void listElementReplaced(ObservableList list, int index, Object oldElement) {
-                        fireTableDataChanged();
-                    }
+                        @Override
+                        public void listElementReplaced(final ObservableList list,
+                                final int index,
+                                final Object oldElement) {
+                            fireTableDataChanged();
+                        }
 
-                    @Override
-                    public void listElementPropertyChanged(ObservableList list, int index) {
-                        fireTableDataChanged();
-                    }
-                });
+                        @Override
+                        public void listElementPropertyChanged(final ObservableList list, final int index) {
+                            fireTableDataChanged();
+                        }
+                    });
             }
         }
         fireTableDataChanged();

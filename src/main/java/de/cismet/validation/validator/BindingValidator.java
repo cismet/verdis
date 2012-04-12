@@ -1,32 +1,67 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.validation.validator;
 
-import de.cismet.validation.ValidatorState;
-import de.cismet.validation.ValidatorStateImpl;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import org.apache.log4j.Logger;
+
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingListener;
 import org.jdesktop.beansbinding.PropertyStateEvent;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
+import de.cismet.validation.ValidatorState;
+import de.cismet.validation.ValidatorStateImpl;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public class BindingValidator extends AbstractValidator implements BindingListener {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final Logger LOG = Logger.getLogger(BindingValidator.class);
+
+    //~ Instance fields --------------------------------------------------------
+
     private Binding binding;
     private Action action = new AbstractAction() {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            getBinding().refreshAndNotify();
-        }
-    };
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                getBinding().refreshAndNotify();
+            }
+        };
 
-    public BindingValidator(Binding binding) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new BindingValidator object.
+     *
+     * @param  binding  DOCUMENT ME!
+     */
+    public BindingValidator(final Binding binding) {
         setBinding(binding);
     }
 
-    public final void setBinding(Binding binding) {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  binding  DOCUMENT ME!
+     */
+    public final void setBinding(final Binding binding) {
         if (this.binding != null) {
             this.binding.removeBindingListener(this);
         }
@@ -36,47 +71,61 @@ public class BindingValidator extends AbstractValidator implements BindingListen
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Binding getBinding() {
         return this.binding;
     }
 
     @Override
-    public void bindingBecameBound(Binding binding) {
+    public void bindingBecameBound(final Binding binding) {
     }
 
     @Override
-    public void bindingBecameUnbound(Binding binding) {
+    public void bindingBecameUnbound(final Binding binding) {
         setState(null);
     }
 
     @Override
-    public void syncFailed(Binding binding, Binding.SyncFailure failure) {
-        LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
-        setState(new ValidatorStateImpl(ValidatorStateImpl.Type.ERROR, "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.", this.action));
+    public void syncFailed(final Binding binding, final Binding.SyncFailure failure) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
+        }
+        setState(new ValidatorStateImpl(
+                ValidatorStateImpl.Type.ERROR,
+                "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.",
+                this.action));
     }
 
     @Override
-    public void syncWarning(Binding binding, Binding.SyncFailure failure) {
-        LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
-        setState(new ValidatorStateImpl(ValidatorStateImpl.Type.WARNING, "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.", this.action));
+    public void syncWarning(final Binding binding, final Binding.SyncFailure failure) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
+        }
+        setState(new ValidatorStateImpl(
+                ValidatorStateImpl.Type.WARNING,
+                "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.",
+                this.action));
     }
 
     @Override
-    public void synced(Binding binding) {
+    public void synced(final Binding binding) {
         setState(null);
     }
 
     @Override
-    public void sourceChanged(Binding binding, PropertyStateEvent event) {
+    public void sourceChanged(final Binding binding, final PropertyStateEvent event) {
     }
 
     @Override
-    public void targetChanged(Binding binding, PropertyStateEvent event) {
+    public void targetChanged(final Binding binding, final PropertyStateEvent event) {
     }
 
     @Override
     public ValidatorState performValidation() {
         return getState();
     }
-
 }

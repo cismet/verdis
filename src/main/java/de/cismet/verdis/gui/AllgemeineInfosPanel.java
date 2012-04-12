@@ -100,14 +100,18 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
 
         setLayout(new java.awt.GridBagLayout());
 
-        lblGrundsteuer.setText(org.openide.util.NbBundle.getMessage(AllgemeineInfosPanel.class, "AllgemeineInfosPanel.lblGrundsteuer.text")); // NOI18N
+        lblGrundsteuer.setText(org.openide.util.NbBundle.getMessage(
+                AllgemeineInfosPanel.class,
+                "AllgemeineInfosPanel.lblGrundsteuer.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
         add(lblGrundsteuer, gridBagConstraints);
 
-        lblSchmutzwasser.setText(org.openide.util.NbBundle.getMessage(AllgemeineInfosPanel.class, "AllgemeineInfosPanel.lblSchmutzwasser.text")); // NOI18N
+        lblSchmutzwasser.setText(org.openide.util.NbBundle.getMessage(
+                AllgemeineInfosPanel.class,
+                "AllgemeineInfosPanel.lblSchmutzwasser.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -116,7 +120,9 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
         add(lblSchmutzwasser, gridBagConstraints);
 
-        lblAbfall.setText(org.openide.util.NbBundle.getMessage(AllgemeineInfosPanel.class, "AllgemeineInfosPanel.lblAbfall.text")); // NOI18N
+        lblAbfall.setText(org.openide.util.NbBundle.getMessage(
+                AllgemeineInfosPanel.class,
+                "AllgemeineInfosPanel.lblAbfall.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -124,7 +130,9 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(lblAbfall, gridBagConstraints);
 
-        lblBemerkung.setText(org.openide.util.NbBundle.getMessage(AllgemeineInfosPanel.class, "AllgemeineInfosPanel.lblBemerkung.text")); // NOI18N
+        lblBemerkung.setText(org.openide.util.NbBundle.getMessage(
+                AllgemeineInfosPanel.class,
+                "AllgemeineInfosPanel.lblBemerkung.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -137,7 +145,12 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         txtBemerkung.setLineWrap(true);
         txtBemerkung.setRows(2);
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_zu_abgaben}"), txtBemerkung, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_zu_abgaben}"),
+                txtBemerkung,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         scpBemerkung.setViewportView(txtBemerkung);
@@ -150,14 +163,21 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(scpBemerkung, gridBagConstraints);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.grundsteuer.name}"), txtGrundsteuer, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.grundsteuer.name}"),
+                txtGrundsteuer,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         txtGrundsteuer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtGrundsteuerActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    txtGrundsteuerActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -166,7 +186,12 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(txtGrundsteuer, gridBagConstraints);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.schmutzwasser.name}"), txtSchmutzwasser, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.schmutzwasser.name}"),
+                txtSchmutzwasser,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -176,14 +201,21 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(txtSchmutzwasser, gridBagConstraints);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.abfallgebuehr.name}"), txtABfall, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.abfallgebuehr.name}"),
+                txtABfall,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         txtABfall.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtABfallActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    txtABfallActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -191,9 +223,16 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(txtABfall, gridBagConstraints);
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(AllgemeineInfosPanel.class, "AllgemeineInfosPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(
+                AllgemeineInfosPanel.class,
+                "AllgemeineInfosPanel.jLabel1.text")); // NOI18N
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.abfallgebuehr.schluessel}"), jLabel1, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.abfallgebuehr.schluessel}"),
+                jLabel1,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         binding.setSourceNullValue("000");
         binding.setSourceUnreadableValue("000");
         bindingGroup.addBinding(binding);
@@ -205,25 +244,25 @@ public class AllgemeineInfosPanel extends javax.swing.JPanel implements CidsBean
         add(jLabel1, gridBagConstraints);
 
         bindingGroup.bind();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtABfallActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtABfallActionPerformed
+    private void txtABfallActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtABfallActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtABfallActionPerformed
+    } //GEN-LAST:event_txtABfallActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtGrundsteuerActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGrundsteuerActionPerformed
+    private void txtGrundsteuerActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtGrundsteuerActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtGrundsteuerActionPerformed
+    } //GEN-LAST:event_txtGrundsteuerActionPerformed
 
     @Override
     public CidsBean getCidsBean() {

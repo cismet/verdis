@@ -30,6 +30,7 @@ import Sirius.navigator.connection.RESTfulConnection;
 import Sirius.navigator.exception.ConnectionException;
 
 import de.cismet.cids.custom.objecteditors.EditorTester;
+
 import de.cismet.verdis.CidsAppBackend;
 
 /**
@@ -57,10 +58,18 @@ public class VerdisEditorTester extends EditorTester {
 
     /**
      * Creates a new WrrlEditorTester object.
+     *
+     * @param   className    DOCUMENT ME!
+     * @param   editorClass  DOCUMENT ME!
+     * @param   domain       DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     public VerdisEditorTester(final String className, final Class editorClass, final String domain) throws Exception {
         super(className, editorClass, domain);
-        LOG.debug("init VerdisEditorTester");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("init VerdisEditorTester");
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -73,13 +82,17 @@ public class VerdisEditorTester extends EditorTester {
 
     @Override
     protected Connection getConnection() throws ConnectionException {
-        LOG.debug("getConnection");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("getConnection");
+        }
         return ConnectionFactory.getFactory().createConnection(CALLSERVER_CLASSNAME, CALLSERVER_URL);
     }
 
     @Override
     protected ConnectionInfo getConnectionInfo() {
-        LOG.debug("getConnectionInfo");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("getConnectionInfo");
+        }
         final ConnectionInfo connectionInfo = new ConnectionInfo();
         connectionInfo.setCallserverURL(CALLSERVER_URL);
         connectionInfo.setUsername(USERNAME);
@@ -94,5 +107,4 @@ public class VerdisEditorTester extends EditorTester {
     public void run() {
         EditorTester.run(this);
     }
-
 }

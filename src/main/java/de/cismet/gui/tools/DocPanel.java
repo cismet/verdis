@@ -11,21 +11,19 @@
  * Created on 16. Dezember 2004, 15:39
  */
 package de.cismet.gui.tools;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
-
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.gui.DokumentenPanel;
-import java.util.ArrayList;
 /**
  * Klasse zum Anzeigen von Links und zugehoerigen Icons in einer Anwendung.<br>
  * Bei Klick wird die URL im Webbrowser geoeffnet.
@@ -33,7 +31,7 @@ import java.util.ArrayList;
  * @author   hell
  * @version  $Revision$, $Date$
  */
-public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
+public class DocPanel extends javax.swing.JPanel implements CidsBeanStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -44,7 +42,7 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
 
     ArrayList actionListeners = new ArrayList();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-        private String desc;
+    private String desc;
     private String gotoUrl;
     private java.applet.AppletContext appletContext = null;
     private boolean deletable = false;
@@ -144,7 +142,6 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         pmnLink = new javax.swing.JPopupMenu();
         mniDelete = new javax.swing.JMenuItem();
         lblIcon = new javax.swing.JLabel();
@@ -152,10 +149,12 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
 
         mniDelete.setText("Link entfernen");
         mniDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniDeleteActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniDeleteActionPerformed(evt);
+                }
+            });
         pmnLink.add(mniDelete);
 
         setMaximumSize(new java.awt.Dimension(100, 50));
@@ -164,74 +163,89 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
         setLayout(new java.awt.BorderLayout());
 
         lblIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/filetypes/dms_default.png"))); // NOI18N
+        lblIcon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/filetypes/dms_default.png"))); // NOI18N
         lblIcon.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblIconMousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                lblIconMouseReleased(evt);
-            }
-        });
+
+                @Override
+                public void mousePressed(final java.awt.event.MouseEvent evt) {
+                    lblIconMousePressed(evt);
+                }
+                @Override
+                public void mouseReleased(final java.awt.event.MouseEvent evt) {
+                    lblIconMouseReleased(evt);
+                }
+            });
         add(lblIcon, java.awt.BorderLayout.CENTER);
 
         lblDescr.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDescr.setText("Beschreibung");
         lblDescr.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblDescrMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lblDescrMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lblDescrMouseExited(evt);
-            }
-        });
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    lblDescrMouseClicked(evt);
+                }
+                @Override
+                public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                    lblDescrMouseEntered(evt);
+                }
+                @Override
+                public void mouseExited(final java.awt.event.MouseEvent evt) {
+                    lblDescrMouseExited(evt);
+                }
+            });
         lblDescr.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                lblDescrMouseMoved(evt);
-            }
-        });
+
+                @Override
+                public void mouseMoved(final java.awt.event.MouseEvent evt) {
+                    lblDescrMouseMoved(evt);
+                }
+            });
         add(lblDescr, java.awt.BorderLayout.SOUTH);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblIconMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconMousePressed
+    private void lblIconMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblIconMousePressed
         if ((evt.isPopupTrigger())) {
             popupTrigged(evt);
         }
-    }//GEN-LAST:event_lblIconMousePressed
+    }                                                                       //GEN-LAST:event_lblIconMousePressed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
     private void popupTrigged(final java.awt.event.MouseEvent evt) {
         if (isDeletable()) {
             if (this.getParent().getParent() instanceof DokumentenPanel) {
                 if (((DokumentenPanel)(getParent().getParent())).isInEditMode()) {
                     pmnLink.show(evt.getComponent(), evt.getX(), evt.getY());
                 }
-            }            
+            }
         }
     }
-    
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void mniDeleteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDeleteActionPerformed
-        fireDeleteActionPerformed();
-    }//GEN-LAST:event_mniDeleteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblDescrMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDescrMouseClicked
+    private void mniDeleteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDeleteActionPerformed
+        fireDeleteActionPerformed();
+    }                                                                             //GEN-LAST:event_mniDeleteActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void lblDescrMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblDescrMouseClicked
 
         if (gotoUrl == null) {
             JOptionPane.showMessageDialog(this, "Es wurde keine Url hinterlegt!", "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -261,41 +275,46 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
                 }
             }
         }
-    }//GEN-LAST:event_lblDescrMouseClicked
+    } //GEN-LAST:event_lblDescrMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblDescrMouseExited(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDescrMouseExited
+    private void lblDescrMouseExited(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblDescrMouseExited
         this.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblDescr.setForeground(java.awt.Color.BLACK);
-    }//GEN-LAST:event_lblDescrMouseExited
+    }                                                                       //GEN-LAST:event_lblDescrMouseExited
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblDescrMouseEntered(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDescrMouseEntered
+    private void lblDescrMouseEntered(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblDescrMouseEntered
         this.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblDescr.setForeground(java.awt.Color.BLUE);
-    }//GEN-LAST:event_lblDescrMouseEntered
+    }                                                                        //GEN-LAST:event_lblDescrMouseEntered
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblDescrMouseMoved(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDescrMouseMoved
-    }//GEN-LAST:event_lblDescrMouseMoved
+    private void lblDescrMouseMoved(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblDescrMouseMoved
+    }                                                                      //GEN-LAST:event_lblDescrMouseMoved
 
-    private void lblIconMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconMouseReleased
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void lblIconMouseReleased(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblIconMouseReleased
         if ((evt.isPopupTrigger())) {
             popupTrigged(evt);
         }
-    }//GEN-LAST:event_lblIconMouseReleased
+    }                                                                        //GEN-LAST:event_lblIconMouseReleased
 
     /**
      * DOCUMENT ME!
@@ -352,7 +371,7 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore{
     }
 
     @Override
-    public void setCidsBean(CidsBean cidsBean) {
-        dmsUrl=cidsBean;
+    public void setCidsBean(final CidsBean cidsBean) {
+        dmsUrl = cidsBean;
     }
 }

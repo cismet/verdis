@@ -1,10 +1,10 @@
 /***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2010 thorsten
  *
@@ -30,8 +30,31 @@ package de.cismet.verdis.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+
+import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolox.event.PNotification;
+
+import java.awt.Event;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import java.sql.Date;
+
+import java.util.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.plaf.basic.BasicToggleButtonUI;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.gui.MappingComponent;
@@ -42,36 +65,29 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.memento.MementoInterface;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
+
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
+
 import de.cismet.cismap.tools.gui.CidsBeanDropJPopupMenuButton;
+
 import de.cismet.gui.tools.PureNewFeatureWithThickerLineString;
+
 import de.cismet.tools.CurrentStackTrace;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.StaticDecimalTools;
+
 import de.cismet.tools.gui.JPopupMenuButton;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
+
 import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
 import de.cismet.verdis.constants.*;
+
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolox.event.PNotification;
-import java.awt.Event;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.sql.Date;
-import java.util.*;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.plaf.basic.BasicToggleButtonUI;
 
 /**
  * DOCUMENT ME!
@@ -80,17 +96,177 @@ import javax.swing.plaf.basic.BasicToggleButtonUI;
  * @version  $Revision$, $Date$
  */
 public class KartenPanel extends javax.swing.JPanel implements FeatureCollectionListener,
-        RetrievalListener,
-        Observer,
-        CidsBeanStore,
-        EditModeListener,
-        AppModeListener,
-        PropertyChangeListener {
+    RetrievalListener,
+    Observer,
+    CidsBeanStore,
+    EditModeListener,
+    AppModeListener,
+    PropertyChangeListener {
 
     //~ Instance fields --------------------------------------------------------
-    final private HashSet activeRetrievalServices = new HashSet();
+
+    private final HashSet activeRetrievalServices = new HashSet();
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
+
+    private Action searchAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("searchAction"); // NOI18N
+                            }
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+
+                                        if (mniSearchRectangle1.isSelected()) {
+                                            mainGroup.clearSelection();
+                                            cmdSearchKassenzeichen.setSelected(true);
+                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                                CreateGeometryListener.RECTANGLE);
+                                        } else if (mniSearchPolygon1.isSelected()) {
+                                            mainGroup.clearSelection();
+                                            cmdSearchKassenzeichen.setSelected(true);
+                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                                CreateGeometryListener.POLYGON);
+                                        } else if (mniSearchEllipse1.isSelected()) {
+                                            mainGroup.clearSelection();
+                                            cmdSearchKassenzeichen.setSelected(true);
+                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                                CreateGeometryListener.ELLIPSE);
+                                        }
+                                    }
+                                });
+                        }
+                    });
+            }
+        };
+
+    private Action searchRectangleAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("searchRectangleAction");                                                          // NOI18N
+                            }
+                            cmdSearchKassenzeichen.setIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png")));          // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"))); // NOI18N
+
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);
+
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                            ServerSearchCreateSearchGeometryListener.RECTANGLE);
+                                    }
+                                });
+                        }
+                    });
+            }
+        };
+
+    private Action searchPolygonAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("searchPolygonAction"); // NOI18N
+                            }
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);
+
+                            cmdSearchKassenzeichen.setIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon.png")));          // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon_selected.png"))); // NOI18N
+
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                            ServerSearchCreateSearchGeometryListener.POLYGON);
+                                    }
+                                });
+                        }
+                    });
+            }
+        };
+
+    private Action searchEllipseAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("searchEllipseAction"); // NOI18N
+                            }
+
+                            mainGroup.clearSelection();
+                            cmdSearchKassenzeichen.setSelected(true);
+
+                            cmdSearchKassenzeichen.setIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse.png")));          // NOI18N
+                            cmdSearchKassenzeichen.setSelectedIcon(
+                                new javax.swing.ImageIcon(
+                                    getClass().getResource(
+                                        "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse_selected.png"))); // NOI18N
+
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
+                                        ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
+                                                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
+                                            ServerSearchCreateSearchGeometryListener.ELLIPSE);
+                                    }
+                                });
+                        }
+                    });
+            }
+        };
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton cmdALB;
     private javax.swing.JButton cmdAdd;
@@ -149,13 +325,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates new form KartenPanel.
      */
     public KartenPanel() {
         initComponents();
 
-        ((JPopupMenuButton)cmdSearchKassenzeichen).setPopupMenu(popMenSearch);                
+        ((JPopupMenuButton)cmdSearchKassenzeichen).setPopupMenu(popMenSearch);
 
         CidsAppBackend.getInstance().setMainMap(mappingComp);
         CismapBroker.getInstance().setMappingComponent(mappingComp);
@@ -174,23 +351,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         // TIM Easy
         cmdNewPoint.setVisible(true);
 
-        ((JHistoryButton) cmdForward).setDirection(JHistoryButton.DIRECTION_FORWARD);
-        ((JHistoryButton) cmdBack).setDirection(JHistoryButton.DIRECTION_BACKWARD);
-        ((JHistoryButton) cmdForward).setHistoryModel(mappingComp);
-        ((JHistoryButton) cmdBack).setHistoryModel(mappingComp);
+        ((JHistoryButton)cmdForward).setDirection(JHistoryButton.DIRECTION_FORWARD);
+        ((JHistoryButton)cmdBack).setDirection(JHistoryButton.DIRECTION_BACKWARD);
+        ((JHistoryButton)cmdForward).setHistoryModel(mappingComp);
+        ((JHistoryButton)cmdBack).setHistoryModel(mappingComp);
 
         cmdWmsBackground.setSelected(mappingComp.isBackgroundEnabled());
 
-        mappingComp.getCamera().addPropertyChangeListener(
-                PCamera.PROPERTY_VIEW_TRANSFORM,
-                new PropertyChangeListener() {
+        mappingComp.getCamera()
+                .addPropertyChangeListener(
+                    PCamera.PROPERTY_VIEW_TRANSFORM,
+                    new PropertyChangeListener() {
 
-                    @Override
-                    public void propertyChange(final PropertyChangeEvent evt) {
-                        final int sd = (int) (mappingComp.getScaleDenominator() + 0.5);
-                        lblScale.setText("1:" + sd);
-                    }
-                });
+                        @Override
+                        public void propertyChange(final PropertyChangeEvent evt) {
+                            final int sd = (int)(mappingComp.getScaleDenominator() + 0.5);
+                            lblScale.setText("1:" + sd);
+                        }
+                    });
 
         addScalePopupMenu("1:500", 500);
         addScalePopupMenu("1:750", 750);
@@ -204,35 +382,36 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (LOG.isDebugEnabled()) {
             LOG.debug("Fl\u00E4chen\u00DCbersichtsTabellenPanel als Observer anmelden");
         }
-        ((Observable) mappingComp.getMemUndo()).addObserver(this);
-        ((Observable) mappingComp.getMemRedo()).addObserver(this);
+        ((Observable)mappingComp.getMemUndo()).addObserver(this);
+        ((Observable)mappingComp.getMemRedo()).addObserver(this);
 
 //        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
 //            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
 //        }
-        
+
     }
 
     //~ Methods ----------------------------------------------------------------
-                
+
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        final Object source = evt.getSource();        
+    public void propertyChange(final PropertyChangeEvent evt) {
+        final Object source = evt.getSource();
         final String propName = evt.getPropertyName();
         final Object newValue = evt.getNewValue();
-        
+
         if (source == null) {
             return;
         }
         if (source.equals(mappingComp.getInputListener(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER))) {
-            if (AbstractCreateSearchGeometryListener.PROPERTY_FORGUI_MODE.equals(propName) || AbstractCreateSearchGeometryListener.PROPERTY_MODE.equals(propName)) {
+            if (AbstractCreateSearchGeometryListener.PROPERTY_FORGUI_MODE.equals(propName)
+                        || AbstractCreateSearchGeometryListener.PROPERTY_MODE.equals(propName)) {
                 mniSearchEllipse1.setSelected(CreateGeometryListener.ELLIPSE.equals(newValue));
                 mniSearchPolygon1.setSelected(CreateGeometryListener.POLYGON.equals(newValue));
                 mniSearchRectangle1.setSelected(CreateGeometryListener.RECTANGLE.equals(newValue));
             }
         }
     }
-        
+
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
@@ -282,7 +461,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdNewPoint = new javax.swing.JToggleButton();
         cmdOrthogonalRectangle = new javax.swing.JToggleButton();
         cmdSearchFlurstueck = new javax.swing.JToggleButton();
-        cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER, mappingComp, null);
+        cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(
+                Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER,
+                mappingComp,
+                null);
         cmdRaisePolygon = new javax.swing.JToggleButton();
         cmdRemovePolygon = new javax.swing.JToggleButton();
         cmdAttachPolyToAlphadata = new javax.swing.JToggleButton();
@@ -298,39 +480,47 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRedo = new javax.swing.JButton();
 
         popMenSearch.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
-            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
-                popMenSearchPopupMenuWillBecomeVisible(evt);
-            }
-        });
+
+                public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent evt) {
+                }
+                public void popupMenuWillBecomeInvisible(final javax.swing.event.PopupMenuEvent evt) {
+                }
+                public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) {
+                    popMenSearchPopupMenuWillBecomeVisible(evt);
+                }
+            });
 
         mniSearchRectangle1.setAction(searchRectangleAction);
         searchGroup.add(mniSearchRectangle1);
         mniSearchRectangle1.setSelected(true);
         mniSearchRectangle1.setText("Rechteck");
-        mniSearchRectangle1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rectangleSearch.png"))); // NOI18N
+        mniSearchRectangle1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rectangleSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchRectangle1);
 
         mniSearchPolygon1.setAction(searchPolygonAction);
         searchGroup.add(mniSearchPolygon1);
         mniSearchPolygon1.setText("Polygon");
-        mniSearchPolygon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonSearch.png"))); // NOI18N
+        mniSearchPolygon1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchPolygon1);
 
         mniSearchEllipse1.setAction(searchEllipseAction);
         searchGroup.add(mniSearchEllipse1);
         mniSearchEllipse1.setText("Ellipse / Kreis");
-        mniSearchEllipse1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/ellipseSearch.png"))); // NOI18N
+        mniSearchEllipse1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/ellipseSearch.png"))); // NOI18N
         popMenSearch.add(mniSearchEllipse1);
 
         setLayout(new java.awt.BorderLayout());
 
         panMap.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2), javax.swing.BorderFactory.createEtchedBorder()), javax.swing.BorderFactory.createEmptyBorder(4, 4, 1, 4)));
+        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2),
+                    javax.swing.BorderFactory.createEtchedBorder()),
+                javax.swing.BorderFactory.createEmptyBorder(4, 4, 1, 4)));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         mappingComp.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -340,17 +530,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         panStatus.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 1, 1, 1));
         panStatus.setLayout(new java.awt.GridBagLayout());
 
-        cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
+        cmdAdd.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
         cmdAdd.setBorderPainted(false);
         cmdAdd.setFocusPainted(false);
         cmdAdd.setMinimumSize(new java.awt.Dimension(25, 25));
         cmdAdd.setPreferredSize(new java.awt.Dimension(25, 25));
-        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
+        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/statusbar/layersman.png"))); // NOI18N
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 0;
@@ -388,10 +582,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         lblScale.setText("1:???");
         lblScale.setComponentPopupMenu(pomScale);
         lblScale.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblScaleMousePressed(evt);
-            }
-        });
+
+                public void mousePressed(final java.awt.event.MouseEvent evt) {
+                    lblScaleMousePressed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -414,33 +609,40 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         tobVerdis.setFloatable(false);
 
-        cmdFullPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
+        cmdFullPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
         cmdFullPoly.setToolTipText("Zeige alle Flächen");
         cmdFullPoly.setBorderPainted(false);
         cmdFullPoly.setContentAreaFilled(false);
         cmdFullPoly.setFocusPainted(false);
         cmdFullPoly.setFocusable(false);
         cmdFullPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdFullPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdFullPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdFullPoly);
 
-        cmdFullPoly1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"))); // NOI18N
+        cmdFullPoly1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullSelPoly.png"))); // NOI18N
         cmdFullPoly1.setToolTipText("Zoom zur ausgewählten Fläche");
         cmdFullPoly1.setBorderPainted(false);
         cmdFullPoly1.setContentAreaFilled(false);
         cmdFullPoly1.setFocusPainted(false);
         cmdFullPoly1.setFocusable(false);
         cmdFullPoly1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdFullPoly1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdFullPoly1ActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdFullPoly1);
 
-        cmdBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
+        cmdBack.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
         cmdBack.setToolTipText("Zurück");
         cmdBack.setBorderPainted(false);
         cmdBack.setContentAreaFilled(false);
@@ -448,7 +650,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdBack.setFocusable(false);
         tobVerdis.add(cmdBack);
 
-        cmdForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fwd.png"))); // NOI18N
+        cmdForward.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fwd.png"))); // NOI18N
         cmdForward.setToolTipText("Vor");
         cmdForward.setBorderPainted(false);
         cmdForward.setContentAreaFilled(false);
@@ -460,21 +663,26 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         jSeparator5.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator5);
 
-        cmdWmsBackground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png"))); // NOI18N
+        cmdWmsBackground.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png")));    // NOI18N
         cmdWmsBackground.setToolTipText("Hintergrund an/aus");
         cmdWmsBackground.setBorderPainted(false);
         cmdWmsBackground.setContentAreaFilled(false);
         cmdWmsBackground.setFocusPainted(false);
         cmdWmsBackground.setFocusable(false);
-        cmdWmsBackground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
+        cmdWmsBackground.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/map_on.png"))); // NOI18N
         cmdWmsBackground.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdWmsBackgroundActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdWmsBackgroundActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdWmsBackground);
 
-        cmdForeground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png"))); // NOI18N
+        cmdForeground.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png")));    // NOI18N
         cmdForeground.setToolTipText("Vordergrund an/aus");
         cmdForeground.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
         cmdForeground.setBorderPainted(false);
@@ -483,28 +691,35 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdForeground.setFocusable(false);
         cmdForeground.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdForeground.setSelected(true);
-        cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
+        cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         cmdForeground.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdForeground.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdForegroundActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdForegroundActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdForeground);
 
-        cmdSnap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png"))); // NOI18N
+        cmdSnap.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png")));          // NOI18N
         cmdSnap.setSelected(true);
         cmdSnap.setToolTipText("Snapping an/aus");
         cmdSnap.setBorderPainted(false);
         cmdSnap.setContentAreaFilled(false);
         cmdSnap.setFocusPainted(false);
         cmdSnap.setFocusable(false);
-        cmdSnap.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
+        cmdSnap.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap_selected.png"))); // NOI18N
         cmdSnap.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSnapActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSnapActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSnap);
 
         sep2.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -512,133 +727,166 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(sep2);
 
         mainGroup.add(cmdZoom);
-        cmdZoom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom.png"))); // NOI18N
+        cmdZoom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom.png")));          // NOI18N
         cmdZoom.setToolTipText("Zoomen");
         cmdZoom.setBorderPainted(false);
         cmdZoom.setContentAreaFilled(false);
         cmdZoom.setFocusPainted(false);
         cmdZoom.setFocusable(false);
-        cmdZoom.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
+        cmdZoom.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/zoom_selected.png"))); // NOI18N
         cmdZoom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdZoomActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdZoomActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdZoom);
 
         mainGroup.add(cmdPan);
-        cmdPan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2.png"))); // NOI18N
+        cmdPan.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2.png")));          // NOI18N
         cmdPan.setToolTipText("Verschieben");
         cmdPan.setBorderPainted(false);
         cmdPan.setContentAreaFilled(false);
         cmdPan.setFocusPainted(false);
         cmdPan.setFocusable(false);
-        cmdPan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
+        cmdPan.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/move2_selected.png"))); // NOI18N
         cmdPan.setVerifyInputWhenFocusTarget(false);
         cmdPan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdPanActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdPanActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdPan);
 
         mainGroup.add(cmdSelect);
-        cmdSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png"))); // NOI18N
+        cmdSelect.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/select.png")));          // NOI18N
         cmdSelect.setSelected(true);
         cmdSelect.setToolTipText("Auswählen");
         cmdSelect.setBorderPainted(false);
         cmdSelect.setContentAreaFilled(false);
         cmdSelect.setFocusPainted(false);
         cmdSelect.setFocusable(false);
-        cmdSelect.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
+        cmdSelect.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/select_selected.png"))); // NOI18N
         cmdSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSelectActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSelectActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSelect);
 
         mainGroup.add(cmdALB);
-        cmdALB.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png"))); // NOI18N
+        cmdALB.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png")));          // NOI18N
         cmdALB.setToolTipText("ALB");
         cmdALB.setBorderPainted(false);
         cmdALB.setContentAreaFilled(false);
         cmdALB.setFocusPainted(false);
         cmdALB.setFocusable(false);
         cmdALB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdALB.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
+        cmdALB.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
         cmdALB.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdALB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdALBActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdALBActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdALB);
 
         mainGroup.add(cmdMovePolygon);
-        cmdMovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png"))); // NOI18N
+        cmdMovePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png")));          // NOI18N
         cmdMovePolygon.setToolTipText("Polygon verschieben");
         cmdMovePolygon.setBorderPainted(false);
         cmdMovePolygon.setContentAreaFilled(false);
         cmdMovePolygon.setFocusPainted(false);
         cmdMovePolygon.setFocusable(false);
-        cmdMovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
+        cmdMovePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly_selected.png"))); // NOI18N
         cmdMovePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdMovePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdMovePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdMovePolygon);
 
         mainGroup.add(cmdNewPolygon);
-        cmdNewPolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png"))); // NOI18N
+        cmdNewPolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png")));          // NOI18N
         cmdNewPolygon.setToolTipText("neues Polygon");
         cmdNewPolygon.setBorderPainted(false);
         cmdNewPolygon.setContentAreaFilled(false);
         cmdNewPolygon.setFocusPainted(false);
         cmdNewPolygon.setFocusable(false);
-        cmdNewPolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
+        cmdNewPolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly_selected.png"))); // NOI18N
         cmdNewPolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewPolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewPolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewPolygon);
 
         mainGroup.add(cmdNewLinestring);
-        cmdNewLinestring.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newLine.png"))); // NOI18N
+        cmdNewLinestring.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newLine.png")));          // NOI18N
         cmdNewLinestring.setToolTipText("neue Linie");
         cmdNewLinestring.setBorderPainted(false);
         cmdNewLinestring.setContentAreaFilled(false);
         cmdNewLinestring.setFocusPainted(false);
         cmdNewLinestring.setFocusable(false);
         cmdNewLinestring.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdNewLinestring.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newLine_selected.png"))); // NOI18N
+        cmdNewLinestring.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newLine_selected.png"))); // NOI18N
         cmdNewLinestring.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdNewLinestring.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewLinestringActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewLinestringActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewLinestring);
 
         mainGroup.add(cmdNewPoint);
-        cmdNewPoint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint.png"))); // NOI18N
+        cmdNewPoint.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint.png")));          // NOI18N
         cmdNewPoint.setToolTipText("neuer Punkt");
         cmdNewPoint.setBorderPainted(false);
         cmdNewPoint.setContentAreaFilled(false);
         cmdNewPoint.setFocusPainted(false);
         cmdNewPoint.setFocusable(false);
-        cmdNewPoint.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
+        cmdNewPoint.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoint_selected.png"))); // NOI18N
         cmdNewPoint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewPointActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewPointActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewPoint);
 
         mainGroup.add(cmdOrthogonalRectangle);
-        cmdOrthogonalRectangle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck.png"))); // NOI18N
+        cmdOrthogonalRectangle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck.png")));          // NOI18N
         cmdOrthogonalRectangle.setToolTipText("Rechteckige Fläche");
         cmdOrthogonalRectangle.setBorderPainted(false);
         cmdOrthogonalRectangle.setContentAreaFilled(false);
@@ -647,17 +895,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdOrthogonalRectangle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdOrthogonalRectangle.setMaximumSize(new java.awt.Dimension(28, 20));
         cmdOrthogonalRectangle.setPreferredSize(new java.awt.Dimension(28, 20));
-        cmdOrthogonalRectangle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck_selected.png"))); // NOI18N
+        cmdOrthogonalRectangle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck_selected.png"))); // NOI18N
         cmdOrthogonalRectangle.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdOrthogonalRectangle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdOrthogonalRectangleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdOrthogonalRectangleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdOrthogonalRectangle);
 
         mainGroup.add(cmdSearchFlurstueck);
-        cmdSearchFlurstueck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png"))); // NOI18N
+        cmdSearchFlurstueck.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
         cmdSearchFlurstueck.setToolTipText("Alkis Renderer");
         cmdSearchFlurstueck.setBorderPainted(false);
         cmdSearchFlurstueck.setContentAreaFilled(false);
@@ -666,17 +918,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchFlurstueck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdSearchFlurstueck.setMaximumSize(new java.awt.Dimension(28, 20));
         cmdSearchFlurstueck.setPreferredSize(new java.awt.Dimension(28, 20));
-        cmdSearchFlurstueck.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+        cmdSearchFlurstueck.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
         cmdSearchFlurstueck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchFlurstueck.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSearchFlurstueckActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchFlurstueckActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSearchFlurstueck);
 
         cmdSearchKassenzeichen.setAction(searchAction);
-        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
+        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
         cmdSearchKassenzeichen.setToolTipText("Kassenzeichen-Suche");
         cmdSearchKassenzeichen.setBorderPainted(false);
         mainGroup.add(cmdSearchKassenzeichen);
@@ -684,88 +940,112 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchKassenzeichen.setFocusPainted(false);
         cmdSearchKassenzeichen.setFocusable(false);
         cmdSearchKassenzeichen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"))); // NOI18N
+        cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource(
+                    "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png")));           // NOI18N
         cmdSearchKassenzeichen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSearchKassenzeichenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchKassenzeichenActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSearchKassenzeichen);
 
         mainGroup.add(cmdRaisePolygon);
-        cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png"))); // NOI18N
+        cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly.png")));          // NOI18N
         cmdRaisePolygon.setToolTipText("Polygon hochholen");
         cmdRaisePolygon.setBorderPainted(false);
         cmdRaisePolygon.setContentAreaFilled(false);
         cmdRaisePolygon.setFocusPainted(false);
         cmdRaisePolygon.setFocusable(false);
-        cmdRaisePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
+        cmdRaisePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/raisePoly_selected.png"))); // NOI18N
         cmdRaisePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRaisePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRaisePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRaisePolygon);
 
         mainGroup.add(cmdRemovePolygon);
-        cmdRemovePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png"))); // NOI18N
+        cmdRemovePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png")));          // NOI18N
         cmdRemovePolygon.setToolTipText("Polygon entfernen");
         cmdRemovePolygon.setBorderPainted(false);
         cmdRemovePolygon.setContentAreaFilled(false);
         cmdRemovePolygon.setFocusPainted(false);
         cmdRemovePolygon.setFocusable(false);
-        cmdRemovePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
+        cmdRemovePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly_selected.png"))); // NOI18N
         cmdRemovePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRemovePolygonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRemovePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRemovePolygon);
 
         mainGroup.add(cmdAttachPolyToAlphadata);
-        cmdAttachPolyToAlphadata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment.png"))); // NOI18N
+        cmdAttachPolyToAlphadata.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment.png")));          // NOI18N
         cmdAttachPolyToAlphadata.setToolTipText("Polygon zuordnen");
         cmdAttachPolyToAlphadata.setBorderPainted(false);
         cmdAttachPolyToAlphadata.setContentAreaFilled(false);
         cmdAttachPolyToAlphadata.setFocusPainted(false);
         cmdAttachPolyToAlphadata.setFocusable(false);
-        cmdAttachPolyToAlphadata.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
+        cmdAttachPolyToAlphadata.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/polygonAttachment_selected.png"))); // NOI18N
         cmdAttachPolyToAlphadata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAttachPolyToAlphadataActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAttachPolyToAlphadataActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdAttachPolyToAlphadata);
 
         mainGroup.add(cmdJoinPoly);
-        cmdJoinPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly.png"))); // NOI18N
+        cmdJoinPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly.png")));          // NOI18N
         cmdJoinPoly.setToolTipText("Polygone zusammenfassen");
         cmdJoinPoly.setBorderPainted(false);
         cmdJoinPoly.setContentAreaFilled(false);
         cmdJoinPoly.setFocusPainted(false);
         cmdJoinPoly.setFocusable(false);
-        cmdJoinPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
+        cmdJoinPoly.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/joinPoly_selected.png"))); // NOI18N
         cmdJoinPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdJoinPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdJoinPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdJoinPoly);
 
         mainGroup.add(cmdSplitPoly);
-        cmdSplitPoly.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png"))); // NOI18N
+        cmdSplitPoly.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png")));          // NOI18N
         cmdSplitPoly.setToolTipText("Polygon splitten");
         cmdSplitPoly.setBorderPainted(false);
         cmdSplitPoly.setContentAreaFilled(false);
         cmdSplitPoly.setFocusPainted(false);
         cmdSplitPoly.setFocusable(false);
-        cmdSplitPoly.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
+        cmdSplitPoly.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly_selected.png"))); // NOI18N
         cmdSplitPoly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdSplitPolyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSplitPolyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdSplitPoly);
 
         sep3.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -773,71 +1053,87 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(sep3);
 
         handleGroup.add(cmdMoveHandle);
-        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png"))); // NOI18N
+        cmdMoveHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle.png")));          // NOI18N
         cmdMoveHandle.setSelected(true);
         cmdMoveHandle.setToolTipText("Handle verschieben");
         cmdMoveHandle.setBorderPainted(false);
         cmdMoveHandle.setContentAreaFilled(false);
         cmdMoveHandle.setFocusPainted(false);
         cmdMoveHandle.setFocusable(false);
-        cmdMoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
+        cmdMoveHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/moveHandle_selected.png"))); // NOI18N
         cmdMoveHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdMoveHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdMoveHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdMoveHandle);
 
         handleGroup.add(cmdAddHandle);
-        cmdAddHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle.png"))); // NOI18N
+        cmdAddHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle.png")));          // NOI18N
         cmdAddHandle.setToolTipText("Handle hinzufügen");
         cmdAddHandle.setBorderPainted(false);
         cmdAddHandle.setContentAreaFilled(false);
         cmdAddHandle.setFocusPainted(false);
         cmdAddHandle.setFocusable(false);
-        cmdAddHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
+        cmdAddHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/addHandle_selected.png"))); // NOI18N
         cmdAddHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdAddHandle);
 
         handleGroup.add(cmdRemoveHandle);
-        cmdRemoveHandle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle.png"))); // NOI18N
+        cmdRemoveHandle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle.png")));          // NOI18N
         cmdRemoveHandle.setToolTipText("Handle entfernen");
         cmdRemoveHandle.setBorderPainted(false);
         cmdRemoveHandle.setContentAreaFilled(false);
         cmdRemoveHandle.setFocusPainted(false);
         cmdRemoveHandle.setFocusable(false);
-        cmdRemoveHandle.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
+        cmdRemoveHandle.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/removeHandle_selected.png"))); // NOI18N
         cmdRemoveHandle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRemoveHandleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRemoveHandleActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRemoveHandle);
 
         handleGroup.add(cmdRotatePolygon);
-        cmdRotatePolygon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png"))); // NOI18N
+        cmdRotatePolygon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16.png")));          // NOI18N
         cmdRotatePolygon.setToolTipText("Rotiere Polygon");
         cmdRotatePolygon.setBorderPainted(false);
         cmdRotatePolygon.setContentAreaFilled(false);
         cmdRotatePolygon.setFocusPainted(false);
         cmdRotatePolygon.setFocusable(false);
-        cmdRotatePolygon.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
+        cmdRotatePolygon.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
         cmdRotatePolygon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRotatePolygonActionPerformed(evt);
-            }
-        });
+
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRotatePolygonActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRotatePolygon);
 
         sep4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         sep4.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(sep4);
 
-        cmdUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
+        cmdUndo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
         cmdUndo.setToolTipText("Undo");
         cmdUndo.setBorderPainted(false);
         cmdUndo.setContentAreaFilled(false);
@@ -846,13 +1142,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdUndo.setFocusable(false);
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdUndoActionPerformed(evt);
-            }
-        });
+
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdUndoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdUndo);
 
-        cmdRedo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
+        cmdRedo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
         cmdRedo.setBorderPainted(false);
         cmdRedo.setContentAreaFilled(false);
         cmdRedo.setEnabled(false);
@@ -861,65 +1159,66 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRedo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdRedo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRedo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRedoActionPerformed(evt);
-            }
-        });
+
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRedoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRedo);
 
         panMap.add(tobVerdis, java.awt.BorderLayout.NORTH);
 
         add(panMap, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         try {
             mappingComp.showInternalLayerWidget(!mappingComp.isInternalLayerWidgetVisible(), 500);
         } catch (Throwable t) {
             LOG.error("Fehler beim Anzeigen des Layersteuerelements", t);
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblScaleMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblScaleMousePressed
+    private void lblScaleMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblScaleMousePressed
         if (evt.isPopupTrigger()) {
             pomScale.setVisible(true);
         }
-    }//GEN-LAST:event_lblScaleMousePressed
+    }                                                                        //GEN-LAST:event_lblScaleMousePressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdFullPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPolyActionPerformed
+    private void cmdFullPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPolyActionPerformed
         mappingComp.zoomToFullFeatureCollectionBounds();
-    }//GEN-LAST:event_cmdFullPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdFullPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPoly1ActionPerformed
+    private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPoly1ActionPerformed
         mappingComp.zoomToSelectedNode();
-    }//GEN-LAST:event_cmdFullPoly1ActionPerformed
+    }                                                                                //GEN-LAST:event_cmdFullPoly1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWmsBackgroundActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWmsBackgroundActionPerformed
+    private void cmdWmsBackgroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWmsBackgroundActionPerformed
         if (mappingComp.isBackgroundEnabled()) {
             mappingComp.setBackgroundEnabled(false);
             cmdWmsBackground.setSelected(false);
@@ -928,14 +1227,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             cmdWmsBackground.setSelected(true);
             mappingComp.queryServices();
         }
-    }//GEN-LAST:event_cmdWmsBackgroundActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdWmsBackgroundActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdForegroundActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdForegroundActionPerformed
+    private void cmdForegroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdForegroundActionPerformed
         if (mappingComp.isFeatureCollectionVisible()) {
             mappingComp.setFeatureCollectionVisibility(false);
             cmdForeground.setSelected(false);
@@ -943,61 +1242,61 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             mappingComp.setFeatureCollectionVisibility(true);
             cmdForeground.setSelected(true);
         }
-    }//GEN-LAST:event_cmdForegroundActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdForegroundActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSnapActionPerformed
+    private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSnapActionPerformed
         mappingComp.setSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
-    }//GEN-LAST:event_cmdSnapActionPerformed
+    }                                                                           //GEN-LAST:event_cmdSnapActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMoveHandleActionPerformed
+    private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMoveHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.MOVE_HANDLE);
-    }//GEN-LAST:event_cmdMoveHandleActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdMoveHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddHandleActionPerformed
+    private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
-    }//GEN-LAST:event_cmdAddHandleActionPerformed
+    }                                                                                //GEN-LAST:event_cmdAddHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveHandleActionPerformed
+    private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.REMOVE_HANDLE);
-    }//GEN-LAST:event_cmdRemoveHandleActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdRemoveHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRotatePolygonActionPerformed
+    private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRotatePolygonActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.ROTATE_POLYGON);
-    }//GEN-LAST:event_cmdRotatePolygonActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdRotatePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
         LOG.info("UNDO");
         final CustomAction a = mappingComp.getMemUndo().getLastAction();
         if (LOG.isDebugEnabled()) {
@@ -1014,14 +1313,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             LOG.debug("... neue Aktion auf REDO-Stack: " + inverse);
             LOG.debug("... fertig");
         }
-    }//GEN-LAST:event_cmdUndoActionPerformed
+    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRedoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRedoActionPerformed
+    private void cmdRedoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRedoActionPerformed
         LOG.info("REDO");
         final CustomAction a = mappingComp.getMemRedo().getLastAction();
         if (LOG.isDebugEnabled()) {
@@ -1038,158 +1337,173 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             LOG.debug("... neue Aktion auf UNDO-Stack: " + inverse);
             LOG.debug("... fertig");
         }
-    }//GEN-LAST:event_cmdRedoActionPerformed
-
-    private void popMenSearchPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
-    }//GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
+    }                                                                           //GEN-LAST:event_cmdRedoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSplitPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSplitPolyActionPerformed
+    private void popMenSearchPopupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) { //GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
+    }                                                                                                 //GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSplitPolyActionPerformed
         mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
         cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSplitPolyActionPerformed
+    }                                                                                //GEN-LAST:event_cmdSplitPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdJoinPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdJoinPolyActionPerformed
+    private void cmdJoinPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdJoinPolyActionPerformed
         mappingComp.setInteractionMode(MappingComponent.JOIN_POLYGONS);
-    }//GEN-LAST:event_cmdJoinPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdJoinPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAttachPolyToAlphadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
+    private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
         mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
-    }//GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
+    }                                                                                            //GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemovePolygonActionPerformed
+    private void cmdRemovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemovePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.REMOVE_POLYGON);
-    }//GEN-LAST:event_cmdRemovePolygonActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdRemovePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRaisePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRaisePolygonActionPerformed
+    private void cmdRaisePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRaisePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.RAISE_POLYGON);
-    }//GEN-LAST:event_cmdRaisePolygonActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdRaisePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPointActionPerformed
+    private void cmdNewPointActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPointActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.POINT);
-    }//GEN-LAST:event_cmdNewPointActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.POINT);
+    }                                                                               //GEN-LAST:event_cmdNewPointActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPanActionPerformed
+    private void cmdPanActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPanActionPerformed
         mappingComp.setInteractionMode(MappingComponent.PAN);
-    }//GEN-LAST:event_cmdPanActionPerformed
+    }                                                                          //GEN-LAST:event_cmdPanActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSelectActionPerformed
+    private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSelectActionPerformed
         mappingComp.setInteractionMode(MappingComponent.SELECT);
         cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSelectActionPerformed
+    }                                                                             //GEN-LAST:event_cmdSelectActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdALBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdALBActionPerformed
+    private void cmdALBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdALBActionPerformed
         mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
         cmdALB.isSelected();
-    }//GEN-LAST:event_cmdALBActionPerformed
+    }                                                                          //GEN-LAST:event_cmdALBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdMovePolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMovePolygonActionPerformed
+    private void cmdMovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMovePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.MOVE_POLYGON);
-    }//GEN-LAST:event_cmdMovePolygonActionPerformed
+    }                                                                                  //GEN-LAST:event_cmdMovePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewPolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPolygonActionPerformed
+    private void cmdNewPolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(PureNewFeature.class);
-    }//GEN-LAST:event_cmdNewPolygonActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.POLYGON);
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
+            PureNewFeature.class);
+    }                                                                                 //GEN-LAST:event_cmdNewPolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewLinestringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewLinestringActionPerformed
+    private void cmdNewLinestringActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewLinestringActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.LINESTRING);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
-                PureNewFeatureWithThickerLineString.class);
-    }//GEN-LAST:event_cmdNewLinestringActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.LINESTRING);
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
+            PureNewFeatureWithThickerLineString.class);
+    }                                                                                    //GEN-LAST:event_cmdNewLinestringActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOrthogonalRectangleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
+    private void cmdOrthogonalRectangleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
-        ((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
-                CreateGeometryListener.RECTANGLE_FROM_LINE);
-    }//GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
+        ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
+            CreateGeometryListener.RECTANGLE_FROM_LINE);
+    }                                                                                          //GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
 
-    private void cmdSearchFlurstueckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
         mappingComp.setInteractionMode(Main.FLURSTUECK_SEARCH_GEOMETRY_LISTENER);
-    }//GEN-LAST:event_cmdSearchFlurstueckActionPerformed
-
-    private void cmdSearchKassenzeichenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
-
-   }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_cmdSearchFlurstueckActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdZoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdZoomActionPerformed
+    private void cmdSearchKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdZoomActionPerformed
         mappingComp.setInteractionMode(MappingComponent.ZOOM);
-    }//GEN-LAST:event_cmdZoomActionPerformed
+    }                                                                           //GEN-LAST:event_cmdZoomActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1201,11 +1515,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final JMenuItem jmi = new JMenuItem(text);
         jmi.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                mappingComp.gotoBoundingBoxWithHistory(mappingComp.getBoundingBoxFromScale(scaleDenominator));
-            }
-        });
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    mappingComp.gotoBoundingBoxWithHistory(mappingComp.getBoundingBoxFromScale(scaleDenominator));
+                }
+            });
         pomScale.add(jmi);
     }
 
@@ -1253,7 +1567,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void retrievalAborted(final RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
@@ -1264,7 +1578,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void retrievalComplete(final RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
@@ -1275,7 +1589,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void retrievalError(final RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
@@ -1286,7 +1600,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void retrievalProgress(final RetrievalEvent e) {
-        activeRetrievalServices.remove(((ServiceLayer) e.getRetrievalService()).getName());
+        activeRetrievalServices.remove(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
@@ -1297,7 +1611,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void retrievalStarted(final RetrievalEvent e) {
-        activeRetrievalServices.add(((ServiceLayer) e.getRetrievalService()).getName());
+        activeRetrievalServices.add(((ServiceLayer)e.getRetrievalService()).getName());
         checkProgress();
     }
 
@@ -1322,22 +1636,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
                 EventQueue.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        cmdUndo.setEnabled(true);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdUndo.setEnabled(true);
+                        }
+                    });
             } else if (arg.equals(MementoInterface.DEACTIVATE) && cmdUndo.isEnabled()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("UNDO-Button deaktivieren");
                 }
                 EventQueue.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        cmdUndo.setEnabled(false);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdUndo.setEnabled(false);
+                        }
+                    });
             }
         } else if (o.equals(mappingComp.getMemRedo())) {
             if (arg.equals(MementoInterface.ACTIVATE) && !cmdRedo.isEnabled()) {
@@ -1346,22 +1660,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
                 EventQueue.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        cmdRedo.setEnabled(true);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdRedo.setEnabled(true);
+                        }
+                    });
             } else if (arg.equals(MementoInterface.DEACTIVATE) && cmdRedo.isEnabled()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("REDO-Button deaktivieren");
                 }
                 EventQueue.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        cmdRedo.setEnabled(false);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            cmdRedo.setEnabled(false);
+                        }
+                    });
             }
         }
     }
@@ -1382,7 +1696,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final Collection<Feature> selectedFeatures = mappingComp.getFeatureCollection().getSelectedFeatures();
         final Collection<Feature> cidsFeatures = new ArrayList<Feature>();
         for (final Feature feature : selectedFeatures) {
-            if (feature instanceof CidsFeature || feature instanceof PureNewFeature) {
+            if ((feature instanceof CidsFeature) || (feature instanceof PureNewFeature)) {
                 cidsFeatures.add(feature);
             }
         }
@@ -1418,15 +1732,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     area += f.getGeometry().getArea();
                     umfang += f.getGeometry().getLength();
                 }
-            }                    
-            if ((area == 0.0 && umfang == 0.0) || cf.isEmpty()) {
+            }
+            if (((area == 0.0) && (umfang == 0.0)) || cf.isEmpty()) {
                 lblMeasurement.setText("");
             } else {
                 // vor dem runden erst zweistellig abschneiden (damit nicht aufgerundet wird)
                 final double areadd = ((double)(Math.ceil(area * 100))) / 100;
                 final double umfangdd = ((double)(Math.ceil(umfang * 100))) / 100;
                 lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(areadd) + "  Umfang: "
-                        + StaticDecimalTools.round(umfangdd));
+                            + StaticDecimalTools.round(umfangdd));
             }
         } else if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ESW)) {
             double length = 0.0;
@@ -1449,22 +1763,25 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     public void coordinatesChanged(final PNotification notification) {
         final Object o = notification.getObject();
         if (o instanceof SimpleMoveListener) {
-            final double x = ((SimpleMoveListener) o).getXCoord();
-            final double y = ((SimpleMoveListener) o).getYCoord();
+            final double x = ((SimpleMoveListener)o).getXCoord();
+            final double y = ((SimpleMoveListener)o).getYCoord();
 
             lblCoord.setText(MappingComponent.getCoordinateString(x, y)); // + "... " +test);
-            final PFeature pf = ((SimpleMoveListener) o).getUnderlyingPFeature();
+            final PFeature pf = ((SimpleMoveListener)o).getUnderlyingPFeature();
             if ((pf != null) && (pf.getFeature() instanceof PostgisFeature) && (pf.getVisible() == true)
-                    && (pf.getParent() != null)
-                    && (pf.getParent().getVisible() == true)) {
-                lblInfo.setText(((PostgisFeature) pf.getFeature()).getObjectName());
+                        && (pf.getParent() != null)
+                        && (pf.getParent().getVisible() == true)) {
+                lblInfo.setText(((PostgisFeature)pf.getFeature()).getObjectName());
             } else if ((pf != null) && (pf.getFeature() instanceof CidsFeature)) {
-                final CidsFeature cf = (CidsFeature) pf.getFeature();
-                if (cf.getMetaClass().getName().toLowerCase().equals(VerdisMetaClassConstants.MC_FLAECHE.toLowerCase())) {
-                    final CidsBean cb = (CidsBean) cf.getMetaObject().getBean();
+                final CidsFeature cf = (CidsFeature)pf.getFeature();
+                if (cf.getMetaClass().getName().toLowerCase().equals(
+                                VerdisMetaClassConstants.MC_FLAECHE.toLowerCase())) {
+                    final CidsBean cb = (CidsBean)cf.getMetaObject().getBean();
 
-                    final int kassenzeichenNummer = (Integer) getCidsBean().getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-                    final String bezeichnung = (String) cb.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    final int kassenzeichenNummer = (Integer)getCidsBean().getProperty(
+                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    final String bezeichnung = (String)cb.getProperty(
+                            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
 
                     lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + bezeichnung);
                 }
@@ -1489,14 +1806,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             final Object o = notification.getObject();
 
             if (o instanceof JoinPolygonsListener) {
-                final JoinPolygonsListener listener = ((JoinPolygonsListener) o);
+                final JoinPolygonsListener listener = ((JoinPolygonsListener)o);
                 final PFeature joinCandidate = listener.getFeatureRequestedForJoin();
                 if ((joinCandidate.getFeature() instanceof CidsFeature)
-                        || (joinCandidate.getFeature() instanceof PureNewFeature)) {
+                            || (joinCandidate.getFeature() instanceof PureNewFeature)) {
                     if ((listener.getModifier() & Event.CTRL_MASK) != 0) {
                         if ((one != null) && (joinCandidate != one)) {
                             if ((one.getFeature() instanceof PureNewFeature)
-                                    && (joinCandidate.getFeature() instanceof CidsFeature)) {
+                                        && (joinCandidate.getFeature() instanceof CidsFeature)) {
                                 two = one;
 
                                 one = joinCandidate;
@@ -1508,86 +1825,113 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             }
                             try {
                                 final Geometry backup = one.getFeature().getGeometry();
-                                final Geometry newGeom = one.getFeature().getGeometry().union(two.getFeature().getGeometry());
+                                final Geometry newGeom = one.getFeature()
+                                            .getGeometry()
+                                            .union(two.getFeature().getGeometry());
                                 if (newGeom.getGeometryType().equalsIgnoreCase("Multipolygon")) {
                                     JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                            "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.",
-                                            "Zusammenfassung nicht m\u00F6glich",
-                                            JOptionPane.WARNING_MESSAGE,
-                                            null);
+                                        "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.",
+                                        "Zusammenfassung nicht m\u00F6glich",
+                                        JOptionPane.WARNING_MESSAGE,
+                                        null);
                                     return;
                                 }
                                 if (newGeom.getGeometryType().equalsIgnoreCase("Polygon")
-                                        && (((Polygon) newGeom).getNumInteriorRing() > 0)) {
+                                            && (((Polygon)newGeom).getNumInteriorRing() > 0)) {
                                     JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                            "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.",
-                                            "Zusammenfassung nicht m\u00F6glich",
-                                            JOptionPane.WARNING_MESSAGE,
-                                            null);
+                                        "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.",
+                                        "Zusammenfassung nicht m\u00F6glich",
+                                        JOptionPane.WARNING_MESSAGE,
+                                        null);
                                     return;
                                 }
                                 if ((one != null) && (two != null) && (one.getFeature() instanceof CidsFeature)
-                                        && (two.getFeature() instanceof CidsFeature)) {
-
-                                    final CidsFeature cfOne = (CidsFeature) one.getFeature();
-                                    final CidsFeature cfTwo = (CidsFeature) two.getFeature();
+                                            && (two.getFeature() instanceof CidsFeature)) {
+                                    final CidsFeature cfOne = (CidsFeature)one.getFeature();
+                                    final CidsFeature cfTwo = (CidsFeature)two.getFeature();
                                     final CidsBean cbOne = cfOne.getMetaObject().getBean();
                                     final CidsBean cbTwo = cfTwo.getMetaObject().getBean();
 
-                                    final int artOne = (Integer) cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
-                                    final int artTwo = (Integer) cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                                    final int artOne = (Integer)cbOne.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                                    final int artTwo = (Integer)cbTwo.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
 
-                                    final int gradOne = (Integer) cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
-                                    final int gradTwo = (Integer) cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
+                                    final int gradOne = (Integer)cbOne.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
+                                    final int gradTwo = (Integer)cbTwo.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
 
-                                    if (artOne != artTwo || gradOne != gradTwo) {
+                                    if ((artOne != artTwo) || (gradOne != gradTwo)) {
                                         JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                                "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.",
-                                                "Zusammenfassung nicht m\u00F6glich",
-                                                JOptionPane.WARNING_MESSAGE,
-                                                null);
+                                            "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.",
+                                            "Zusammenfassung nicht m\u00F6glich",
+                                            JOptionPane.WARNING_MESSAGE,
+                                            null);
                                         return;
                                     }
 
-                                    final Integer anteilOne = (Integer) cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL);
-                                    final Integer anteilTwo = (Integer) cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                                    final Integer anteilOne = (Integer)cbOne.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                                    final Integer anteilTwo = (Integer)cbTwo.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__ANTEIL);
 
                                     // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
-                                    if (anteilOne != null || anteilTwo != null) {
+                                    if ((anteilOne != null) || (anteilTwo != null)) {
                                         JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                                "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.",
-                                                "Zusammenfassung nicht m\u00F6glich",
-                                                JOptionPane.WARNING_MESSAGE,
-                                                null);
+                                            "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.",
+                                            "Zusammenfassung nicht m\u00F6glich",
+                                            JOptionPane.WARNING_MESSAGE,
+                                            null);
                                         return;
                                     }
 
                                     Main.getCurrentInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
 
-                                    cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK, new Integer((int) (newGeom.getArea())));
+                                    cbOne.setProperty(
+                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                        new Integer((int)(newGeom.getArea())));
 
-                                    final String bemerkungOne = (String) cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
+                                    final String bemerkungOne = (String)cbOne.getProperty(
+                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
 
-                                    if (bemerkungOne != null && bemerkungOne.trim().length() > 0) {
-                                        cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG, bemerkungOne + "\n");
+                                    if ((bemerkungOne != null) && (bemerkungOne.trim().length() > 0)) {
+                                        cbOne.setProperty(
+                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG,
+                                            bemerkungOne
+                                                    + "\n");
                                     }
-                                    cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG, getJoinBackupString(cbTwo));
+                                    cbOne.setProperty(
+                                        RegenFlaechenPropertyConstants.PROP__BEMERKUNG,
+                                        getJoinBackupString(cbTwo));
 
-                                    final boolean sperreOne = cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE) != null && (Boolean) cbOne.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE);
-                                    final boolean sperreTwo = cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE) != null && (Boolean) cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE);
+                                    final boolean sperreOne = (cbOne.getProperty(
+                                                RegenFlaechenPropertyConstants.PROP__SPERRE) != null)
+                                                && (Boolean)cbOne.getProperty(
+                                                    RegenFlaechenPropertyConstants.PROP__SPERRE);
+                                    final boolean sperreTwo = (cbTwo.getProperty(
+                                                RegenFlaechenPropertyConstants.PROP__SPERRE) != null)
+                                                && (Boolean)cbTwo.getProperty(
+                                                    RegenFlaechenPropertyConstants.PROP__SPERRE);
 
                                     if (!sperreOne && sperreTwo) {
                                         cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__SPERRE, true);
-                                        cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE, "JOIN::" + cbTwo.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE));
+                                        cbOne.setProperty(
+                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                            "JOIN::"
+                                                    + cbTwo.getProperty(
+                                                        RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE));
                                     }
                                 }
                                 if (one.getFeature() instanceof CidsFeature) {
-                                    final CidsFeature cfOne = (CidsFeature) one.getFeature();
+                                    final CidsFeature cfOne = (CidsFeature)one.getFeature();
                                     final CidsBean cbOne = cfOne.getMetaObject().getBean();
 
                                     // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
                                     RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
-                                    cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK, (int) newGeom.getArea());
+                                    cbOne.setProperty(
+                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                        (int)newGeom.getArea());
                                 }
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
@@ -1610,7 +1954,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                         }
                         one = pf;
                         if (one.getFeature() instanceof CidsFeature) {
-                            final CidsFeature flaecheFeature = (CidsFeature) one.getFeature();
+                            final CidsFeature flaecheFeature = (CidsFeature)one.getFeature();
                             mappingComp.getFeatureCollection().select(flaecheFeature);
                         } else {
                             mappingComp.getFeatureCollection().unselectAll();
@@ -1621,26 +1965,40 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
     }
 
-    private static String getJoinBackupString(CidsBean flaecheBean) {
-        final String bezeichnung = (String) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-        final String gr_grafik = Integer.toString((Integer) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK));
-        final String gr_korrektur = Integer.toString((Integer) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR));
-        final String erfassungsdatum = ((Date) flaecheBean.getProperty(KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG)).toString();
-        final String veranlagungsdatum = (String) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG);
-        final String sperre = Boolean.toString(flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE) != null && (Boolean) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE));
-        final String bem_sperre = (String) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE);
-        final String feb_id = (String) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FEB_ID);
-        final String bemerkung = (String) flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   flaecheBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static String getJoinBackupString(final CidsBean flaecheBean) {
+        final String bezeichnung = (String)flaecheBean.getProperty(
+                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+        final String gr_grafik = Integer.toString((Integer)flaecheBean.getProperty(
+                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK));
+        final String gr_korrektur = Integer.toString((Integer)flaecheBean.getProperty(
+                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR));
+        final String erfassungsdatum =
+            ((Date)flaecheBean.getProperty(KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG)).toString();
+        final String veranlagungsdatum = (String)flaecheBean.getProperty(
+                RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG);
+        final String sperre = Boolean.toString((flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE)
+                            != null) && (Boolean)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE));
+        final String bem_sperre = (String)flaecheBean.getProperty(
+                RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE);
+        final String feb_id = (String)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FEB_ID);
+        final String bemerkung = (String)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
 
         String ret = "<JOIN ";
         ret += "bez=\"" + bezeichnung
-                + "\" gr=\"" + gr_grafik
-                + "\" grk=\"" + gr_korrektur
-                + "\" edat=\"" + erfassungsdatum
-                + "\" vdat=\"" + veranlagungsdatum
-                + "\" sp=\"" + sperre
-                + "\" spbem=\"" + bem_sperre
-                + "\" febid=\"" + feb_id + "  >\n";
+                    + "\" gr=\"" + gr_grafik
+                    + "\" grk=\"" + gr_korrektur
+                    + "\" edat=\"" + erfassungsdatum
+                    + "\" vdat=\"" + veranlagungsdatum
+                    + "\" sp=\"" + sperre
+                    + "\" spbem=\"" + bem_sperre
+                    + "\" febid=\"" + feb_id + "  >\n";
         ret += bemerkung;
         if ((bemerkung != null) && (bemerkung.trim().length() > 0) && !bemerkung.endsWith("\n")) {
             ret += "\n";
@@ -1654,6 +2012,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         return kassenzeichenBean;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  withZoom  DOCUMENT ME!
+     */
     private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
         final boolean editable = CidsAppBackend.getInstance().isEditable();
@@ -1664,29 +2027,44 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (cidsBean != null) {
             switch (CidsAppBackend.getInstance().getMode()) {
                 case ALLGEMEIN: {
-                    final Feature add = new BeanUpdatingCidsFeature(cidsBean, KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                    final Feature add = new BeanUpdatingCidsFeature(
+                            cidsBean,
+                            KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
                     add.setEditable(editable);
                     featureCollection.addFeature(add);
-                } break;
+                }
+                break;
                 case REGEN: {
-                    final List<CidsBean> flaechen = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                    final List<CidsBean> flaechen = (List<CidsBean>)cidsBean.getProperty(
+                            KassenzeichenPropertyConstants.PROP__FLAECHEN);
                     for (final CidsBean flaeche : flaechen) {
-                        final Feature add = new BeanUpdatingCidsFeature(flaeche, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                        final Feature add = new BeanUpdatingCidsFeature(
+                                flaeche,
+                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
-                } break;
+                }
+                break;
                 case ESW: {
-                    final List<CidsBean> fronten = (List<CidsBean>) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
+                    final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
+                            KassenzeichenPropertyConstants.PROP__FRONTEN);
                     for (final CidsBean front : fronten) {
-                        final Feature add = new BeanUpdatingCidsFeature(front, FrontinfoPropertyConstants.PROP__GEOMETRIE + PropertyConstants.DOT + GeomPropertyConstants.PROP__GEO_FIELD);
+                        final Feature add = new BeanUpdatingCidsFeature(
+                                front,
+                                FrontinfoPropertyConstants.PROP__GEOMETRIE
+                                        + PropertyConstants.DOT
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
-                } break;
+                }
+                break;
             }
             if (withZoom) {
-                mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(), true, mappingComp.isFixedMapScale());
+                mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
+                    true,
+                    mappingComp.isFixedMapScale());
             }
         }
     }
@@ -1697,7 +2075,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         kassenzeichenBean = cidsBean;
 
-        refreshInMap(cidsBean != null && !cidsBean.equals(oldCidsBean));
+        refreshInMap((cidsBean != null) && !cidsBean.equals(oldCidsBean));
     }
 
     @Override
@@ -1706,21 +2084,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final List<Feature> all = mappingComp.getFeatureCollection().getAllFeatures();
         for (final Feature f : all) {
             f.setEditable(b);
-        }        
+        }
         CidsAppBackend.getInstance().getMainMap().setReadOnly(!b);
     }
-    
+
     @Override
     public void appModeChanged() {
         refreshInMap(true);
         lblMeasurement.setText("");
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void changeSelectedButtonAccordingToInteractionMode() {
         final String im = mappingComp.getInteractionMode();
         if (LOG.isDebugEnabled()) {
             LOG.debug("changeSelectedButtonAccordingToInteractionMode: " + mappingComp.getInteractionMode(),
-                    new CurrentStackTrace());
+                new CurrentStackTrace());
         }
         if (im.equals(MappingComponent.ZOOM)) {
             cmdZoom.setSelected(true);
@@ -1732,10 +2113,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         } else if (im.equals(MappingComponent.SELECT)) {
             cmdSelect.setSelected(true);
         } else if (im.equals(MappingComponent.NEW_POLYGON)) {
-            if (((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(
-                    CreateGeometryListener.POINT)) {
+            if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(
+                            CreateGeometryListener.POINT)) {
                 cmdNewPoint.setSelected(true);
-            } else if (((CreateGeometryListener) mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(CreateGeometryListener.POLYGON)) {
+            } else if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode()
+                        .equals(CreateGeometryListener.POLYGON)) {
                 cmdNewPolygon.setSelected(true);
             } else {
                 cmdSelect.setSelected(true);
@@ -1751,20 +2133,26 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notfication  DOCUMENT ME!
+     */
     public void selectionChanged(final PNotification notfication) {
         final Object o = notfication.getObject();
-        if (o instanceof SelectionListener || o instanceof FeatureMoveListener || o instanceof SplitPolygonListener) {
+        if ((o instanceof SelectionListener) || (o instanceof FeatureMoveListener)
+                    || (o instanceof SplitPolygonListener)) {
             PFeature pf = null;
             if (o instanceof SelectionListener) {
-                pf = ((SelectionListener) o).getSelectedPFeature();
-                if (((SelectionListener) o).getClickCount() > 1 && pf.getFeature() instanceof PostgisFeature) {
+                pf = ((SelectionListener)o).getSelectedPFeature();
+                if ((((SelectionListener)o).getClickCount() > 1) && (pf.getFeature() instanceof PostgisFeature)) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener) o).getClickCount());
+                        LOG.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener)o).getClickCount());
                     }
-                    final PostgisFeature postgisFeature = ((PostgisFeature) pf.getFeature());
+                    final PostgisFeature postgisFeature = ((PostgisFeature)pf.getFeature());
                     try {
-                        if (pf.getVisible() == true && pf.getParent().getVisible() == true
-                                && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
+                        if ((pf.getVisible() == true) && (pf.getParent().getVisible() == true)
+                                    && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
                             Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(postgisFeature.getGroupingKey());
                         }
                     } catch (Exception e) {
@@ -1775,14 +2163,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notfication  DOCUMENT ME!
+     */
     public void featureDeleteRequested(final PNotification notfication) {
         final Object o = notfication.getObject();
         if (o instanceof DeleteFeatureListener) {
-            final DeleteFeatureListener dfl = (DeleteFeatureListener) o;
+            final DeleteFeatureListener dfl = (DeleteFeatureListener)o;
             final PFeature pf = dfl.getFeatureRequestedForDeletion();
             if (pf.getFeature() instanceof CidsFeature) {
                 try {
-                    final CidsFeature cf = (CidsFeature) pf.getFeature();
+                    final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
                     cb.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, null);
                 } catch (Exception ex) {
@@ -1792,17 +2185,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
     public void splitPolygon(final PNotification notification) {
         if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.REGEN)) {
             final Object o = notification.getObject();
             if (o instanceof SplitPolygonListener) {
-                final SplitPolygonListener l = (SplitPolygonListener) o;
+                final SplitPolygonListener l = (SplitPolygonListener)o;
                 final PFeature pf = l.getFeatureClickedOn();
                 if (pf.getFeature() instanceof CidsFeature) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Split");
                     }
-                    final CidsFeature cf = (CidsFeature) pf.getFeature();
+                    final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
                     try {
                         cb.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, null);
@@ -1823,146 +2221,4 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         }
     }
-    
-    private Action searchAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("searchAction"); // NOI18N
-                            }
-                            EventQueue.invokeLater(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-
-                                        if (mniSearchRectangle1.isSelected()) {
-                                            mainGroup.clearSelection();
-                                            cmdSearchKassenzeichen.setSelected(true);                                            
-                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                                CreateGeometryListener.RECTANGLE);
-                                        } else if (mniSearchPolygon1.isSelected()) {
-                                            mainGroup.clearSelection();
-                                            cmdSearchKassenzeichen.setSelected(true);
-                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                                CreateGeometryListener.POLYGON);
-                                        } else if (mniSearchEllipse1.isSelected()) {
-                                            mainGroup.clearSelection();
-                                            cmdSearchKassenzeichen.setSelected(true);
-                                            ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                                    Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                                CreateGeometryListener.ELLIPSE);
-                                        }
-                                    }
-                                });
-                        }
-                    });
-            }
-        };    
-    
-    
-    private Action searchRectangleAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("searchRectangleAction");                                                      // NOI18N
-                            }
-                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
-                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png"))); // NOI18N
-
-                            mainGroup.clearSelection();
-                            cmdSearchKassenzeichen.setSelected(true);                                            
-                            
-                            EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                        ServerSearchCreateSearchGeometryListener.RECTANGLE);
-                                }
-                            });
-                        }
-                    });
-            }
-        };
-
-    private Action searchPolygonAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("searchPolygonAction");                                                      // NOI18N
-                            }
-                            mainGroup.clearSelection();
-                            cmdSearchKassenzeichen.setSelected(true);                                            
-                            
-                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon.png"))); // NOI18N
-                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchPolygon_selected.png"))); // NOI18N
-                            
-                            EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                        ServerSearchCreateSearchGeometryListener.POLYGON);
-                                }
-                            });
-                        }
-                    });
-            }
-        };
-
-    private Action searchEllipseAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("searchEllipseAction");                                                      // NOI18N
-                            }
-                            
-                            mainGroup.clearSelection();
-                            cmdSearchKassenzeichen.setSelected(true);                                            
-                            
-                            cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse.png"))); // NOI18N
-                            cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchEllipse_selected.png"))); // NOI18N
-
-                            EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    mappingComp.setInteractionMode(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER);
-                                    ((ServerSearchCreateSearchGeometryListener)mappingComp.getInputListener(
-                                            Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER)).setMode(
-                                        ServerSearchCreateSearchGeometryListener.ELLIPSE);
-                                }
-                            });
-                        }
-                    });
-            }
-        };
-
 }

@@ -1,59 +1,65 @@
-/*
- * Copyright (C) 2012 cismet GmbH
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.verdis.gui;
 
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
 import java.text.SimpleDateFormat;
+
 import java.util.Date;
 
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
+
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public class FortfuehrungenTableModel extends CidsBeanTableModel {
 
-    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FortfuehrungenTableModel.class);
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            FortfuehrungenTableModel.class);
 
     private static final String[] COLUMN_NAMES = {
-        "Datum",
-        "Art",
-        ""
-    };
-    
+            "Datum",
+            "Art",
+            ""
+        };
+
     private static final Class[] COLUMN_CLASSES = {
-        String.class,
-        String.class,
-        String.class
-    };
-    
+            String.class,
+            String.class,
+            String.class
+        };
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new FortfuehrungenTableModel object.
+     */
     public FortfuehrungenTableModel() {
         super(COLUMN_NAMES, COLUMN_CLASSES);
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);        
+    public Object getValueAt(final int rowIndex, final int columnIndex) {
+        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);
         if (fortfuehrungBean == null) {
             return null;
-        }        
+        }
         if (columnIndex == 0) {
-            try {                
-                final Date date = (Date) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
+            try {
+                final Date date = (Date)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
                 if (date != null) {
                     return new SimpleDateFormat("dd.MM.yyyy").format(date);
                 } else {
@@ -62,18 +68,20 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
-            }            
-        }  else if (columnIndex == 1) {
+            }
+        } else if (columnIndex == 1) {
             try {
-                return (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS_NAME);
+                return (String)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS_NAME);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
-            }            
+            }
         } else if (columnIndex == 2) {
             try {
-                final String flurstueck_alt = (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__FLURSTUECK_ALT);
-                final String flurstueck_neu = (String) fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__FLURSTUECK_NEU);
+                final String flurstueck_alt = (String)fortfuehrungBean.getProperty(
+                        FortfuehrungPropertyConstants.PROP__FLURSTUECK_ALT);
+                final String flurstueck_neu = (String)fortfuehrungBean.getProperty(
+                        FortfuehrungPropertyConstants.PROP__FLURSTUECK_NEU);
                 if (flurstueck_alt.equals(flurstueck_neu)) {
                     return flurstueck_alt;
                 } else {
@@ -82,9 +90,8 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
-            }            
+            }
         }
-        return null;        
+        return null;
     }
-        
 }

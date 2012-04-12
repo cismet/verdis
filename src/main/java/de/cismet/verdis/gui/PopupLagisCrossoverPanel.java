@@ -359,18 +359,18 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         closeDialog();
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
+    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
         loadSelectedFlurstueck();
-    }//GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
+    }                                                                                             //GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
     /**
      * ToDo ugly.
      */

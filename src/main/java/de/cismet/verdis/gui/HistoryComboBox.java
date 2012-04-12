@@ -12,9 +12,12 @@
 package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.HistoryObject;
-import java.awt.Component;
-import javax.swing.DefaultListCellRenderer;
+
 import org.apache.log4j.Logger;
+
+import java.awt.Component;
+
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -31,26 +34,35 @@ public class HistoryComboBox extends JComboBox {
 
     private static final Logger LOG = Logger.getLogger(HistoryComboBox.class);
 
-    //~ Instance fields --------------------------------------------------------
-
     //~ Constructors -----------------------------------------------------------
 
+    /**
+     * Creates a new HistoryComboBox object.
+     */
     public HistoryComboBox() {
         setRenderer(new HistoryComboBoxRenderer());
     }
-
 }
 
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 class HistoryComboBoxRenderer extends DefaultListCellRenderer implements ListCellRenderer {
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+    public Component getListCellRendererComponent(final JList list,
+            final Object value,
+            final int index,
+            final boolean isSelected,
+            final boolean cellHasFocus) {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value != null) {
             if (value instanceof HistoryObject) {
-                HistoryObject ho = (HistoryObject) value;
+                final HistoryObject ho = (HistoryObject)value;
                 setText(ho.getValidFrom().toString()); // NOI18N
             }
         }

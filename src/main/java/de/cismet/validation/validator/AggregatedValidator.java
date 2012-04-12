@@ -1,26 +1,54 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.validation.validator;
+
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorListener;
 import de.cismet.validation.ValidatorState;
 import de.cismet.validation.ValidatorStateImpl;
-import java.util.ArrayList;
-import java.util.Collection;
-import org.apache.log4j.Logger;
 
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public class AggregatedValidator extends AbstractValidator implements ValidatorListener {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final Logger LOG = Logger.getLogger(AggregatedValidator.class);
-    
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Collection<Validator> validators = new ArrayList();
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Collection<Validator> getValidators() {
         return validators;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void clear() {
         // concurrent exception vermeiden dur kopie
-        Collection<Validator> copyOfValidators = new ArrayList<Validator>();
+        final Collection<Validator> copyOfValidators = new ArrayList<Validator>();
         for (final Validator validator : validators) {
             copyOfValidators.add(validator);
         }
@@ -30,14 +58,28 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
         copyOfValidators.clear();
     }
 
-    public boolean add(Validator validator) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   validator  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean add(final Validator validator) {
         validator.addListener(this);
         final boolean result = this.validators.add(validator);
         validate();
         return result;
     }
 
-    public boolean remove(Validator validator) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   validator  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean remove(final Validator validator) {
         validator.removeListener(this);
         final boolean result = this.validators.remove(validator);
         validate();
@@ -46,16 +88,18 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
 
     @Override
     public void stateChanged(final ValidatorState state) {
-            validate();
+        validate();
     }
 
     @Override
     protected ValidatorState performValidation() {
         ValidatorState worstState = null;
-        for (Validator validator : this.validators) {
-            ValidatorState valState = validator.getState();
+        for (final Validator validator : this.validators) {
+            final ValidatorState valState = validator.getState();
             if ((valState != null) && (valState.compareTo(worstState) > 0)) {
-                worstState = new ValidatorStateImpl(valState.getType(), valState.getMessage(), valState.getHintAction());
+                worstState = new ValidatorStateImpl(valState.getType(),
+                        valState.getMessage(),
+                        valState.getHintAction());
             }
         }
         return worstState;

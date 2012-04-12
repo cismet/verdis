@@ -1,10 +1,10 @@
 /***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2010 thorsten
  *
@@ -26,25 +26,39 @@ package de.cismet.verdis;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
+
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
 import Sirius.server.search.CidsServerSearch;
+
 import Sirius.util.collections.MultiMap;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.gui.MappingComponent;
-import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.data.AppPreferences;
+
 import java.awt.Frame;
+
 import java.util.*;
+
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.gui.MappingComponent;
+
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+
+import de.cismet.verdis.data.AppPreferences;
+
+import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
+
+import static de.cismet.verdis.commons.constants.VerdisConstants.*;
 
 /**
  * DOCUMENT ME!
@@ -55,27 +69,14 @@ import javax.swing.SwingWorker;
 public class CidsAppBackend implements CidsBeanStore {
 
     //~ Static fields/initializers ---------------------------------------------
+
     private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             CidsAppBackend.class);
-    public static final String DOMAIN = "VERDIS_GRUNDIS";
     private static CidsAppBackend instance = null;
     private static AppPreferences appprefs;
 
-    //~ Instance fields --------------------------------------------------------
-    private final MultiMap crossReferences = new MultiMap();
-    private final HashMap<Mode, FeatureAttacher> featureAttacherByMode = new HashMap<Mode, FeatureAttacher>(3);
-    private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
-    private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
-    private final ArrayList<AppModeListener> appModeListeners = new ArrayList<AppModeListener>();
-    private String domain = DOMAIN;
-    private ConnectionProxy proxy = null;
-    private CidsBean kassenzeichenBean = null;
-    private boolean editable = false;
-    private Frame frameToDisplayDialogs = null;
-    private MappingComponent mainMap = null;
-    private Mode mode = null;
-
     //~ Enums ------------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
@@ -84,6 +85,7 @@ public class CidsAppBackend implements CidsBeanStore {
     public enum Mode {
 
         //~ Enum constants -----------------------------------------------------
+
         REGEN {
 
             @Override
@@ -107,38 +109,65 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    //~ Instance fields --------------------------------------------------------
+
+    private final MultiMap crossReferences = new MultiMap();
+    private final HashMap<Mode, FeatureAttacher> featureAttacherByMode = new HashMap<Mode, FeatureAttacher>(3);
+    private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
+    private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
+    private final ArrayList<AppModeListener> appModeListeners = new ArrayList<AppModeListener>();
+    private String domain = DOMAIN;
+    private ConnectionProxy proxy = null;
+    private CidsBean kassenzeichenBean = null;
+    private boolean editable = false;
+    private Frame frameToDisplayDialogs = null;
+    private MappingComponent mainMap = null;
+    private Mode mode = null;
+
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates a new CidsAppBackend object.
+     *
+     * @param  proxy  DOCUMENT ME!
      */
-    private CidsAppBackend(ConnectionProxy proxy) {
+    private CidsAppBackend(final ConnectionProxy proxy) {
         try {
             this.proxy = proxy;
             if (!SessionManager.isInitialized()) {
                 SessionManager.init(proxy);
                 ClassCacheMultiple.setInstance(domain);
             }
-
         } catch (Throwable e) {
             log.fatal("no connection to the cids server possible. too bad.", e);
         }
     }
 
-    public synchronized static void init(ConnectionProxy proxy) {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxy  DOCUMENT ME!
+     */
+    public static synchronized void init(final ConnectionProxy proxy) {
 //       if (instance!=null){
 //           throw new IllegalStateException("Backend is already inited. Please call init(AppPreferences prefs) only once.");
 //       }else {
         instance = new CidsAppBackend(proxy);
 //       }
-
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public static void devInit() {
         try {
             Log4JQuickConfig.configure4LumbermillOnLocalhost();
             final String callServerURL = "http://localhost:9986/callserver/binary";
             final String connectionClass = "Sirius.navigator.connection.RESTfulConnection";
-            final Connection connection = ConnectionFactory.getFactory().createConnection(connectionClass, callServerURL);
+            final Connection connection = ConnectionFactory.getFactory()
+                        .createConnection(connectionClass, callServerURL);
 
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
@@ -148,25 +177,25 @@ public class CidsAppBackend implements CidsBeanStore {
             connectionInfo.setUsergroupDomain(DOMAIN);
             connectionInfo.setUsername("SteinbacherD102");
 
-            ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
+            final ConnectionSession session = ConnectionFactory.getFactory()
+                        .createSession(connection, connectionInfo, true);
 
             System.out.println("CidsAppBackend: session created");
-            ConnectionProxy proxy = ConnectionFactory.getFactory().createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+            final ConnectionProxy proxy = ConnectionFactory.getFactory()
+                        .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
             init(proxy);
-
-
         } catch (Throwable e) {
             log.fatal("no connection to the cids server possible. too bad.", e);
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
     /**
      * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
      */
-    public synchronized static CidsAppBackend getInstance() {
+    public static synchronized CidsAppBackend getInstance() {
         if (instance == null) {
             throw new IllegalStateException("Backend is not inited. Please call init(AppPreferences prefs) first.");
         }
@@ -208,14 +237,22 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public void refresh() {
         if (kassenzeichenBean != null) {
-            final int nummer = (Integer) kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            final int nummer = (Integer)kassenzeichenBean.getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
             retrieveKassenzeichenByNummer(nummer);
         } else {
             log.warn("kassenzeichen = null . cannot be refreshed");
         }
     }
 
-    public MetaClass getVerdisMetaClass(String tablename) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   tablename  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaClass getVerdisMetaClass(final String tablename) {
         try {
             return CidsBean.getMetaClassFromTableName(domain, tablename);
         } catch (Exception exception) {
@@ -236,36 +273,42 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichen  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param  kassenzeichen  DOCUMENT ME!
      */
     public void retrieveKassenzeichenByNummer(final int kassenzeichen) {
         new SwingWorker<Boolean, Void>() {
 
-            @Override
-            protected Boolean doInBackground() throws Exception {
-                CidsBean ksBean = loadKassenzeichenByNummer(kassenzeichen);
-                setCidsBean(ksBean);
-                return ksBean != null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                } catch (Exception e) {
-                    log.error("Exception in Background Thread", e);
+                @Override
+                protected Boolean doInBackground() throws Exception {
+                    final CidsBean ksBean = loadKassenzeichenByNummer(kassenzeichen);
+                    setCidsBean(ksBean);
+                    return ksBean != null;
                 }
-            }
-        }.execute();
+
+                @Override
+                protected void done() {
+                    try {
+                    } catch (Exception e) {
+                        log.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichen  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public CidsBean loadKassenzeichenByNummer(final int kassenzeichen) {
         try {
-            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");        
-            String query = "SELECT " + mcKassenzeichen.getId() + ", id FROM kassenzeichen WHERE " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");
+            final String query = "SELECT " + mcKassenzeichen.getId() + ", id FROM kassenzeichen WHERE "
+                        + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
-            if (mos == null || mos.length < 1) {
+            if ((mos == null) || (mos.length < 1)) {
                 return null;
             } else {
                 final MetaObject mo = mos[0];
@@ -277,18 +320,24 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   fromDate  DOCUMENT ME!
+     * @param   toDate    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<CidsBean> loadFortfuehrungBeansByDates(final Date fromDate, final Date toDate) {
-        
-
         try {
-            final MetaClass mcFortfuehrung = ClassCacheMultiple.getMetaClass(DOMAIN, "fortfuehrung");        
+            final MetaClass mcFortfuehrung = ClassCacheMultiple.getMetaClass(DOMAIN, "fortfuehrung");
             final String query = "SELECT "
-                    + "   " + mcFortfuehrung.getId() + ", "
-                    + "   id FROM fortfuehrung "
-                    + "WHERE "
-                    + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";        
+                        + "   " + mcFortfuehrung.getId() + ", "
+                        + "   id FROM fortfuehrung "
+                        + "WHERE "
+                        + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
-            if (mos == null || mos.length < 1) {
+            if ((mos == null) || (mos.length < 1)) {
                 return null;
             } else {
                 final List<CidsBean> cbs = new ArrayList<CidsBean>();
@@ -302,7 +351,7 @@ public class CidsAppBackend implements CidsBeanStore {
             return null;
         }
     }
-    
+
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;
@@ -321,14 +370,22 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
     private void updateCrossReferences(final CidsBean cidsBean) {
-        final int kassenzeichenNummer = (Integer) cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+        final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
         final CidsServerSearch search = new FlaechenCrossReferencesServerSearch(kassenzeichenNummer);
         try {
             crossReferences.clear();
-            Collection collection = getProxy().customServerSearch(CidsAppBackend.getInstance().getSession().getUser(), search);
-            for (Object row : collection) {
-                Object[] r = ((Collection)row).toArray();
+            final Collection collection = getProxy().customServerSearch(CidsAppBackend.getInstance().getSession()
+                            .getUser(),
+                    search);
+            for (final Object row : collection) {
+                final Object[] r = ((Collection)row).toArray();
 //                  synchronized (kassenzeichenChangedBlocker) {
                 crossReferences.put(r[1], r[3] + ":" + r[4]);
 //                  }
@@ -338,8 +395,15 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
-    public Collection<String> getCrossReferencesFor(int kassenzeichenNummer) {
-        return (Collection<String>) crossReferences.get(kassenzeichenNummer);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenNummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<String> getCrossReferencesFor(final int kassenzeichenNummer) {
+        return (Collection<String>)crossReferences.get(kassenzeichenNummer);
     }
 
     /**
@@ -465,20 +529,32 @@ public class CidsAppBackend implements CidsBeanStore {
      * DOCUMENT ME!
      *
      * @param   kassenzeichenId  DOCUMENT ME!
-     * @param   howMuch        DOCUMENT ME!
+     * @param   howMuch          DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public HistoryObject[] getHistory(final int kassenzeichenId, final int howMuch) {
         try {
-            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");                    
-            return proxy.getHistory(mcKassenzeichen.getId(), kassenzeichenId, DOMAIN, SessionManager.getSession().getUser(), howMuch);
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");
+            return proxy.getHistory(mcKassenzeichen.getId(),
+                    kassenzeichenId,
+                    DOMAIN,
+                    SessionManager.getSession().getUser(),
+                    howMuch);
         } catch (ConnectionException ex) {
             log.error("error in retrieving the history og " + kassenzeichenId, ex);
             return null;
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   objectId  DOCUMENT ME!
+     * @param   classtId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public MetaObject getVerdisMetaObject(final int objectId, final int classtId) {
         try {
             return proxy.getMetaObject(objectId, classtId, DOMAIN);
@@ -487,7 +563,7 @@ public class CidsAppBackend implements CidsBeanStore {
             return null;
         }
     }
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -497,8 +573,8 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public static void main(final String[] args) throws Exception {
         final long l = System.currentTimeMillis();
-        //final MetaObject mo = CidsAppBackend.getInstance().proxy.getMetaObject(6000467, 11, DOMAIN);
-//            MetaObject mo = proxy.getMetaObject(6021737, 11, DOMAIN);
+        // final MetaObject mo = CidsAppBackend.getInstance().proxy.getMetaObject(6000467, 11, DOMAIN);
+// MetaObject mo = proxy.getMetaObject(6021737, 11, DOMAIN);
         System.out.println("dauer:" + (System.currentTimeMillis() - l));
         System.out.println("retrieved 6000467");
         // System.out.println(mo.getBean().toJSONString());
@@ -575,22 +651,53 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getDomain() {
         return domain;
     }
 
-    public void setDomain(String domain) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain  DOCUMENT ME!
+     */
+    public void setDomain(final String domain) {
         this.domain = domain;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public ConnectionProxy getProxy() {
         return proxy;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public ConnectionSession getSession() {
         return proxy.getSession();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domainName  DOCUMENT ME!
+     * @param   tabName     DOCUMENT ME!
+     * @param   query       DOCUMENT ME!
+     * @param   fields      DOCUMENT ME!
+     * @param   formatter   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static MetaObject[] getLightweightMetaObjectsForQuery(final String domainName,
             final String tabName,
             final String query,
@@ -622,6 +729,5 @@ public class CidsAppBackend implements CidsBeanStore {
             log.error(ex, ex);
         }
         return new MetaObject[0];
-    }    
-
+    }
 }

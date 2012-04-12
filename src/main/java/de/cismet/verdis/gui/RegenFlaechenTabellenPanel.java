@@ -1,10 +1,10 @@
 /***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2010 thorsten
  *
@@ -27,37 +27,55 @@
  * Created on 03.12.2010, 21:50:28
  */
 package de.cismet.verdis.gui;
-
 import Sirius.navigator.connection.SessionManager;
+
 import Sirius.server.middleware.types.MetaObject;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+
+import edu.umd.cs.piccolox.event.PNotification;
+
+import org.jdesktop.swingx.decorator.*;
+
+import java.awt.Color;
+import java.awt.Component;
+
+import java.sql.Date;
+
+import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
+
 import de.cismet.cismap.navigatorplugin.CidsFeature;
+
 import de.cismet.tools.NumberStringComparator;
+
 import de.cismet.validation.Validator;
+
 import de.cismet.validation.validator.AggregatedValidator;
+
 import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.constants.PropertyConstants;
 import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.constants.VerdisMetaClassConstants;
-import edu.umd.cs.piccolox.event.PNotification;
-import java.awt.Color;
-import java.awt.Component;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
-import org.jdesktop.swingx.decorator.*;
 
 /**
  * DOCUMENT ME!
@@ -65,68 +83,74 @@ import org.jdesktop.swingx.decorator.*;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements RegenFlaechenPropertyConstants, CidsBeanStore {
+public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements RegenFlaechenPropertyConstants,
+    CidsBeanStore {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTabellenPanel.class);
-    
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            RegenFlaechenTabellenPanel.class);
+
     //~ Instance fields --------------------------------------------------------
+
     private CidsBean cidsBean;
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTable jxtOverview;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates new form RegenFlaechenTabellenPanel.
      */
     public RegenFlaechenTabellenPanel() {
         super(CidsAppBackend.Mode.REGEN, new RegenFlaechenTableModel());
-        
+
         initComponents();
 
         jxtOverview.setModel(getModel());
         final HighlightPredicate errorPredicate = new HighlightPredicate() {
 
-            @Override
-            public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
-                final int displayedIndex = componentAdapter.row;
-                final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                return getItemValidator(cidsBean).getState().isError();
-            }
-        };
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
+                    return getItemValidator(cidsBean).getState().isError();
+                }
+            };
 
         final Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
 
         final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
-            @Override
-            public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
-                final int displayedIndex = componentAdapter.row;
-                final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                if (cidsBean != null) {
-                    return cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
-                } else {
-                    return false;
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
+                    if (cidsBean != null) {
+                        return cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
+                    } else {
+                        return false;
+                    }
                 }
-            }
-        };
+            };
 
         final Highlighter changedHighlighter = new ColorHighlighter(changedPredicate, null, Color.RED);
 
         final HighlightPredicate noGeometryPredicate = new HighlightPredicate() {
 
-            @Override
-            public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
-                final int displayedIndex = componentAdapter.row;
-                final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                return getGeometry(cidsBean) == null;
-            }
-        };
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedIndex = componentAdapter.row;
+                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
+                    return getGeometry(cidsBean) == null;
+                }
+            };
 
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
@@ -154,6 +178,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     }
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
@@ -161,7 +186,6 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         jScrollPane1 = new javax.swing.JScrollPane();
         jxtOverview = getJXTable();
 
@@ -173,28 +197,34 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jScrollPane1.setViewportView(jxtOverview);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
     public void attachFeatureRequested(final PNotification notification) {
         final Object o = notification.getObject();
         if (o instanceof AttachFeatureListener) {
-            final AttachFeatureListener afl = (AttachFeatureListener) o;
+            final AttachFeatureListener afl = (AttachFeatureListener)o;
             final PFeature pf = afl.getFeatureToAttach();
-            if (pf.getFeature() instanceof PureNewFeature && pf.getFeature().getGeometry() instanceof Polygon) {
+            if ((pf.getFeature() instanceof PureNewFeature) && (pf.getFeature().getGeometry() instanceof Polygon)) {
                 final List<CidsBean> selectedBeans = getSelectedBeans();
                 final CidsBean selectedBean = (!selectedBeans.isEmpty()) ? selectedBeans.get(0) : null;
                 if (selectedBean != null) {
                     final boolean hasGeometrie = getGeometry(selectedBean) != null;
-                    final boolean isMarkedForDeletion = selectedBean.getMetaObject().getStatus() == MetaObject.TO_DELETE;
+                    final boolean isMarkedForDeletion = selectedBean.getMetaObject().getStatus()
+                                == MetaObject.TO_DELETE;
                     if (!hasGeometrie) {
                         if (isMarkedForDeletion) {
                             JOptionPane.showMessageDialog(
-                                    Main.getMappingComponent(),
-                                    "Dieser Fl\u00E4che kann im Moment keine Geometrie zugewiesen werden. Bitte zuerst speichern.");
+                                Main.getMappingComponent(),
+                                "Dieser Fl\u00E4che kann im Moment keine Geometrie zugewiesen werden. Bitte zuerst speichern.");
                         } else {
                             try {
                                 final Geometry geom = pf.getFeature().getGeometry();
-                                final int groesse = (int) geom.getArea();
+                                final int groesse = (int)geom.getArea();
                                 Main.getMappingComponent().getFeatureCollection().removeFeature(pf.getFeature());
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(PROP__FLAECHENINFO__GROESSE_GRAFIK, groesse);
@@ -211,8 +241,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 }
             } else if (pf.getFeature() instanceof CidsFeature) {
                 JOptionPane.showMessageDialog(
-                        Main.getMappingComponent(),
-                        "Es k\u00F6nnen nur nicht bereits zugeordnete Fl\u00E4chen zugeordnet werden.");
+                    Main.getMappingComponent(),
+                    "Es k\u00F6nnen nur nicht bereits zugeordnete Fl\u00E4chen zugeordnet werden.");
             }
         }
     }
@@ -230,7 +260,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         return aggVal;
     }
 
-    
+    /**
+     * DOCUMENT ME!
+     */
     public void reEnumerateFlaechen() {
         final TableSorter sort = new TableSorter(getModel());
         sort.setSortingStatus(3, TableSorter.DESCENDING);
@@ -239,7 +271,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         for (int i = 0; i < getModel().getRowCount(); ++i) {
             final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(i));
             if (flaecheBean != null) {
-                final int art = (Integer) flaecheBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID);
+                final int art = (Integer)flaecheBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID);
                 switch (art) {
                     case 1:
                     case 2: {
@@ -273,13 +305,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @Override
     public CidsBean createNewBean() throws Exception {
         final Object[] possibleValues = {
-            "Dachfl\u00E4che",
-            "Gr\u00FCndach",
-            "versiegelte Fl\u00E4che",
-            "\u00D6kopflaster",
-            "st\u00E4dtische Stra\u00DFenfl\u00E4che",
-            "st\u00E4dtische Stra\u00DFenfl\u00E4che (\u00D6kopflaster)"
-        };
+                "Dachfl\u00E4che",
+                "Gr\u00FCndach",
+                "versiegelte Fl\u00E4che",
+                "\u00D6kopflaster",
+                "st\u00E4dtische Stra\u00DFenfl\u00E4che",
+                "st\u00E4dtische Stra\u00DFenfl\u00E4che (\u00D6kopflaster)"
+            };
         final Object selectedValue = JOptionPane.showInputDialog(
                 Main.getCurrentInstance(),
                 "W\u00E4hlen Sie die Art der neuen Fl\u00E4che aus",
@@ -297,16 +329,37 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             }
         }
 
-        final CidsBean flaecheBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE).getEmptyInstance().getBean();
-        final CidsBean anschlussgradBean = SessionManager.getProxy().getMetaObject(1, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD).getId(), CidsAppBackend.DOMAIN).getBean();
-        final CidsBean flaechenartBean = SessionManager.getProxy().getMetaObject(art, CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART).getId(), CidsAppBackend.DOMAIN).getBean();
-        final CidsBean flaecheninfoBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO).getEmptyInstance().getBean();
-        final CidsBean geomBean = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM).getEmptyInstance().getBean();
+        final CidsBean flaecheBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean anschlussgradBean = SessionManager.getProxy()
+                    .getMetaObject(
+                            1,
+                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD)
+                                .getId(),
+                            VerdisConstants.DOMAIN)
+                    .getBean();
+        final CidsBean flaechenartBean = SessionManager.getProxy()
+                    .getMetaObject(
+                            art,
+                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART)
+                                .getId(),
+                            VerdisConstants.DOMAIN)
+                    .getBean();
+        final CidsBean flaecheninfoBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean geomBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getEmptyInstance()
+                    .getBean();
 
         final int newId = getNextNewBeanId();
         flaecheBean.setProperty(PropertyConstants.PROP__ID, newId);
         flaecheBean.getMetaObject().setID(newId);
-        
+
         flaecheBean.setProperty(PROP__FLAECHENINFO, flaecheninfoBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE, geomBean);
         flaecheBean.setProperty(PROP__FLAECHENINFO__ANSCHLUSSGRAD, anschlussgradBean);
@@ -318,7 +371,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         flaecheBean.setProperty(PROP__DATUM_VERANLAGUNG, new SimpleDateFormat("yy/MM").format(cal.getTime()));
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
-        if (sole != null && sole.getFeature().getGeometry() instanceof Polygon) {
+        if ((sole != null) && (sole.getFeature().getGeometry() instanceof Polygon)) {
             final int answer = JOptionPane.showConfirmDialog(
                     Main.getCurrentInstance(),
                     "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Fl\u00E4che zugeordnet werden?",
@@ -329,7 +382,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 try {
                     final Geometry geom = sole.getFeature().getGeometry();
 
-                    final int groesse = new Integer((int) (geom.getArea()));
+                    final int groesse = new Integer((int)(geom.getArea()));
                     flaecheBean.setProperty(PROP__FLAECHENINFO__GROESSE_GRAFIK, groesse);
                     flaecheBean.setProperty(PROP__FLAECHENINFO__GROESSE_KORREKTUR, groesse);
                     setGeometry(geom, flaecheBean);
@@ -344,18 +397,25 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         return flaecheBean;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   art  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getValidFlaechenname(final int art) {
         int highestNumber = 0;
         String highestBezeichner = null;
         boolean noFlaeche = true;
-        for (CidsBean flaecheBean : getAllBeans()) {
+        for (final CidsBean flaecheBean : getAllBeans()) {
             noFlaeche = false;
-            final int a = (Integer) flaecheBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID);
-            final String bezeichnung = (String) flaecheBean.getProperty(PROP__FLAECHENBEZEICHNUNG);
+            final int a = (Integer)flaecheBean.getProperty(PROP__FLAECHENINFO__FLAECHENART__ID);
+            final String bezeichnung = (String)flaecheBean.getProperty(PROP__FLAECHENBEZEICHNUNG);
             if (bezeichnung == null) {
                 break;
             }
-            if (a == Main.PROPVAL_ART_DACH || a == Main.PROPVAL_ART_GRUENDACH) {
+            if ((a == Main.PROPVAL_ART_DACH) || (a == Main.PROPVAL_ART_GRUENDACH)) {
                 // In Bezeichnung m\u00FCsste eigentlich ne Zahl stehen. Einfach ignorieren falls nicht.
                 try {
                     final int num = new Integer(bezeichnung).intValue();
@@ -372,8 +432,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 if (highestBezeichner == null) {
                     highestBezeichner = bezeichnung;
                 } else if ((bezeichnung.trim().length() > highestBezeichner.trim().length())
-                        || ((bezeichnung.trim().length() == highestBezeichner.trim().length())
-                        && (bezeichnung.compareTo(highestBezeichner) > 0))) {
+                            || ((bezeichnung.trim().length() == highestBezeichner.trim().length())
+                                && (bezeichnung.compareTo(highestBezeichner) > 0))) {
                     highestBezeichner = bezeichnung;
                 }
             }
@@ -410,6 +470,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   s  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private String nextFlBez(String s) {
         boolean carry = false;
         if (s != null) {
@@ -417,7 +484,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             final char[] charArr = s.toCharArray();
             for (int i = charArr.length - 1; i >= 0; --i) {
                 if (charArr[i] != 'Z') {
-                    charArr[i] = (char) (charArr[i] + 1);
+                    charArr[i] = (char)(charArr[i] + 1);
                     carry = false;
                     break;
                 } else {
@@ -456,13 +523,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         this.cidsBean = cidsBean;
-        
+
         final String prop = KassenzeichenPropertyConstants.PROP__FLAECHEN;
         if ((cidsBean != null) && (cidsBean.getProperty(prop) instanceof List)) {
-            setCidsBeans((List<CidsBean>) cidsBean.getProperty(prop));
+            setCidsBeans((List<CidsBean>)cidsBean.getProperty(prop));
         } else {
-            setCidsBeans(new ArrayList<CidsBean>());            
-        }        
+            setCidsBeans(new ArrayList<CidsBean>());
+        }
     }
 
     @Override
@@ -474,5 +541,4 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     public Geometry getGeometry(final CidsBean cidsBean) {
         return RegenFlaechenDetailsPanel.getGeometry(cidsBean);
     }
-    
 }

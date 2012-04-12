@@ -73,10 +73,9 @@ public class AppPreferences {
     private LagisServerRemote lagisServerAccessor;
     private double flurstueckBuffer = -0.5;
 
-    private String appbackenddomain=null;
-    private String appbackendconnectionclass=null;
-    private String appbackendcallserverurl=null;
-
+    private String appbackenddomain = null;
+    private String appbackendconnectionclass = null;
+    private String appbackendcallserverurl = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -261,7 +260,7 @@ public class AppPreferences {
             }
             dbConnectionInfo = new ConnectionInfo(root.getChild("dbConnectionInfo"));
 
-            //cismapPrefs = new CismapPreferences(root.getChild("cismapPreferences"));
+            // cismapPrefs = new CismapPreferences(root.getChild("cismapPreferences"));
 
             try {
                 final WFSFormFactory wfsFormFactory = WFSFormFactory.getInstance();
@@ -275,16 +274,13 @@ public class AppPreferences {
         }
 
         try {
-                final Element cidsappbackendPrefs = root.getChild("cidsAppBackend");
-                appbackenddomain = cidsappbackendPrefs.getChildText("domain");
-                appbackendconnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
-                appbackendcallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
-
-            } catch (Exception ex) {
-                log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
-            }
-
-
+            final Element cidsappbackendPrefs = root.getChild("cidsAppBackend");
+            appbackenddomain = cidsappbackendPrefs.getChildText("domain");
+            appbackendconnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
+            appbackendcallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
+        } catch (Exception ex) {
+            log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
+        }
     }
 
     /**
@@ -646,7 +642,12 @@ public class AppPreferences {
         return standaloneCallServerHost;
     }
 
-     public String getCallServerUrl() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getCallServerUrl() {
         return standaloneCallServerHost;
     }
 
@@ -677,18 +678,30 @@ public class AppPreferences {
         this.flurstueckBuffer = flurstueckBuffer;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getAppbackendCallserverurl() {
         return appbackendcallserverurl;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getAppbackendConnectionclass() {
         return appbackendconnectionclass;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getAppbackendDomain() {
         return appbackenddomain;
     }
-
-
-
 }

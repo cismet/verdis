@@ -29,20 +29,22 @@
 package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.HistoryObject;
-import java.awt.event.ActionEvent;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.text.DateFormat;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
 import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import javax.swing.JOptionPane;
 
 /**
  * DOCUMENT ME!
@@ -52,14 +54,23 @@ import javax.swing.JOptionPane;
  */
 public class HistoryPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
 
-    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(HistoryPanel.class);
-    private final static String JSON_MIMETYPE = "text/javascript";
-    
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(HistoryPanel.class);
+    private static final String JSON_MIMETYPE = "text/javascript";
+
     //~ Instance fields --------------------------------------------------------
 
     private CidsBean kassenzeichenBean;
     private HistoryObject left;
     private HistoryObject right;
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox cbLeft;
+    private javax.swing.JComboBox cbRight;
+    private javax.swing.JPanel jPanel1;
+    private de.cismet.custom.visualdiff.DiffPanel pnlDiffPanel;
+    // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
 
@@ -71,46 +82,51 @@ public class HistoryPanel extends javax.swing.JPanel implements CidsBeanStore, E
 
         cbLeft.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                if(cbLeft.getModel().getSelectedItem() instanceof HistoryObject) {
-                    left = (HistoryObject) cbLeft.getModel().getSelectedItem();
-                } else {
-                    left = null;
-                }
+                @Override
+                public void actionPerformed(final ActionEvent ae) {
+                    if (cbLeft.getModel().getSelectedItem() instanceof HistoryObject) {
+                        left = (HistoryObject)cbLeft.getModel().getSelectedItem();
+                    } else {
+                        left = null;
+                    }
 
-                int index = cbLeft.getSelectedIndex();
-                if (index == 0) {
-                    cbRight.setSelectedIndex(0);
-                } else if(index + 1 < cbRight.getItemCount()) {
-                    cbRight.setSelectedIndex(index + 1);
+                    final int index = cbLeft.getSelectedIndex();
+                    if (index == 0) {
+                        cbRight.setSelectedIndex(0);
+                    } else if ((index + 1) < cbRight.getItemCount()) {
+                        cbRight.setSelectedIndex(index + 1);
+                    }
                 }
-            }
-        });
+            });
 
         cbRight.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                right = null;
+                @Override
+                public void actionPerformed(final ActionEvent ae) {
+                    right = null;
 
-                if(cbRight.getModel().getSelectedItem() instanceof HistoryObject) {
-                    right = (HistoryObject) cbRight.getModel().getSelectedItem();
+                    if (cbRight.getModel().getSelectedItem() instanceof HistoryObject) {
+                        right = (HistoryObject)cbRight.getModel().getSelectedItem();
+                    }
+
+                    if ((left != null) && (right != null)) {
+                        final String leftDate = DateFormat.getDateTimeInstance().format(left.getValidFrom());
+                        final String rightDate = DateFormat.getDateTimeInstance().format(right.getValidFrom());
+
+                        pnlDiffPanel.setLeftAndRight(
+                            left.getJsonData(),
+                            JSON_MIMETYPE,
+                            leftDate,
+                            right.getJsonData(),
+                            JSON_MIMETYPE,
+                            rightDate);
+                    } else {
+                        pnlDiffPanel.showFilesMissing();
+                    }
+
+                    repaint();
                 }
-
-                if(left != null && right != null) {
-                    final String leftDate = DateFormat.getDateTimeInstance().format(left.getValidFrom());
-                    final String rightDate = DateFormat.getDateTimeInstance().format(right.getValidFrom());
-
-                    pnlDiffPanel.setLeftAndRight(left.getJsonData(), JSON_MIMETYPE, leftDate, right.getJsonData(), JSON_MIMETYPE, rightDate);
-                } else {
-                    pnlDiffPanel.showFilesMissing();
-                }
-
-                repaint();
-            }
-        });
-
+            });
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -122,7 +138,6 @@ public class HistoryPanel extends javax.swing.JPanel implements CidsBeanStore, E
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         pnlDiffPanel = new de.cismet.custom.visualdiff.DiffPanel();
         jPanel1 = new javax.swing.JPanel();
         cbLeft = new HistoryComboBox();
@@ -136,7 +151,7 @@ public class HistoryPanel extends javax.swing.JPanel implements CidsBeanStore, E
         jPanel1.add(cbRight);
 
         add(jPanel1, java.awt.BorderLayout.PAGE_START);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     @Override
     public CidsBean getCidsBean() {
@@ -152,46 +167,47 @@ public class HistoryPanel extends javax.swing.JPanel implements CidsBeanStore, E
 
             new SwingWorker<HistoryObject[], Void>() {
 
-                @Override
-                protected HistoryObject[] doInBackground() {
-                    try {
-                        return CidsAppBackend.getInstance().getHistory(kassenzeichenId, 5);
-                    } catch(Exception e) {
-                        LOG.error("Error occurred while fetching history of kassenzeichen '" + kassenzeichenId + "'.", e);
-                        return new HistoryObject[]{};
-                    }
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        HistoryObject[] historyObjects = get();
-                        if(historyObjects != null && historyObjects.length > 0) {
-                            cbLeft.setModel(new HistoryComboBoxModel(historyObjects));
-                            cbRight.setModel(new HistoryComboBoxModel(historyObjects));
-                            cbLeft.setEnabled(true);
-                            cbRight.setEnabled(true);
-                        } else {
-                            cbLeft.setEnabled(false);
-                            cbRight.setEnabled(false);
-                            JOptionPane.showMessageDialog(HistoryPanel.this, "Der Verlauf des Kassenzeichens '" + kassenzeichenId + "' konnte nicht erstellt werden.", "Fehler", JOptionPane.ERROR_MESSAGE);
+                    @Override
+                    protected HistoryObject[] doInBackground() {
+                        try {
+                            return CidsAppBackend.getInstance().getHistory(kassenzeichenId, 5);
+                        } catch (Exception e) {
+                            LOG.error("Error occurred while fetching history of kassenzeichen '" + kassenzeichenId
+                                        + "'.",
+                                e);
+                            return new HistoryObject[] {};
                         }
-                    } catch (Exception e) {
-                        LOG.error("Exception in Background Thread", e);
                     }
-                }
-            }.execute();
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final HistoryObject[] historyObjects = get();
+                            if ((historyObjects != null) && (historyObjects.length > 0)) {
+                                cbLeft.setModel(new HistoryComboBoxModel(historyObjects));
+                                cbRight.setModel(new HistoryComboBoxModel(historyObjects));
+                                cbLeft.setEnabled(true);
+                                cbRight.setEnabled(true);
+                            } else {
+                                cbLeft.setEnabled(false);
+                                cbRight.setEnabled(false);
+                                JOptionPane.showMessageDialog(
+                                    HistoryPanel.this,
+                                    "Der Verlauf des Kassenzeichens '"
+                                            + kassenzeichenId
+                                            + "' konnte nicht erstellt werden.",
+                                    "Fehler",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Exception in Background Thread", e);
+                        }
+                    }
+                }.execute();
         }
     }
 
     @Override
     public void editModeChanged() {
     }
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cbLeft;
-    private javax.swing.JComboBox cbRight;
-    private javax.swing.JPanel jPanel1;
-    private de.cismet.custom.visualdiff.DiffPanel pnlDiffPanel;
-    // End of variables declaration//GEN-END:variables
 }

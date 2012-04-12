@@ -32,11 +32,12 @@ import javax.swing.table.*;
  * <p/>TableSorter registers itself as a listener to the underlying model, just as the JTable itself would. Events
  * recieved from the model are examined, sometimes manipulated (typically widened), and then passed on to the
  * TableSorter's listeners (typically the JTable). If a change to the model has invalidated the order of TableSorter's
- * rows, a note of this is made and the sorter will resort the rows the next time a value is requested.
- * </p>When the tableHeader property is set, either by using the setTableHeader() method or the two argument
- * constructor, the table header may be used as a complete UI for TableSorter. The default renderer of the tableHeader
- * is decorated with a renderer that indicates the sorting status of each column. In addition, a mouse listener is
- * installed with the following behavior:
+ * rows, a note of this is made and the sorter will resort the rows the next time a value is requested.</p>
+ *
+ * <p>When the tableHeader property is set, either by using the setTableHeader() method or the two argument constructor,
+ * the table header may be used as a complete UI for TableSorter. The default renderer of the tableHeader is decorated
+ * with a renderer that indicates the sorting status of each column. In addition, a mouse listener is installed with the
+ * following behavior:</p>
  *
  * <ul>
  *   <li>Mouse-click: Clears the sorting status of all other columns and advances the sorting status of that column

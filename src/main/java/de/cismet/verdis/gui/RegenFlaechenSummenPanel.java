@@ -1,10 +1,10 @@
 /***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * SummenPanel.java
  *
@@ -17,19 +17,21 @@ import java.awt.Color;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-
 /**
  * DOCUMENT ME!
  *
  * @author   hell
  * @version  $Revision$, $Date$
  */
-public class RegenFlaechenSummenPanel extends javax.swing.JPanel
-        implements CidsBeanStore {
+public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements CidsBeanStore {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenSummenPanel.class);
-    
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            RegenFlaechenSummenPanel.class);
+
     //~ Instance fields --------------------------------------------------------
+
     private RegenFlaechenSummenTableModel tableModel;
     private CidsBean kassenzeichenBean;
 //    private Connection connection;
@@ -51,6 +53,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates new form SummenPanel.
      */
@@ -85,6 +88,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
     }
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07 temporary disabled --> handled in Main.java.
      *
@@ -93,7 +97,6 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
     public void setLeftTitlebarColor(final Color c) {
         // panTitle.setLeftColor(c);
         // panTitle.repaint();
-
     }
 
     @Override
@@ -113,7 +116,6 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         panTab = new javax.swing.JPanel();
         tabSum = new javax.swing.JTable();
 
@@ -127,16 +129,13 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
 
         tabSum.setBackground(javax.swing.UIManager.getDefaults().getColor("Label.background"));
         tabSum.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+                new Object[][] {
+                    { null, null, null, null },
+                    { null, null, null, null },
+                    { null, null, null, null },
+                    { null, null, null, null }
+                },
+                new String[] { "Title 1", "Title 2", "Title 3", "Title 4" }));
         tabSum.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         tabSum.setFocusable(false);
         tabSum.setRowSelectionAllowed(false);
@@ -145,5 +144,5 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel
         panTab.add(tabSum, java.awt.BorderLayout.CENTER);
 
         add(panTab, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 }

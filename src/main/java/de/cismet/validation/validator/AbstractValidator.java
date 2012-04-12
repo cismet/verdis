@@ -1,32 +1,58 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.validation.validator;
+
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorDisplay;
 import de.cismet.validation.ValidatorListener;
 import de.cismet.validation.ValidatorState;
 import de.cismet.validation.ValidatorStateImpl;
-import java.util.ArrayList;
-import java.util.Collection;
-import org.apache.log4j.Logger;
 
-public abstract class AbstractValidator
-        implements Validator {
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public abstract class AbstractValidator implements Validator {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(AbstractValidator.class);
+
+    //~ Instance fields --------------------------------------------------------
+
     private ValidatorState state = new ValidatorStateImpl(ValidatorState.Type.VALID, "", null);
     private Collection<ValidatorListener> listeners = new ArrayList();
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     public ValidatorState getState() {
         return this.state;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  state  DOCUMENT ME!
+     */
     protected void setState(final ValidatorState state) {
         boolean hasChanged;
         if ((this.state == null) && (state == null)) {
             hasChanged = false;
         } else {
-            hasChanged = ((this.state == null) && (state != null)) || ((this.state != null) && (state == null)) || (!state.equals(this.state));
+            hasChanged = ((this.state == null) && (state != null)) || ((this.state != null) && (state == null))
+                        || (!state.equals(this.state));
         }
 
         if (hasChanged) {
@@ -36,24 +62,31 @@ public abstract class AbstractValidator
     }
 
     @Override
-    public boolean addListener(ValidatorListener listener) {
+    public boolean addListener(final ValidatorListener listener) {
         return this.listeners.add(listener);
     }
 
     @Override
-    public boolean removeListener(ValidatorListener listener) {
+    public boolean removeListener(final ValidatorListener listener) {
         return this.listeners.remove(listener);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  state  DOCUMENT ME!
+     */
     protected void fireStateChanged(final ValidatorState state) {
-        LOG.debug("fire state changed");
-        for (ValidatorListener listener : this.listeners) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("fire state changed");
+        }
+        for (final ValidatorListener listener : this.listeners) {
             listener.stateChanged(state);
         }
     }
 
     @Override
-    public void attachDisplay(ValidatorDisplay display) {
+    public void attachDisplay(final ValidatorDisplay display) {
         display.addValidator(this);
     }
 
@@ -62,6 +95,10 @@ public abstract class AbstractValidator
         setState(performValidation());
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected abstract ValidatorState performValidation();
-
 }

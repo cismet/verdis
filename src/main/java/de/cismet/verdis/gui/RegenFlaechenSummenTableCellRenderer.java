@@ -23,9 +23,10 @@ import javax.swing.table.*;
  */
 public class RegenFlaechenSummenTableCellRenderer extends DefaultTableCellRenderer {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenSummenTableCellRenderer.class);
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            RegenFlaechenSummenTableCellRenderer.class);
 
     //~ Constructors -----------------------------------------------------------
 

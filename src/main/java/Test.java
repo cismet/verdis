@@ -1,13 +1,28 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 
-import de.cismet.cids.client.tools.DevelopmentTools;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import org.openide.util.Exceptions;
+
 import java.util.Collection;
 import java.util.List;
-import org.openide.util.Exceptions;
+
+import de.cismet.cids.client.tools.DevelopmentTools;
+
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+
+import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
+import de.cismet.verdis.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 
 /*
  * Copyright (C) 2012 cismet GmbH
@@ -27,27 +42,45 @@ import org.openide.util.Exceptions;
  */
 
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public class Test {
-    
-    private final static transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Test.class);
 
-    public static void main(String[] args) {
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Test.class);
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
         try {
             Log4JQuickConfig.configure4LumbermillOnLocalhost();
-            final CidsBean kassenzeiechenBean = DevelopmentTools.createCidsBeanFromRMIConnectionOnLocalhost(CidsAppBackend.DOMAIN, "VORN", "SteinbacherD102", "vds102", "kassenzeichen", 41);            
-            final List<CidsBean> fronten = (List<CidsBean>)kassenzeiechenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN);
-            final CidsBean frontBean = fronten.get(fronten.size() - 1);            
-            final CidsBean geomBean = (CidsBean) frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE);            
-            
+            final CidsBean kassenzeiechenBean = DevelopmentTools.createCidsBeanFromRMIConnectionOnLocalhost(
+                    VerdisConstants.DOMAIN,
+                    "VORN",
+                    "SteinbacherD102",
+                    "vds102",
+                    "kassenzeichen",
+                    41);
+            final List<CidsBean> fronten = (List<CidsBean>)kassenzeiechenBean.getProperty(
+                    KassenzeichenPropertyConstants.PROP__FRONTEN);
+            final CidsBean frontBean = fronten.get(fronten.size() - 1);
+            final CidsBean geomBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE);
+
             if (geomBean != null) {
                 geomBean.delete();
             }
             frontBean.delete();
-            fronten.remove(frontBean);            
-            
+            fronten.remove(frontBean);
+
             LOG.fatal(kassenzeiechenBean.getMOString());
             final CidsBean persistedBean = kassenzeiechenBean.persist();
             LOG.fatal(persistedBean.getMOString());
@@ -55,5 +88,4 @@ public class Test {
             LOG.fatal(ex, ex);
         }
     }
-    
 }

@@ -1,55 +1,122 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2011 jruiz
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cismet.verdis.interfaces;
 
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.validation.Validatable;
-import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import java.util.List;
 
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+
+import de.cismet.validation.Validatable;
+
+import de.cismet.verdis.gui.AbstractCidsBeanTable;
+
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public interface CidsBeanTable extends Validatable {
 
-    public void addNewBean();
+    //~ Methods ----------------------------------------------------------------
 
-    public void removeSelectedBeans();
+    /**
+     * DOCUMENT ME!
+     */
+    void addNewBean();
 
-    public void restoreSelectedBeans();
+    /**
+     * DOCUMENT ME!
+     */
+    void removeSelectedBeans();
 
-    public void addBean(final CidsBean cidsBean);
+    /**
+     * DOCUMENT ME!
+     */
+    void restoreSelectedBeans();
 
-    public void removeBean(final CidsBean cidsBean);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    void addBean(final CidsBean cidsBean);
 
-    public void setSelectedRowListener(final CidsBeanStore selectedRowListener);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    void removeBean(final CidsBean cidsBean);
 
-    public CidsBeanStore getSelectedRowListener();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  selectedRowListener  DOCUMENT ME!
+     */
+    void setSelectedRowListener(final CidsBeanStore selectedRowListener);
 
-    public List<CidsBean> getAllBeans();
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    CidsBeanStore getSelectedRowListener();
 
-    public List<CidsBean> getSelectedBeans();
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    List<CidsBean> getAllBeans();
 
-    public AbstractCidsBeanTable getTableHelper();
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    List<CidsBean> getSelectedBeans();
 
-    public void setCidsBeans(final List<CidsBean> cidsBeans);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    AbstractCidsBeanTable getTableHelper();
 
-    public void selectCidsBean(final CidsBean cidsBean);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBeans  DOCUMENT ME!
+     */
+    void setCidsBeans(final List<CidsBean> cidsBeans);
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    void selectCidsBean(final CidsBean cidsBean);
 }

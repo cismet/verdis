@@ -24,6 +24,7 @@
 package de.cismet.verdis.gui;
 
 import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.verdis.constants.FrontinfoPropertyConstants;
 
 /**
@@ -34,26 +35,37 @@ import de.cismet.verdis.constants.FrontinfoPropertyConstants;
  */
 public class WDSRTableModel extends CidsBeanTableModel {
 
-    private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTableModel.class);
-    
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final String[] COLUMN_NAMES = {
-        "Nummer",
-        "Länge",
-        "Straßenreinigung",
-        "Winterdienst"
-    };
-    
+            "Nummer",
+            "Länge",
+            "Straßenreinigung",
+            "Winterdienst"
+        };
+
     private static final Class[] COLUMN_CLASSES = {
-        Integer.class,
-        Float.class,
-        String.class,
-        String.class        
-    };
-    
+            Integer.class,
+            Float.class,
+            String.class,
+            String.class
+        };
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTableModel.class);
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new WDSRTableModel object.
+     */
     public WDSRTableModel() {
         super(COLUMN_NAMES, COLUMN_CLASSES);
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     @Override
     public boolean isCellEditable(final int i, final int i1) {
         return false;
@@ -96,5 +108,5 @@ public class WDSRTableModel extends CidsBeanTableModel {
                 return "";
             }
         }
-    }  
+    }
 }

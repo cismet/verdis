@@ -1,70 +1,115 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  *  Copyright (C) 2011 jruiz
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cismet.verdis.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
-import de.cismet.cids.custom.util.CidsBeanSupport;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.cismap.commons.features.FeatureCollectionListener;
-import de.cismet.cismap.navigatorplugin.CidsFeature;
-import de.cismet.validation.Validator;
-import de.cismet.validation.validator.AggregatedValidator;
-import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.FeatureAttacher;
-import de.cismet.verdis.interfaces.CidsBeanTable;
+
+import org.jdesktop.swingx.JXTable;
+
 import java.util.*;
+
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.jdesktop.swingx.JXTable;
+
+import de.cismet.cids.custom.util.CidsBeanSupport;
+
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollectionEvent;
+import de.cismet.cismap.commons.features.FeatureCollectionListener;
+
+import de.cismet.cismap.navigatorplugin.CidsFeature;
+
+import de.cismet.validation.Validator;
+
+import de.cismet.validation.validator.AggregatedValidator;
+
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.FeatureAttacher;
+
+import de.cismet.verdis.interfaces.CidsBeanTable;
 
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
-public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTable, FeatureCollectionListener, ListSelectionListener, FeatureAttacher {
+public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTable,
+    FeatureCollectionListener,
+    ListSelectionListener,
+    FeatureAttacher {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(AbstractCidsBeanTable.class);
-    
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Map<Integer, CidsBean> beanBackups = new HashMap<Integer, CidsBean>();
     private final AggregatedValidator aggVal = new AggregatedValidator();
     private final HashMap<CidsBean, Validator> beanToValidatorMap = new HashMap<CidsBean, Validator>();
     private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<CidsBean, CidsFeature>();
     private final JXTable jxTable = new JXTable();
     private final CidsAppBackend.Mode modus;
-    private final CidsBeanTableModel model;   
-    
-    private CidsBeanStore selectedRowListener = null;
-    private int newBeanId = 0;    
+    private final CidsBeanTableModel model;
 
+    private CidsBeanStore selectedRowListener = null;
+    private int newBeanId = 0;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AbstractCidsBeanTable object.
+     *
+     * @param  modus  DOCUMENT ME!
+     * @param  model  DOCUMENT ME!
+     */
     public AbstractCidsBeanTable(final CidsAppBackend.Mode modus, final CidsBeanTableModel model) {
         this.modus = modus;
         this.model = model;
-        
+
         init();
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
     private void init() {
         jxTable.getSelectionModel().addListSelectionListener(this);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getNextNewBeanId() {
         return --newBeanId;
     }
@@ -75,7 +120,6 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             final CidsBean newBean = createNewBean();
             addBean(newBean);
             Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
-
         } catch (final Exception ex) {
             LOG.error("error while creating new bean", ex);
         }
@@ -83,7 +127,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
 
     @Override
     public void removeSelectedBeans() {
-        for (CidsBean cidsBean : getSelectedBeans()) {
+        for (final CidsBean cidsBean : getSelectedBeans()) {
             removeBean(cidsBean);
             aggVal.remove(beanToValidatorMap.get(cidsBean));
             beanToValidatorMap.remove(cidsBean);
@@ -98,13 +142,21 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void clearBackups() {
         beanBackups.clear();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
     public void backupBean(final CidsBean cidsBean) {
         try {
-            final int id = (Integer) cidsBean.getProperty("id");
+            final int id = (Integer)cidsBean.getProperty("id");
             final CidsBean backupBean = CidsBeanSupport.cloneCidsBean(cidsBean);
             beanBackups.put(id, backupBean);
         } catch (Exception ex) {
@@ -112,15 +164,25 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
     public void unbackupBean(final CidsBean cidsBean) {
-        beanBackups.remove((Integer) cidsBean.getProperty("id"));
+        beanBackups.remove((Integer)cidsBean.getProperty("id"));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
     public void restoreBean(final CidsBean cidsBean) {
         try {
             final CidsFeature cidsFeature = createCidsFeature(cidsBean);
 
-            final CidsBean backupBean = beanBackups.get((Integer) cidsBean.getProperty("id"));
+            final CidsBean backupBean = beanBackups.get((Integer)cidsBean.getProperty("id"));
             CidsBeanSupport.copyProperties(backupBean, cidsBean);
 
             if (cidsFeature != null) {
@@ -155,13 +217,22 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
                 getAllBeans().remove(cidsBean);
                 model.removeCidsBean(cidsBean);
                 unbackupBean(cidsBean);
-                Main.getMappingComponent().getFeatureCollection().removeFeature(new CidsFeature(cidsBean.getMetaObject()));
+                Main.getMappingComponent()
+                        .getFeatureCollection()
+                        .removeFeature(new CidsFeature(cidsBean.getMetaObject()));
             } catch (Exception ex) {
                 LOG.error("error while removing bean", ex);
             }
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public CidsFeature createCidsFeature(final CidsBean cidsBean) {
         if (cidsBean == null) {
             return null;
@@ -196,12 +267,16 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             getJXTable().getSelectionModel().removeListSelectionListener(this);
             getJXTable().getSelectionModel().clearSelection();
 
-            final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance().getMainMap().getFeatureCollection().getSelectedFeatures(); // fce.getEventFeatures();
+            final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance()
+                        .getMainMap()
+                        .getFeatureCollection()
+                        .getSelectedFeatures(); // fce.getEventFeatures();
             final Collection<Feature> selectedFlaechenFeatures = new ArrayList<Feature>();
 
             for (final Feature selectedFeature : selectedFeatures) {
                 if (selectedFeature instanceof CidsFeature) {
-                    final int index = model.getIndexByCidsBean(((CidsFeature) selectedFeature).getMetaObject().getBean());
+                    final int index = model.getIndexByCidsBean(((CidsFeature)selectedFeature).getMetaObject()
+                                    .getBean());
                     final int viewIndex = getJXTable().convertRowIndexToView(index);
                     getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
                     selectedFlaechenFeatures.add(selectedFeature);
@@ -209,7 +284,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             }
 
             if (selectedFlaechenFeatures.size() == 1) {
-                final CidsFeature feature = (CidsFeature) selectedFlaechenFeatures.toArray()[0];
+                final CidsFeature feature = (CidsFeature)selectedFlaechenFeatures.toArray()[0];
                 setDetailBean(feature.getMetaObject().getBean());
             } else {
                 setDetailBean(null);
@@ -231,8 +306,8 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         if (CidsAppBackend.getInstance().getMode().equals(modus)) {
             final Collection<Feature> features = fce.getEventFeatures();
             for (final Feature feature : features) {
-                if (feature instanceof CidsFeature && featureMap.containsValue((CidsFeature) feature)) {
-                    final CidsBean cidsBean = ((CidsFeature) feature).getMetaObject().getBean();
+                if ((feature instanceof CidsFeature) && featureMap.containsValue((CidsFeature)feature)) {
+                    final CidsBean cidsBean = ((CidsFeature)feature).getMetaObject().getBean();
                     try {
                         setGeometry(feature.getGeometry(), cidsBean);
                     } catch (Exception ex) {
@@ -334,7 +409,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         if (getJXTable().getSelectedRowCount() <= 0) {
             return cidsBeans;
         } else if (getJXTable().getSelectedRowCount() == 1) {
-            rows = new int[]{getJXTable().getSelectedRow()};
+            rows = new int[] { getJXTable().getSelectedRow() };
         } else {
             rows = getJXTable().getSelectedRows();
         }
@@ -403,21 +478,58 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         return aggVal;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected final CidsBeanTableModel getModel() {
         return model;
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected final JXTable getJXTable() {
         return jxTable;
     }
-    
-    public abstract CidsBean createNewBean() throws Exception;    
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public abstract CidsBean createNewBean() throws Exception;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   geometry  DOCUMENT ME!
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public abstract void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception;
 
-    public abstract Geometry getGeometry(final CidsBean cidsBean);    
-    
-    public abstract Validator getItemValidator(final CidsBean cidsBean);    
-    
-    
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public abstract Geometry getGeometry(final CidsBean cidsBean);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public abstract Validator getItemValidator(final CidsBean cidsBean);
 }

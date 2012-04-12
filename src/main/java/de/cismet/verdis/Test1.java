@@ -19,6 +19,8 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
 /**
  * DOCUMENT ME!
  *
@@ -57,9 +59,9 @@ public class Test1 {
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
             connectionInfo.setPassword("sb");
-            connectionInfo.setUserDomain(CidsAppBackend.DOMAIN);
-            connectionInfo.setUsergroup(CidsAppBackend.DOMAIN);
-            connectionInfo.setUsergroupDomain(CidsAppBackend.DOMAIN);
+            connectionInfo.setUserDomain(VerdisConstants.DOMAIN);
+            connectionInfo.setUsergroup(VerdisConstants.DOMAIN);
+            connectionInfo.setUsergroupDomain(VerdisConstants.DOMAIN);
             connectionInfo.setUsername("SteinbacherD102");
 
             session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
@@ -71,8 +73,8 @@ public class Test1 {
             System.out.println("connection established");
             System.out.println("retrieve 6000467");
             final long l = System.currentTimeMillis();
-            final MetaObject mo = proxy.getMetaObject(6000467, 11, CidsAppBackend.DOMAIN);
-//            MetaObject mo = proxy.getMetaObject(6021737, 11, CidsAppBackend.DOMAIN);
+            final MetaObject mo = proxy.getMetaObject(6000467, 11, VerdisConstants.DOMAIN);
+//            MetaObject mo = proxy.getMetaObject(6021737, 11, VerdisConstants.DOMAIN);
             System.out.println("dauer:" + (System.currentTimeMillis() - l));
             System.out.println("retrieved 6000467");
             System.out.println(mo.getBean().toJSONString());

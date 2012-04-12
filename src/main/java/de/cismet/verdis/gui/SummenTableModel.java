@@ -11,15 +11,16 @@
  * Created on 7. Januar 2005, 10:32
  */
 package de.cismet.verdis.gui;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
-
 import java.sql.*;
 
 import java.util.*;
 
 import javax.swing.table.*;
+
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
+
+import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 /**
  * DOCUMENT ME!
  *
@@ -32,29 +33,24 @@ public class SummenTableModel extends DefaultTableModel implements CidsBeanStore
     //~ Instance fields --------------------------------------------------------
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-   
+
     private CidsBean kassenzeichenBean;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new instance of SummenTableModel.
-     *
-     * @param  c  DOCUMENT ME!
      */
     public SummenTableModel() {
         super(0, 2);
-        
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
-     *
-     * @param  kz  DOCUMENT ME!
      */
-   
+
     /**
      * DOCUMENT ME!
      */
@@ -62,7 +58,7 @@ public class SummenTableModel extends DefaultTableModel implements CidsBeanStore
         this.dataVector.removeAllElements();
         fireTableDataChanged();
     }
- 
+
 //                    select sub.bezeichner,sum(groesse) as Groesse,round(sum(groesseGewichtet)*10000)/10000 as GroesseGewichtet   from
 //                    (
 //                    select bezeichner, flaecheninfo.groesse_korrektur as Groesse, flaecheninfo.groesse_korrektur*veranlagungsgrundlage.veranlagungsschluessel as GroesseGewichtet
@@ -145,16 +141,13 @@ public class SummenTableModel extends DefaultTableModel implements CidsBeanStore
     }
 
     @Override
-    public void setCidsBean(CidsBean cidsBean) {
-        kassenzeichenBean=cidsBean;
-        List<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
-        for (CidsBean flaeche : flaechen){
-
+    public void setCidsBean(final CidsBean cidsBean) {
+        kassenzeichenBean = cidsBean;
+        final List<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+        for (final CidsBean flaeche : flaechen) {
         }
     }
-
-
-
 }
 //                    select sub.bezeichner,sum(groesse) as Groesse,round(sum(groesseGewichtet)*10000)/10000 as GroesseGewichtet   from
 //                    (
