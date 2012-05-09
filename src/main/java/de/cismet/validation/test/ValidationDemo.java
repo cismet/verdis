@@ -84,12 +84,13 @@ public class ValidationDemo extends javax.swing.JPanel implements CidsBeanStore 
 
     //~ Instance fields --------------------------------------------------------
 
-    // End of variables declaration//GEN-END:variables
-    private CidsBean cidsBean;
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify
     private javax.swing.JTextField jTextField1;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
+    // </editor-fold>//GEN-END:initComponents
+
+    // End of variables declaration
+    private CidsBean cidsBean;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -115,7 +116,7 @@ public class ValidationDemo extends javax.swing.JPanel implements CidsBeanStore 
                             KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
                     if (kassenzeichennummer.intValue() < 1000) {
                         return new ValidatorStateImpl(
-                                ValidatorStateImpl.Type.ERROR,
+                                ValidatorState.Type.ERROR,
                                 "zu kurz! klick zum korrigieren",
                                 new AbstractAction("ToolTipText") {
 
@@ -134,12 +135,12 @@ public class ValidationDemo extends javax.swing.JPanel implements CidsBeanStore 
                                 });
                     }
                     if (kassenzeichennummer.intValue() < 1000000) {
-                        return new ValidatorStateImpl(ValidatorStateImpl.Type.WARNING, "ein bisschen zu kurz!");
+                        return new ValidatorStateImpl(ValidatorState.Type.WARNING, "ein bisschen zu kurz!");
                     }
                     if (kassenzeichennummer.intValue() > 1000000000) {
-                        return new ValidatorStateImpl(ValidatorStateImpl.Type.ERROR, "zu lang!");
+                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "zu lang!");
                     }
-                    return new ValidatorStateImpl(ValidatorStateImpl.Type.VALID, "genau richtig!");
+                    return new ValidatorStateImpl(ValidatorState.Type.VALID, "genau richtig!");
                 }
             };
         validator1.attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(this.jTextField1));
@@ -180,6 +181,8 @@ public class ValidationDemo extends javax.swing.JPanel implements CidsBeanStore 
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
+
+    // End of variables declaration
 
     /**
      * DOCUMENT ME!

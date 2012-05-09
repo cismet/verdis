@@ -66,6 +66,7 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
 import de.cismet.validation.Validator;
+import de.cismet.validation.ValidatorState;
 
 import de.cismet.validation.validator.AggregatedValidator;
 

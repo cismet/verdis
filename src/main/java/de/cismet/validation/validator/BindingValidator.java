@@ -95,7 +95,7 @@ public class BindingValidator extends AbstractValidator implements BindingListen
             LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
         }
         setState(new ValidatorStateImpl(
-                ValidatorStateImpl.Type.ERROR,
+                ValidatorState.Type.ERROR,
                 "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.",
                 this.action));
     }
@@ -106,7 +106,7 @@ public class BindingValidator extends AbstractValidator implements BindingListen
             LOG.debug("Fehler bei der Wertkonvertierung: " + failure.toString());
         }
         setState(new ValidatorStateImpl(
-                ValidatorStateImpl.Type.WARNING,
+                ValidatorState.Type.WARNING,
                 "Fehler bei der Wertkonvertierung. Hier klicken um den vorherigen Wert wiederherzustellen.",
                 this.action));
     }

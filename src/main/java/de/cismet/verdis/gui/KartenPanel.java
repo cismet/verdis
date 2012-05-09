@@ -481,10 +481,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         popMenSearch.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
 
+                @Override
                 public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent evt) {
                 }
+                @Override
                 public void popupMenuWillBecomeInvisible(final javax.swing.event.PopupMenuEvent evt) {
                 }
+                @Override
                 public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) {
                     popMenSearchPopupMenuWillBecomeVisible(evt);
                 }
@@ -583,6 +586,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         lblScale.setComponentPopupMenu(pomScale);
         lblScale.addMouseListener(new java.awt.event.MouseAdapter() {
 
+                @Override
                 public void mousePressed(final java.awt.event.MouseEvent evt) {
                     lblScaleMousePressed(evt);
                 }
@@ -1122,6 +1126,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/rotate16_selected.png"))); // NOI18N
         cmdRotatePolygon.addActionListener(new java.awt.event.ActionListener() {
 
+                @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
                     cmdRotatePolygonActionPerformed(evt);
                 }
@@ -1143,6 +1148,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
 
+                @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
                     cmdUndoActionPerformed(evt);
                 }
@@ -1160,6 +1166,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRedo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRedo.addActionListener(new java.awt.event.ActionListener() {
 
+                @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
                     cmdRedoActionPerformed(evt);
                 }

@@ -31,7 +31,7 @@ package de.cismet.verdis.constants;
  */
 public interface FrontinfoPropertyConstants extends PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__LAENGE_GRAFIK = "laenge_grafik";
     String PROP__LAENGE_KORREKTUR = "laenge_korrektur";

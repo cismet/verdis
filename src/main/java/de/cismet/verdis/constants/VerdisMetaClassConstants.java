@@ -31,7 +31,7 @@ package de.cismet.verdis.constants;
  */
 public interface VerdisMetaClassConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String MC_GEOM = "geom";
     String MC_FLAECHENBESCHREIBUNG = "flaechenbeschreibung";

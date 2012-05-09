@@ -31,7 +31,7 @@ package de.cismet.verdis.constants;
  */
 public interface RegenFlaechenPropertyConstants extends PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__FEB_ID = "feb_id";
     String PROP__BEMERKUNG = "bemerkung";

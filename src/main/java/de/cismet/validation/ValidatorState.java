@@ -44,7 +44,7 @@ public interface ValidatorState extends Comparable<ValidatorState> {
 
         //~ Enum constants -----------------------------------------------------
 
-        VALID, WARNING, ERROR
+        VALID, WARNING, ERROR, NONE
     }
 
     //~ Methods ----------------------------------------------------------------

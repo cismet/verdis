@@ -15,7 +15,7 @@ package de.cismet.verdis.constants;
  */
 public interface PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__ID = "id";
     String DOT = ".";

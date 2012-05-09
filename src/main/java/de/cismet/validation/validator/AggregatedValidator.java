@@ -96,7 +96,7 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
         ValidatorState worstState = null;
         for (final Validator validator : this.validators) {
             final ValidatorState valState = validator.getState();
-            if ((valState != null) && (valState.compareTo(worstState) > 0)) {
+            if (valState.compareTo(worstState) > 0) {
                 worstState = new ValidatorStateImpl(valState.getType(),
                         valState.getMessage(),
                         valState.getHintAction());

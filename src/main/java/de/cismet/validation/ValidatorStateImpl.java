@@ -35,7 +35,7 @@ public class ValidatorStateImpl implements ValidatorState {
 
     //~ Instance fields --------------------------------------------------------
 
-    private Type type = Type.VALID;
+    private Type type = Type.NONE;
     private String message;
     private Action hintAction;
 

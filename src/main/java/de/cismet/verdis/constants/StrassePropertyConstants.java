@@ -15,7 +15,7 @@ package de.cismet.verdis.constants;
  */
 public interface StrassePropertyConstants extends PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__SCHLUESSEL = "schluessel";
     String PROP__NAME = "name";

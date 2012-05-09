@@ -28,11 +28,21 @@ public abstract class AbstractValidator implements Validator {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(AbstractValidator.class);
+    private static final ValidatorState STATE_NONE = new ValidatorStateImpl(ValidatorState.Type.NONE, "", null);
 
     //~ Instance fields --------------------------------------------------------
 
-    private ValidatorState state = new ValidatorStateImpl(ValidatorState.Type.VALID, "", null);
+    private ValidatorState state;
     private Collection<ValidatorListener> listeners = new ArrayList();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AbstractValidator object.
+     */
+    public AbstractValidator() {
+        setState(STATE_NONE);
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -46,18 +56,15 @@ public abstract class AbstractValidator implements Validator {
      *
      * @param  state  DOCUMENT ME!
      */
-    protected void setState(final ValidatorState state) {
-        boolean hasChanged;
-        if ((this.state == null) && (state == null)) {
-            hasChanged = false;
-        } else {
-            hasChanged = ((this.state == null) && (state != null)) || ((this.state != null) && (state == null))
-                        || (!state.equals(this.state));
-        }
+    protected final void setState(final ValidatorState state) {
+        // sicherstellen, dass nicht null gesetzt werden kann
+        final ValidatorState setState = (state == null) ? STATE_NONE : state;
+
+        final boolean hasChanged = (!setState.equals(this.state));
 
         if (hasChanged) {
-            this.state = state;
-            fireStateChanged(state);
+            this.state = setState;
+            fireStateChanged(setState);
         }
     }
 

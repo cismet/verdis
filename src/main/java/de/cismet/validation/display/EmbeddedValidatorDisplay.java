@@ -74,8 +74,7 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
                 @Override
                 public void mouseClicked(final MouseEvent e) {
                     final ValidatorState state = EmbeddedValidatorDisplay.this.aggValidator.getState();
-                    if ((state != null)
-                                && (state.getHintAction() != null)) {
+                    if (state.getHintAction() != null) {
                         state.getHintAction().actionPerformed(null);
                     }
                 }
@@ -130,7 +129,7 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
     private void refresh() {
         final ValidatorState state = this.aggValidator.getState();
 
-        if (state != null) {
+        if (state.getType() != ValidatorState.Type.NONE) {
             if ((this.outFaderThread != null) && (this.outFaderThread.isAlive())) {
                 this.outFaderThread.interrupt();
             }

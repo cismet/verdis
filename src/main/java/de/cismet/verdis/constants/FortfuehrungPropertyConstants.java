@@ -31,7 +31,7 @@ package de.cismet.verdis.constants;
  */
 public interface FortfuehrungPropertyConstants extends PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__BEGINN = "beginn";
     String PROP__ANLASS = "anlass";

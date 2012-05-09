@@ -31,7 +31,7 @@ package de.cismet.verdis.constants;
  */
 public interface KassenzeichenPropertyConstants extends PropertyConstants {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     String PROP__FLAECHEN = "flaechen";
     String PROP__FRONTEN = "fronten";
