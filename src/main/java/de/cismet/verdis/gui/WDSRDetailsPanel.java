@@ -395,7 +395,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.satzungseintrag.sr_bem}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sr_bem}"),
                 txtBemSR,
                 org.jdesktop.beansbinding.BeanProperty.create("text"));
         binding.setSourceNullValue("");
@@ -442,7 +442,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.satzungseintrag.wd_bem}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.wd_bem}"),
                 txtBemWD,
                 org.jdesktop.beansbinding.BeanProperty.create("text"));
         binding.setSourceNullValue("");
