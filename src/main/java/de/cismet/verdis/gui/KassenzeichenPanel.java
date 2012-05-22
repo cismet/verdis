@@ -53,8 +53,6 @@ import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 
-import de.cismet.verdis.server.search.NextKassenzeichenSearch;
-
 /**
  * DOCUMENT ME!
  *
@@ -85,7 +83,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
-    private javax.swing.JButton btnNextKassenzeichen;
     private javax.swing.JButton btnSearch;
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JLabel jLabel2;
@@ -94,7 +91,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private javax.swing.JLabel lblErfassungsdatum;
     private javax.swing.JLabel lblKassenzeichen;
     private javax.swing.JLabel lblLastModification;
-    private javax.swing.JLabel lblNextKassenzeichen;
     private javax.swing.JLabel lblSperre;
     private javax.swing.JLabel lblSuche;
     private javax.swing.JPanel panKZValues;
@@ -174,40 +170,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
-
-        btnNextKassenzeichen.setEnabled(false);
-        btnNextKassenzeichen.setVisible(false);
-        lblNextKassenzeichen.setVisible(true);
-
-        if (cidsBean != null) {
-            new SwingWorker<Collection, Void>() {
-
-                    @Override
-                    protected Collection doInBackground() throws Exception {
-                        final NextKassenzeichenSearch nextKassenzeichenSearch = new NextKassenzeichenSearch((Integer)
-                                cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
-                        return SessionManager.getProxy()
-                                    .customServerSearch(SessionManager.getSession().getUser(), nextKassenzeichenSearch);
-                    }
-
-                    @Override
-                    protected void done() {
-                        try {
-                            final Collection<Integer> kassenzeichenCollection = get();
-                            if (!kassenzeichenCollection.isEmpty()) {
-                                final Integer nextKassenzeichen = kassenzeichenCollection.toArray(new Integer[0])[0];
-                                KassenzeichenPanel.this.nextKassenzeichen = nextKassenzeichen;
-                            }
-                        } catch (Exception ex) {
-                            LOG.error("error while searching next Kassenzeichen", ex);
-                        } finally {
-                            btnNextKassenzeichen.setEnabled(KassenzeichenPanel.this.nextKassenzeichen != null);
-                            btnNextKassenzeichen.setVisible(true);
-                            lblNextKassenzeichen.setVisible(false);
-                        }
-                    }
-                }.execute();
-        }
     }
 
     /**
@@ -290,9 +252,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         txtSearch = new javax.swing.JTextField();
         lblSuche = new javax.swing.JLabel();
         btnSearch = new javax.swing.JButton();
-        btnNextKassenzeichen = new javax.swing.JButton();
-        final JXBusyLabel busy = new JXBusyLabel(new Dimension(18, 18));
-        lblNextKassenzeichen = busy;
         panKZValues = new javax.swing.JPanel();
         lblKassenzeichen = new javax.swing.JLabel();
         lblErfassungsdatum = new javax.swing.JLabel();
@@ -367,36 +326,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         panSearch.add(btnSearch, gridBagConstraints);
-
-        btnNextKassenzeichen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/nextKassenzeichen.png"))); // NOI18N
-        btnNextKassenzeichen.setEnabled(false);
-        btnNextKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnNextKassenzeichenActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-        panSearch.add(btnNextKassenzeichen, gridBagConstraints);
-
-        busy.setBusy(true);
-        lblNextKassenzeichen.setMaximumSize(new java.awt.Dimension(18, 18));
-        lblNextKassenzeichen.setMinimumSize(new java.awt.Dimension(18, 18));
-        lblNextKassenzeichen.setPreferredSize(new java.awt.Dimension(18, 18));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-        panSearch.add(lblNextKassenzeichen, gridBagConstraints);
-        lblNextKassenzeichen.setVisible(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -740,17 +669,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gotoTxtKassenzeichen();
     }                                                                             //GEN-LAST:event_btnSearchActionPerformed
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void btnNextKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnNextKassenzeichenActionPerformed
-        if (nextKassenzeichen != null) {
-            gotoKassenzeichen(Integer.toString(nextKassenzeichen));
-        }
-    }                                                                                        //GEN-LAST:event_btnNextKassenzeichenActionPerformed
-
     @Override
     public void appModeChanged() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
@@ -877,7 +795,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);
             setKZSearchField(kz);
-            btnNextKassenzeichen.setEnabled(false);
 
             new SwingWorker<CidsBean, Void>() {
 
