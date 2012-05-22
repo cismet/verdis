@@ -31,7 +31,7 @@ import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
 
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 
 /**
  * DOCUMENT ME!

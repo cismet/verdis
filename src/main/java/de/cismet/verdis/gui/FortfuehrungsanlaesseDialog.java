@@ -39,8 +39,8 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
-import de.cismet.verdis.constants.GeomPropertyConstants;
+import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 

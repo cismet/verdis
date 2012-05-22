@@ -37,8 +37,8 @@ import javax.swing.table.DefaultTableModel;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 /**
  * DOCUMENT ME!

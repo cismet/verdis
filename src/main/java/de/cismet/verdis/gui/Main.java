@@ -148,10 +148,9 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.FlaechenClipboardListener;
 
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.crossover.VerdisCrossover;
 

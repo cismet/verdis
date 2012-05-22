@@ -62,9 +62,9 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
  * DOCUMENT ME!
@@ -75,7 +75,6 @@ import de.cismet.verdis.constants.VerdisMetaClassConstants;
 public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements CidsBeanStore,
     EditModeListener,
     HyperlinkListener,
-    RegenFlaechenPropertyConstants,
     Validatable {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -170,9 +169,11 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Geometry getGeometry(final CidsBean flaecheBean) {
-        if ((flaecheBean != null) && (flaecheBean.getProperty(PROP__FLAECHENINFO) != null)
-                    && (flaecheBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE) != null)) {
-            return (Geometry)flaecheBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+        if ((flaecheBean != null)
+                    && (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO) != null)
+                    && (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null)) {
+            return (Geometry)flaecheBean.getProperty(
+                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
         } else {
             return null;
         }
@@ -188,14 +189,14 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      */
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
         Main.transformToDefaultCrsNeeded(geom);
-        if (cidsBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE) == null) {
+        if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
                         .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE, emptyGeoBean);
+            cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, emptyGeoBean);
         }
-        cidsBean.setProperty(PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD, geom);
+        cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD, geom);
     }
 
     /**
@@ -329,7 +330,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaechenbezeichnung}"),
                 txtBezeichnung,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                PROP__FLAECHENBEZEICHNUNG);
+                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -348,7 +349,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_aus_grafik}"),
                 txtGroesseGrafik,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -374,7 +375,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
                 txtGroesseKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -434,7 +435,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.anteil}"),
                 txtAnteil,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                PROP__ANTEIL);
+                RegenFlaechenPropertyConstants.PROP__ANTEIL);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -527,7 +528,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         scpBemerkung.setOpaque(false);
         scpBemerkung.setPreferredSize(new java.awt.Dimension(40, 40));
 
-        txtBemerkung.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 11));
+        txtBemerkung.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 11)); // NOI18N
         txtBemerkung.setLineWrap(true);
         txtBemerkung.setRows(2);
         txtBemerkung.setMinimumSize(new java.awt.Dimension(73, 38));
@@ -597,7 +598,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.feb_id}"),
                 txtFEB_ID,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                PROP__FEB_ID);
+                RegenFlaechenPropertyConstants.PROP__FEB_ID);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -762,7 +763,8 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         bindingGroup.bind();
 
         try {
-            if ((cidsBean != null) && (cidsBean.getProperty(PROP__FLAECHENINFO__GEOMETRIE) != null)) {
+            if ((cidsBean != null)
+                        && (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null)) {
                 bpanRegenFlDetails.setBackgroundEnabled(true);
             } else {
                 bpanRegenFlDetails.setBackgroundEnabled(false);

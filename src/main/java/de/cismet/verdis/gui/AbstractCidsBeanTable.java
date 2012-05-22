@@ -157,7 +157,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     public void backupBean(final CidsBean cidsBean) {
         try {
             final int id = (Integer)cidsBean.getProperty("id");
-            final CidsBean backupBean = CidsBeanSupport.cloneCidsBean(cidsBean);
+            final CidsBean backupBean = model.deepcloneBean(cidsBean);
             beanBackups.put(id, backupBean);
         } catch (Exception ex) {
             LOG.error("error while making backup of bean", ex);
@@ -183,7 +183,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             final CidsFeature cidsFeature = createCidsFeature(cidsBean);
 
             final CidsBean backupBean = beanBackups.get((Integer)cidsBean.getProperty("id"));
-            CidsBeanSupport.copyProperties(backupBean, cidsBean);
+            CidsBeanSupport.copyAllProperties(backupBean, cidsBean);
 
             if (cidsFeature != null) {
                 Main.getMappingComponent().getFeatureCollection().removeFeature(cidsFeature);
@@ -483,7 +483,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
      *
      * @return  DOCUMENT ME!
      */
-    protected final CidsBeanTableModel getModel() {
+    public final CidsBeanTableModel getModel() {
         return model;
     }
 

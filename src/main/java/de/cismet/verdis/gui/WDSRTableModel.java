@@ -23,9 +23,11 @@
  */
 package de.cismet.verdis.gui;
 
+import de.cismet.cids.custom.util.CidsBeanSupport;
+
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -108,5 +110,22 @@ public class WDSRTableModel extends CidsBeanTableModel {
                 return "";
             }
         }
+    }
+
+    @Override
+    public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
+        final CidsBean deepclone = super.deepcloneBean(cidsBean);
+        deepclone.setProperty(
+            FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
+        deepclone.setProperty(
+            FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
+            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
+        deepclone.setProperty(
+            FrontinfoPropertyConstants.PROP__STRASSE,
+            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
+        // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
+        // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
+        return deepclone;
     }
 }

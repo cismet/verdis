@@ -40,10 +40,9 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
@@ -140,7 +139,7 @@ public class FlaechenClipboard {
      * @throws  Exception  DOCUMENT ME!
      */
     private CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = CidsBeanSupport.cloneCidsBean(clipboardBean);
+        final CidsBean pasteBean = flaechenTable.getModel().deepcloneBean(clipboardBean);
 
         final int id = flaechenTable.getTableHelper().getNextNewBeanId();
         pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__ID, id);
@@ -249,7 +248,7 @@ public class FlaechenClipboard {
             try {
                 clipboardFlaecheBeans.clear();
                 for (final CidsBean flaecheBean : flaecheBeans) {
-                    this.clipboardFlaecheBeans.add(CidsBeanSupport.cloneCidsBean(flaecheBean));
+                    this.clipboardFlaecheBeans.add(CidsBeanSupport.deepcloneCidsBean(flaecheBean));
                 }
                 fireClipboardChanged();
                 return true;

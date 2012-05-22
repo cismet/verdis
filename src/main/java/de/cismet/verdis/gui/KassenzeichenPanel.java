@@ -12,9 +12,14 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.apache.log4j.Logger;
 
+import org.jdesktop.swingx.JXBusyLabel;
+
 import java.awt.Color;
+import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,8 +50,10 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+
+import de.cismet.verdis.server.search.NextKassenzeichenSearch;
 
 /**
  * DOCUMENT ME!
@@ -74,17 +81,20 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private CidsBean kassenzeichenBean;
     private final Validator bindingValidator;
     private final AggregatedValidator aggVal = new AggregatedValidator();
+    private Integer nextKassenzeichen = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
+    private javax.swing.JButton btnNextKassenzeichen;
     private javax.swing.JButton btnSearch;
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblBemerkung;
     private javax.swing.JLabel lblErfassungsdatum;
     private javax.swing.JLabel lblKassenzeichen;
     private javax.swing.JLabel lblLastModification;
+    private javax.swing.JLabel lblNextKassenzeichen;
     private javax.swing.JLabel lblSperre;
     private javax.swing.JLabel lblSuche;
     private javax.swing.JPanel panKZValues;
@@ -164,6 +174,40 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
+
+        btnNextKassenzeichen.setEnabled(false);
+        btnNextKassenzeichen.setVisible(false);
+        lblNextKassenzeichen.setVisible(true);
+
+        if (cidsBean != null) {
+            new SwingWorker<Collection, Void>() {
+
+                    @Override
+                    protected Collection doInBackground() throws Exception {
+                        final NextKassenzeichenSearch nextKassenzeichenSearch = new NextKassenzeichenSearch((Integer)
+                                cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                        return SessionManager.getProxy()
+                                    .customServerSearch(SessionManager.getSession().getUser(), nextKassenzeichenSearch);
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final Collection<Integer> kassenzeichenCollection = get();
+                            if (!kassenzeichenCollection.isEmpty()) {
+                                final Integer nextKassenzeichen = kassenzeichenCollection.toArray(new Integer[0])[0];
+                                KassenzeichenPanel.this.nextKassenzeichen = nextKassenzeichen;
+                            }
+                        } catch (Exception ex) {
+                            LOG.error("error while searching next Kassenzeichen", ex);
+                        } finally {
+                            btnNextKassenzeichen.setEnabled(KassenzeichenPanel.this.nextKassenzeichen != null);
+                            btnNextKassenzeichen.setVisible(true);
+                            lblNextKassenzeichen.setVisible(false);
+                        }
+                    }
+                }.execute();
+        }
     }
 
     /**
@@ -243,16 +287,12 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         btgMode = new javax.swing.ButtonGroup();
         lblLastModification = new javax.swing.JLabel();
         panSearch = new javax.swing.JPanel();
-        sepTitle1 = new javax.swing.JSeparator();
         txtSearch = new javax.swing.JTextField();
         lblSuche = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        togRegenMode = new javax.swing.JToggleButton();
-        togWDSRMode = new javax.swing.JToggleButton();
-        togInfoMode = new javax.swing.JToggleButton();
-        jLabel2 = new javax.swing.JLabel();
-        sepTitle2 = new javax.swing.JSeparator();
         btnSearch = new javax.swing.JButton();
+        btnNextKassenzeichen = new javax.swing.JButton();
+        final JXBusyLabel busy = new JXBusyLabel(new Dimension(18, 18));
+        lblNextKassenzeichen = busy;
         panKZValues = new javax.swing.JPanel();
         lblKassenzeichen = new javax.swing.JLabel();
         lblErfassungsdatum = new javax.swing.JLabel();
@@ -264,6 +304,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         txtBemerkung = new javax.swing.JTextArea();
         txtKassenzeichen = new javax.swing.JTextField();
         txtSperreBemerkung = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        togRegenMode = new javax.swing.JToggleButton();
+        togWDSRMode = new javax.swing.JToggleButton();
+        togInfoMode = new javax.swing.JToggleButton();
+        sepTitle1 = new javax.swing.JSeparator();
+        sepTitle2 = new javax.swing.JSeparator();
 
         lblLastModification.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/goto.png"))); // NOI18N
@@ -279,15 +326,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         setLayout(new java.awt.GridBagLayout());
 
         panSearch.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 0, 0, 0);
-        panSearch.add(sepTitle1, gridBagConstraints);
 
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
 
@@ -302,103 +340,17 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 13, 3, 3);
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         panSearch.add(txtSearch, gridBagConstraints);
 
         lblSuche.setText("Kassenzeichen");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(13, 8, 3, 3);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         panSearch.add(lblSuche, gridBagConstraints);
-
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        btgMode.add(togRegenMode);
-        togRegenMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/regen_gr.png"))); // NOI18N
-        togRegenMode.setToolTipText("Versiegelte Flächen");
-        togRegenMode.setFocusable(false);
-        togRegenMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        togRegenMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        togRegenMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togRegenModeActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
-        jPanel1.add(togRegenMode, gridBagConstraints);
-
-        btgMode.add(togWDSRMode);
-        togWDSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
-        togWDSRMode.setToolTipText("ESW");
-        togWDSRMode.setFocusable(false);
-        togWDSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        togWDSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        togWDSRMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togWDSRModeActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 2, 4, 2);
-        jPanel1.add(togWDSRMode, gridBagConstraints);
-
-        btgMode.add(togInfoMode);
-        togInfoMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/info_gr.png"))); // NOI18N
-        togInfoMode.setSelected(true);
-        togInfoMode.setToolTipText("Info");
-        togInfoMode.setFocusable(false);
-        togInfoMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        togInfoMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        togInfoMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togInfoModeActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 0);
-        jPanel1.add(togInfoMode, gridBagConstraints);
-
-        jLabel2.setText("Modus:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 0, 4, 0);
-        jPanel1.add(jLabel2, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
-        panSearch.add(jPanel1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        panSearch.add(sepTitle2, gridBagConstraints);
 
         btnSearch.setMnemonic('s');
         btnSearch.setText("suchen");
@@ -412,16 +364,47 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 3, 3, 8);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         panSearch.add(btnSearch, gridBagConstraints);
+
+        btnNextKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/nextKassenzeichen.png"))); // NOI18N
+        btnNextKassenzeichen.setEnabled(false);
+        btnNextKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnNextKassenzeichenActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
+        panSearch.add(btnNextKassenzeichen, gridBagConstraints);
+
+        busy.setBusy(true);
+        lblNextKassenzeichen.setMaximumSize(new java.awt.Dimension(18, 18));
+        lblNextKassenzeichen.setMinimumSize(new java.awt.Dimension(18, 18));
+        lblNextKassenzeichen.setPreferredSize(new java.awt.Dimension(18, 18));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
+        panSearch.add(lblNextKassenzeichen, gridBagConstraints);
+        lblNextKassenzeichen.setVisible(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(7, 7, 7, 7);
         add(panSearch, gridBagConstraints);
 
         panKZValues.setLayout(new java.awt.GridBagLayout());
@@ -431,8 +414,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(13, 8, 3, 3);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panKZValues.add(lblKassenzeichen, gridBagConstraints);
 
         lblErfassungsdatum.setText("Datum der Erfassung");
@@ -441,25 +423,22 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 8, 3, 3);
         panKZValues.add(lblErfassungsdatum, gridBagConstraints);
 
         lblBemerkung.setText("Bemerkung");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 8, 3, 3);
         panKZValues.add(lblBemerkung, gridBagConstraints);
 
         lblSperre.setText("Veranlagung gesperrt");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 8, 13, 3);
         panKZValues.add(lblSperre, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -479,7 +458,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 8);
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
         panKZValues.add(txtErfassungsdatum, gridBagConstraints);
 
         chkSperre.setForeground(java.awt.Color.red);
@@ -503,9 +482,9 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 13, 2);
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
         panKZValues.add(chkSperre, gridBagConstraints);
 
         scpBemerkung.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -530,11 +509,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 8);
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
         panKZValues.add(scpBemerkung, gridBagConstraints);
 
         txtKassenzeichen.setEditable(false);
@@ -555,7 +534,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 3, 3, 8);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
         panKZValues.add(txtKassenzeichen, gridBagConstraints);
 
         txtSperreBemerkung.setBackground(getBackground());
@@ -574,20 +553,110 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 13, 8);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         panKZValues.add(txtSperreBemerkung, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(7, 7, 7, 7);
+        add(panKZValues, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jLabel2.setText("Modus");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jLabel2, gridBagConstraints);
+
+        btgMode.add(togRegenMode);
+        togRegenMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/regen_gr.png"))); // NOI18N
+        togRegenMode.setToolTipText("Versiegelte Flächen");
+        togRegenMode.setFocusable(false);
+        togRegenMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togRegenMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togRegenMode.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togRegenModeActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(togRegenMode, gridBagConstraints);
+
+        btgMode.add(togWDSRMode);
+        togWDSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
+        togWDSRMode.setToolTipText("ESW");
+        togWDSRMode.setFocusable(false);
+        togWDSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togWDSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togWDSRMode.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togWDSRModeActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        jPanel2.add(togWDSRMode, gridBagConstraints);
+
+        btgMode.add(togInfoMode);
+        togInfoMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/info_gr.png"))); // NOI18N
+        togInfoMode.setSelected(true);
+        togInfoMode.setToolTipText("Info");
+        togInfoMode.setFocusable(false);
+        togInfoMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togInfoMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togInfoMode.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togInfoModeActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(togInfoMode, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(panKZValues, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(3, 7, 3, 7);
+        add(jPanel2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.weightx = 1.0;
+        add(sepTitle1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.weightx = 1.0;
+        add(sepTitle2, gridBagConstraints);
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
@@ -670,6 +739,17 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchActionPerformed
         gotoTxtKassenzeichen();
     }                                                                             //GEN-LAST:event_btnSearchActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnNextKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnNextKassenzeichenActionPerformed
+        if (nextKassenzeichen != null) {
+            gotoKassenzeichen(Integer.toString(nextKassenzeichen));
+        }
+    }                                                                                        //GEN-LAST:event_btnNextKassenzeichenActionPerformed
 
     @Override
     public void appModeChanged() {
@@ -793,14 +873,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         }
 
         if ((mainApp.changesPending() == false) || (refreshFlag == true)) {
+            mainApp.disableKassenzeichenCmds();
+            txtSearch.setEnabled(false);
+            btnSearch.setEnabled(false);
+            setKZSearchField(kz);
+            btnNextKassenzeichen.setEnabled(false);
+
             new SwingWorker<CidsBean, Void>() {
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        mainApp.disableKassenzeichenCmds();
-                        setKZSearchField(kz);
-                        txtSearch.setEnabled(false);
-                        btnSearch.setEnabled(false);
                         return CidsAppBackend.getInstance()
                                     .loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
                     }

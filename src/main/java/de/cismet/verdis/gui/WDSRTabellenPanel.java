@@ -55,6 +55,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
+import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -66,16 +67,14 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
 import de.cismet.validation.Validator;
-import de.cismet.validation.ValidatorState;
 
 import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.constants.PropertyConstants;
-import de.cismet.verdis.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
  * DOCUMENT ME!
@@ -311,7 +310,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         final CidsBean winterdienstBean = SessionManager.getProxy().getMetaObjectByQuery(wdQuery, 0)[0].getBean();
 
         final int newId = getNextNewBeanId();
-        frontinfoBean.setProperty(PropertyConstants.PROP__ID, newId);
+        frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__ID, newId);
         frontinfoBean.getMetaObject().setID(newId);
 
         // final CidsBean strasseBean = SessionManager.getProxy().getVerdisMetaObject(8, PROP__"strasse".getId(),

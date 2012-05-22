@@ -56,12 +56,12 @@ public class CidsBeanSupport {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public static CidsBean cloneCidsBean(final CidsBean cidsBean) throws Exception {
+    public static CidsBean deepcloneCidsBean(final CidsBean cidsBean) throws Exception {
         if (cidsBean == null) {
             return null;
         }
         final CidsBean cloneBean = cidsBean.getMetaObject().getMetaClass().getEmptyInstance().getBean();
-        copyProperties(cidsBean, cloneBean);
+        deepcopyAllProperties(cidsBean, cloneBean);
         return cloneBean;
     }
 
@@ -73,7 +73,7 @@ public class CidsBeanSupport {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public static void copyProperties(final CidsBean sourceBean, final CidsBean targetBean) throws Exception {
+    public static void deepcopyAllProperties(final CidsBean sourceBean, final CidsBean targetBean) throws Exception {
         if ((sourceBean == null) || (targetBean == null)) {
             return;
         }
@@ -86,13 +86,13 @@ public class CidsBeanSupport {
                 targetBean.setProperty("id", id);
                 targetBean.getMetaObject().setID(id);
             } else if (o instanceof CidsBean) {
-                targetBean.setProperty(propName, cloneCidsBean((CidsBean)o));
+                targetBean.setProperty(propName, deepcloneCidsBean((CidsBean)o));
             } else if (o instanceof Collection) {
                 final List<CidsBean> list = (List<CidsBean>)o;
                 final List<CidsBean> newList = new ArrayList<CidsBean>();
 
                 for (final CidsBean tmpBean : list) {
-                    newList.add(cloneCidsBean(tmpBean));
+                    newList.add(deepcloneCidsBean(tmpBean));
                 }
                 targetBean.setProperty(propName, newList);
             } else if (o instanceof Geometry) {
@@ -117,6 +117,25 @@ public class CidsBeanSupport {
                 }
                 targetBean.setProperty(propName, o);
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceBean  DOCUMENT ME!
+     * @param   targetBean  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void copyAllProperties(final CidsBean sourceBean, final CidsBean targetBean) throws Exception {
+        if ((sourceBean == null) || (targetBean == null)) {
+            return;
+        }
+
+        for (final String propName : sourceBean.getPropertyNames()) {
+            final Object o = sourceBean.getProperty(propName);
+            targetBean.setProperty(propName, o);
         }
     }
 }

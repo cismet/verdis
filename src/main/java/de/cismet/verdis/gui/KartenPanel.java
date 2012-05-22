@@ -50,7 +50,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.plaf.basic.BasicToggleButtonUI;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -74,7 +73,6 @@ import de.cismet.cismap.tools.gui.CidsBeanDropJPopupMenuButton;
 import de.cismet.gui.tools.PureNewFeatureWithThickerLineString;
 
 import de.cismet.tools.CurrentStackTrace;
-import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.StaticDecimalTools;
 
 import de.cismet.tools.gui.JPopupMenuButton;
@@ -85,7 +83,7 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.constants.*;
+import de.cismet.verdis.commons.constants.*;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
@@ -2059,9 +2057,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     for (final CidsBean front : fronten) {
                         final Feature add = new BeanUpdatingCidsFeature(
                                 front,
-                                FrontinfoPropertyConstants.PROP__GEOMETRIE
-                                        + PropertyConstants.DOT
-                                        + GeomPropertyConstants.PROP__GEO_FIELD);
+                                FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }

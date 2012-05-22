@@ -31,7 +31,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
-import de.cismet.verdis.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 
 import de.cismet.verdis.gui.Main;
 

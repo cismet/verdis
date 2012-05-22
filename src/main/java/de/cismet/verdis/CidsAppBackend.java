@@ -52,13 +52,13 @@ import de.cismet.cismap.commons.gui.MappingComponent;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 
-import static de.cismet.verdis.commons.constants.VerdisConstants.*;
+import static de.cismet.verdis.commons.constants.VerdisConstants.DOMAIN;
 
 /**
  * DOCUMENT ME!

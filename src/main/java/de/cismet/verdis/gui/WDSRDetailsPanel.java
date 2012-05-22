@@ -52,7 +52,6 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorHelper;
@@ -66,9 +65,7 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.constants.*;
+import de.cismet.verdis.commons.constants.*;
 
 /**
  * DOCUMENT ME!
@@ -697,7 +694,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             final String tabWinterdienst = VerdisMetaClassConstants.MC_WINTERDIENST;
             final String tabStrassenreinigung = VerdisMetaClassConstants.MC_STRASSENREINIGUNG;
             final String tabStrasse = VerdisMetaClassConstants.MC_STRASSE;
-            final String fldId = PropertyConstants.PROP__ID;
+            final String fldId = FrontinfoPropertyConstants.PROP__ID;
             final String fldStrasse = "strasse";
             final String fldStrName = "name";
             final String fldSrBem = "sr_bem";
@@ -915,8 +912,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     public static Geometry getGeometry(final CidsBean frontBean) {
         if ((frontBean != null) && (frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + PropertyConstants.DOT
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
         } else {
             return null;
         }
@@ -939,8 +935,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                         .getBean();
             cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
         }
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + PropertyConstants.DOT
-                    + GeomPropertyConstants.PROP__GEO_FIELD,
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD,
             geom);
     }
 
@@ -977,6 +972,18 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             bpanWdsrDetails.setBackgroundEnabled(false);
         }
 
+//        if (cidsBean != null) {
+//            final CidsBean satzungBean = (CidsBean) cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG);
+//            if (satzungBean != null) {
+//                final CidsBean srBean = (CidsBean) satzungBean.getProperty("sr_klasse");
+//                cboReinigungsklasse.setSelectedItem(srBean);
+//                txtBemSR.setText((String) satzungBean.getProperty("sr_bem"));
+//                final CidsBean wdBean = (CidsBean) satzungBean.getProperty("wd_prio");
+//                cboWinterdienstPrio.setSelectedItem(wdBean);
+//                txtBemWD.setText((String) satzungBean.getProperty("wd_bem"));
+//            }
+//        }
+//
         attachBeanValidators();
     }
 

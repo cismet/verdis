@@ -15,7 +15,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.server.search.RegenFlaechenSummenServerSearch;
 

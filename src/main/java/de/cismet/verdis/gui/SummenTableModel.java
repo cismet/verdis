@@ -11,16 +11,14 @@
  * Created on 7. Januar 2005, 10:32
  */
 package de.cismet.verdis.gui;
-import java.sql.*;
+import java.util.List;
 
-import java.util.*;
-
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 /**
  * DOCUMENT ME!
  *

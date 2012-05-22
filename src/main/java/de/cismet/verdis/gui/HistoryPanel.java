@@ -44,8 +44,6 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
-
 /**
  * DOCUMENT ME!
  *

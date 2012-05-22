@@ -6,9 +6,6 @@
 *
 ****************************************************/
 
-import org.openide.util.Exceptions;
-
-import java.util.Collection;
 import java.util.List;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
@@ -17,12 +14,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
-import de.cismet.verdis.CidsAppBackend;
-
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 
 /*
  * Copyright (C) 2012 cismet GmbH

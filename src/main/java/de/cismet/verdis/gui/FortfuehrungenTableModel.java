@@ -13,7 +13,7 @@ import java.util.Date;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.constants.FortfuehrungPropertyConstants;
+import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
 
 /**
  * DOCUMENT ME!

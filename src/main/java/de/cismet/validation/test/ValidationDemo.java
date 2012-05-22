@@ -28,16 +28,10 @@
  */
 package de.cismet.validation.test;
 
-import Sirius.navigator.connection.Connection;
-import Sirius.navigator.connection.ConnectionFactory;
-import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.connection.ConnectionSession;
-import Sirius.navigator.connection.RESTfulConnection;
-import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
 
-import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -62,7 +56,7 @@ import de.cismet.validation.display.EmbeddedValidatorDisplay;
 
 import de.cismet.validation.validator.BindingValidator;
 
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -87,7 +81,7 @@ public class ValidationDemo extends javax.swing.JPanel implements CidsBeanStore 
     // Variables declaration - do not modify
     private javax.swing.JTextField jTextField1;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
-    // </editor-fold>//GEN-END:initComponents
+    // </editor-fold>
 
     // End of variables declaration
     private CidsBean cidsBean;

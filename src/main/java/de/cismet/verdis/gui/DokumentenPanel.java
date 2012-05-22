@@ -14,27 +14,22 @@ package de.cismet.verdis.gui;
 
 import java.applet.AppletContext;
 
-import java.awt.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import java.sql.*;
-
 import java.util.Collection;
-import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.gui.tools.*;
+import de.cismet.gui.tools.DocPanel;
 
 import de.cismet.tools.URLSplitter;
 
@@ -43,9 +38,8 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.constants.KassenzeichenPropertyConstants;
 
 /**
  * DOCUMENT ME!

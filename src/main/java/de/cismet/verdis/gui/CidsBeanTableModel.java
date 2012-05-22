@@ -27,6 +27,8 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.cismet.cids.custom.util.CidsBeanSupport;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 /**
@@ -169,5 +171,19 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
         } catch (Exception ex) {
             LOG.error("error while deleting bean", ex);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
+        final CidsBean deepclone = CidsBeanSupport.deepcloneCidsBean(cidsBean);
+        return deepclone;
     }
 }
