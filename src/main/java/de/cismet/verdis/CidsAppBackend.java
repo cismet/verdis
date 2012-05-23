@@ -323,6 +323,27 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
+     * @param   query  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<CidsBean> getBeansByQuery(final String query) {
+        try {
+            final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
+            final Collection<CidsBean> beans = new ArrayList<CidsBean>();
+            for (final MetaObject mo : mos) {
+                beans.add(mo.getBean());
+            }
+            return beans;
+        } catch (ConnectionException ex) {
+            log.error("error during retrieval of object", ex);
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   fromDate  DOCUMENT ME!
      * @param   toDate    DOCUMENT ME!
      *

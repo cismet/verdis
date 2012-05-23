@@ -130,7 +130,8 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                     final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                     if (cidsBean != null) {
-                        return cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
+                        return CidsAppBackend.getInstance().isEditable()
+                                    && (cidsBean.getMetaObject().getStatus() == MetaObject.MODIFIED);
                     } else {
                         return false;
                     }
