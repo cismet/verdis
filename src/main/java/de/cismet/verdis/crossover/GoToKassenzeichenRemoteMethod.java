@@ -11,6 +11,8 @@
  */
 package de.cismet.verdis.crossover;
 
+import org.openide.util.lookup.ServiceProvider;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,25 +20,40 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import de.cismet.remote.AbstractRESTRemoteControlMethod;
+import de.cismet.remote.RESTRemoteControlMethod;
+
 import de.cismet.verdis.gui.Main;
 
 /**
  * DOCUMENT ME!
  *
  * @author   spuhl
+ * @author   Benjamin Friedrich (benjamin.friedrich@cismet.de)
  * @version  $Revision$, $Date$
  */
-@Path("/verdis/")
-public class VerdisCrossover {
+@Path("/gotoKassenzeichen/")
+@ServiceProvider(service = RESTRemoteControlMethod.class)
+public class GoToKassenzeichenRemoteMethod extends AbstractRESTRemoteControlMethod {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(VerdisCrossover.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
+            GoToKassenzeichenRemoteMethod.class);
 
     //~ Instance fields --------------------------------------------------------
 
     @Context
     private UriInfo context;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new GoToKassenzeichenRemoteMethod object.
+     */
+    public GoToKassenzeichenRemoteMethod() {
+        super(-1, "/gotoKassenzeichen/");
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -49,7 +66,6 @@ public class VerdisCrossover {
      */
     @GET
     @Produces("text/html")
-    @Path("/gotoKassenzeichen/")
     public String gotoKassenzeichen(@QueryParam("kassenzeichen") final String kassenzeichen) {
         if (log.isDebugEnabled()) {
             log.debug("Crossover: gotoKassenzeichen");

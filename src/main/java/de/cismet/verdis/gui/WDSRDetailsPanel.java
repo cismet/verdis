@@ -29,31 +29,46 @@
 package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.MetaObject;
+
 import com.vividsolutions.jts.geom.Geometry;
+
+import edu.umd.cs.piccolo.PCanvas;
+
+import org.jdesktop.beansbinding.Converter;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import java.util.Collection;
+import java.util.regex.Pattern;
+
+import javax.swing.*;
+
 import de.cismet.cids.custom.util.BindingValidationSupport;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
+
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
+
 import de.cismet.tools.CismetThreadPool;
+
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorHelper;
 import de.cismet.validation.ValidatorState;
 import de.cismet.validation.ValidatorStateImpl;
+
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
+
 import de.cismet.validation.validator.CidsBeanValidator;
+
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
-import edu.umd.cs.piccolo.PCanvas;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.regex.Pattern;
-import javax.swing.*;
-import org.jdesktop.beansbinding.Converter;
 
 /**
  * DOCUMENT ME!
@@ -805,7 +820,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboStrasseActionPerformed
+    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
         CidsBean strasseBean = null;
         if (frontBean != null) {
             strasseBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE);
@@ -899,25 +914,25 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                             + ";",
                     (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_WD)));
         }
-    }//GEN-LAST:event_cboStrasseActionPerformed
+    } //GEN-LAST:event_cboStrasseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageSRActionPerformed
+    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
         updateLageDependendCbos();
-    }//GEN-LAST:event_cboLageSRActionPerformed
+    }                                                                             //GEN-LAST:event_cboLageSRActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageWDActionPerformed
+    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageWDActionPerformed
         updateLageDependendCbos();
-    }//GEN-LAST:event_cboLageWDActionPerformed
+    }                                                                             //GEN-LAST:event_cboLageWDActionPerformed
 
     /**
      * DOCUMENT ME!

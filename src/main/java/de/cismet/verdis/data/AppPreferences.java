@@ -15,21 +15,11 @@ import java.io.InputStream;
 
 import java.net.URL;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
-
-import de.cismet.ee.EJBAccessor;
-
-import de.cismet.lagisEE.bean.LagisServerRemote;
-
-import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
 
 import de.cismet.tools.ConnectionInfo;
 
@@ -69,8 +59,6 @@ public class AppPreferences {
     private String rmRegistryServerPath;
     private int verdisCrossoverPort;
     private int lagisCrossoverPort;
-    private LagisCrossoverRemote lagisCrossoverAccessor;
-    private LagisServerRemote lagisServerAccessor;
     private double flurstueckBuffer = -0.5;
 
     private String appbackenddomain = null;
@@ -230,12 +218,6 @@ public class AppPreferences {
                 if (log.isDebugEnabled()) {
                     log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
                 }
-                lagisCrossoverAccessor = EJBAccessor.createEJBAccessor(
-                            lagisHost,
-                            lagisORBPort,
-                            LagisCrossoverRemote.class).getEjbInterface();
-                lagisServerAccessor = EJBAccessor.createEJBAccessor(lagisHost, lagisORBPort, LagisServerRemote.class)
-                            .getEjbInterface();
             } catch (Exception ex) {
                 log.warn("Crossover: Error beim setzen des LagIS servers", ex);
             }
@@ -319,23 +301,6 @@ public class AppPreferences {
         this.lagisCrossoverPort = lagisCrossoverPort;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public LagisCrossoverRemote getLagisCrossoverAccessor() {
-        return lagisCrossoverAccessor;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public LagisServerRemote getLagisServerAccessor() {
-        return lagisServerAccessor;
-    }
     /**
      * ADDED FOR RM PLUGIN FUNCTIONALTY 22.07.07 Sebastian Puhl.
      *

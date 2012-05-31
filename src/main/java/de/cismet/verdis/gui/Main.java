@@ -125,6 +125,8 @@ import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
+import de.cismet.remote.RESTRemoteControlStarter;
+
 import de.cismet.rmplugin.RMPlugin;
 
 import de.cismet.tools.StaticDebuggingTools;
@@ -151,8 +153,6 @@ import de.cismet.verdis.FlaechenClipboardListener;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
-
-import de.cismet.verdis.crossover.VerdisCrossover;
 
 import de.cismet.verdis.data.AppPreferences;
 
@@ -1537,9 +1537,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 LOG.warn("Crossover: Invalid Crossover serverport: " + crossoverServerPort
                             + ". Going to use default port: " + defaultServerPort);
                 defaultServerPortUsed = true;
-                initCrossoverServerImpl(defaultServerPort);
+                RESTRemoteControlStarter.initRestRemoteControlMethods(defaultServerPort);
             } else {
-                initCrossoverServerImpl(crossoverServerPort);
+                RESTRemoteControlStarter.initRestRemoteControlMethods(crossoverServerPort);
             }
         } catch (Exception ex) {
             LOG.error("Crossover: Error while creating crossover server on port: " + crossoverServerPort, ex);
@@ -1549,7 +1549,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
                 defaultServerPortUsed = true;
                 try {
-                    initCrossoverServerImpl(defaultServerPort);
+                    RESTRemoteControlStarter.initRestRemoteControlMethods(defaultServerPort);
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Crossover: Server started at port: " + defaultServerPort, ex);
                     }
@@ -1561,21 +1561,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
             }
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   crossoverServerPort  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    private void initCrossoverServerImpl(final int crossoverServerPort) throws Exception {
-        final HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, VerdisCrossover.class);
-        final HttpServer server = HttpServer.create(new InetSocketAddress(crossoverServerPort), 0);
-        server.createContext("/", handler);
-        server.setExecutor(null);
-        server.start();
     }
 
     /**

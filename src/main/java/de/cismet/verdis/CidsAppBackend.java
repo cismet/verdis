@@ -205,6 +205,26 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
+     * @param   query   DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject[] getMetaObject(final String query, final String domain) {
+        MetaObject[] mos = null;
+        try {
+            final User user = SessionManager.getSession().getUser();
+            final ConnectionProxy proxy = getProxy();
+            mos = proxy.getMetaObjectByQuery(user, query, domain);
+        } catch (ConnectionException ex) {
+            log.error("error retrieving metaobject by query", ex);
+        }
+        return mos;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  editable  DOCUMENT ME!
      */
     public void setEditable(final boolean editable) {

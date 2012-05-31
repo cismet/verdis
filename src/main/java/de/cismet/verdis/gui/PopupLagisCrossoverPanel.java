@@ -16,9 +16,9 @@
  */
 package de.cismet.verdis.gui;
 
-import com.vividsolutions.jts.geom.Geometry;
+import Sirius.server.middleware.types.MetaObject;
 
-import entity.KassenzeichenEntity;
+import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -26,17 +26,13 @@ import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXTable;
 
-import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import java.io.IOException;
 
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,14 +42,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import de.cismet.lagisEE.bean.LagisServerRemote;
-
-import de.cismet.lagisEE.crossover.LagisCrossoverRemote;
-import de.cismet.lagisEE.crossover.entity.WfsFlurstuecke;
-
-import de.cismet.lagisEE.entity.core.FlurstueckSchluessel;
+import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.layout.FadingCardLayout;
+
+import de.cismet.verdis.CidsAppBackend;
 
 /**
  * DOCUMENT ME!
@@ -68,10 +61,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
     // ToDo defaults für Panel ?
     private static final Logger log = org.apache.log4j.Logger.getLogger(PopupLagisCrossoverPanel.class);
     private static final String server = "http://localhost:";
-    private static final String request = "/lagis/loadFlurstueck?";
-    // ToDo perhaps place in LagisCrossover
-    // Problem: would be the the only dependency to LagisClient
-    // http://localhost:19000/lagis/loadFlurstueck?gemarkung=Barmen&flur=1&zaehler=100&nenner=0
+    private static final String request = "/loadFlurstueck?";
     public static final NameValuePair PARAMETER_GEMARKUNG = new NameValuePair("gemarkung", "");
     public static final NameValuePair PARAMETER_FLUR = new NameValuePair("flur", "");
     public static final NameValuePair PARAMETER_FLURSTUECK_ZAEHLER = new NameValuePair("zaehler", "");
@@ -79,6 +69,9 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
     private static final String PROGRESS_CARD_NAME = "progress";
     private static final String CONTENT_CARD_NAME = "content";
     private static final String MESSAGE_CARD_NAME = "message";
+
+    private static final int ALKIS_LANDPARCEL_META_CLASS_ID = 169;
+    private static final int ALKIS_LANDPARCEL_GEOM_SRID = 25832;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -401,15 +394,15 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
     /**
      * ToDo place query generation in LagisCrossover. Give key get Query. ToDo maybe thread ??
      *
-     * @param  key  DOCUMENT ME!
+     * @param  bean  key DOCUMENT ME!
      */
-    private void openFlurstueckInLagis(final FlurstueckSchluessel key) {
-        if (key != null) {
+    private void openFlurstueckInLagis(final CidsBean bean) {
+        if (bean != null) {
             if ((lagisCrossoverPort < 0) || (lagisCrossoverPort > 65535)) {
                 log.warn("Crossover: lagisCrossoverPort ist ungültig: " + lagisCrossoverPort);
             } else {
                 // ToDo Thread
-                final URL lagisQuery = createQuery(lagisCrossoverPort, key);
+                final URL lagisQuery = createQuery(lagisCrossoverPort, bean);
                 if (lagisQuery != null) {
                     final SwingWorker<Void, Void> openKassenzeichen = new SwingWorker<Void, Void>() {
 
@@ -464,9 +457,9 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
             if (selectedRow != -1) {
                 final int modelIndex = ((JXTable)tblFlurstuecke).convertRowIndexToModel(selectedRow);
                 if (modelIndex != -1) {
-                    final FlurstueckSchluessel key = tableModel.getFlurstueckSchluesselAtIndex(modelIndex);
-                    if (key != null) {
-                        openFlurstueckInLagis(key);
+                    final CidsBean bean = tableModel.getFlurstueckSchluesselAtIndex(modelIndex);
+                    if (bean != null) {
+                        openFlurstueckInLagis(bean);
                     } else {
                         log.warn("Crossover: Kein FlurstueckSchluessel zu angebenen Index.");
                     }
@@ -487,25 +480,40 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
     /**
      * DOCUMENT ME!
      *
-     * @param   port  DOCUMENT ME!
-     * @param   key   DOCUMENT ME!
+     * @param   o  str bean DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static URL createQuery(final int port, final FlurstueckSchluessel key) {
+    private static String convertFlurstueckNumbersToString(final Object o) {
+        if (o == null) {
+            return "0";
+        }
+
+        final String str = (String)o;
+        return str.replaceFirst("^0+", "");
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   port  DOCUMENT ME!
+     * @param   bean  key DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static URL createQuery(final int port, final CidsBean bean) {
         if ((port < 0) || (port > 65535)) {
             log.warn("Crossover: lagisCrossoverPort ist ungültig: " + port);
         } else {
             try {
                 // ToDo ugly because is static
-                PARAMETER_GEMARKUNG.setValue(key.getGemarkung().getBezeichnung());
-                PARAMETER_FLUR.setValue(key.getFlur().toString());
-                PARAMETER_FLURSTUECK_ZAEHLER.setValue(key.getFlurstueckZaehler().toString());
-                if (key.getFlurstueckNenner() != null) {
-                    PARAMETER_FLURSTUECK_NENNER.setValue(key.getFlurstueckNenner().toString());
-                } else {
-                    PARAMETER_FLURSTUECK_NENNER.setValue("0");
-                }
+                PARAMETER_GEMARKUNG.setValue(String.valueOf(bean.getProperty("gemarkung")));
+                PARAMETER_FLUR.setValue(convertFlurstueckNumbersToString(bean.getProperty("flur")));
+                PARAMETER_FLURSTUECK_ZAEHLER.setValue(convertFlurstueckNumbersToString(
+                        bean.getProperty("fstck_zaehler")));
+                PARAMETER_FLURSTUECK_NENNER.setValue(convertFlurstueckNumbersToString(
+                        bean.getProperty("fstck_nenner")));
+
                 final GetMethod tmp = new GetMethod(server + port + request);
                 tmp.setQueryString(
                     new NameValuePair[] {
@@ -547,7 +555,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
         //~ Instance fields ----------------------------------------------------
 
         private final String[] COLUMN_HEADER = { "Flurstücke" };
-        private final ArrayList<FlurstueckSchluessel> data = new ArrayList<FlurstueckSchluessel>();
+        private final ArrayList<CidsBean> data = new ArrayList<CidsBean>();
 
         //~ Methods ------------------------------------------------------------
 
@@ -563,10 +571,16 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
         @Override
         public Object getValueAt(final int rowIndex, final int columnIndex) {
-            final FlurstueckSchluessel value = data.get(rowIndex);
+            final CidsBean bean = data.get(rowIndex);
             switch (columnIndex) {
                 case 0: {
-                    return value.getKeyString();
+                    return bean.getProperty("gemarkung")
+                                + " "
+                                + convertFlurstueckNumbersToString(bean.getProperty("flur"))
+                                + " "
+                                + convertFlurstueckNumbersToString(bean.getProperty("fstck_zaehler"))
+                                + "/"
+                                + convertFlurstueckNumbersToString(bean.getProperty("fstck_nenner"));
                 }
                 default: {
                     return "Spalte ist nicht definiert";
@@ -579,7 +593,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
          *
          * @param  newData  DOCUMENT ME!
          */
-        public void updateTableModel(final Set newData) {
+        public void updateTableModel(final List newData) {
             data.clear();
             if (newData != null) {
                 data.addAll(newData);
@@ -593,7 +607,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
          *
          * @return  DOCUMENT ME!
          */
-        public FlurstueckSchluessel getFlurstueckSchluesselAtIndex(final int index) {
+        public CidsBean getFlurstueckSchluesselAtIndex(final int index) {
             return data.get(index);
         }
 
@@ -608,59 +622,73 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      *
      * @version  $Revision$, $Date$
      */
-    class FlurstueckRetriever extends SwingWorker<Set<FlurstueckSchluessel>, Void> {
+    class FlurstueckRetriever extends SwingWorker<List<CidsBean>, Void> {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   geom    DOCUMENT ME!
+         * @param   buffer  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private List<CidsBean> getIntersectingFlurstuecke(final Geometry geom, final double buffer) {
+            final String sql = "SELECT " + ALKIS_LANDPARCEL_META_CLASS_ID + ", alkis_landparcel.id "
+                        + "FROM "
+                        + "   alkis_landparcel, "
+                        + "   geom "
+                        + "WHERE "
+                        + "   geom.id = alkis_landparcel.geometrie "
+                        + " and intersects(geom.geo_field, "
+                        + "                    st_buffer(st_buffer("
+                        + "st_transform( "
+                        + "   geomFromText('" + geom.toText() + "'," + geom.getSRID() + ")"
+                        + "," + ALKIS_LANDPARCEL_GEOM_SRID + "), "
+                        + buffer + "), 0))";
+
+            if (log.isDebugEnabled()) {
+                log.debug(sql);
+            }
+
+            final MetaObject[] result = CidsAppBackend.getInstance().getMetaObject(sql, "WUNDA_BLAU");
+            final ArrayList<CidsBean> beans = new ArrayList<CidsBean>((result == null) ? 0 : result.length);
+
+            if (result != null) {
+                for (int i = 0; i < result.length; i++) {
+                    beans.add(result[i].getBean());
+                }
+            }
+
+            return beans;
+        }
+
         @Override
-        protected Set<FlurstueckSchluessel> doInBackground() throws Exception {
+        protected List<CidsBean> doInBackground() throws Exception {
             final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
             if ((currentKZ != null) && (currentKZ.length() > 0)) {
                 final Geometry kassenzeichenGeom = mainApp.getGeometry();
                 if (kassenzeichenGeom != null) {
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
-                    final LagisCrossoverRemote lagisCrossover = mainApp.getPrefs().getLagisCrossoverAccessor();
-                    final LagisServerRemote lagisServer = mainApp.getPrefs().getLagisServerAccessor();
-                    if ((lagisCrossover != null) && (lagisServer != null)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("buffer: " + mainApp.getPrefs().getFlurstueckBuffer());
+                    }
+
+                    final List<CidsBean> wfsFlurstuecke = this.getIntersectingFlurstuecke(
+                            kassenzeichenGeom,
+                            mainApp.getPrefs().getFlurstueckBuffer());
+
+                    if ((wfsFlurstuecke.size() > 0)) {
                         if (log.isDebugEnabled()) {
-                            log.debug("buffer: " + mainApp.getPrefs().getFlurstueckBuffer());
+                            log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
                         }
-                        final Set<WfsFlurstuecke> wfsFlurstuecke = lagisCrossover.getIntersectingFlurstuecke(
-                                kassenzeichenGeom,
-                                mainApp.getPrefs().getFlurstueckBuffer());
-                        if ((wfsFlurstuecke != null) && (wfsFlurstuecke.size() > 0)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Crossover: Anzahl WFS Flurstücke: " + wfsFlurstuecke.size());
-                            }
-                            final Set<FlurstueckSchluessel> flurstueckSchluessel =
-                                lagisServer.getFlurstueckSchluesselForWFSFlurstueck(wfsFlurstuecke);
-                            if ((flurstueckSchluessel != null) && (flurstueckSchluessel.size() > 0)) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Crossover: Anzahl Flurstück Schlüssel: " + flurstueckSchluessel.size());
-                                }
-                                if (flurstueckSchluessel.size() != wfsFlurstuecke.size()) {
-                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
-                                }
-                            } else {
-                                log.info("Crossover: Keine geschnittenen Flurstücke gefunden(Schlüssel).");
-                                if (!wfsFlurstuecke.isEmpty()) {
-                                    log.warn("Crossover: Achtung Anzahl WFS/Schlüssel sind unterschiedlich");
-                                }
-                            }
-                            return flurstueckSchluessel;
-                        } else {
-                            log.info("Crossover: Keine geschnittenen Flurstücke gefunden(WFS).");
-                            // ToDo Meldung an benutzer
-                            lblMessage.setText(
-                                "<html>Keine geschnittenen Flurstücke gefunden.</html>");
-                        }
+                        return wfsFlurstuecke;
                     } else {
+                        log.info("Crossover: Keine geschnittenen Flurstücke gefunden(WFS).");
+                        // ToDo Meldung an benutzer
                         lblMessage.setText(
-                            "<html>Die Verbindung zum LagIS Server<br/>ist nicht richtig konfiguriert.</html>");
-                        log.warn(
-                            "Crossover: Kann die Flurstücke nicht bestimmen, weil die Verbindung zum server nicht richtig konfiguriert ist.");
-                        log.warn("Crossover: lagisCrossover=" + lagisCrossover);
-                        log.warn("Crossover: lagisServer=" + lagisServer);
+                            "<html>Keine geschnittenen Flurstücke gefunden.</html>");
                     }
                 } else {
                     // ToDo user message !
@@ -689,10 +717,9 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
                 }
             }
             try {
-                Set<FlurstueckSchluessel> results = get();
+                final List<CidsBean> results = get();
                 if (results == null) {
-                    results = new HashSet<FlurstueckSchluessel>();
-                    tableModel.updateTableModel(results);
+                    tableModel.updateTableModel(new ArrayList(0));
                     layout.show(panAll, MESSAGE_CARD_NAME);
                 } else {
                     tableModel.updateTableModel(results);
@@ -700,13 +727,10 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
                 }
             } catch (Exception ex) {
                 log.error("Fehler beim verarbeiten der Ergebnisse: ", ex);
-                tableModel.updateTableModel(new HashSet<KassenzeichenEntity>());
+                tableModel.updateTableModel(new ArrayList<CidsBean>());
                 lblMessage.setText("<html>Fehler beim abfragen<br/>der Flurstücke.</html>");
                 layout.show(panAll, MESSAGE_CARD_NAME);
             }
-//            LagisCrossoverPanel.this.revalidate();
-//            LagisCrossoverPanel.this.repaint();
-//            ((JDialog) getParent().getParent().getParent().getParent()).repaint();
         }
     }
 }
