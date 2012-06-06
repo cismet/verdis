@@ -43,7 +43,6 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/layout.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Aktuelles Layout speichern"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mniSaveLayoutActionPerformed"/>
@@ -58,7 +57,6 @@
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/layout.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Layout laden"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mniLoadLayoutActionPerformed"/>
