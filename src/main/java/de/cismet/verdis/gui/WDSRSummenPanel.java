@@ -165,13 +165,31 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
                 final SumHashMap wdHash = new SumHashMap();
 
                 for (final CidsBean front : fronten) {
-                    final String srKey = front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY) + "-"
-                                + front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__SCHLUESSEL);
                     final Integer laenge = (Integer)front.getProperty(
                             FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+
+                    final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
+                            FrontinfoPropertyConstants.PROP__LAGE_SR);
+                    final String srKey;
+                    if (satzung_strassenreinigung == null) {
+                        srKey = front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY) + "-"
+                                    + front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__SCHLUESSEL);
+                    } else {
+                        srKey = satzung_strassenreinigung.getProperty("sr_klasse.key") + "-"
+                                    + satzung_strassenreinigung.getProperty("sr_klasse.schluessel");
+                    }
                     srHash.add(srKey, laenge);
-                    final String wdKey = front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY) + "-"
-                                + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__SCHLUESSEL);
+
+                    final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
+                            FrontinfoPropertyConstants.PROP__LAGE_WD);
+                    final String wdKey;
+                    if (satzung_winterdienst == null) {
+                        wdKey = front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY) + "-"
+                                    + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__SCHLUESSEL);
+                    } else {
+                        wdKey = satzung_winterdienst.getProperty("wd_prio.key") + "-"
+                                    + satzung_winterdienst.getProperty("wd_prio.schluessel");
+                    }
                     wdHash.add(wdKey, laenge);
                 }
 
