@@ -5,22 +5,15 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.HistoryObject;
-
-import org.apache.log4j.Logger;
 
 import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 
 /**
  * DOCUMENT ME!
@@ -29,10 +22,6 @@ import javax.swing.ListCellRenderer;
  * @version  $Revision$, $Date$
  */
 public class HistoryComboBox extends JComboBox {
-
-    //~ Static fields/initializers ---------------------------------------------
-
-    private static final Logger LOG = Logger.getLogger(HistoryComboBox.class);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -49,7 +38,7 @@ public class HistoryComboBox extends JComboBox {
  *
  * @version  $Revision$, $Date$
  */
-class HistoryComboBoxRenderer extends DefaultListCellRenderer implements ListCellRenderer {
+class HistoryComboBoxRenderer extends DefaultListCellRenderer {
 
     //~ Methods ----------------------------------------------------------------
 
