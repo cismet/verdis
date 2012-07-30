@@ -12,6 +12,8 @@ import org.jdesktop.observablecollections.ObservableListListener;
 
 import java.sql.Date;
 
+import java.text.SimpleDateFormat;
+
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
@@ -33,6 +35,7 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
 
     CidsBean kassenzeichenBean;
     List<CidsBean> befreiungen;
+    final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
@@ -75,7 +78,7 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
         if (column == 0) {
             return be.getProperty("aktenzeichen");
         } else {
-            return be.getProperty("gueltig_bis");
+            return dateFormat.format(be.getProperty("gueltig_bis"));
         }
     }
 
@@ -86,7 +89,7 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
             if (column == 0) {
                 be.setProperty("aktenzeichen", value.toString());
             } else {
-                be.setProperty("gueltig_bis", Date.valueOf(value.toString()));
+                be.setProperty("gueltig_bis", new Date(dateFormat.parse(value.toString()).getTime()));
             }
         } catch (Exception e) {
             log.error("Fehler beim Ändern eines Attributes", e);
