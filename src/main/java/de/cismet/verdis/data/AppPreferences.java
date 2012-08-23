@@ -21,8 +21,6 @@ import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
 
-import de.cismet.tools.ConnectionInfo;
-
 /**
  * DOCUMENT ME!
  *
@@ -45,7 +43,6 @@ public class AppPreferences {
     private String kassenzeichenSuche;
     private Vector usergroups = new Vector();
     private Vector rwGroups = new Vector();
-    private ConnectionInfo dbConnectionInfo;
     private CismapPreferences cismapPrefs;
     private String standaloneDomainname;
     private String standaloneCallServerHost;
@@ -240,7 +237,6 @@ public class AppPreferences {
                     }
                 }
             }
-            dbConnectionInfo = new ConnectionInfo(root.getChild("dbConnectionInfo"));
 
             // cismapPrefs = new CismapPreferences(root.getChild("cismapPreferences"));
 
@@ -488,24 +484,6 @@ public class AppPreferences {
      */
     public void setKassenzeichenSuche(final String kassenzeichenSuche) {
         this.kassenzeichenSuche = kassenzeichenSuche;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public ConnectionInfo getDbConnectionInfo() {
-        return dbConnectionInfo;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dbConnectionInfo  DOCUMENT ME!
-     */
-    public void setDbConnectionInfo(final ConnectionInfo dbConnectionInfo) {
-        this.dbConnectionInfo = dbConnectionInfo;
     }
 
     /**

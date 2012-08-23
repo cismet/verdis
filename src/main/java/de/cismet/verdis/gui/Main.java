@@ -219,7 +219,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     //~ Instance fields --------------------------------------------------------
 
-    de.cismet.tools.ConnectionInfo connectionInfo = new de.cismet.tools.ConnectionInfo();
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -1581,7 +1580,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 //        INITIAL_WMS_BB_X2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getX2();
 //        INITIAL_WMS_BB_Y2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getY2();
 
-        connectionInfo = prefs.getDbConnectionInfo();
         if (!plugin) {
             if (prefs.getMode().trim().toLowerCase().equals("readonly")) {
                 readonly = true;
