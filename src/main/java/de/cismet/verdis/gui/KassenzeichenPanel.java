@@ -170,6 +170,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
+
+        Main.getCurrentInstance().refreshTitle();
     }
 
     /**
@@ -751,6 +753,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      */
     public String getShownKassenzeichen() {
         return txtKassenzeichen.getText();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getShownBemerkung() {
+        return txtBemerkung.getText();
     }
 
     /**

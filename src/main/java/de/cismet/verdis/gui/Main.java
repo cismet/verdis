@@ -4221,8 +4221,27 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void setUserString(final String userString) {
         this.userString = userString;
-        Main.this.setTitle("verdis [" + userString + "]");
+        refreshTitle();
 //        kzPanel.setUserString(userString);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void refreshTitle() {
+        String zusatz = " [" + userString + "]";
+
+        if (getKzPanel() != null) {
+            final String kassenzeichen = getKzPanel().getShownKassenzeichen();
+            final String bemerkung = getKzPanel().getShownBemerkung();
+            if ((kassenzeichen != null) && (kassenzeichen.length() > 1)) {
+                zusatz += " " + kassenzeichen;
+                if ((bemerkung != null) && (bemerkung.length() > 1)) {
+                    zusatz += " - " + bemerkung.replace('\n', ' ');
+                }
+            }
+        }
+        Main.this.setTitle("verdis" + zusatz);
     }
 
     /**
