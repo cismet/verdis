@@ -23,6 +23,7 @@ import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -34,6 +35,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
+
+import de.cismet.cismap.commons.features.Feature;
 
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
@@ -887,124 +890,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         editmode = b;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   object_id  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lockDataset(final String object_id) {
-        return CidsAppBackend.getInstance().lockDataset(object_id);
-
-//        try {
-//            Statement stmnt = connection.createStatement();
-//            ResultSet rs = stmnt.executeQuery("select class_id,object_id,user_string,additional_info from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id);
-//            if (!rs.next()) {
-//                rs.close();
-//                //Kein Eintragvorhanden. Eintrag schreiben
-//                stmnt = connection.createStatement();
-//                String locker = "insert into cs_locks (class_id,object_id,user_string,additional_info) values (" + Main.KASSENZEICHEN_CLASS_ID + "," + object_id + ",'" + userString + "','" + lockNonce + "')";
-//                log.debug("lockDataset: " + locker);
-//                stmnt.executeUpdate(locker);
-//                stmnt.close();
-//                //Sperreintrag geschrieben. Jetzt wird noch \u00FCberpr\u00FCft ob in der zwischenzeit noch jemnad einen Sperreintrag geschrieben hat
-//                stmnt = connection.createStatement();
-//                rs = stmnt.executeQuery("select count(*) from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id);
-//                if (!rs.next()) {
-//                    log.fatal("select count(*) hat nichts zur\u00FCckgeliefert.");
-//                    return false;
-//                } else {
-//                    int count = rs.getInt(1);
-//                    if (count > 1) {
-//                        final JFrame t = mainApp;
-//                        new Thread() {
-//
-//                            {
-//                                start();
-//                            }
-//
-//                            public void run() {
-//                                JOptionPane.showMessageDialog(t, "Es wurde gleichzeitig versucht einen Datensatz zu sperren. Der kl\u00FCgere gibt nach ;-)", "Sperren fehlgeschlagen", JOptionPane.WARNING_MESSAGE);
-//                            }
-//                        };
-//                        stmnt = connection.createStatement();
-//                        int ret = stmnt.executeUpdate("delete from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id + " and additional_info='" + lockNonce + "'");
-//                        stmnt.close();
-//                        if (ret != 1) {
-//                            log.warn("Kassenzeichen " + object_id + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret);
-//                        }
-//
-//                        return false;
-//                    } else {
-//                        return true;
-//                    }
-//                }
-//            } else {
-//                final JFrame t = mainApp;
-//                final String user = rs.getString(3);
-//                rs.close();
-//                new Thread() {
-//
-//                    {
-//                        start();
-//                    }
-//
-//                    public void run() {
-//                        JOptionPane.showMessageDialog(t, "Der Datensatz wird schon vom Benutzer " + user + " zum Ver\u00E4ndern gesperrt", "Kein Editieren m\u00F6glich", JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                };
-//                return false;
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("SQL Fehler beim Sperren", e);
-//            return false;
-//        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  object_id  DOCUMENT ME!
-     */
-    public void unlockDataset(final String object_id) {
-        CidsAppBackend.getInstance().unlockDataset(object_id);
-//        String sql = "delete from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id + " and additional_info='" + lockNonce + "'";
-//        log.info("unlockDataset: " + sql);
-//        try {
-//            Statement stmnt = connection.createStatement();
-//            int ret = stmnt.executeUpdate(sql);
-//            stmnt.close();
-//            if (ret != 1) {
-//                log.fatal("Kassenzeichen " + object_id + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret + "(" + sql + ")");
-//            }
-//
-//        } catch (Exception e) {
-//            log.fatal("SQL Fehler beim Entsperren (Statement=" + sql + ")", e);
-//        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lockDataset() {
-        final String object_id = txtKassenzeichen.getText().trim();
-        return lockDataset(object_id);
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void unlockDataset() {
-        final String object_id = txtKassenzeichen.getText().trim();
-        if ((object_id != null) && (object_id.length() > 0)) {
-            unlockDataset(object_id);
-        }
-    }
-
     @Override
     public void historyChanged() {
         if ((historyModel != null) && (historyModel.getCurrentElement() != null)) {
@@ -1047,15 +932,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      */
     public void setEditmode(final boolean editmode) {
         this.editmode = editmode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CidsBean getKassenzeichenObject() {
-        return kassenzeichenBean;
     }
 
     /**

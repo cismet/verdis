@@ -3041,10 +3041,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 if (answer == JOptionPane.YES_OPTION) {
                     storeChanges();
                 }
-                unlockDataset();
-            } else {
-                unlockDataset();
             }
+            CidsAppBackend.getInstance().releaseLock();
         }
         closeAllConnections();
     }                                                                      //GEN-LAST:event_formWindowClosing
@@ -3123,7 +3121,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
         }
         enableEditing(false);
-        unlockDataset();
+        CidsAppBackend.getInstance().releaseLock();
         kassenzeichenPanel.refresh();
     }                                                                             //GEN-LAST:event_cmdCancelActionPerformed
 
@@ -3134,10 +3132,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
-            if (!editmode && (kassenzeichenPanel.isEmpty() || lockDataset())) {
+            if (!editmode && CidsAppBackend.getInstance().acquireLock(kassenzeichenPanel.getCidsBean())) {
                 enableEditing(true);
             } else if (!changesPending()) {
-                unlockDataset();
+                CidsAppBackend.getInstance().releaseLock();
                 enableEditing(false);
             }
         }
@@ -3518,22 +3516,18 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     return;
                 }
 
-                this.unlockDataset();
-                if (this.lockDataset(newKZ)) {
-                    try {
-                        kassenzeichenBean.setProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
-                            newKZInt);
-                        if (storeChanges(false, newKZ)) {
-                            this.unlockDataset(newKZ);
-                        } else {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("storechanges error");
-                            }
+                CidsAppBackend.getInstance().releaseLock();
+                try {
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
+                        newKZInt);
+                    if (!storeChanges(false, newKZ)) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("storechanges error");
                         }
-                    } catch (Exception ex) {
-                        LOG.error("error while setting kassenzeichennummer", ex);
                     }
+                } catch (Exception ex) {
+                    LOG.error("error while setting kassenzeichennummer", ex);
                 }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(
@@ -3574,23 +3568,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                 return null;
                             }
 
-                            unlockDataset();
-                            if (lockDataset(newKassenzeichennummer)) {
-                                final CidsBean kassenzeichen = createNewKassenzeichen(kzNummer);
-                                kassenzeichen.persist();
+                            final CidsBean kassenzeichen = createNewKassenzeichen(kzNummer);
+                            kassenzeichen.persist();
 
-                                unlockDataset(newKassenzeichennummer);
-                                kassenzeichenPanel.setKZSearchField(newKassenzeichennummer);
-                                kassenzeichenPanel.gotoKassenzeichen(newKassenzeichennummer);
+                            kassenzeichenPanel.setKZSearchField(newKassenzeichennummer);
+                            kassenzeichenPanel.gotoKassenzeichen(newKassenzeichennummer);
 
-                                enableEditing(true);
-                            } else {
-                                JOptionPane.showMessageDialog(
-                                    Main.this,
-                                    "Neues Kassenzeichen kann nicht gesperrt werden.",
-                                    "Fehler",
-                                    JOptionPane.ERROR_MESSAGE);
-                            }
+                            enableEditing(true);
                             return null;
                         }
 
@@ -3823,10 +3807,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 if (answer == JOptionPane.YES_OPTION) {
                     storeChanges();
                 }
-                unlockDataset();
-            } else {
-                unlockDataset();
             }
+            CidsAppBackend.getInstance().releaseLock();
         }
         if (param == false) {
             closeAllConnections();
@@ -4025,36 +4007,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdOk.setEnabled(CidsAppBackend.getInstance().isEditable() && b);
     }
 
-    @Override
-    public boolean lockDataset() {
-        return kassenzeichenPanel.lockDataset();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   object_id  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lockDataset(final String object_id) {
-        return kassenzeichenPanel.lockDataset(object_id);
-    }
-
-    @Override
-    public void unlockDataset() {
-        kassenzeichenPanel.unlockDataset();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  object_id  DOCUMENT ME!
-     */
-    public void unlockDataset(final String object_id) {
-        kassenzeichenPanel.unlockDataset(object_id);
-    }
-
     /**
      * DOCUMENT ME!
      */
@@ -4093,7 +4045,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             setCidsBean(kassenzeichenBean.persist());
 
             if (!editModeAfterStoring) {
-                unlockDataset();
+                CidsAppBackend.getInstance().releaseLock();
             }
             enableEditing(editModeAfterStoring);
 

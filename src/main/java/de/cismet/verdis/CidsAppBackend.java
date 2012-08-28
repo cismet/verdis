@@ -40,6 +40,7 @@ import java.awt.Frame;
 
 import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -55,6 +56,8 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.data.AppPreferences;
+
+import de.cismet.verdis.gui.Main;
 
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 
@@ -110,6 +113,8 @@ public class CidsAppBackend implements CidsBeanStore {
     }
 
     //~ Instance fields --------------------------------------------------------
+
+    private CidsBean sperreBean = null;
 
     private final MultiMap crossReferences = new MultiMap();
     private final HashMap<Mode, FeatureAttacher> featureAttacherByMode = new HashMap<Mode, FeatureAttacher>(3);
@@ -632,21 +637,92 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
-     * @param   object_id  DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
-    public boolean lockDataset(final String object_id) {
-//        lockNonce = "VERDIS:" + System.currentTimeMillis();
-        return true;
+    private String getAccountName() {
+        final ConnectionSession session = SessionManager.getSession();
+        final User user = session.getUser();
+
+        final String userString = user.getName() + "@" + user.getUserGroup().getName();
+        return userString;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  object_id  DOCUMENT ME!
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public void unlockDataset(final String object_id) {
+    public boolean acquireLock(final CidsBean kassenzeichenBean) {
+        try {
+            if ((kassenzeichenBean != null) && (sperreBean == null)) {
+                final MetaObject[] oldSperren = getMetaObject("SELECT " + getVerdisMetaClass("sperre").getId()
+                                + ", id FROM sperre WHERE fk_kassenzeichen = '"
+                                + kassenzeichenBean.getProperty("id") + "'",
+                        DOMAIN);
+
+                if ((oldSperren != null) && (oldSperren.length > 0)) {
+                    final CidsBean oldSperreBean = oldSperren[0].getBean();
+                    final String benutzerkonto = (String)oldSperreBean.getProperty("benutzerkonto");
+                    log.info("Sperre für Kassenzeichen " + kassenzeichenBean.getProperty("id")
+                                + " bereitsvorhanden von Benutzer " + benutzerkonto);
+                    JOptionPane.showMessageDialog(
+                        Main.getCurrentInstance(),
+                        "Der Datensatz ist schon vom Benutzer "
+                                + benutzerkonto
+                                + " zum Verändern gesperrt",
+                        "Kein Editieren möglich",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    return false;
+                } else {
+                    final CidsBean newSperre = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "sperre");
+                    newSperre.setProperty("fk_kassenzeichen", kassenzeichenBean);
+                    newSperre.setProperty("benutzerkonto", getAccountName());
+                    newSperre.setProperty("zeitstempel_timestamp", new Date());
+                    sperreBean = newSperre.persist();
+                    if (log.isDebugEnabled()) {
+                        log.debug("Sperre konnte erfolgreich angelegt werden");
+                    }
+                    return true;
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Kassenzeichen ist null oder Sperre bereits vorhanden.");
+                }
+                return false;
+            }
+        } catch (Exception ex) {
+            log.error("Fehler beim anlegen der Sperre", ex);
+            return false;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean releaseLock() {
+        try {
+            if (sperreBean != null) {
+                sperreBean.delete();
+                sperreBean.persist();
+                sperreBean = null;
+                if (log.isDebugEnabled()) {
+                    log.debug("Sperre konnte erfolgreich gelöst werden");
+                }
+                return true;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Sperre ist null");
+                }
+                return false;
+            }
+        } catch (Exception ex) {
+            log.error("Fehler beim lösen der Sperre", ex);
+            return false;
+        }
     }
 
     /**
