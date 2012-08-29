@@ -117,11 +117,6 @@ import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 
-import de.cismet.extensions.timeasy.TimEasyDialog;
-import de.cismet.extensions.timeasy.TimEasyEvent;
-import de.cismet.extensions.timeasy.TimEasyListener;
-import de.cismet.extensions.timeasy.TimEasyPureNewFeature;
-
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
@@ -933,19 +928,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         .getImage());
         }
 
-        // TimEasy
-        ((CreateGeometryListener)CidsAppBackend.getInstance().getMainMap().getInputListener(
-                MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(TimEasyPureNewFeature.class);
-
         final MappingComponent mainMap = CidsAppBackend.getInstance().getMainMap();
-        TimEasyDialog.addTimTimEasyListener(new TimEasyListener() {
-
-                @Override
-                public void timEasyObjectInserted(final TimEasyEvent tee) {
-                    mainMap.getFeatureCollection().removeFeature(tee.getPureNewfeature());
-                    mainMap.refresh();
-                }
-            });
         configurationManager.configure(mappingModel);
         mainMap.preparationSetMappingModel(mappingModel);
         ((NewSimpleInternalLayerWidget)mainMap.getInternalWidget(MappingComponent.LAYERWIDGET)).setMappingModel(
