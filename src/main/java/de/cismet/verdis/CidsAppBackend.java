@@ -38,6 +38,8 @@ import Sirius.util.collections.MultiMap;
 
 import java.awt.Frame;
 
+import java.sql.Timestamp;
+
 import java.util.*;
 
 import javax.swing.JOptionPane;
@@ -679,7 +681,7 @@ public class CidsAppBackend implements CidsBeanStore {
                     final CidsBean newSperre = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "sperre");
                     newSperre.setProperty("fk_kassenzeichen", kassenzeichenBean);
                     newSperre.setProperty("benutzerkonto", getAccountName());
-                    newSperre.setProperty("zeitstempel_timestamp", new Date());
+                    newSperre.setProperty("zeitstempel_timestamp", new Timestamp(new Date().getTime()));
                     sperreBean = newSperre.persist();
                     if (log.isDebugEnabled()) {
                         log.debug("Sperre konnte erfolgreich angelegt werden");
