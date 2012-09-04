@@ -12,6 +12,7 @@ import org.jdesktop.observablecollections.ObservableListListener;
 
 import java.sql.Date;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.List;
@@ -74,12 +75,28 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        final CidsBean be = befreiungen.get(row);
+        final CidsBean be = getBefreiungAt(row);
         if (column == 0) {
             return be.getProperty("aktenzeichen");
         } else {
-            return dateFormat.format(be.getProperty("gueltig_bis"));
+            final Date gueltigBis = (Date)be.getProperty("gueltig_bis");
+            if (gueltigBis != null) {
+                return dateFormat.format(gueltigBis);
+            } else {
+                return "";
+            }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   row  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean getBefreiungAt(final int row) {
+        return befreiungen.get(row);
     }
 
     @Override
@@ -89,11 +106,20 @@ public class BefreiungenModel extends DefaultTableModel implements CidsBeanStore
             if (column == 0) {
                 be.setProperty("aktenzeichen", value.toString());
             } else {
-                be.setProperty("gueltig_bis", new Date(dateFormat.parse(value.toString()).getTime()));
+                try {
+                    be.setProperty("gueltig_bis", new Date(dateFormat.parse(value.toString()).getTime()));
+                } catch (ParseException e) {
+                    be.setProperty("gueltig_bis", null);
+                }
             }
         } catch (Exception e) {
             log.error("Fehler beim Ändern eines Attributes", e);
         }
+    }
+
+    @Override
+    public boolean isCellEditable(final int row, final int column) {
+        return false;
     }
 
     /**

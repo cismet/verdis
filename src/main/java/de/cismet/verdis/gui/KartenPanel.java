@@ -1788,7 +1788,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     final String bezeichnung = (String)cb.getProperty(
                             RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
 
-                    lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + bezeichnung);
+                    final String anschlussGrad = (String)cb.getProperty(
+                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__GRAD);
+
+                    lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + bezeichnung
+                                + " - " + anschlussGrad);
                 }
             } else {
                 lblInfo.setText("");

@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
@@ -72,7 +72,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,0,-2,0,0,1,-68"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,0,-2,0,0,1,-60"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
@@ -131,18 +131,13 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="lblEntleerung" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="lblAngeschlossen" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="cboMKRangeschlossen" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="cboRKangeschlossen" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="cboMKSangeschlossen" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="cboSKangeschlossen" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkKKAentleerung" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkSGentleerung" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
@@ -151,18 +146,17 @@
                           <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="jSeparator4" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Component id="lblBE" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="43" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="cmdAddBefreiungErlaubnis" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="cmdDeleteBefreiungErlaubnis" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="scpBE" pref="229" max="32767" attributes="0"/>
+                      <Component id="scpBE" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -170,79 +164,82 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jSeparator4" alignment="0" pref="254" max="32767" attributes="0"/>
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lblAngeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblVorhanden1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lblRK" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkRKvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboRKangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lblMKR" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkMKRvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboMKRangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lblMKS" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkMKSvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboMKSangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="lblSK" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkSKvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboSKangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                          <Component id="lblSG" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="lblEntleerung" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblVorhanden2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblAngeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblVorhanden1" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkSGvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkSGentleerung" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblRK" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkRKvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboRKangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="lblMKR" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkMKRvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboMKRangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="lblMKS" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkMKSvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboMKSangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="lblSK" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSKvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboSKangeschlossen" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                                  <Component id="lblSG" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="lblEntleerung" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblVorhanden2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkSGvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkSGentleerung" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="lblKKA" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkKKAvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="chkKKAentleerung" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkErlaubnisfreieVersickerung" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblEVG" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblBE" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmdAddBefreiungErlaubnis" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmdDeleteBefreiungErlaubnis" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="scpBE" pref="196" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblKKA" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkKKAvorhanden" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Component id="chkKKAentleerung" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chkErlaubnisfreieVersickerung" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblEVG" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace pref="20" max="32767" attributes="0"/>
-              </Group>
-              <Component id="jSeparator4" alignment="0" pref="254" max="32767" attributes="0"/>
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="lblBE" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="cmdAddBefreiungErlaubnis" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="cmdDeleteBefreiungErlaubnis" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="scpBE" pref="196" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -561,9 +558,26 @@
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                   <Table columnCount="2" rowCount="0">
-                    <Column editable="true" title="Aktenzeichen" type="java.lang.String"/>
-                    <Column editable="true" title="g&#xfc;ltig bis" type="java.lang.String"/>
+                    <Column editable="false" title="Aktenzeichen" type="java.lang.String"/>
+                    <Column editable="false" title="g&#xfc;ltig bis" type="java.lang.String"/>
                   </Table>
+                </Property>
+                <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
+                  <TableColumnModel selectionModel="0">
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                      <Title/>
+                      <Editor/>
+                      <Renderer/>
+                    </Column>
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                      <Title/>
+                      <Editor/>
+                      <Renderer/>
+                    </Column>
+                  </TableColumnModel>
+                </Property>
+                <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+                  <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                 </Property>
               </Properties>
               <Events>

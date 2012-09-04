@@ -235,6 +235,7 @@
                 <Connection code="KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE" type="code"/>
               </Property>
             </BindingProperty>
+            <BindingProperty name="toolTipText" source="Form" sourcePath="${cidsBean.bemerkung_sperre}" target="txtSperreBemerkung" targetPath="toolTipText" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

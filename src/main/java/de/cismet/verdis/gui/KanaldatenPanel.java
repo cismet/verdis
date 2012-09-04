@@ -16,6 +16,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,6 +39,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
@@ -74,6 +77,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
     private Main main;
     private boolean isClipboardBECutPasted = true;
     private CidsBean kassenzeichenBean;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cboMKRangeschlossen;
     private javax.swing.JComboBox cboMKSangeschlossen;
@@ -433,7 +437,11 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                                     .getDomain(),
                             "befreiungerlaubnis");
                     befreiung.setProperty("aktenzeichen", befreiungData[0]);
-                    befreiung.setProperty("gueltig_bis", Date.valueOf(befreiungData[1]));
+                    try {
+                        befreiung.setProperty("gueltig_bis", Date.valueOf(befreiungData[1]));
+                    } catch (final Exception ex) {
+                        befreiung.setProperty("gueltig_bis", null);
+                    }
                     befreiungen.add(befreiung);
                 }
             }
@@ -841,10 +849,16 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                 new String[] { "Aktenzeichen", "gültig bis" }) {
 
                 Class[] types = new Class[] { java.lang.String.class, java.lang.String.class };
+                boolean[] canEdit = new boolean[] { false, false };
 
                 @Override
                 public Class getColumnClass(final int columnIndex) {
                     return types[columnIndex];
+                }
+
+                @Override
+                public boolean isCellEditable(final int rowIndex, final int columnIndex) {
+                    return canEdit[columnIndex];
                 }
             });
         tblBE.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -947,11 +961,8 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                                         cboSKangeschlossen,
                                         org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
                                         org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))).add(
-                                panMainLayout.createSequentialGroup().add(10, 10, 10).add(
-                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                        chkKKAentleerung).add(chkSGentleerung)))).add(13, 13, 13))).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
+                                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(chkKKAentleerung).add(
+                                        chkSGentleerung)))).add(13, 13, 13))).add(
                     jSeparator4,
                     org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
                     org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
@@ -960,73 +971,75 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                     panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
                         panMainLayout.createSequentialGroup().add(lblBE).addPreferredGap(
                             org.jdesktop.layout.LayoutStyle.RELATED,
-                            43,
+                            org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                             Short.MAX_VALUE).add(cmdAddBefreiungErlaubnis).addPreferredGap(
                             org.jdesktop.layout.LayoutStyle.RELATED).add(cmdDeleteBefreiungErlaubnis)).add(
                         scpBE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        229,
+                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+                        0,
                         Short.MAX_VALUE)).addContainerGap()));
         panMainLayout.setVerticalGroup(
             panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                panMainLayout.createSequentialGroup().addContainerGap().add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                        lblAngeschlossen).add(lblVorhanden1)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblRK).add(
-                        chkRKvorhanden).add(
-                        cboRKangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblMKR).add(
-                        chkMKRvorhanden).add(
-                        cboMKRangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblMKS).add(
-                        chkMKSvorhanden).add(
-                        cboMKSangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblSK).add(
-                        chkSKvorhanden).add(
-                        cboSKangeschlossen,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).add(8, 8, 8).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createSequentialGroup().add(18, 18, 18).add(lblSG)).add(
-                        panMainLayout.createSequentialGroup().add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                                lblEntleerung).add(lblVorhanden2)).addPreferredGap(
-                            org.jdesktop.layout.LayoutStyle.RELATED).add(
-                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                                chkSGvorhanden).add(chkSGentleerung)))).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblKKA).add(
-                            chkKKAvorhanden)).add(chkKKAentleerung)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                        chkErlaubnisfreieVersickerung).add(lblEVG)).addContainerGap(20, Short.MAX_VALUE)).add(
                 jSeparator4,
                 org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                 254,
                 Short.MAX_VALUE).add(
                 panMainLayout.createSequentialGroup().addContainerGap().add(
-                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(lblBE).add(
-                        cmdAddBefreiungErlaubnis).add(cmdDeleteBefreiungErlaubnis)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    scpBE,
-                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                    196,
-                    Short.MAX_VALUE).addContainerGap()));
+                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
+                        panMainLayout.createSequentialGroup().add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                lblAngeschlossen).add(lblVorhanden1)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblRK).add(
+                                chkRKvorhanden).add(
+                                cboRKangeschlossen,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                lblMKR).add(chkMKRvorhanden).add(
+                                cboMKRangeschlossen,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                lblMKS).add(chkMKSvorhanden).add(
+                                cboMKSangeschlossen,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(lblSK).add(
+                                chkSKvorhanden).add(
+                                cboSKangeschlossen,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+                                org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).add(8, 8, 8).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
+                                panMainLayout.createSequentialGroup().add(18, 18, 18).add(lblSG)).add(
+                                panMainLayout.createSequentialGroup().add(
+                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                        lblEntleerung).add(lblVorhanden2)).addPreferredGap(
+                                    org.jdesktop.layout.LayoutStyle.RELATED).add(
+                                    panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                        chkSGvorhanden).add(chkSGentleerung)))).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
+                                panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                    lblKKA).add(chkKKAvorhanden)).add(chkKKAentleerung)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
+                                chkErlaubnisfreieVersickerung).add(lblEVG)).add(0, 8, Short.MAX_VALUE)).add(
+                        panMainLayout.createSequentialGroup().add(
+                            panMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(lblBE).add(
+                                cmdAddBefreiungErlaubnis).add(cmdDeleteBefreiungErlaubnis)).addPreferredGap(
+                            org.jdesktop.layout.LayoutStyle.RELATED).add(
+                            scpBE,
+                            org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+                            196,
+                            Short.MAX_VALUE))).addContainerGap()));
 
         add(panMain, java.awt.BorderLayout.CENTER);
 
@@ -1069,13 +1082,25 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
         try {
             final List<CidsBean> list = kassenzeichenBean.getBeanCollectionProperty(
                     "kanalanschluss.befreiungenunderlaubnisse");
-            final CidsBean befreiung = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.getInstance().getDomain(),
+
+            final CidsBean newBefreiungBean = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.getInstance()
+                            .getDomain(),
                     "befreiungerlaubnis");
-            list.add(befreiung);
+
+            final JDialog dialog = new BEDialog(StaticSwingTools.getParentFrame(this), newBefreiungBean, list);
+            dialog.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosed(final WindowEvent e) {
+                        ((BefreiungenModel)tblBE.getModel()).fireTableDataChanged();
+                    }
+                });
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
         } catch (Exception e) {
             log.error("Fehler beim Hinzufügen einer neuen Befreiung", e);
         }
-    }                                                                                            //GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
+    } //GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1181,8 +1206,22 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             }
             updateClipboardMenu();
             jPopupMenu1.show(evt.getComponent(), evt.getX(), evt.getY());
+        } else if (SwingUtilities.isLeftMouseButton(evt) && (evt.getClickCount() == 2) && isEditmode()) {
+            final Point p = evt.getPoint();
+            final int rowNumber = tblBE.rowAtPoint(p);
+            final CidsBean newBefreiungBean = ((BefreiungenModel)tblBE.getModel()).getBefreiungAt(rowNumber);
+            final JDialog dialog = new BEDialog(StaticSwingTools.getParentFrame(this), newBefreiungBean);
+            dialog.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosed(final WindowEvent e) {
+                        ((BefreiungenModel)tblBE.getModel()).fireTableDataChanged();
+                    }
+                });
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
         }
-    }                                                                     //GEN-LAST:event_tblBEMousePressed
+    } //GEN-LAST:event_tblBEMousePressed
 
     /**
      * DOCUMENT ME!
