@@ -197,31 +197,31 @@ public class KassenzeichenGeomSearchDialog extends javax.swing.JDialog implement
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstKassenzeichenMouseClicked
+    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lstKassenzeichenMouseClicked
         if (evt.getClickCount() == 2) {
             if (lstKassenzeichen.getSelectedValue() != null) {
                 gotoSelectedKassenzeichen();
             }
         }
-    }//GEN-LAST:event_lstKassenzeichenMouseClicked
+    }                                                                                //GEN-LAST:event_lstKassenzeichenMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstKassenzeichenValueChanged
+    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstKassenzeichenValueChanged
         jButton1.setEnabled(!lstKassenzeichen.getSelectionModel().isSelectionEmpty());
-    }//GEN-LAST:event_lstKassenzeichenValueChanged
+    }                                                                                           //GEN-LAST:event_lstKassenzeichenValueChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         gotoSelectedKassenzeichen();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
