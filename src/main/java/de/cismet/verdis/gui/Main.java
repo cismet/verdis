@@ -130,6 +130,7 @@ import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
 
 import de.cismet.tools.gui.Static2DTools;
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.tools.gui.startup.StaticStartupTools;
@@ -614,7 +615,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             alkisRendererDialog.setTitle("Alkis Renderer");
             alkisRendererDialog.setContentPane(descriptionPane);
             alkisRendererDialog.setSize(1000, 800);
-            alkisRendererDialog.setLocationRelativeTo(Main.THIS);
 
             // Menu for Navigator
             if (plugin) {
@@ -1092,7 +1092,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                         id,
                                         "");
                                     if (!alkisRendererDialog.isVisible()) {
-                                        alkisRendererDialog.setVisible(true);
+                                        StaticSwingTools.showDialog(alkisRendererDialog);
                                     }
                                 } catch (Exception ex) {
                                     // TODO fehlerdialog
@@ -2917,8 +2917,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             d.pack();
             about = d;
         }
-        about.setLocationRelativeTo(this);
-        about.setVisible(true);
+        StaticSwingTools.showDialog(about);
     } //GEN-LAST:event_cmdInfoActionPerformed
 
     /**
@@ -3249,8 +3248,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         dial.setTitle("Kassenzeichen-Verlauf");
         dial.setContentPane(historyPan);
         dial.setSize(800, 600);
-        dial.setLocationRelativeTo(this);
-        dial.setVisible(true);
+        StaticSwingTools.showDialog(dial);
     } //GEN-LAST:event_btnHistoryActionPerformed
 
     /**
@@ -3461,8 +3459,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniOptionsActionPerformed
         final OptionsDialog od = new OptionsDialog(this, true);
-        od.setLocationRelativeTo(this);
-        od.setVisible(true);
+        StaticSwingTools.showDialog(od);
     }                                                                              //GEN-LAST:event_mniOptionsActionPerformed
 
     /**
@@ -3471,7 +3468,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
-        FortfuehrungsanlaesseDialog.getInstance().setVisible(true);
+        StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
     }                                                                                   //GEN-LAST:event_cmdFortfuehrungActionPerformed
 
     /**

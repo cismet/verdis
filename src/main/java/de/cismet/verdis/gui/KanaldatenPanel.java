@@ -1095,8 +1095,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                         ((BefreiungenModel)tblBE.getModel()).fireTableDataChanged();
                     }
                 });
-            dialog.setLocationRelativeTo(this);
-            dialog.setVisible(true);
+            StaticSwingTools.showDialog(dialog);
         } catch (Exception e) {
             log.error("Fehler beim Hinzufügen einer neuen Befreiung", e);
         }
@@ -1218,8 +1217,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                         ((BefreiungenModel)tblBE.getModel()).fireTableDataChanged();
                     }
                 });
-            dialog.setLocationRelativeTo(this);
-            dialog.setVisible(true);
+            StaticSwingTools.showDialog(dialog);
         }
     } //GEN-LAST:event_tblBEMousePressed
 
