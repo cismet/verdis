@@ -1051,34 +1051,34 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboMKSangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMKSangeschlossenActionPerformed
+    private void cboMKSangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboMKSangeschlossenActionPerformed
         visualizeValidity();
-    }//GEN-LAST:event_cboMKSangeschlossenActionPerformed
+    }                                                                                       //GEN-LAST:event_cboMKSangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboMKRangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboMKRangeschlossenActionPerformed
+    private void cboMKRangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboMKRangeschlossenActionPerformed
         visualizeValidity();
-    }//GEN-LAST:event_cboMKRangeschlossenActionPerformed
+    }                                                                                       //GEN-LAST:event_cboMKRangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboRKangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboRKangeschlossenActionPerformed
+    private void cboRKangeschlossenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboRKangeschlossenActionPerformed
         visualizeValidity();
-    }//GEN-LAST:event_cboRKangeschlossenActionPerformed
+    }                                                                                      //GEN-LAST:event_cboRKangeschlossenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddBefreiungErlaubnisActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddBefreiungErlaubnisActionPerformed
+    private void cmdAddBefreiungErlaubnisActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddBefreiungErlaubnisActionPerformed
         try {
             final List<CidsBean> list = kassenzeichenBean.getBeanCollectionProperty(
                     "kanalanschluss.befreiungenunderlaubnisse");
@@ -1099,14 +1099,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
         } catch (Exception e) {
             log.error("Fehler beim Hinzufügen einer neuen Befreiung", e);
         }
-    }//GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
+    } //GEN-LAST:event_cmdAddBefreiungErlaubnisActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkKKAvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkKKAvorhandenActionPerformed
+    private void chkKKAvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkKKAvorhandenActionPerformed
         if (chkKKAvorhanden.isSelected() && editmode) {
             chkKKAentleerung.setEnabled(true);
         } else {
@@ -1114,14 +1114,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             chkKKAentleerung.setSelected(false);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkKKAvorhandenActionPerformed
+    }                                                                                   //GEN-LAST:event_chkKKAvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSGvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSGvorhandenActionPerformed
+    private void chkSGvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSGvorhandenActionPerformed
         if (chkSGvorhanden.isSelected() && editmode) {
             chkSGentleerung.setEnabled(true);
         } else {
@@ -1129,14 +1129,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             chkSGentleerung.setSelected(false);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkSGvorhandenActionPerformed
+    }                                                                                  //GEN-LAST:event_chkSGvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSKvorhandenActionPerformed
+    private void chkSKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSKvorhandenActionPerformed
         if (chkSKvorhanden.isSelected() && editmode) {
             cboSKangeschlossen.setEnabled(true);
         } else {
@@ -1144,14 +1144,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             cboSKangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkSKvorhandenActionPerformed
+    }                                                                                  //GEN-LAST:event_chkSKvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkMKSvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMKSvorhandenActionPerformed
+    private void chkMKSvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkMKSvorhandenActionPerformed
         if (chkMKSvorhanden.isSelected() && editmode) {
             cboMKSangeschlossen.setEnabled(true);
         } else {
@@ -1159,14 +1159,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             cboMKSangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkMKSvorhandenActionPerformed
+    }                                                                                   //GEN-LAST:event_chkMKSvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkMKRvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMKRvorhandenActionPerformed
+    private void chkMKRvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkMKRvorhandenActionPerformed
         if (chkMKRvorhanden.isSelected() && editmode) {
             cboMKRangeschlossen.setEnabled(true);
         } else {
@@ -1174,14 +1174,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             cboMKRangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkMKRvorhandenActionPerformed
+    }                                                                                   //GEN-LAST:event_chkMKRvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkRKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRKvorhandenActionPerformed
+    private void chkRKvorhandenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkRKvorhandenActionPerformed
         if (chkRKvorhanden.isSelected() && editmode) {
             cboRKangeschlossen.setEnabled(true);
         } else {
@@ -1189,14 +1189,14 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
             cboRKangeschlossen.setSelectedIndex(-1);
         }
         visualizeValidity();
-    }//GEN-LAST:event_chkRKvorhandenActionPerformed
+    }                                                                                  //GEN-LAST:event_chkRKvorhandenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tblBEMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBEMousePressed
+    private void tblBEMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_tblBEMousePressed
         if (SwingUtilities.isRightMouseButton(evt) && isEditmode()) {
             final Point p = evt.getPoint();
             final int rowNumber = tblBE.rowAtPoint(p);
@@ -1219,16 +1219,16 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                 });
             StaticSwingTools.showDialog(dialog);
         }
-    }//GEN-LAST:event_tblBEMousePressed
+    } //GEN-LAST:event_tblBEMousePressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void scpBEMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scpBEMousePressed
+    private void scpBEMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_scpBEMousePressed
         tblBEMousePressed(evt);
-    }//GEN-LAST:event_scpBEMousePressed
+    }                                                                     //GEN-LAST:event_scpBEMousePressed
 
     @Override
     public void editModeChanged() {
