@@ -9,6 +9,7 @@ package de.cismet.validation.display;
 
 import org.apache.log4j.Logger;
 
+import java.awt.*;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -185,7 +186,13 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
             alpha = ALPHA_MAX;
         }
         this.alpha = alpha;
-        repaint();
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    repaint();
+                }
+            });
     }
 
     //~ Inner Classes ----------------------------------------------------------
