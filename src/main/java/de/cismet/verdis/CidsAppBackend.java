@@ -426,21 +426,38 @@ public class CidsAppBackend implements CidsBeanStore {
     private void updateCrossReferences(final CidsBean cidsBean) {
         final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
                 KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-        final CidsServerSearch search = new FlaechenCrossReferencesServerSearch(kassenzeichenNummer);
-        try {
-            crossReferences.clear();
-            final Collection collection = getProxy().customServerSearch(CidsAppBackend.getInstance().getSession()
-                            .getUser(),
-                    search);
-            for (final Object row : collection) {
-                final Object[] r = ((Collection)row).toArray();
-//                  synchronized (kassenzeichenChangedBlocker) {
-                crossReferences.put(r[1], r[3] + ":" + r[4]);
-//                  }
-            }
-        } catch (ConnectionException ex) {
-            log.error("error during retrieval of object", ex);
-        }
+
+        crossReferences.clear();
+
+        new SwingWorker<Collection, Void>() {
+
+                @Override
+                protected Collection doInBackground() throws Exception {
+                    final CidsServerSearch search = new FlaechenCrossReferencesServerSearch(kassenzeichenNummer);
+                    try {
+                        return getProxy().customServerSearch(CidsAppBackend.getInstance().getSession().getUser(),
+                                search);
+                    } catch (ConnectionException ex) {
+                        log.error("error during retrieval of object", ex);
+                        return null;
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final Collection collection = get();
+                        for (final Object row : collection) {
+                            final Object[] fields = ((Collection)row).toArray();
+                            // synchronized (kassenzeichenChangedBlocker) {
+                            crossReferences.put(fields[1], fields[3] + ":" + fields[4]);
+                            // }
+                        }
+                    } catch (Exception ex) {
+                        log.error("error while doing server search", ex);
+                    }
+                }
+            }.execute();
     }
 
     /**
