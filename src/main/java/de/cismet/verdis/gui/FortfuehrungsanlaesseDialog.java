@@ -1037,7 +1037,6 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     public static FortfuehrungsanlaesseDialog getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new FortfuehrungsanlaesseDialog(Main.getCurrentInstance(), false);
-            INSTANCE.setLocationRelativeTo(Main.getCurrentInstance());
         }
         return INSTANCE;
     }

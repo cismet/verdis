@@ -23,10 +23,10 @@
  */
 package de.cismet.verdis.gui;
 
+import java.text.SimpleDateFormat;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
-import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -44,6 +44,8 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             RegenFlaechenTableModel.class);
+    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+
     private static ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
     private static ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(RegenFlaechenPropertyConstants.class.getResource(
@@ -57,13 +59,15 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
             " ",
             "Gr\u00F6\u00DFe in m²",
             "Fl\u00E4chenart",
-            "Anschlu\u00DFgrad"
+            "Anschlu\u00DFgrad",
+            "Erfassungsdatum"
         };
 
     private static final Class[] COLUMN_CLASSES = {
             Icon.class,
             String.class,
             javax.swing.Icon.class,
+            String.class,
             String.class,
             String.class,
             String.class
@@ -86,49 +90,64 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
         if (cidsBean == null) {
             return null;
         }
-        if (columnIndex == 0) {
-            if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL) != null) {
-                return MULT_IMAGE;
-            }
-            if ((cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE) instanceof Boolean)
-                        && (Boolean)cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE)) {
-                return WARN_IMAGE;
-            }
-            return null;
-        } // Bezeichnungsspalte
-        else if (columnIndex == 1) {
-            return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-        } // Edit Icon Spalte
-        // hier kommt ein Edit Icon rein wenn die Gr\u00F6\u00DFe von
-        // Hand ge\u00E4ndert wurde
-        else if (columnIndex == 2) {
-            if (!((cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR)
-                                == null)
-                            || cidsBean.getProperty(
-                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR).equals(
-                                cidsBean.getProperty(
-                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK)))) {
-                return EDITED_IMAGE;
-            } else {
+        switch (columnIndex) {
+            case 0: {
+                // Bezeichnungsspalte
+                if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL) != null) {
+                    return MULT_IMAGE;
+                }
+                if ((cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE) instanceof Boolean)
+                            && (Boolean)cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE)) {
+                    return WARN_IMAGE;
+                }
                 return null;
             }
-        } // Groesse
-        // Wenn in flaecheninfo.groesse_korrektur was drinsteht
-        // wird das genommen
-        else if (columnIndex == 3) {
-            if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR) != null) {
-                return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
-            } else {
-                return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+            case 1: {
+                // Edit Icon Spalte
+                // hier kommt ein Edit Icon rein wenn die Gr\u00F6\u00DFe von
+                // Hand ge\u00E4ndert wurde
+                return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
             }
-        } // Flaechenart
-        else if (columnIndex == 4) {
-            return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ABKUERZUNG);
-        } // Anschlussgrad
-        else if (columnIndex == 5) {
-            return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ABKUERZUNG);
-        } else {
-            return null;
+            case 2: {
+                // Groesse
+                // Wenn in flaecheninfo.groesse_korrektur was drinsteht
+                // wird das genommen
+                if (!((cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR)
+                                    == null)
+                                || cidsBean.getProperty(
+                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR).equals(
+                                    cidsBean.getProperty(
+                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK)))) {
+                    return EDITED_IMAGE;
+                } else {
+                    return null;
+                }
+            }
+            case 3: {
+                // Flaechenart
+                if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR)
+                            != null) {
+                    return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+                } else {
+                    return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                }
+            }
+            case 4: {
+                // Anschlussgrad
+                return cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ABKUERZUNG);
+            }
+            case 5: {
+                // Anschlussgrad
+                return cidsBean.getProperty(
+                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ABKUERZUNG);
+            }
+            case 6: {
+                // Erfassungsdatum
+                return DATE_FORMAT.format(cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG));
+            }
+            default: {
+                return null;
+            }
         }
     }
 

@@ -34,14 +34,4 @@ public interface Storable {
      * @param  b  DOCUMENT ME!
      */
     void enableEditing(boolean b);
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    boolean lockDataset();
-    /**
-     * DOCUMENT ME!
-     */
-    void unlockDataset();
 }
