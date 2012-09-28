@@ -191,38 +191,30 @@ public class AppPreferences {
 
             try {
                 final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                final String crossoverServerPort = crossoverPrefs.getChildText("ServerPort");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: Crossover port: " + crossoverServerPort);
+                try {
+                    final String crossoverServerPort = crossoverPrefs.getChildText("ServerPort");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Crossover: Crossover port: " + crossoverServerPort);
+                    }
+                    setVerdisCrossoverPort(Integer.parseInt(crossoverServerPort));
+                } catch (Exception ex) {
+                    log.warn("Crossover: Error beim setzen des Server ports.", ex);
                 }
-                setVerdisCrossoverPort(Integer.parseInt(crossoverServerPort));
-            } catch (Exception ex) {
-                log.warn("Crossover: Error beim setzen des Server ports", ex);
-            }
-
-            try {
-                final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                final String lagisHost = crossoverPrefs.getChild("LagisConfiguration").getChildText("Host");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: lagisHost: " + lagisHost);
+                try {
+                    setLagisCrossoverPort(Integer.parseInt(crossoverPrefs.getChildText("LagisCrossoverPort")));
+                    if (log.isDebugEnabled()) {
+                        log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
+                    }
+                } catch (Exception ex) {
+                    log.warn("Crossover: Error beim setzen des LagIS servers.", ex);
                 }
-                final String lagisORBPort = crossoverPrefs.getChild("LagisConfiguration").getChildText("ORBPort");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: lagisHost: " + lagisORBPort);
-                }
-                setLagisCrossoverPort(Integer.parseInt(
-                        crossoverPrefs.getChild("LagisConfiguration").getChildText("LagisCrossoverPort")));
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
+                try {
+                    flurstueckBuffer = Double.parseDouble(crossoverPrefs.getChildText("FlurstueckBuffer"));
+                } catch (Exception ex) {
+                    log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage.", ex);
                 }
             } catch (Exception ex) {
-                log.warn("Crossover: Error beim setzen des LagIS servers", ex);
-            }
-            try {
-                final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                flurstueckBuffer = Double.parseDouble(crossoverPrefs.getChildText("FlurstueckBuffer"));
-            } catch (Exception ex) {
-                log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
+                log.error("Crossover: Fehler beim Konfigurieren.", ex);
             }
 
             final List list = root.getChild("usergroups").getChildren("ug");
