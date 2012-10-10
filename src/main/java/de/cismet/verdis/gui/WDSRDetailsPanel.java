@@ -1003,7 +1003,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             } else {
                 bpanWdsrDetails.setBackgroundEnabled(false);
             }
-            if (cidsBean == null) {
+            if ((cidsBean == null) || (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
                 cboLageSR.setSelectedItem(null);
                 cboLageWD.setSelectedItem(null);
             }
