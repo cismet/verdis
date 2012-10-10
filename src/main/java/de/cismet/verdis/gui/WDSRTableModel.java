@@ -23,8 +23,6 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
-
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
@@ -45,7 +43,6 @@ public class WDSRTableModel extends CidsBeanTableModel {
             "Straßenreinigung",
             "Winterdienst"
         };
-
     private static final Class[] COLUMN_CLASSES = {
             Integer.class,
             Float.class,
@@ -95,16 +92,30 @@ public class WDSRTableModel extends CidsBeanTableModel {
             }
         } else if (column == 2) {
             try {
-                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY);
-                return (o == null) ? "" : o.toString();
+                final CidsBean satzung_strassenreinigung = (CidsBean)frontBean.getProperty(
+                        FrontinfoPropertyConstants.PROP__LAGE_SR);
+                final String srKey;
+                if (satzung_strassenreinigung == null) {
+                    srKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY);
+                } else {
+                    srKey = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
+                }
+                return (srKey == null) ? "" : srKey;
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
             }
         } else {
             try {
-                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY);
-                return (o == null) ? "" : o.toString();
+                final CidsBean satzung_winterdienst = (CidsBean)frontBean.getProperty(
+                        FrontinfoPropertyConstants.PROP__LAGE_WD);
+                final String wdKey;
+                if (satzung_winterdienst == null) {
+                    wdKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY);
+                } else {
+                    wdKey = (String)satzung_winterdienst.getProperty("wd_prio.key");
+                }
+                return (wdKey == null) ? "" : wdKey;
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
