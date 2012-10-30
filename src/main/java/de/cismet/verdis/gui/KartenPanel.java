@@ -1425,6 +1425,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSelectActionPerformed
         mappingComp.setInteractionMode(MappingComponent.SELECT);
+        cmdMoveHandle.setSelected(true);
         cmdMoveHandleActionPerformed(null);
     }                                                                             //GEN-LAST:event_cmdSelectActionPerformed
 
