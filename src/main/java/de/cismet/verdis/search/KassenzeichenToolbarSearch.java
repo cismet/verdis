@@ -7,7 +7,7 @@
 ****************************************************/
 package de.cismet.verdis.search;
 
-import Sirius.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import javax.swing.ImageIcon;
 
@@ -48,7 +48,7 @@ public class KassenzeichenToolbarSearch implements CidsToolbarSearch {
     }
 
     @Override
-    public CidsServerSearch getServerSearch() {
+    public MetaObjectNodeServerSearch getServerSearch() {
         return new KassenzeichenSearchStatement(input);
     }
 }
