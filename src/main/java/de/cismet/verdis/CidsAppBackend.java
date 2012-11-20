@@ -48,6 +48,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cismap.commons.features.Feature;

@@ -38,6 +38,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -69,6 +70,8 @@ import org.jdom.Element;
 
 import org.openide.util.Exceptions;
 
+import org.postgis.PGgeometry;
+
 import java.applet.AppletContext;
 
 import java.awt.*;
@@ -86,6 +89,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.net.InetSocketAddress;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -116,6 +120,7 @@ import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
 import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
@@ -162,6 +167,7 @@ import de.cismet.verdis.interfaces.Storable;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
+import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 
 /**
@@ -197,6 +203,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
     public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
     public static final String FLURSTUECK_SEARCH_GEOMETRY_LISTENER = "FLURSTUECK_SEARCH_GEOMETRY_LISTENER";
+    public static final String FLURSTUECK_ASSIGN_GEOMETRY_LISTENER = "FLURSTUECK_ASSIGN_GEOMETRY_LISTENER";
     private static final String DIRECTORYPATH_HOME = System.getProperty("user.home");
     private static final String FILESEPARATOR = System.getProperty("file.separator");
     private static final String DIRECTORYEXTENSION = System.getProperty("directory.extension");
@@ -256,6 +263,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private View vTabelleWDSR;
     private View vDetailsWDSR;
     private View vZusammenfassungWDSR;
+    private View vFlurstuecke;
     private View vInfoAllgemein;
     private View vTabelleRegen;
     private View vDetailsRegen;
@@ -270,6 +278,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private final DokumentenPanel dokPanel;
     private final KassenzeichenPanel kassenzeichenPanel;
     private final KanaldatenPanel kanaldatenPanel;
+    private final FlurstueckePanel flurstueckePanel;
     private final AllgemeineInfosPanel allgInfosPanel;
     private final RegenFlaechenDetailsPanel regenFlaechenDetailsPanel;
     private final RegenFlaechenTabellenPanel regenFlaechenTabellenPanel;
@@ -431,6 +440,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         kanaldatenPanel = new de.cismet.verdis.gui.KanaldatenPanel();
 
+        flurstueckePanel = new FlurstueckePanel();
+
         allgInfosPanel = new AllgemeineInfosPanel();
 
         regenFlaechenDetailsPanel = new RegenFlaechenDetailsPanel();
@@ -455,6 +466,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         CidsAppBackend.getInstance().addCidsBeanStore(wdsrSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(dokPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(flurstueckePanel);
         CidsAppBackend.getInstance().addCidsBeanStore(allgInfosPanel);
 //        CidsAppBackend.getInstance().addCidsBeanStore(historyPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(regenFlaechenTabellenPanel);
@@ -463,6 +475,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenPanel);
         CidsAppBackend.getInstance().addEditModeListener(wdsrFrontenDetailsPanel);
+        CidsAppBackend.getInstance().addEditModeListener(flurstueckePanel);
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
         CidsAppBackend.getInstance().addEditModeListener(regenFlaechenDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
@@ -805,6 +818,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     wdsrSummenPanel);
             viewMap.addView("ESW Zusammenfassung", vZusammenfassungWDSR);
 
+            vFlurstuecke = new View(
+                    "Flurstücke",
+                    Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
+                    flurstueckePanel);
+            viewMap.addView("Flurstücke", vFlurstuecke);
+
             vInfoAllgemein = new View(
                     "Informationen",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
@@ -1105,6 +1124,53 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                 }
             });
+
+        final AssignLandparcelGeomSearch assignLandparcelGeomSearch = new AssignLandparcelGeomSearch();
+        final String assignLandparcelGeomCrs = assignLandparcelGeomSearch.getCrs();
+        final ServerSearchCreateSearchGeometryListener flurstueckAssigneGeometryListener =
+            new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
+                assignLandparcelGeomSearch);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .addCustomInputListener(FLURSTUECK_ASSIGN_GEOMETRY_LISTENER, flurstueckAssigneGeometryListener);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .putCursor(FLURSTUECK_ASSIGN_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
+        flurstueckAssigneGeometryListener.setMode(CreateGeometryListener.POINT);
+        flurstueckAssigneGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    final String propName = evt.getPropertyName();
+
+                    if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(propName)) {
+                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(propName)) {
+                        final Collection<Geometry> geoms = (Collection<Geometry>)evt.getNewValue();
+                        if ((geoms == null) || geoms.isEmpty()) {
+                            JOptionPane.showMessageDialog(
+                                Main.THIS,
+                                "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
+                                "Keine FLurstücke gefunden.",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            final Geometry geom = geoms.iterator().next();
+                            if (geom != null) {
+                                LOG.fatal("TODO: assign landparcel");
+                                // TODO: assign code here
+
+                                final Feature geomFeature = new PureNewFeature(geom);
+                                LOG.fatal("geom: " + geom.getSRID());
+                                geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
+                                LOG.fatal("geom: " + geom.getSRID());
+                                CrsTransformer.transformToCurrentCrs(geom);
+                                getMappingComponent().getFeatureCollection().addFeature(geomFeature);
+                            }
+                        }
+                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
+                        LOG.error("error while searching flurstueck", (Exception)evt.getNewValue());
+                    }
+                }
+            });
     }
 
     /**
@@ -1169,54 +1235,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         } else {
             CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Deprecated
-    public void setupDefaultLayoutAll() {
-        EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    rootWindow.setWindow(
-                        new SplitWindow(
-                            false,
-                            0.4353147f,
-                            new SplitWindow(
-                                true,
-                                0.24596775f,
-                                vKassenzeichen,
-                                new SplitWindow(
-                                    true,
-                                    0.67061925f,
-                                    new SplitWindow(true, 0.29148936f,
-                                        vSummen,
-                                        vKanaldaten),
-                                    vDokumente)),
-                            new SplitWindow(
-                                true,
-                                0.68609864f,
-                                new TabWindow(
-                                    new DockingWindow[] {
-                                        vKarte,
-                                        vTabelleWDSR,
-                                        vDetailsRegen,
-                                        vTabelleRegen,
-                                        vInfoAllgemein,
-                                        vZusammenfassungWDSR
-//                                                ,
-//                                        vHistory
-                                    }),
-                                vDetailsWDSR)));
-
-                    // log.debug("layout: "+flPanel.getCustomButtons());
-                    // vFlaechen.getCustomTabComponents().addAll(flPanel.getCustomButtons());
-                    rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
-                    rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-                }
-            });
     }
 
     /**
@@ -1392,7 +1410,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                     vDokumente)),
                             new SplitWindow(
                                 true,
-                                0.68609864f,
+                                0.66f,
                                 new TabWindow(
                                     new DockingWindow[] {
                                         vKarte,
@@ -1496,7 +1514,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                 new SplitWindow(true, 0.51783353f,
                                     vInfoAllgemein,
                                     vDokumente)),
-                            vKarte));
+                            new SplitWindow(true, 0.66f,
+                                vKarte,
+                                vFlurstuecke)));
 
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);

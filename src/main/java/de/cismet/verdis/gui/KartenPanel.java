@@ -107,6 +107,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
 
+    private boolean isAssignLandparcel = false;
+
     private Action searchAction = new AbstractAction() {
 
             @Override
@@ -297,6 +299,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdWmsBackground;
     private javax.swing.JToggleButton cmdZoom;
     private javax.swing.ButtonGroup handleGroup;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -476,6 +479,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         sep4 = new javax.swing.JSeparator();
         cmdUndo = new javax.swing.JButton();
         cmdRedo = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         popMenSearch.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
 
@@ -1171,6 +1175,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdRedo);
 
+        jButton1.setText("FS");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(jButton1);
+
         panMap.add(tobVerdis, java.awt.BorderLayout.NORTH);
 
         add(panMap, java.awt.BorderLayout.CENTER);
@@ -1510,6 +1527,18 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdZoomActionPerformed
         mappingComp.setInteractionMode(MappingComponent.ZOOM);
     }                                                                           //GEN-LAST:event_cmdZoomActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        isAssignLandparcel = !isAssignLandparcel;
+        if (isAssignLandparcel) {
+            mappingComp.setInteractionMode(Main.FLURSTUECK_ASSIGN_GEOMETRY_LISTENER);
+        }
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
