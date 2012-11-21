@@ -23,17 +23,23 @@
  */
 package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
-import Sirius.server.middleware.types.MetaObject;
-
+import java.awt.Color;
 import java.awt.Paint;
+import java.awt.Stroke;
 
-import de.cismet.cids.dynamics.CidsBean;
+import javax.swing.JComponent;
+
+import de.cismet.cids.custom.objectrenderer.wunda_blau.AlkisBuchungsblattRenderer;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+import de.cismet.cismap.commons.Refreshable;
+import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
+import de.cismet.cismap.commons.gui.piccolo.FixedWidthStroke;
 
-import de.cismet.verdis.gui.Main;
+import de.cismet.cismap.navigatorplugin.CidsFeature;
+
+import de.cismet.verdis.gui.FlurstueckePanel;
 
 /**
  * DOCUMENT ME!
@@ -41,64 +47,82 @@ import de.cismet.verdis.gui.Main;
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
+public class FlurstueckeFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            FlaecheFeatureRenderer.class);
+            FlurstueckeFeatureRenderer.class);
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void assign() {
+    public synchronized Paint getFillingStyle(final CidsFeature subFeature) {
+        int colorIndex = super.cidsBean.getMetaObject().getId();
+        if (colorIndex < 0) {
+            colorIndex = -colorIndex;
+        }
+        colorIndex %= FlurstueckePanel.LANDPARCEL_COLORS.size();
+        return FlurstueckePanel.LANDPARCEL_COLORS.get(colorIndex);
+    }
+
+    @Override
+    public JComponent getInfoComponent(final Refreshable refresh, final CidsFeature subFeature) {
+        return null;
+    }
+
+    @Override
+    public Paint getLinePaint(final CidsFeature subFeature) {
+        return Color.BLACK;
+    }
+
+    @Override
+    public Stroke getLineStyle(final CidsFeature subFeature) {
+        return new FixedWidthStroke();
+    }
+
+    @Override
+    public FeatureAnnotationSymbol getPointSymbol(final CidsFeature subFeature) {
+        return null;
+    }
+
+    @Override
+    public float getTransparency(final CidsFeature subFeature) {
+        return 0.6f;
     }
 
     @Override
     public Paint getFillingStyle() {
-        int art = -1;
-        try {
-            art = (Integer)super.cidsBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
-        } catch (Exception e) {
-            LOG.error("error during getting the flaechenart", e);
-        }
-        boolean markedForDeletion = false;
-        try {
-            final CidsBean geom = (CidsBean)cidsBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE);
-            markedForDeletion = geom.getMetaObject().getStatus() == MetaObject.TO_DELETE;
-        } catch (Exception e) {
-            LOG.error("error during markedForDeletionCheck", e);
-        }
-        int alpha = 0;
-        if (markedForDeletion) {
-            alpha = 100;
-        } else {
-            alpha = 255;
-        }
-        switch (art) {
-            case Main.PROPVAL_ART_DACH: {
-                return new java.awt.Color(162, 76, 41, alpha);
-            }
-            case Main.PROPVAL_ART_GRUENDACH: {
-                return new java.awt.Color(106, 122, 23, alpha);
-            }
-            case Main.PROPVAL_ART_VERSIEGELTEFLAECHE: {
-                return new java.awt.Color(120, 129, 128, alpha);
-            }
-            case Main.PROPVAL_ART_OEKOPFLASTER: {
-                return new java.awt.Color(159, 155, 108, alpha);
-            }
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE: {
-                return new java.awt.Color(138, 134, 132, alpha);
-            }
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER: {
-                return new java.awt.Color(126, 91, 71, alpha);
-            }
-            default: {
-                return null;
-            }
-        }
+        return getFillingStyle(null);
     }
+
+    @Override
+    public JComponent getInfoComponent(final Refreshable refresh) {
+        return getInfoComponent(refresh, null);
+    }
+
+    @Override
+    public Paint getLinePaint() {
+        return getLinePaint(null);
+    }
+
+    @Override
+    public Stroke getLineStyle() {
+        return getLineStyle(null);
+    }
+
+    @Override
+    public FeatureAnnotationSymbol getPointSymbol() {
+        return getPointSymbol(null);
+    }
+
+    @Override
+    public float getTransparency() {
+        return getTransparency(null);
+    }
+
+    @Override
+    public void assign() {
+    }
+    
 }

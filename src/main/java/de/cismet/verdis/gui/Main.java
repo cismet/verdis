@@ -125,6 +125,7 @@ import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
+import de.cismet.cismap.navigatorplugin.CidsFeature;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
@@ -295,6 +296,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private PluginContext context;
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
@@ -494,6 +496,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 .getMainMap()
                 .getFeatureCollection()
                 .addFeatureCollectionListener(wdsrFrontenTabellenPanel);
+        CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeatureCollectionListener(flurstueckePanel);
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .getFeatureCollection()
@@ -1145,29 +1148,51 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                     if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(propName)) {
                     } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(propName)) {
-                        final Collection<Geometry> geoms = (Collection<Geometry>)evt.getNewValue();
-                        if ((geoms == null) || geoms.isEmpty()) {
-                            JOptionPane.showMessageDialog(
-                                Main.THIS,
-                                "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
-                                "Keine FLurstücke gefunden.",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        } else {
-                            final Geometry geom = geoms.iterator().next();
-                            if (geom != null) {
-                                LOG.fatal("TODO: assign landparcel");
-                                // TODO: assign code here
+                        if ((getCidsBean() != null) && CidsAppBackend.getInstance().isEditable()) {
+                            final Collection data = (Collection)evt.getNewValue();
+                            if ((data == null) || data.isEmpty()) {
+                                JOptionPane.showMessageDialog(
+                                    Main.THIS,
+                                    "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
+                                    "Keine FLurstücke gefunden.",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                final Iterator iterator = data.iterator();
+                                final Geometry geom = (Geometry)iterator.next();
+                                final String bezeichnung = (String)iterator.next();
+                                if (geom != null) {
+                                    try {
+                                        geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
+                                        final Geometry transformedGeom = CrsTransformer.transformToCurrentCrs(geom);
+                                        transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
 
-                                final Feature geomFeature = new PureNewFeature(geom);
-                                LOG.fatal("geom: " + geom.getSRID());
-                                geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
-                                LOG.fatal("geom: " + geom.getSRID());
-                                CrsTransformer.transformToCurrentCrs(geom);
-                                getMappingComponent().getFeatureCollection().addFeature(geomFeature);
+                                        final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
+                                                VerdisConstants.DOMAIN,
+                                                "geom");
+                                        geomBean.setProperty("geo_field", transformedGeom);
+
+                                        final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
+                                                VerdisConstants.DOMAIN,
+                                                "flurstuecke");
+                                        flurstueckGeomBean.setProperty("istfrei", false);
+                                        flurstueckGeomBean.setProperty("geom", geomBean);
+                                        flurstueckGeomBean.setProperty("text", bezeichnung);
+
+                                        final CidsFeature cidsFeature = new CidsFeature(
+                                                flurstueckGeomBean.getMetaObject());
+                                        cidsFeature.getMetaObject().setID(FlurstueckePanel.getNewFlurstueckGeomId());
+                                        cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
+                                        getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
+
+                                        getCidsBean().getBeanCollectionProperty("flurstuecke").add(flurstueckGeomBean);
+                                    } catch (Exception ex) {
+                                        LOG.fatal("", ex);
+                                    }
+                                }
                             }
+                        } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
+                            LOG.error("error while searching flurstueck", (Exception)evt.getNewValue());
                         }
-                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
-                        LOG.error("error while searching flurstueck", (Exception)evt.getNewValue());
                     }
                 }
             });
@@ -1189,14 +1214,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             break;
             case ALLGEMEIN: {
-                final Object o = notification.getObject();
-                if (o instanceof AttachFeatureListener) {
-                    final AttachFeatureListener afl = (AttachFeatureListener)o;
-                    final PFeature pf = afl.getFeatureToAttach();
-                    if (pf.getFeature() instanceof PureNewFeature) {
-                        setKZGeomFromFeature(pf.getFeature());
-                    }
-                }
+                flurstueckePanel.attachFeatureRequested(notification);
             }
             break;
         }

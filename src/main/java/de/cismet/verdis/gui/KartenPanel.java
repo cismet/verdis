@@ -2066,11 +2066,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (cidsBean != null) {
             switch (CidsAppBackend.getInstance().getMode()) {
                 case ALLGEMEIN: {
-                    final Feature add = new BeanUpdatingCidsFeature(
-                            cidsBean,
-                            KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
-                    add.setEditable(editable);
-                    featureCollection.addFeature(add);
+                    final List<CidsBean> flurstueckGeometrien = (List<CidsBean>)cidsBean.getProperty("flurstuecke");
+                    for (final CidsBean flurstueckGeometrie : flurstueckGeometrien) {
+                        final Feature add = new BeanUpdatingCidsFeature(flurstueckGeometrie,
+                                "geom.geo_field");
+                        add.setEditable(editable);
+                        featureCollection.addFeature(add);
+                    }
                 }
                 break;
                 case REGEN: {

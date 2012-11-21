@@ -28,18 +28,66 @@
  */
 package de.cismet.verdis.gui;
 
+import com.vividsolutions.jts.geom.Geometry;
+
+import edu.umd.cs.piccolox.event.PNotification;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollectionEvent;
+import de.cismet.cismap.commons.features.FeatureCollectionListener;
+import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.gui.piccolo.PFeature;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
+
+import de.cismet.cismap.navigatorplugin.CidsFeature;
+
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
+public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStore,
+    EditModeListener,
+    FeatureCollectionListener {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            FlurstueckePanel.class);
+    private static final Color[] COLORS = new Color[] {
+            new Color(41, 86, 178),
+            new Color(101, 156, 239),
+            new Color(125, 189, 0),
+            new Color(220, 246, 0),
+            new Color(255, 91, 0)
+        };
+    public static final List<Color> LANDPARCEL_COLORS = Collections.unmodifiableList(Arrays.asList(COLORS));
+    private static int NEW_FLURSTUECK_GEOM_ID = -1;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -48,13 +96,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -64,6 +110,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      */
     public FlurstueckePanel() {
         initComponents();
+        jList1.setCellRenderer(new FancyListCellRenderer());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -76,6 +123,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
@@ -83,14 +131,29 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
         jList1.setBackground(new java.awt.Color(242, 241, 240));
-        jList1.setEnabled(false);
+
+        final org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create(
+                "${cidsBean.flurstuecke}");
+        final org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings
+                    .createJListBinding(
+                        org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                        this,
+                        eLProperty,
+                        jList1,
+                        "");
+        bindingGroup.addBinding(jListBinding);
+
+        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+
+                @Override
+                public void valueChanged(final javax.swing.event.ListSelectionEvent evt) {
+                    jList1ValueChanged(evt);
+                }
+            });
         jScrollPane1.setViewportView(jList1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -125,26 +188,34 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         add(jPanel1, gridBagConstraints);
 
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-
-        jPanel4.setLayout(new java.awt.GridLayout(1, 0, 4, 0));
-
-        jButton3.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.jButton3.text")); // NOI18N
-        jPanel4.add(jButton3);
-
-        jPanel3.add(jPanel4, new java.awt.GridBagConstraints());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        add(jPanel3, gridBagConstraints);
+        bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jList1ValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_jList1ValueChanged
+        try {
+            final Collection<Feature> features = new ArrayList<Feature>();
+            final int[] selection = jList1.getSelectedIndices();
+            for (int index = 0; index < selection.length; ++index) {
+                final Object ob = jList1.getModel().getElementAt(selection[index]);
+                if (ob instanceof CidsBean) {
+                    final CidsBean flurstueckGeomBean = (CidsBean)ob;
+                    final CidsFeature cidsFeature = new CidsFeature(flurstueckGeomBean.getMetaObject());
+                    features.add(cidsFeature);
+                }
+            }
+
+            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeatureCollectionListener(this);
+            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().select(features);
+            CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeatureCollectionListener(this);
+        } catch (Exception ex) {
+            LOG.error(ex, ex);
+        }
+    } //GEN-LAST:event_jList1ValueChanged
 
     @Override
     public CidsBean getCidsBean() {
@@ -153,7 +224,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
+        bindingGroup.unbind();
         kassenzeichenBean = cidsBean;
+        bindingGroup.bind();
     }
 
     @Override
@@ -166,6 +239,198 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         super.setEnabled(bln);
         jButton1.setEnabled(bln);
         jButton2.setEnabled(bln);
-        jButton3.setEnabled(bln);
+    }
+
+    @Override
+    public void featuresAdded(final FeatureCollectionEvent fce) {
+    }
+
+    @Override
+    public void allFeaturesRemoved(final FeatureCollectionEvent fce) {
+    }
+
+    @Override
+    public void featuresRemoved(final FeatureCollectionEvent fce) {
+        if (getCidsBean() != null) {
+            final Collection<CidsBean> flurstueckBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+            final Collection<Feature> removedFeatures = fce.getEventFeatures();
+            for (final Feature feature : removedFeatures) {
+                if (feature instanceof CidsFeature) {
+                    final CidsFeature cidsFeature = (CidsFeature)feature;
+                    final CidsBean toRemoveBean = cidsFeature.getMetaObject().getBean();
+                    flurstueckBeans.remove(toRemoveBean);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void featuresChanged(final FeatureCollectionEvent fce) {
+    }
+
+    @Override
+    public void featureSelectionChanged(final FeatureCollectionEvent fce) {
+        final List<CidsBean> flurstueckBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+        final Collection<Feature> features = fce.getEventFeatures();
+        if (features != null) {
+            final int[] indices = new int[features.size()];
+
+            final int i = 0;
+            for (final Feature feature : features) {
+                final int index = flurstueckBeans.indexOf(((CidsFeature)feature).getMetaObject().getBean());
+                indices[i] = index;
+            }
+
+            jList1.setSelectedIndices(indices);
+        } else {
+            jList1.setSelectedIndex(-1);
+        }
+    }
+
+    @Override
+    public void featureReconsiderationRequested(final FeatureCollectionEvent fce) {
+    }
+
+    @Override
+    public void featureCollectionChanged() {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void attachFeatureRequested(final PNotification notification) {
+        final Object o = notification.getObject();
+        if (o instanceof AttachFeatureListener) {
+            final AttachFeatureListener afl = (AttachFeatureListener)o;
+            final PFeature pf = afl.getFeatureToAttach();
+            if ((pf.getFeature() instanceof PureNewFeature)) {
+                try {
+                    final Geometry geom = pf.getFeature().getGeometry();
+
+                    final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
+                            VerdisConstants.DOMAIN,
+                            "geom");
+                    geomBean.setProperty("geo_field", geom);
+
+                    final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
+                            VerdisConstants.DOMAIN,
+                            "flurstuecke");
+                    flurstueckGeomBean.setProperty("istfrei", true);
+                    flurstueckGeomBean.setProperty("geom", geomBean);
+                    flurstueckGeomBean.setProperty("text", "freie Geometrie");
+
+                    final CidsFeature cidsFeature = new CidsFeature(
+                            flurstueckGeomBean.getMetaObject());
+                    cidsFeature.getMetaObject().setID(getNewFlurstueckGeomId());
+                    cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
+                    CidsAppBackend.getInstance().getMainMap().getFeatureCollection().removeFeature(pf.getFeature());
+                    CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeature(cidsFeature);
+
+                    getCidsBean().getBeanCollectionProperty("flurstuecke").add(flurstueckGeomBean);
+                } catch (Exception ex) {
+                    LOG.error("error while attaching feature", ex);
+                }
+            } else if (pf.getFeature() instanceof CidsFeature) {
+                JOptionPane.showMessageDialog(
+                    Main.getMappingComponent(),
+                    "Es k\u00F6nnen nur nicht bereits zugeordnete Fl\u00E4chen zugeordnet werden.");
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static int getNewFlurstueckGeomId() {
+        return NEW_FLURSTUECK_GEOM_ID--;
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class FancyListCellRenderer extends DefaultListCellRenderer {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final int SPACING = 5;
+        private static final int MARKER_WIDTH = 4;
+
+        //~ Instance fields ----------------------------------------------------
+
+        private boolean selected = false;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new FancyListCellRenderer object.
+         */
+        public FancyListCellRenderer() {
+            setOpaque(false);
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   list          DOCUMENT ME!
+         * @param   value         DOCUMENT ME!
+         * @param   index         DOCUMENT ME!
+         * @param   isSelected    DOCUMENT ME!
+         * @param   cellHasFocus  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        @Override
+        public Component getListCellRendererComponent(final JList list,
+                final Object value,
+                final int index,
+                final boolean isSelected,
+                final boolean cellHasFocus) {
+            final CidsBean bean = (CidsBean)value;
+            final Component comp = super.getListCellRendererComponent(
+                    list,
+                    bean.getProperty("text"),
+                    index,
+                    isSelected,
+                    cellHasFocus);
+            selected = isSelected;
+            int colorIndex = bean.getMetaObject().getId();
+            if (colorIndex < 0) {
+                colorIndex = -colorIndex;
+            }
+            colorIndex %= FlurstueckePanel.LANDPARCEL_COLORS.size();
+
+            setBackground(LANDPARCEL_COLORS.get(colorIndex));
+            setBorder(BorderFactory.createEmptyBorder(1, (2 * SPACING) + MARKER_WIDTH, 1, 0));
+            return comp;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  g  DOCUMENT ME!
+         */
+        @Override
+        protected void paintComponent(final Graphics g) {
+            final Graphics2D g2d = (Graphics2D)g;
+            final Paint backup = g2d.getPaint();
+            if (selected) {
+                g2d.setColor(javax.swing.UIManager.getDefaults().getColor("List.selectionBackground"));
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+            g2d.setColor(getBackground());
+            g2d.fillRect(SPACING, 0, MARKER_WIDTH, getHeight());
+            g2d.setPaint(backup);
+            super.paintComponent(g);
+        }
     }
 }
