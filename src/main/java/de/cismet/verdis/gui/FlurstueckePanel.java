@@ -58,7 +58,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import javax.swing.event.ListSelectionListener;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -436,11 +435,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             } else {
                 alkisLandparcelListModel.addElement("Flurstücke werden geladen...");
 
-                final AlkisLandparcelSearch serverSearch = new AlkisLandparcelSearch();
-                final String crs = serverSearch.getCrs();
-
+                final Collection<CidsBean> selectedFlurstueckGeomBeans = new ArrayList<CidsBean>();
                 final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
-                Geometry unionGeom = null;
                 for (int index = 0; index < selectedIndices.length; ++index) {
                     final int selectedIndex = selectedIndices[index];
                     final Object listObject = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
@@ -449,24 +445,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         final CidsFeature flurstueckGeomFeature = new CidsFeature(
                                 flurstueckGeomBean.getMetaObject());
 
+                        selectedFlurstueckGeomBeans.add(flurstueckGeomBean);
                         featuresToSelect.add(flurstueckGeomFeature);
                         flurstueckGeomFeature.setEditable(CidsAppBackend.getInstance().isEditable());
-
-                        final Geometry geom = (Geometry)((CidsBean)flurstueckGeomBean.getProperty("geom")).getProperty(
-                                "geo_field");
-                        final Geometry transformedGeom = CrsTransformer.transformToGivenCrs((Geometry)geom.clone(),
-                                    crs).buffer(LANDPARCEL_GEOM_BUFFER);
-                        transformedGeom.setSRID(CrsTransformer.extractSridFromCrs(crs));
-                        if (unionGeom == null) {
-                            unionGeom = transformedGeom;
-                        } else {
-                            final int srid = unionGeom.getSRID();
-                            unionGeom = unionGeom.union(transformedGeom);
-                            unionGeom.setSRID(srid);
-                        }
                     }
                 }
-                serverSearch.setGeometry((Geometry)unionGeom.clone());
 
                 try {
                     featureCollection.removeFeatureCollectionListener(this);
@@ -475,7 +458,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     featureCollection.addFeatureCollectionListener(this);
                 }
 
-                WORKER = new AlkisLandparcelWorker(serverSearch);
+                WORKER = new AlkisLandparcelWorker(selectedFlurstueckGeomBeans);
                 WORKER.execute();
             }
         } catch (Exception ex) {
@@ -1016,7 +999,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         private final FeatureCollection featureCollection = CidsAppBackend.getInstance()
                     .getMainMap()
                     .getFeatureCollection();
-        private final AlkisLandparcelSearch serverSearch;
+        private final Collection<CidsBean> flurstueckGeomBeans;
         private final Map<CidsBean, List<CidsBean>> alkisLandparcelToFlurstueckGeomMap =
             new HashMap<CidsBean, List<CidsBean>>();
 
@@ -1025,16 +1008,35 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         /**
          * Creates a new AlkisLandparcelWorker object.
          *
-         * @param  serverSearch  DOCUMENT ME!
+         * @param  flurstueckGeomBeans  serverSearch DOCUMENT ME!
          */
-        public AlkisLandparcelWorker(final AlkisLandparcelSearch serverSearch) {
-            this.serverSearch = serverSearch;
+        public AlkisLandparcelWorker(final Collection<CidsBean> flurstueckGeomBeans) {
+            this.flurstueckGeomBeans = flurstueckGeomBeans;
         }
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         protected MetaObject[] doInBackground() throws Exception {
+            final AlkisLandparcelSearch serverSearch = new AlkisLandparcelSearch();
+            final String crs = serverSearch.getCrs();
+            Geometry unionGeom = null;
+            for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
+                final Geometry geom = (Geometry)((CidsBean)flurstueckGeomBean.getProperty("geom")).getProperty(
+                        "geo_field");
+                final Geometry transformedGeom = CrsTransformer.transformToGivenCrs((Geometry)geom.clone(),
+                        crs).buffer(LANDPARCEL_GEOM_BUFFER);
+                transformedGeom.setSRID(CrsTransformer.extractSridFromCrs(crs));
+                if (unionGeom == null) {
+                    unionGeom = transformedGeom;
+                } else {
+                    final int srid = unionGeom.getSRID();
+                    unionGeom = unionGeom.union(transformedGeom);
+                    unionGeom.setSRID(srid);
+                }
+            }
+            serverSearch.setGeometry((Geometry)unionGeom.clone());
+
             final List<Integer> alkisLandparcelIds = (List<Integer>)SessionManager.getProxy()
                         .customServerSearch(SessionManager.getSession().getUser(), serverSearch);
 
@@ -1087,11 +1089,12 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
                                 "geometrie.geo_field");
 
-                        final String crs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
+                        final String currentCrs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
                         final Geometry transformedAlkisLandparcelGeom = CrsTransformer.transformToGivenCrs((Geometry)
                                 alkisLandparcelGeom.clone(),
-                                crs);
+                                currentCrs);
                         transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
+                        alkisLandparcelBean.setProperty("geometrie.geo_field", transformedAlkisLandparcelGeom);
 
                         if (transformedAlkisLandparcelGeom.buffer(LANDPARCEL_GEOM_BUFFER).intersects(
                                         flurstueckGeom)) {
