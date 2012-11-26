@@ -105,8 +105,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     private static final double LANDPARCEL_GEOM_BUFFER = -0.05;
     private static int NEW_FLURSTUECK_GEOM_ID = -1;
 
-    private static final Map<CidsBean, List<CidsBean>> ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP =
-        new HashMap<CidsBean, List<CidsBean>>();
+    private static AlkisLandparcelWorker WORKER;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -417,16 +416,24 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     }
                 }
             }
-            featureCollection.removeFeatureCollectionListener(this);
-            featureCollection.removeFeatures(alkisLandparcelFeaturesToRemove);
-            featureCollection.addFeatureCollectionListener(this);
-
-            ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP.clear();
+            try {
+                featureCollection.removeFeatureCollectionListener(this);
+                featureCollection.removeFeatures(alkisLandparcelFeaturesToRemove);
+            } finally {
+                featureCollection.addFeatureCollectionListener(this);
+            }
 
             final DefaultListModel alkisLandparcelListModel = (DefaultListModel)lstAlkisLandparcels.getModel();
             alkisLandparcelListModel.clear();
             final int[] selectedIndices = lstFlurstueckGeoms.getSelectedIndices();
-            if (selectedIndices.length > 0) {
+            if (selectedIndices.length == 0) {
+                try {
+                    featureCollection.removeFeatureCollectionListener(this);
+                    featureCollection.select((Feature)null);
+                } finally {
+                    featureCollection.addFeatureCollectionListener(this);
+                }
+            } else {
                 alkisLandparcelListModel.addElement("Flurstücke werden geladen...");
 
                 final AlkisLandparcelSearch serverSearch = new AlkisLandparcelSearch();
@@ -459,117 +466,17 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         }
                     }
                 }
+                serverSearch.setGeometry((Geometry)unionGeom.clone());
 
-                featureCollection.removeFeatureCollectionListener(this);
-                featureCollection.select(featuresToSelect);
-                featureCollection.addFeatureCollectionListener(this);
+                try {
+                    featureCollection.removeFeatureCollectionListener(this);
+                    featureCollection.select(featuresToSelect);
+                } finally {
+                    featureCollection.addFeatureCollectionListener(this);
+                }
 
-                final Geometry searchGeom = (Geometry)unionGeom.clone();
-
-                new SwingWorker<MetaObject[], Void>() {
-
-                        @Override
-                        protected MetaObject[] doInBackground() throws Exception {
-                            serverSearch.setGeometry(searchGeom);
-                            final List<Integer> alkisLandparcelIds = (List<Integer>)SessionManager.getProxy()
-                                        .customServerSearch(SessionManager.getSession().getUser(), serverSearch);
-
-                            if (alkisLandparcelIds.isEmpty()) {
-                                return null;
-                            }
-
-                            final StringBuilder idStringBuilder = new StringBuilder();
-                            for (int index = 0; index < alkisLandparcelIds.size(); index++) {
-                                final Integer alkisLandparcel = alkisLandparcelIds.get(index);
-                                if (index > 0) {
-                                    idStringBuilder.append(", ");
-                                }
-                                idStringBuilder.append(Integer.toString(alkisLandparcel));
-                            }
-                            final MetaClass mc = CidsBean.getMetaClassFromTableName(
-                                    "WUNDA_BLAU",
-                                    "alkis_landparcel");
-                            final MetaObject[] mos = SessionManager.getProxy()
-                                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
-                                            "SELECT "
-                                            + mc.getId()
-                                            + ", id FROM alkis_landparcel WHERE id IN ("
-                                            + idStringBuilder.toString()
-                                            + ")",
-                                            "WUNDA_BLAU");
-
-                            if (mos != null) {
-                                for (final MetaObject mo : mos) {
-                                    final CidsBean alkisLandparcelBean = mo.getBean();
-
-                                    final List<CidsBean> assignedFlurstueckGeomBeans;
-                                    if (ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP.get(alkisLandparcelBean)
-                                                == null) {
-                                        assignedFlurstueckGeomBeans = new ArrayList<CidsBean>();
-                                        ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP.put(
-                                            alkisLandparcelBean,
-                                            assignedFlurstueckGeomBeans);
-                                    } else {
-                                        assignedFlurstueckGeomBeans = ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP.get(
-                                                alkisLandparcelBean);
-                                    }
-
-                                    final List<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty(
-                                            "flurstuecke");
-                                    for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
-                                        final Geometry flurstueckGeom = (Geometry)flurstueckGeomBean.getProperty(
-                                                "geom.geo_field");
-
-                                        final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
-                                                "geometrie.geo_field");
-
-                                        final String crs = CrsTransformer.createCrsFromSrid(CrsTransformer
-                                                        .getCurrentSrid());
-                                        final Geometry transformedAlkisLandparcelGeom = CrsTransformer
-                                                    .transformToGivenCrs((Geometry)alkisLandparcelGeom.clone(),
-                                                        crs);
-                                        transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
-
-                                        if (transformedAlkisLandparcelGeom.buffer(LANDPARCEL_GEOM_BUFFER).intersects(
-                                                        flurstueckGeom)) {
-                                            assignedFlurstueckGeomBeans.add(flurstueckGeomBean);
-                                        }
-                                    }
-                                }
-                            }
-                            return mos;
-                        }
-
-                        @Override
-                        protected void done() {
-                            try {
-                                final MetaObject[] mos = get();
-
-                                final DefaultListModel alkisLandparcelListModel = (DefaultListModel)
-                                    lstAlkisLandparcels.getModel();
-                                alkisLandparcelListModel.clear();
-
-                                if (mos != null) {
-                                    for (final MetaObject mo : mos) {
-                                        final CidsBean alkisLandparcelBean = mo.getBean();
-                                        final CidsFeature alkisLandparcelFeature = new CidsFeature(mo);
-                                        featureCollection.removeFeatureCollectionListener(FlurstueckePanel.this);
-                                        alkisLandparcelListModel.addElement(alkisLandparcelBean);
-                                        featureCollection.addFeature(alkisLandparcelFeature);
-                                        featureCollection.addFeatureCollectionListener(FlurstueckePanel.this);
-                                        alkisLandparcelFeature.setEditable(false);
-                                        CidsAppBackend.getInstance()
-                                                .getMainMap()
-                                                .getPFeatureHM()
-                                                .get(alkisLandparcelFeature)
-                                                .setVisible(false);
-                                    }
-                                }
-                            } catch (final Exception ex) {
-                                LOG.error(ex, ex);
-                            }
-                        }
-                    }.execute();
+                WORKER = new AlkisLandparcelWorker(serverSearch);
+                WORKER.execute();
             }
         } catch (Exception ex) {
             LOG.error(ex, ex);
@@ -969,7 +876,12 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         index,
                         isSelected,
                         cellHasFocus);
-                final List<CidsBean> flurstueckGeomBeans = ALKIS_LANDPARCEL_TO_LANDPARCEL_GEOM_MAP.get(bean);
+                final List<CidsBean> flurstueckGeomBeans;
+                if (WORKER == null) {
+                    flurstueckGeomBeans = null;
+                } else {
+                    flurstueckGeomBeans = WORKER.getAlkisLandparcelToFlurstueckGeomMap().get(bean);
+                }
                 final Color color;
                 if ((flurstueckGeomBeans == null) || flurstueckGeomBeans.isEmpty()) {
                     color = null;
@@ -1089,6 +1001,150 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             g2d.fillRect(SPACING, 0, MARKER_WIDTH, getHeight());
             g2d.setPaint(backup);
             super.paintComponent(g);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class AlkisLandparcelWorker extends SwingWorker<MetaObject[], Void> {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final FeatureCollection featureCollection = CidsAppBackend.getInstance()
+                    .getMainMap()
+                    .getFeatureCollection();
+        private final AlkisLandparcelSearch serverSearch;
+        private final Map<CidsBean, List<CidsBean>> alkisLandparcelToFlurstueckGeomMap =
+            new HashMap<CidsBean, List<CidsBean>>();
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new AlkisLandparcelWorker object.
+         *
+         * @param  serverSearch  DOCUMENT ME!
+         */
+        public AlkisLandparcelWorker(final AlkisLandparcelSearch serverSearch) {
+            this.serverSearch = serverSearch;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        protected MetaObject[] doInBackground() throws Exception {
+            final List<Integer> alkisLandparcelIds = (List<Integer>)SessionManager.getProxy()
+                        .customServerSearch(SessionManager.getSession().getUser(), serverSearch);
+
+            if (alkisLandparcelIds.isEmpty()) {
+                return null;
+            }
+
+            final StringBuilder idStringBuilder = new StringBuilder();
+            for (int index = 0; index < alkisLandparcelIds.size(); index++) {
+                final Integer alkisLandparcel = alkisLandparcelIds.get(index);
+                if (index > 0) {
+                    idStringBuilder.append(", ");
+                }
+                idStringBuilder.append(Integer.toString(alkisLandparcel));
+            }
+            final MetaClass mc = CidsBean.getMetaClassFromTableName(
+                    "WUNDA_BLAU",
+                    "alkis_landparcel");
+            final MetaObject[] mos = SessionManager.getProxy()
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                            "SELECT "
+                            + mc.getId()
+                            + ", id FROM alkis_landparcel WHERE id IN ("
+                            + idStringBuilder.toString()
+                            + ")",
+                            "WUNDA_BLAU");
+
+            if (mos != null) {
+                for (final MetaObject mo : mos) {
+                    final CidsBean alkisLandparcelBean = mo.getBean();
+
+                    final List<CidsBean> assignedFlurstueckGeomBeans;
+                    if (alkisLandparcelToFlurstueckGeomMap.get(alkisLandparcelBean)
+                                == null) {
+                        assignedFlurstueckGeomBeans = new ArrayList<CidsBean>();
+                        alkisLandparcelToFlurstueckGeomMap.put(
+                            alkisLandparcelBean,
+                            assignedFlurstueckGeomBeans);
+                    } else {
+                        assignedFlurstueckGeomBeans = alkisLandparcelToFlurstueckGeomMap.get(
+                                alkisLandparcelBean);
+                    }
+
+                    final List<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty(
+                            "flurstuecke");
+                    for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
+                        final Geometry flurstueckGeom = (Geometry)flurstueckGeomBean.getProperty(
+                                "geom.geo_field");
+
+                        final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
+                                "geometrie.geo_field");
+
+                        final String crs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
+                        final Geometry transformedAlkisLandparcelGeom = CrsTransformer.transformToGivenCrs((Geometry)
+                                alkisLandparcelGeom.clone(),
+                                crs);
+                        transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
+
+                        if (transformedAlkisLandparcelGeom.buffer(LANDPARCEL_GEOM_BUFFER).intersects(
+                                        flurstueckGeom)) {
+                            assignedFlurstueckGeomBeans.add(flurstueckGeomBean);
+                        }
+                    }
+                }
+            }
+            return mos;
+        }
+
+        @Override
+        protected void done() {
+            if (!isCancelled()) {
+                try {
+                    final MetaObject[] mos = get();
+
+                    final DefaultListModel alkisLandparcelListModel = (DefaultListModel)lstAlkisLandparcels.getModel();
+                    alkisLandparcelListModel.clear();
+
+                    if (mos != null) {
+                        for (final MetaObject mo : mos) {
+                            final CidsBean alkisLandparcelBean = mo.getBean();
+                            final CidsFeature alkisLandparcelFeature = new CidsFeature(mo);
+                            alkisLandparcelListModel.addElement(alkisLandparcelBean);
+                            try {
+                                featureCollection.removeFeatureCollectionListener(
+                                    FlurstueckePanel.this);
+                                featureCollection.addFeature(alkisLandparcelFeature);
+                            } finally {
+                                featureCollection.addFeatureCollectionListener(FlurstueckePanel.this);
+                            }
+                            alkisLandparcelFeature.setEditable(false);
+                            CidsAppBackend.getInstance()
+                                    .getMainMap()
+                                    .getPFeatureHM()
+                                    .get(alkisLandparcelFeature)
+                                    .setVisible(false);
+                        }
+                    }
+                } catch (final Exception ex) {
+                    LOG.error(ex, ex);
+                }
+            }
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public Map<CidsBean, List<CidsBean>> getAlkisLandparcelToFlurstueckGeomMap() {
+            return alkisLandparcelToFlurstueckGeomMap;
         }
     }
 }
