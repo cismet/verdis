@@ -124,5 +124,4 @@ public class FlurstueckeFeatureRenderer extends CustomCidsFeatureRenderer {
     @Override
     public void assign() {
     }
-    
 }

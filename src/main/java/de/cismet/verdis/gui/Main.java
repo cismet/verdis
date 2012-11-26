@@ -33,12 +33,7 @@ import Sirius.server.middleware.types.MetaObject;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -68,10 +63,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Element;
 
-import org.openide.util.Exceptions;
-
-import org.postgis.PGgeometry;
-
 import java.applet.AppletContext;
 
 import java.awt.*;
@@ -85,11 +76,6 @@ import java.beans.PropertyChangeListener;
 
 import java.io.*;
 
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.InetSocketAddress;
-
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -120,7 +106,6 @@ import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
-import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
 import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
@@ -234,8 +219,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 "/de/cismet/verdis/res/images/titlebars/pipe.png"));
     private Icon icoDokumente = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/docs.png"));
-    private Icon icoFlaechen = new javax.swing.ImageIcon(getClass().getResource(
-                "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
     private Icon icoKarte = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
     private Icon icoTabelle = new javax.swing.ImageIcon(getClass().getResource(
@@ -251,7 +234,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /** Creates new form Main. */
     private String userString;
     private String kassenzeichenSuche = "kassenzeichenSuche";
-    private String wmsBackgroundUrlTemplate = "";
     private String userGroup = "noGroup";
     private FlaechenClipboard flaechenClipboard;
     private AppPreferences prefs;
@@ -264,16 +246,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private View vTabelleWDSR;
     private View vDetailsWDSR;
     private View vZusammenfassungWDSR;
-    private View vFlurstuecke;
+    private View vDetailsAllgemein;
     private View vInfoAllgemein;
     private View vTabelleRegen;
     private View vDetailsRegen;
-    private View vHistory;
+//    private View vHistory;
     private RootWindow rootWindow;
     private final StringViewMap viewMap = new StringViewMap();
     private final ArrayList<JMenuItem> menues = new ArrayList<JMenuItem>();
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
-    private final String verdisConfig = ".verdisConfig";
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final RegenFlaechenSummenPanel regenSumPanel;
     private final DokumentenPanel dokPanel;
@@ -342,7 +323,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JMenuItem mniClose;
     private javax.swing.JMenuItem mniDetails;
     private javax.swing.JMenuItem mniDokumente;
-    private javax.swing.JMenuItem mniFlaechen;
     private javax.swing.JMenuItem mniKanalanschluss;
     private javax.swing.JMenuItem mniKarte;
     private javax.swing.JMenuItem mniKassenzeichen;
@@ -638,11 +618,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 navigatorMenue.add(mniKassenzeichen);
                 navigatorMenue.add(mniDokumente);
                 navigatorMenue.add(mniSummen);
-                navigatorMenue.add(mniFlaechen);
                 navigatorMenue.add(mniKanalanschluss);
-                // navigatorMenue.add(menWindows.getItem(4));
                 navigatorMenue.add(new JSeparator());
-                // navigatorMenue.add(menWindows.getItem(6));
                 navigatorMenue.add(mniLoadLayout);
                 navigatorMenue.add(mniSaveLayout);
                 navigatorMenue.add(mniResetWindowLayout);
@@ -821,11 +798,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     wdsrSummenPanel);
             viewMap.addView("ESW Zusammenfassung", vZusammenfassungWDSR);
 
-            vFlurstuecke = new View(
-                    "Flurstücke",
+            vDetailsAllgemein = new View(
+                    "Details (Flächen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     flurstueckePanel);
-            viewMap.addView("Flurstücke", vFlurstuecke);
+            viewMap.addView("Kassenzeichen-Flächen", vDetailsAllgemein);
 
             vInfoAllgemein = new View(
                     "Informationen",
@@ -1063,6 +1040,71 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  domain     DOCUMENT ME!
+     * @param  className  DOCUMENT ME!
+     * @param  id         DOCUMENT ME!
+     */
+    public void showRenderer(final String domain, final String className, final int id) {
+        try {
+            final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+            descPane.clearBreadCrumb();
+            descPane.clear();
+            descPane.gotoMetaObject(
+                ClassCacheMultiple.getMetaClass(domain, className),
+                id,
+                "");
+            if (!alkisRendererDialog.isVisible()) {
+                StaticSwingTools.showDialog(alkisRendererDialog);
+            }
+        } catch (Exception ex) {
+            // TODO fehlerdialog
+            LOG.error("error while loading renderer", ex);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  metaObjects  DOCUMENT ME!
+     */
+    public void showRenderer(final MetaObject[] metaObjects) {
+        try {
+            final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+            descPane.clearBreadCrumb();
+            descPane.clear();
+            descPane.gotoMetaObjects(metaObjects, "");
+            if (!alkisRendererDialog.isVisible()) {
+                StaticSwingTools.showDialog(alkisRendererDialog);
+            }
+        } catch (Exception ex) {
+            // TODO fehlerdialog
+            LOG.error("error while loading renderer", ex);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  metaObject  DOCUMENT ME!
+     */
+    public void showRenderer(final MetaObject metaObject) {
+        try {
+            final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+            descPane.clearBreadCrumb();
+            descPane.clear();
+            descPane.gotoMetaObject(metaObject, "");
+            if (!alkisRendererDialog.isVisible()) {
+                StaticSwingTools.showDialog(alkisRendererDialog);
+            }
+        } catch (Exception ex) {
+            // TODO fehlerdialog
+            LOG.error("error while loading renderer", ex);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
      */
     private void initGeomServerSearches() {
         final ServerSearchCreateSearchGeometryListener kassenzeichenSearchGeometryListener =
@@ -1104,22 +1146,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         } else {
                             final Integer id = ids.iterator().next();
                             if (id != null) {
-                                try {
-                                    final DescriptionPane descPane = ComponentRegistry.getRegistry()
-                                                .getDescriptionPane();
-                                    descPane.clearBreadCrumb();
-                                    descPane.clear();
-                                    descPane.gotoMetaObject(
-                                        ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "alkis_landparcel"),
-                                        id,
-                                        "");
-                                    if (!alkisRendererDialog.isVisible()) {
-                                        StaticSwingTools.showDialog(alkisRendererDialog);
-                                    }
-                                } catch (Exception ex) {
-                                    // TODO fehlerdialog
-                                    LOG.error("error while loading renderer", ex);
-                                }
+                                showRenderer("WUNDA_BLAU", "alkis_landparcel", id);
                             }
                         }
                     } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
@@ -1158,35 +1185,39 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                     JOptionPane.INFORMATION_MESSAGE);
                             } else {
                                 final Iterator iterator = data.iterator();
-                                final Geometry geom = (Geometry)iterator.next();
-                                final String bezeichnung = (String)iterator.next();
-                                if (geom != null) {
-                                    try {
-                                        geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
-                                        final Geometry transformedGeom = CrsTransformer.transformToCurrentCrs(geom);
-                                        transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
+                                while (iterator.hasNext()) {
+                                    final Geometry geom = (Geometry)iterator.next();
+                                    final String bezeichnung = (String)iterator.next();
+                                    if (geom != null) {
+                                        try {
+                                            geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
+                                            final Geometry transformedGeom = CrsTransformer.transformToCurrentCrs(geom);
+                                            transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
 
-                                        final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
-                                                VerdisConstants.DOMAIN,
-                                                "geom");
-                                        geomBean.setProperty("geo_field", transformedGeom);
+                                            final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
+                                                    VerdisConstants.DOMAIN,
+                                                    "geom");
+                                            geomBean.setProperty("geo_field", transformedGeom);
 
-                                        final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
-                                                VerdisConstants.DOMAIN,
-                                                "flurstuecke");
-                                        flurstueckGeomBean.setProperty("istfrei", false);
-                                        flurstueckGeomBean.setProperty("geom", geomBean);
-                                        flurstueckGeomBean.setProperty("text", bezeichnung);
+                                            final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
+                                                    VerdisConstants.DOMAIN,
+                                                    "flurstuecke");
+                                            flurstueckGeomBean.setProperty("istfrei", false);
+                                            flurstueckGeomBean.setProperty("geom", geomBean);
+                                            flurstueckGeomBean.setProperty("text", bezeichnung);
 
-                                        final CidsFeature cidsFeature = new CidsFeature(
-                                                flurstueckGeomBean.getMetaObject());
-                                        cidsFeature.getMetaObject().setID(FlurstueckePanel.getNewFlurstueckGeomId());
-                                        cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
-                                        getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
+                                            final CidsFeature cidsFeature = new CidsFeature(
+                                                    flurstueckGeomBean.getMetaObject());
+                                            cidsFeature.getMetaObject()
+                                                    .setID(FlurstueckePanel.getNewFlurstueckGeomId());
+                                            cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
+                                            getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
 
-                                        getCidsBean().getBeanCollectionProperty("flurstuecke").add(flurstueckGeomBean);
-                                    } catch (Exception ex) {
-                                        LOG.fatal("", ex);
+                                            getCidsBean().getBeanCollectionProperty("flurstuecke")
+                                                    .add(flurstueckGeomBean);
+                                        } catch (Exception ex) {
+                                            LOG.fatal("", ex);
+                                        }
                                     }
                                 }
                             }
@@ -1534,7 +1565,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                     vDokumente)),
                             new SplitWindow(true, 0.66f,
                                 vKarte,
-                                vFlurstuecke)));
+                                vDetailsAllgemein)));
 
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
@@ -1717,7 +1748,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         mniSummen = new javax.swing.JMenuItem();
         mniKanalanschluss = new javax.swing.JMenuItem();
         mniDokumente = new javax.swing.JMenuItem();
-        mniFlaechen = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         mniKarte = new javax.swing.JMenuItem();
         mniTabelle = new javax.swing.JMenuItem();
@@ -2304,22 +2334,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
             });
         menWindows.add(mniDokumente);
-
-        mniFlaechen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_5,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniFlaechen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
-        mniFlaechen.setMnemonic('S');
-        mniFlaechen.setText("Flächen");
-        mniFlaechen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniFlaechenActionPerformed(evt);
-                }
-            });
-        menWindows.add(mniFlaechen);
         menWindows.add(jSeparator11);
 
         mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
@@ -2432,14 +2446,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
     }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void mniFlaechenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniFlaechenActionPerformed
-    }                                                                               //GEN-LAST:event_mniFlaechenActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3315,7 +3321,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniTabelleActionPerformed
-        showOrHideView(vTabelleWDSR);
+        switch (CidsAppBackend.getInstance().getMode()) {
+            case REGEN: {
+                showOrHideView(vTabelleRegen);
+            }
+            break;
+            case ESW: {
+                showOrHideView(vTabelleWDSR);
+            }
+            break;
+        }
     }                                                                              //GEN-LAST:event_mniTabelleActionPerformed
 
     /**
@@ -3324,7 +3339,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDetailsActionPerformed
-        showOrHideView(vDetailsWDSR);
+        switch (CidsAppBackend.getInstance().getMode()) {
+            case REGEN: {
+                showOrHideView(vDetailsRegen);
+            }
+            break;
+            case ESW: {
+                showOrHideView(vDetailsWDSR);
+            }
+            case ALLGEMEIN: {
+                showOrHideView(vDetailsAllgemein);
+            }
+            break;
+        }
     }                                                                              //GEN-LAST:event_mniDetailsActionPerformed
 
     /**
@@ -3693,7 +3720,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     "Kassenzeichen muss eine Zahl sein.",
                     "Fehler",
                     JOptionPane.ERROR_MESSAGE);
-                return;
             }
         }
     }

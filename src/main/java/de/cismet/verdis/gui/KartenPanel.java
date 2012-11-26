@@ -273,6 +273,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdAddHandle;
     private javax.swing.JToggleButton cmdAttachPolyToAlphadata;
     private javax.swing.JButton cmdBack;
+    private javax.swing.JToggleButton cmdCreateLandparcelGeom;
     private javax.swing.JButton cmdForeground;
     private javax.swing.JButton cmdForward;
     private javax.swing.JButton cmdFullPoly;
@@ -299,7 +300,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdWmsBackground;
     private javax.swing.JToggleButton cmdZoom;
     private javax.swing.ButtonGroup handleGroup;
-    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -470,6 +470,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRemovePolygon = new javax.swing.JToggleButton();
         cmdAttachPolyToAlphadata = new javax.swing.JToggleButton();
         cmdJoinPoly = new javax.swing.JToggleButton();
+        cmdCreateLandparcelGeom = new javax.swing.JToggleButton();
         cmdSplitPoly = new javax.swing.JToggleButton();
         sep3 = new javax.swing.JSeparator();
         cmdMoveHandle = new javax.swing.JToggleButton();
@@ -479,7 +480,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         sep4 = new javax.swing.JSeparator();
         cmdUndo = new javax.swing.JButton();
         cmdRedo = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
 
         popMenSearch.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
 
@@ -1035,6 +1035,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdJoinPoly);
 
+        mainGroup.add(cmdCreateLandparcelGeom);
+        cmdCreateLandparcelGeom.setText("FSG");
+        cmdCreateLandparcelGeom.setBorderPainted(false);
+        cmdCreateLandparcelGeom.setFocusable(false);
+        cmdCreateLandparcelGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdCreateLandparcelGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdCreateLandparcelGeom.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCreateLandparcelGeomActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdCreateLandparcelGeom);
+
         mainGroup.add(cmdSplitPoly);
         cmdSplitPoly.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png")));          // NOI18N
@@ -1174,19 +1189,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdRedo);
-
-        jButton1.setText("FS");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(jButton1);
 
         panMap.add(tobVerdis, java.awt.BorderLayout.NORTH);
 
@@ -1533,12 +1535,12 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        isAssignLandparcel = !isAssignLandparcel;
+    private void cmdCreateLandparcelGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCreateLandparcelGeomActionPerformed
+        isAssignLandparcel = cmdCreateLandparcelGeom.isSelected();
         if (isAssignLandparcel) {
             mappingComp.setInteractionMode(Main.FLURSTUECK_ASSIGN_GEOMETRY_LISTENER);
         }
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }                                                                                           //GEN-LAST:event_cmdCreateLandparcelGeomActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1743,6 +1745,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         this.cmdMovePolygon.setVisible(b);
         this.cmdRemovePolygon.setVisible(b);
         this.cmdAttachPolyToAlphadata.setVisible(b);
+        this.cmdCreateLandparcelGeom.setVisible(b);
         this.cmdJoinPoly.setVisible(b);
         this.sep3.setVisible(b);
         this.cmdMoveHandle.setVisible(b);
