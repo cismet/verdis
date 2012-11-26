@@ -14,6 +14,15 @@
         <BindingProperty name="toolTipText" source="Form" sourcePath="${cidsBean.letzte_aenderung_von}" target="lblLastModification" targetPath="toolTipText" updateStrategy="0" immediately="false"/>
       </BindingProperties>
     </Component>
+    <Component class="javax.swing.JButton" name="cmdExecuteForKassenzeichen">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="exec"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdExecuteForKassenzeichenActionPerformed"/>
+      </Events>
+    </Component>
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -217,10 +226,10 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtSperreBemerkung">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection component="Form" name="background" type="property"/>
             </Property>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
             </Property>

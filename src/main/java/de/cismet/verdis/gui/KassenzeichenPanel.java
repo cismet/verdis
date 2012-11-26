@@ -38,6 +38,8 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cismap.commons.features.Feature;
 
+import de.cismet.tools.BrowserLauncher;
+
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
@@ -88,6 +90,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private javax.swing.ButtonGroup btgMode;
     private javax.swing.JButton btnSearch;
     private javax.swing.JCheckBox chkSperre;
+    private javax.swing.JButton cmdExecuteForKassenzeichen;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblBemerkung;
@@ -162,6 +165,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             txtSperreBemerkung.setText("");
             chkSperre.setSelected(false);
         }
+        cmdExecuteForKassenzeichen.setEnabled(cidsBean != null);
 
         aggVal.clear();
         aggVal.add(bindingValidator);
@@ -216,6 +220,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      */
     public Collection<JComponent> getCustomButtons() {
         final Collection<JComponent> tmp = new ArrayList<JComponent>();
+        tmp.add(cmdExecuteForKassenzeichen);
         tmp.add(lblLastModification);
         tmp.add(hbBack);
         tmp.add(hbFwd);
@@ -253,6 +258,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
         btgMode = new javax.swing.ButtonGroup();
         lblLastModification = new javax.swing.JLabel();
+        cmdExecuteForKassenzeichen = new javax.swing.JButton();
         panSearch = new javax.swing.JPanel();
         txtSearch = new javax.swing.JTextField();
         lblSuche = new javax.swing.JLabel();
@@ -286,6 +292,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                 lblLastModification,
                 org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
         bindingGroup.addBinding(binding);
+
+        cmdExecuteForKassenzeichen.setText("exec");
+        cmdExecuteForKassenzeichen.setEnabled(false);
+        cmdExecuteForKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdExecuteForKassenzeichenActionPerformed(evt);
+                }
+            });
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -471,8 +487,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
         panKZValues.add(txtKassenzeichen, gridBagConstraints);
 
-        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setEditable(false);
+        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setForeground(java.awt.Color.red);
         txtSperreBemerkung.setBorder(null);
 
@@ -680,6 +696,17 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchActionPerformed
         gotoTxtKassenzeichen();
     }                                                                             //GEN-LAST:event_btnSearchActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdExecuteForKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdExecuteForKassenzeichenActionPerformed
+        final String kassenzeichenString = Integer.toString((Integer)getCidsBean().getProperty("kassenzeichennummer8"));
+        final String execString = String.format("http://www.google.com/search?q=%s&hl=de", kassenzeichenString);
+        BrowserLauncher.openURLorFile(execString);
+    }                                                                                              //GEN-LAST:event_cmdExecuteForKassenzeichenActionPerformed
 
     @Override
     public void appModeChanged() {
