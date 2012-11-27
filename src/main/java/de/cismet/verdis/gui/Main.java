@@ -4093,6 +4093,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void storeChanges() {
         storeChanges(false);
+
+        doAssessment();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void doAssessment() {
+        final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
+        assessmentDialog.setVisible(true);
+        StaticSwingTools.showDialog(assessmentDialog, true);
     }
 
     /**

@@ -7,9 +7,9 @@
 ****************************************************/
 package de.cismet.verdis.search;
 
-import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
-
 import javax.swing.ImageIcon;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 
