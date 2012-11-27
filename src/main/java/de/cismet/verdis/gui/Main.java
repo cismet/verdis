@@ -1186,35 +1186,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             } else {
                                 final Iterator iterator = data.iterator();
                                 while (iterator.hasNext()) {
-                                    final Geometry geom = (Geometry)iterator.next();
+                                    final Geometry geometry = (Geometry)iterator.next();
                                     final String bezeichnung = (String)iterator.next();
-                                    if (geom != null) {
+                                    if (geometry != null) {
                                         try {
-                                            geom.setSRID(CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
-                                            final Geometry transformedGeom = CrsTransformer.transformToCurrentCrs(geom);
+                                            geometry.setSRID(
+                                                CrsTransformer.extractSridFromCrs(assignLandparcelGeomCrs));
+                                            final Geometry transformedGeom = CrsTransformer.transformToCurrentCrs(
+                                                    geometry);
                                             transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
 
-                                            final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
-                                                    VerdisConstants.DOMAIN,
-                                                    "geom");
-                                            geomBean.setProperty("geo_field", transformedGeom);
-
-                                            final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
-                                                    VerdisConstants.DOMAIN,
-                                                    "flurstuecke");
-                                            flurstueckGeomBean.setProperty("istfrei", false);
-                                            flurstueckGeomBean.setProperty("geom", geomBean);
-                                            flurstueckGeomBean.setProperty("text", bezeichnung);
-
-                                            final CidsFeature cidsFeature = new CidsFeature(
-                                                    flurstueckGeomBean.getMetaObject());
-                                            cidsFeature.getMetaObject()
-                                                    .setID(FlurstueckePanel.getNewFlurstueckGeomId());
-                                            cidsFeature.setEditable(CidsAppBackend.getInstance().isEditable());
-                                            getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
-
-                                            getCidsBean().getBeanCollectionProperty("flurstuecke")
-                                                    .add(flurstueckGeomBean);
+                                            final CidsBean flurstueckGeomBean =
+                                                flurstueckePanel.createNewFlurstueckGeomBean(
+                                                    transformedGeom,
+                                                    bezeichnung,
+                                                    false);
+                                            flurstueckePanel.addFlurstueckGeomBean(flurstueckGeomBean);
                                         } catch (Exception ex) {
                                             LOG.fatal("", ex);
                                         }

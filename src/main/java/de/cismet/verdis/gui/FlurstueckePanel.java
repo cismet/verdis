@@ -85,6 +85,8 @@ import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
@@ -112,7 +114,6 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     public static final List<Color> LANDPARCEL_COLORS = Collections.unmodifiableList(Arrays.asList(COLORS));
     private static final double LANDPARCEL_GEOM_BUFFER = -0.05;
     private static int NEW_FLURSTUECK_GEOM_ID = -1;
-
     private static AlkisLandparcelWorker WORKER;
 
     //~ Instance fields --------------------------------------------------------
@@ -120,6 +121,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     private FlurstueckGeomListListener flurstueckGeomListListener = new FlurstueckGeomListListener();
     private CidsBean kassenzeichenBean;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cmdAutoCreateGeometries;
     private javax.swing.JButton cmdRemoveFlurstueckGeom;
     private javax.swing.JButton cmdShowAlkisRenderer;
     private javax.swing.JButton cmdShowAlkisRendererForAll;
@@ -196,6 +198,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         jPanel5 = new javax.swing.JPanel();
         cmdRemoveFlurstueckGeom = new javax.swing.JButton();
         cmdShowAlkisRenderer = new javax.swing.JButton();
+        cmdAutoCreateGeometries = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -395,7 +398,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         jPanel3.add(tglShowFlurstueckGeoms, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -425,7 +428,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         jPanel3.add(cmdRemoveFlurstueckGeom, gridBagConstraints);
 
@@ -453,6 +456,25 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.gridy = 0;
         jPanel3.add(cmdShowAlkisRenderer, gridBagConstraints);
 
+        cmdAutoCreateGeometries.setText(org.openide.util.NbBundle.getMessage(
+                FlurstueckePanel.class,
+                "FlurstueckePanel.cmdAutoCreateGeometries.text"));        // NOI18N
+        cmdAutoCreateGeometries.setToolTipText(org.openide.util.NbBundle.getMessage(
+                FlurstueckePanel.class,
+                "FlurstueckePanel.cmdAutoCreateGeometries.toolTipText")); // NOI18N
+        cmdAutoCreateGeometries.setEnabled(false);
+        cmdAutoCreateGeometries.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAutoCreateGeometriesActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(cmdAutoCreateGeometries, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -466,13 +488,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
     /**
      * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
      */
-    private void lstFlurstueckGeomsValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstFlurstueckGeomsValueChanged
-        if (evt.getValueIsAdjusting()) {
-            return;
-        }
+    private void refreshLstAlkisLandparcels() {
         final boolean enabled = CidsAppBackend.getInstance().isEditable()
                     && (lstFlurstueckGeoms.getSelectedIndices().length > 0);
         cmdRemoveFlurstueckGeom.setEnabled(enabled);
@@ -539,7 +556,19 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         } catch (Exception ex) {
             LOG.error(ex, ex);
         }
-    } //GEN-LAST:event_lstFlurstueckGeomsValueChanged
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void lstFlurstueckGeomsValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstFlurstueckGeomsValueChanged
+        if (evt.getValueIsAdjusting()) {
+            return;
+        }
+        refreshLstAlkisLandparcels();
+    }                                                                                             //GEN-LAST:event_lstFlurstueckGeomsValueChanged
 
     /**
      * DOCUMENT ME!
@@ -687,11 +716,12 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         int firstSelectedIndex = -1;
         final Collection<CidsBean> beansToRemove = new ArrayList<CidsBean>();
         for (int index = 0; index < selectedIndices.length; ++index) {
+            final int selectedIndex = selectedIndices[index];
+
             if (firstSelectedIndex < 0) {
-                firstSelectedIndex = selectedIndices[index];
+                firstSelectedIndex = selectedIndex;
             }
 
-            final int selectedIndex = selectedIndices[index];
             final Object listObject = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
             if (listObject instanceof CidsBean) {
                 final CidsBean flurstueckGeomBean = (CidsBean)listObject;
@@ -705,7 +735,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             featureCollection.removeFeature(flurstueckGeomFeature);
         }
 
-        final int listSize = lstAlkisLandparcels.getModel().getSize();
+        final int listSize = lstFlurstueckGeoms.getModel().getSize();
         if (firstSelectedIndex >= listSize) {
             firstSelectedIndex = listSize - 1;
         }
@@ -743,8 +773,10 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
                 @Override
                 protected Collection<CidsBean> doInBackground() throws Exception {
-                    final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(getCidsBean()
-                                    .getBeanCollectionProperty("flurstuecke"));
+                    final Geometry unionGeom = getFlurstueckGeomUnionGeometry(getCidsBean().getBeanCollectionProperty(
+                                "flurstuecke"));
+
+                    final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
                     return alkisLandparcelBeans;
                 }
 
@@ -766,19 +798,151 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     cmdShowAlkisRenderer.setEnabled(true);
                 }
             }.execute();
-        final DefaultListModel alkisLandparcelListModel = (DefaultListModel)lstAlkisLandparcels.getModel();
+    } //GEN-LAST:event_cmdShowAlkisRendererActionPerformed
 
-        final int size = alkisLandparcelListModel.getSize();
-        final List<MetaObject> coll = new ArrayList<MetaObject>();
-        for (int index = 0; index < size; ++index) {
-            final Object listObject = lstAlkisLandparcels.getModel().getElementAt(index);
-            if (listObject instanceof CidsBean) {
-                final CidsBean alkisLandparcelBean = (CidsBean)listObject;
-                coll.add(alkisLandparcelBean.getMetaObject());
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAutoCreateGeometriesActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAutoCreateGeometriesActionPerformed
+        new SwingWorker<Collection<CidsBean>, Object>() {
+
+                @Override
+                protected Collection<CidsBean> doInBackground() throws Exception {
+                    Geometry unionGeom = null;
+                    for (final CidsBean flaecheBean
+                                : (Collection<CidsBean>)getCidsBean().getBeanCollectionProperty(
+                                    KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                        final Geometry flaecheGeom = (Geometry)flaecheBean.getProperty(
+                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                        if (flaecheGeom != null) {
+                            if (unionGeom == null) {
+                                unionGeom = (Geometry)flaecheGeom.clone();
+                            } else {
+                                unionGeom = unionGeom.union(flaecheGeom);
+                            }
+                        }
+                    }
+
+                    final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
+                    return alkisLandparcelBeans;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final Collection<CidsBean> alkisLandparcelBeans = get();
+
+                        final Collection<CidsBean> flurstueckGeomBeansToAdd = new ArrayList<CidsBean>();
+                        for (final CidsBean alkisLandparcelBean : alkisLandparcelBeans) {
+                            final String bezeichnung = (String)alkisLandparcelBean.getProperty("bezeichnung");
+                            final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
+                                    "geometrie.geo_field");
+
+                            final String currentCrs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
+                            final Geometry transformedAlkisLandparcelGeom = CrsTransformer.transformToGivenCrs(
+                                    (Geometry)alkisLandparcelGeom.clone(),
+                                    currentCrs);
+                            transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
+
+                            final CidsBean flurstueckGeomBean = createNewFlurstueckGeomBean(
+                                    transformedAlkisLandparcelGeom,
+                                    bezeichnung,
+                                    false);
+                            flurstueckGeomBeansToAdd.add(flurstueckGeomBean);
+                        }
+                        addFlurstueckGeomBeans(flurstueckGeomBeansToAdd);
+                    } catch (final Exception ex) {
+                        LOG.error("error while creating flurstueckGeom beans", ex);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_cmdAutoCreateGeometriesActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   geometry     DOCUMENT ME!
+     * @param   bezeichnung  DOCUMENT ME!
+     * @param   istFrei      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public CidsBean createNewFlurstueckGeomBean(final Geometry geometry,
+            final String bezeichnung,
+            final boolean istFrei) throws Exception {
+        final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(VerdisConstants.DOMAIN, "geom");
+        geomBean.setProperty("geo_field", geometry);
+
+        final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
+                VerdisConstants.DOMAIN,
+                "flurstuecke");
+        flurstueckGeomBean.setProperty("istfrei", istFrei);
+        flurstueckGeomBean.setProperty("geom", geomBean);
+        flurstueckGeomBean.setProperty("text", bezeichnung);
+
+        flurstueckGeomBean.getMetaObject().setID(FlurstueckePanel.getNewFlurstueckGeomId());
+
+        return flurstueckGeomBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  flurstueckGeomBeanToAdd  DOCUMENT ME!
+     */
+    public void addFlurstueckGeomBean(final CidsBean flurstueckGeomBeanToAdd) {
+        if (flurstueckGeomBeanToAdd != null) {
+            final Collection<CidsBean> flurstueckGeomBeanToAdds = new ArrayList<CidsBean>();
+            flurstueckGeomBeanToAdds.add(flurstueckGeomBeanToAdd);
+            addFlurstueckGeomBeans(flurstueckGeomBeanToAdds);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  flurstueckGeomBeansToAdd  DOCUMENT ME!
+     */
+    public void addFlurstueckGeomBeans(final Collection<CidsBean> flurstueckGeomBeansToAdd) {
+        final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
+        final Collection<Feature> featuresToAdd = new ArrayList<Feature>();
+        final Collection<CidsBean> beansToAdd = new ArrayList<CidsBean>();
+
+        for (final CidsBean flurstueckGeomBeanToAdd : flurstueckGeomBeansToAdd) {
+            final Geometry flurstueckGeomToAdd = (Geometry)flurstueckGeomBeanToAdd.getProperty("geom.geo_field");
+            final Collection<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+            CidsFeature geomAlreadyInMapFeature = null;
+            for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
+                final Geometry flurstueckGeom = (Geometry)flurstueckGeomBean.getProperty("geom.geo_field");
+                if (flurstueckGeomToAdd.equals(flurstueckGeom)) {
+                    geomAlreadyInMapFeature = new CidsFeature(
+                            flurstueckGeomBean.getMetaObject());
+                    break;
+                }
+            }
+
+            if (geomAlreadyInMapFeature == null) {
+                beansToAdd.add(flurstueckGeomBeanToAdd);
+
+                final CidsFeature cidsFeatureToAdd = new CidsFeature(
+                        flurstueckGeomBeanToAdd.getMetaObject());
+                cidsFeatureToAdd.setEditable(CidsAppBackend.getInstance().isEditable());
+                featuresToAdd.add(cidsFeatureToAdd);
+                featuresToSelect.add(cidsFeatureToAdd);
+            } else {
+                featuresToSelect.add(geomAlreadyInMapFeature);
             }
         }
-        Main.getCurrentInstance().showRenderer(coll.toArray(new MetaObject[0]));
-    } //GEN-LAST:event_cmdShowAlkisRendererActionPerformed
+
+        getCidsBean().getBeanCollectionProperty("flurstuecke").addAll(beansToAdd);
+
+        Main.getMappingComponent().getFeatureCollection().addFeatures(featuresToAdd);
+        Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
+    }
 
     /**
      * DOCUMENT ME!
@@ -822,6 +986,20 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         final boolean isEditable = CidsAppBackend.getInstance().isEditable();
         setEnabled(isEditable);
         cmdRemoveFlurstueckGeom.setEnabled(isEditable && (lstFlurstueckGeoms.getSelectedIndices().length > 0));
+
+        boolean hasFlaecheGeoms = false;
+        if (getCidsBean() != null) {
+            for (final CidsBean flaecheBean
+                        : (Collection<CidsBean>)getCidsBean().getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                if (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null) {
+                    hasFlaecheGeoms = true;
+                    break;
+                }
+            }
+        }
+
+        cmdAutoCreateGeometries.setEnabled(isEditable && hasFlaecheGeoms);
     }
 
     /**
@@ -892,6 +1070,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     public void featuresChanged(final FeatureCollectionEvent fce) {
         final Collection<Feature> changedFeatures = fce.getEventFeatures();
         if (changedFeatures != null) {
+            boolean refreshNeeded = false;
             for (final Feature changedFeature : changedFeatures) {
                 if (changedFeature instanceof CidsFeature) {
                     final CidsFeature changedCidsFeature = (CidsFeature)changedFeature;
@@ -899,12 +1078,33 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                                     "flurstuecke")) {
                         try {
                             final CidsBean flurstueckGeomBean = changedCidsFeature.getMetaObject().getBean();
-                            flurstueckGeomBean.setProperty("istfrei", false);
-                            flurstueckGeomBean.setProperty("text", "freie Geometrie");
+                            final String alterText = (String)flurstueckGeomBean.getProperty("text");
+                            final Boolean alterIstFrei = (Boolean)flurstueckGeomBean.getProperty("istfrei");
+                            flurstueckGeomBean.setProperty("istfrei", true);
+                            if (!alterIstFrei) {
+                                flurstueckGeomBean.setProperty("text", "freie Geometrie (" + alterText + ")");
+                            }
+
+                            if (!refreshNeeded) {
+                                final int[] selectedIndices = lstFlurstueckGeoms.getSelectedIndices();
+                                for (int index = 0; index < selectedIndices.length; index++) {
+                                    final int selectedIndex = selectedIndices[index];
+                                    final Object lstItem = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
+                                    if (lstItem instanceof CidsBean) {
+                                        final CidsBean selectedFlurstueckGeomBean = (CidsBean)lstItem;
+                                        if (selectedFlurstueckGeomBean.equals(flurstueckGeomBean)) {
+                                            refreshNeeded = true;
+                                        }
+                                    }
+                                }
+                            }
                         } catch (Exception ex) {
                             LOG.error("error while modifying landparcelgeom", ex);
                         }
                     }
+                }
+                if (refreshNeeded) {
+                    refreshLstAlkisLandparcels();
                 }
             }
         }
@@ -975,32 +1175,13 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             final PFeature pFeatureToAttach = afl.getFeatureToAttach();
             if (pFeatureToAttach.getFeature() instanceof PureNewFeature) {
                 try {
-                    final Geometry geom = pFeatureToAttach.getFeature().getGeometry();
+                    final Geometry geometry = pFeatureToAttach.getFeature().getGeometry();
 
-                    final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
-                            VerdisConstants.DOMAIN,
-                            "geom");
-                    geomBean.setProperty("geo_field", geom);
-
-                    final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
-                            VerdisConstants.DOMAIN,
-                            "flurstuecke");
-                    flurstueckGeomBean.setProperty("istfrei", true);
-                    flurstueckGeomBean.setProperty("geom", geomBean);
-                    flurstueckGeomBean.setProperty("text", "freie Geometrie");
-
-                    final CidsFeature flurstueckGeomFeature = new CidsFeature(
-                            flurstueckGeomBean.getMetaObject());
-                    flurstueckGeomFeature.getMetaObject().setID(getNewFlurstueckGeomId());
-                    flurstueckGeomFeature.setEditable(CidsAppBackend.getInstance().isEditable());
-                    final FeatureCollection featureCollection = CidsAppBackend.getInstance()
-                                .getMainMap()
-                                .getFeatureCollection();
-                    featureCollection.removeFeature(pFeatureToAttach.getFeature());
-                    featureCollection.addFeature(flurstueckGeomFeature);
-                    featureCollection.select(flurstueckGeomFeature);
-
-                    getCidsBean().getBeanCollectionProperty("flurstuecke").add(flurstueckGeomBean);
+                    final CidsBean flurstueckGeomBean = createNewFlurstueckGeomBean(geometry,
+                            "freie Geometrie",
+                            true);
+                    addFlurstueckGeomBean(flurstueckGeomBean);
+                    Main.getMappingComponent().getFeatureCollection().removeFeature(pFeatureToAttach.getFeature());
                 } catch (Exception ex) {
                     LOG.error("error while attaching feature", ex);
                 }
@@ -1028,15 +1209,16 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @return  DOCUMENT ME!
      */
-    private Geometry getUnionGeometry(final Collection<CidsBean> flurstueckGeomBeans) {
+    private Geometry getFlurstueckGeomUnionGeometry(final Collection<CidsBean> flurstueckGeomBeans) {
         Geometry unionGeom = null;
         for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
             final Geometry geom = (Geometry)((CidsBean)flurstueckGeomBean.getProperty("geom")).getProperty("geo_field");
+            final Geometry bufferedGeom = geom.buffer(LANDPARCEL_GEOM_BUFFER);
             if (unionGeom == null) {
-                unionGeom = (Geometry)geom.clone();
+                unionGeom = (Geometry)bufferedGeom;
             } else {
                 final int srid = unionGeom.getSRID();
-                unionGeom = unionGeom.union(geom);
+                unionGeom = unionGeom.union(bufferedGeom);
                 unionGeom.setSRID(srid);
             }
         }
@@ -1046,19 +1228,17 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     /**
      * DOCUMENT ME!
      *
-     * @param   flurstueckGeomBeans  DOCUMENT ME!
+     * @param   geometry  flurstueckGeomBeans DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private Collection<CidsBean> searchAlkisLandparcelBeans(final Collection<CidsBean> flurstueckGeomBeans) {
+    private Collection<CidsBean> searchAlkisLandparcelBeans(final Geometry geometry) {
         try {
             final AlkisLandparcelSearch serverSearch = new AlkisLandparcelSearch();
             final String crs = serverSearch.getCrs();
 
-            final Geometry unionGeom = getUnionGeometry(flurstueckGeomBeans);
+            final Geometry transformedGeom = CrsTransformer.transformToGivenCrs(geometry, crs);
 
-            final Geometry transformedGeom = CrsTransformer.transformToGivenCrs(unionGeom, crs)
-                        .buffer(LANDPARCEL_GEOM_BUFFER);
             transformedGeom.setSRID(CrsTransformer.extractSridFromCrs(crs));
             serverSearch.setGeometry(transformedGeom);
 
@@ -1342,7 +1522,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
          */
         @Override
         protected Collection<CidsBean> doInBackground() throws Exception {
-            final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(flurstueckGeomBeans);
+            final Geometry unionGeom = getFlurstueckGeomUnionGeometry(flurstueckGeomBeans);
+            final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
             if (alkisLandparcelBeans != null) {
                 for (final CidsBean alkisLandparcelBean : alkisLandparcelBeans) {
                     final List<CidsBean> assignedFlurstueckGeomBeans;
