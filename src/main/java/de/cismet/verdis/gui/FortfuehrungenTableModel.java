@@ -71,7 +71,7 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             }
         } else if (columnIndex == 1) {
             try {
-                return (String)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS_NAME);
+                return (String)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS__NAME);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";

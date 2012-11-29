@@ -17,7 +17,7 @@ import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
-import de.cismet.verdis.server.search.RegenFlaechenSummenServerSearch;
+import de.cismet.verdis.server.search.FlaechenSummenServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -73,7 +73,7 @@ public class RegenFlaechenSummenTableModel extends DefaultTableModel implements 
         if (cidsBean != null) {
             final int kz = (Integer)kassenzeichenBean.getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-            final RegenFlaechenSummenServerSearch search = new RegenFlaechenSummenServerSearch(kz);
+            final FlaechenSummenServerSearch search = new FlaechenSummenServerSearch(kz);
 
             de.cismet.tools.CismetThreadPool.execute(new javax.swing.SwingWorker<Collection, Void>() {
 
