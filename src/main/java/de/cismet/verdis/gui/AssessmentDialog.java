@@ -11,6 +11,20 @@
  */
 package de.cismet.verdis.gui;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Map;
+
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+
 /**
  * DOCUMENT ME!
  *
@@ -19,18 +33,39 @@ package de.cismet.verdis.gui;
  */
 public class AssessmentDialog extends javax.swing.JDialog {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static int RETURN_CANCEL = 1;
+    public static int RETURN_WITHOUT_ASSESSEMENT = 2;
+    public static int RETURN_WITH_ASSESSEMENT = 3;
+    private static SimpleDateFormat DATEFORMAT_FULL = new SimpleDateFormat("dd.MM.yyyy");
+    private static SimpleDateFormat DATEFORMAT_MONTH = new SimpleDateFormat("MM");
+    private static SimpleDateFormat DATEFORMAT_YEAR = new SimpleDateFormat("yyyy");
+
+    private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(AssessmentDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private int returnType = 0;
+    private String zettelHtml = "";
+    private Map<String, Double> oldSchluesselSummeMap;
+    private Map<String, Double> newSchluesselSummeMap;
+    private Collection<String> bezeichners;
+    private Date datum;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton cmdCancel;
+    private javax.swing.JButton cmdWithAssessement;
+    private javax.swing.JButton cmdWithoutAssessement;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblVeranlagungszettel;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -62,11 +97,12 @@ public class AssessmentDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jLabel2 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        lblVeranlagungszettel = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        cmdWithAssessement = new javax.swing.JButton();
+        cmdWithoutAssessement = new javax.swing.JButton();
+        cmdCancel = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -100,11 +136,28 @@ public class AssessmentDialog extends javax.swing.JDialog {
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setLayout(new java.awt.GridBagLayout());
+
+        lblVeranlagungszettel.setBackground(new java.awt.Color(255, 255, 255));
+        lblVeranlagungszettel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel2,
-            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.jLabel2.text")); // NOI18N
-        jScrollPane2.setViewportView(jLabel2);
+            lblVeranlagungszettel,
+            org.openide.util.NbBundle.getMessage(
+                AssessmentDialog.class,
+                "AssessmentDialog.lblVeranlagungszettel.text")); // NOI18N
+        lblVeranlagungszettel.setMinimumSize(new java.awt.Dimension(200, 400));
+        lblVeranlagungszettel.setPreferredSize(new java.awt.Dimension(200, 400));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel6.add(lblVeranlagungszettel, gridBagConstraints);
+
+        jScrollPane2.setViewportView(jPanel6);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -124,36 +177,59 @@ public class AssessmentDialog extends javax.swing.JDialog {
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(
-            jButton3,
-            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.jButton3.text")); // NOI18N
+            cmdWithAssessement,
+            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.cmdWithAssessement.text")); // NOI18N
+        cmdWithAssessement.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdWithAssessementActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        jPanel3.add(jButton3, gridBagConstraints);
+        jPanel3.add(cmdWithAssessement, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
-            jButton2,
-            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.jButton2.text")); // NOI18N
+            cmdWithoutAssessement,
+            org.openide.util.NbBundle.getMessage(
+                AssessmentDialog.class,
+                "AssessmentDialog.cmdWithoutAssessement.text")); // NOI18N
+        cmdWithoutAssessement.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdWithoutAssessementActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
-        jPanel3.add(jButton2, gridBagConstraints);
+        jPanel3.add(cmdWithoutAssessement, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
-            jButton1,
-            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.jButton1.text")); // NOI18N
+            cmdCancel,
+            org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.cmdCancel.text")); // NOI18N
+        cmdCancel.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCancelActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        jPanel3.add(jButton1, gridBagConstraints);
+        jPanel3.add(cmdCancel, gridBagConstraints);
 
         final javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
                 0,
-                142,
+                151,
                 Short.MAX_VALUE));
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
@@ -186,6 +262,202 @@ public class AssessmentDialog extends javax.swing.JDialog {
 
         pack();
     } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  datum  DOCUMENT ME!
+     */
+    public void setDatum(final Date datum) {
+        this.datum = datum;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<String, Double> getOldSchluesselSummeMap() {
+        return oldSchluesselSummeMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  oldSchluesselSummeMap  DOCUMENT ME!
+     */
+    public void setOldSchluesselSummeMap(final Map<String, Double> oldSchluesselSummeMap) {
+        this.oldSchluesselSummeMap = oldSchluesselSummeMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<String, Double> getNewSchluesselSummeMap() {
+        return newSchluesselSummeMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  newSchluesselSummeMap  DOCUMENT ME!
+     */
+    public void setNewSchluesselSummeMap(final Map<String, Double> newSchluesselSummeMap) {
+        this.newSchluesselSummeMap = newSchluesselSummeMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<String> getBezeichners() {
+        return bezeichners;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  bezeichners  DOCUMENT ME!
+     */
+    public void setBezeichners(final Collection<String> bezeichners) {
+        this.bezeichners = bezeichners;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String createZettelHtml(final CidsBean kassenzeichenBean) {
+        if (kassenzeichenBean != null) {
+            final String kassenzeichennummer = Integer.toString((Integer)kassenzeichenBean.getProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+            final String veranlagunsZettel = (String)kassenzeichenBean.getProperty(
+                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL);
+            final String alterZettel = (veranlagunsZettel != null) ? veranlagunsZettel : "";
+
+            datum = new Date();
+
+            final Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(datum);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            cal.add(Calendar.MONTH, 1);
+            final Date datumVeranlagung = cal.getTime();
+
+            final StringBuilder zettelSB = new StringBuilder();
+            final StringBuilder teilZettelSB = new StringBuilder();
+            zettelSB.append("<html>")
+                    .append("   <basefont face=\"Courier New\">")
+                    .append("   <center><h1> Änderungsnotiz</h1></center>")
+                    .append("   <h2>Kassenzeichen: ")
+                    .append(kassenzeichennummer)
+                    .append("<h2>");
+            teilZettelSB.append("   <hr>")
+                    .append("   <h3>Datum: ")
+                    .append(DATEFORMAT_FULL.format(datum))
+                    .append("</h3>")
+                    .append("   <center>")
+                    .append("      <table cellspacing=\"10\">")
+                    .append("         <thead>")
+                    .append("            <tr>")
+                    .append("               <th align=\"left\">ABS</th>")
+                    .append("               <th align=\"right\">alt</th>")
+                    .append("               <th align=\"right\">neu</th>")
+                    .append("               <th align=\"center\">Monat VA</th>")
+                    .append("               <th align=\"center\">Jahr VA</th>")
+                    .append("            </tr>")
+                    .append("         </thead>")
+                    .append("         <tbody>");
+            for (final String bezeichner : bezeichners) {
+                final double oldSumme = oldSchluesselSummeMap.get(bezeichner);
+                final double newSumme = newSchluesselSummeMap.get(bezeichner);
+                if ((oldSumme > 0) || (newSumme > 0)) {
+                    teilZettelSB.append("            <tr>")
+                            .append("               <td align=\"left\">")
+                            .append(bezeichner)
+                            .append("</td>")
+                            .append("               <td align=\"right\">")
+                            .append(Double.toString(oldSumme))
+                            .append("</td>")
+                            .append("               <td align=\"right\">")
+                            .append(Double.toString(newSumme))
+                            .append("</td>")
+                            .append("               <td align=\"center\">")
+                            .append(DATEFORMAT_MONTH.format(datumVeranlagung))
+                            .append("</td>")
+                            .append("               <td align=\"center\">")
+                            .append(DATEFORMAT_YEAR.format(datumVeranlagung))
+                            .append("</td>")
+                            .append("            </tr>");
+                }
+            }
+            teilZettelSB.append("         </tbody>").append("      </table>");
+            zettelSB.append(teilZettelSB.toString()).append(alterZettel).append("   </center>").append("</html>");
+            this.zettelHtml = teilZettelSB.toString();
+
+            return zettelSB.toString();
+        } else {
+            return null;
+        }
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getReturnType() {
+        return returnType;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getZettelHtml() {
+        return zettelHtml;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
+        returnType = RETURN_CANCEL;
+        dispose();
+    }                                                                             //GEN-LAST:event_cmdCancelActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdWithoutAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithoutAssessementActionPerformed
+        returnType = RETURN_WITHOUT_ASSESSEMENT;
+        dispose();
+    }                                                                                         //GEN-LAST:event_cmdWithoutAssessementActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdWithAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithAssessementActionPerformed
+        returnType = RETURN_WITH_ASSESSEMENT;
+        dispose();
+    }                                                                                      //GEN-LAST:event_cmdWithAssessementActionPerformed
+
+    @Override
+    public void setVisible(final boolean b) {
+        lblVeranlagungszettel.setText(createZettelHtml(CidsAppBackend.getInstance().getCidsBean()));
+        super.setVisible(b);
+    }
 
     /**
      * DOCUMENT ME!
