@@ -190,7 +190,7 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
                     if (satzung_winterdienst == null) {
                         wdKey = front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
                                         + WinterdienstPropertyConstants.PROP__KEY) + "-"
-                                    + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR
+                                    + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
                                         + WinterdienstPropertyConstants.PROP__SCHLUESSEL);
                     } else {
                         wdKey = satzung_winterdienst.getProperty("wd_prio.key") + "-"
