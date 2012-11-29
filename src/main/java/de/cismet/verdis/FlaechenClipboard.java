@@ -40,7 +40,9 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
@@ -142,12 +144,14 @@ public class FlaechenClipboard {
         final CidsBean pasteBean = flaechenTable.getModel().deepcloneBean(clipboardBean);
 
         final int id = flaechenTable.getTableHelper().getNextNewBeanId();
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__ID, id);
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
-        if (clipboardBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO) != null) {
+        if (clipboardBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO) != null) {
             final int flaecheninfoId = (Integer)clipboardBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             final CidsBean flaecheninfoBean = SessionManager.getProxy()
                         .getMetaObject(
                                 flaecheninfoId,
@@ -155,20 +159,24 @@ public class FlaechenClipboard {
                                     VerdisMetaClassConstants.MC_FLAECHENINFO).getId(),
                                 VerdisConstants.DOMAIN)
                         .getBean();
-            pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
+            pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
         }
 
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG, null);
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__BEMERKUNG, null);
         pasteBean.setProperty(
-            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
             flaechenTable.getValidFlaechenname(
                 (Integer)clipboardBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID)));
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + "."
+                            + FlaechenartPropertyConstants.PROP__ID)));
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
 
         return pasteBean;
     }
@@ -186,9 +194,12 @@ public class FlaechenClipboard {
         }
 
         for (final CidsBean flaecheBean : flaechenTable.getAllBeans()) {
-            final int id = (Integer)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+            final int id = (Integer)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             final int ownId = (Integer)clipboardFlaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             if (id == ownId) {
                 return false;
             }

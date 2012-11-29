@@ -53,8 +53,6 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
@@ -225,10 +223,14 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                 Main.getMappingComponent().getFeatureCollection().removeFeature(pf.getFeature());
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(
-                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
                                     groesse);
                                 selectedBean.setProperty(
-                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR,
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
                                     groesse);
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
@@ -273,14 +275,18 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(i));
             if (flaecheBean != null) {
                 final int art = (Integer)flaecheBean.getProperty(
-                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                + "."
+                                + FlaechenartPropertyConstants.PROP__ID);
                 switch (art) {
                     case 1:
                     case 2: {
                         counterInt++;
                         try {
                             flaecheBean.setProperty(
-                                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
                                 new Integer(counterInt).toString());
                         } catch (Exception ex) {
                             LOG.error("error while setting flaechenbezeichnung", ex);
@@ -295,7 +301,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                         counterString = nextFlBez(counterString);
                         try {
                             flaecheBean.setProperty(
-                                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
                                 counterString);
                         } catch (Exception ex) {
                             LOG.error("error while setting flaechenbezeichnung", ex);
@@ -363,21 +369,27 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     .getBean();
 
         final int newId = getNextNewBeanId();
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__ID, newId);
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__ID, newId);
         flaecheBean.getMetaObject().setID(newId);
 
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, geomBean);
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD, anschlussgradBean);
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART, flaechenartBean);
-        flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG, getValidFlaechenname(art));
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+            geomBean);
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+            anschlussgradBean);
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+            flaechenartBean);
+        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG, getValidFlaechenname(art));
         final Calendar cal = Calendar.getInstance();
         flaecheBean.setProperty(
-            RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG,
+            FlaechePropertyConstants.PROP__DATUM_ERFASSUNG,
             new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         flaecheBean.setProperty(
-            RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG,
+            FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG,
             new SimpleDateFormat("yy/MM").format(cal.getTime()));
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
@@ -393,9 +405,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     final Geometry geom = sole.getFeature().getGeometry();
 
                     final int groesse = new Integer((int)(geom.getArea()));
-                    flaecheBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK, groesse);
+                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                        groesse);
                     flaecheBean.setProperty(
-                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR,
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
                         groesse);
                     setGeometry(geom, flaecheBean);
 
@@ -423,9 +439,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         for (final CidsBean flaecheBean : getAllBeans()) {
             noFlaeche = false;
             final int a = (Integer)flaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + "."
+                            + FlaechenartPropertyConstants.PROP__ID);
             final String bezeichnung = (String)flaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
             if (bezeichnung == null) {
                 break;
             }

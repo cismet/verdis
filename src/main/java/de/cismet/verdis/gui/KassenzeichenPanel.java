@@ -12,18 +12,12 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.JXBusyLabel;
-
 import java.awt.Color;
-import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -35,8 +29,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
-
-import de.cismet.cismap.commons.features.Feature;
 
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
@@ -53,8 +45,8 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -870,7 +862,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private void selectFlaecheByBez(final String bez) {
         for (final CidsBean flaeche
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-            if (((String)flaeche.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
+            if (((String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
                 mainApp.getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
                 return;
             }

@@ -67,6 +67,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
@@ -952,7 +953,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     public static Geometry getGeometry(final CidsBean frontBean) {
         if ((frontBean != null) && (frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
         } else {
             return null;
         }
@@ -975,7 +977,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                         .getBean();
             cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
         }
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD,
+        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + "." + GeomPropertyConstants.PROP__GEO_FIELD,
             geom);
     }
 

@@ -33,10 +33,6 @@ import Sirius.server.middleware.types.MetaObject;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -67,8 +63,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Element;
 
-import org.openide.util.Exceptions;
-
 import java.applet.AppletContext;
 
 import java.awt.*;
@@ -81,10 +75,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.*;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.InetSocketAddress;
 
 import java.sql.Timestamp;
 
@@ -150,6 +140,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.FlaechenClipboardListener;
 
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
@@ -286,6 +277,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private PluginContext context;
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
@@ -3391,7 +3383,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             getMappingComponent().getFeatureCollection().removeFeature(feature);
             final Feature add = new BeanUpdatingCidsFeature(
                     kassenzeichenBean,
-                    KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                    KassenzeichenPropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
             final boolean editable = CidsAppBackend.getInstance().isEditable();
             add.setEditable(editable);
             getMappingComponent().getFeatureCollection().addFeature(add);
@@ -3407,7 +3401,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         try {
             final Feature remove = new BeanUpdatingCidsFeature(
                     kassenzeichenBean,
-                    KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                    KassenzeichenPropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
             setGeometry(null);
             getMappingComponent().getFeatureCollection().removeFeature(remove);
         } catch (Exception ex) {
@@ -3445,7 +3441,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static Geometry getGeometry(final CidsBean kassenzeichenBean) {
         if ((kassenzeichenBean != null)
                     && (kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+            return (Geometry)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
         } else {
             return null;
         }
@@ -3468,7 +3465,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         .getBean();
             kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
         }
-        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE__GEO_FIELD, geom);
+        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE + "."
+                    + GeomPropertyConstants.PROP__GEO_FIELD,
+            geom);
     }
 
     /**
