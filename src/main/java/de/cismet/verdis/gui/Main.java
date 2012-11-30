@@ -4117,10 +4117,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
         fillVeranlagungSummeMap(newVeranlagungSummeMap);
 
-        final Date veranlagungsDatum = new Date();
+        final Date datumJetzt = new Date();
+        final Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(datumJetzt);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.add(Calendar.MONTH, 1);
+        final Date datumVeranlagung = cal.getTime();
 
         final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
-        assessmentDialog.setDatum(veranlagungsDatum);
+        assessmentDialog.setDatum(datumJetzt);
+        assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
         final Collection<String> veranlagungBezeichners = new ArrayList<String>();
         veranlagungBezeichners.addAll(veranlagungsgrundlageBezeichners);
         veranlagungBezeichners.addAll(strassenreinigungBezeichners);
@@ -4141,7 +4147,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__DATUM,
-                        new java.sql.Date(veranlagungsDatum.getTime()));
+                        new java.sql.Date(assessmentDialog.getDatum().getTime()));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+                        new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G_200,
                         newVeranlagungSummeMap.get("null--200"));
@@ -4220,6 +4229,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                     veranlagungBean.persist();
                     kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
                 } catch (Exception ex) {
                     LOG.error("error while storing veranlagung", ex);
                 }
@@ -4229,6 +4240,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     kassenzeichenBean.setProperty(
                         KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
                         veranlagungszettel);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                        "beim letzten Speichern nicht veranlagt");
                 } catch (Exception ex) {
                     LOG.error("error while storing veranlagungszettel", ex);
                 }
