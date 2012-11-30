@@ -57,6 +57,7 @@ import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
@@ -332,8 +333,11 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public CidsBean loadKassenzeichenByNummer(final int kassenzeichen) {
         try {
-            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");
-            final String query = "SELECT " + mcKassenzeichen.getId() + ", id FROM kassenzeichen WHERE "
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(
+                    DOMAIN,
+                    VerdisMetaClassConstants.MC_KASSENZEICHEN);
+            final String query = "SELECT " + mcKassenzeichen.getId() + ", " + KassenzeichenPropertyConstants.PROP__ID
+                        + " FROM " + VerdisMetaClassConstants.MC_KASSENZEICHEN + " WHERE "
                         + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
             final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
             if ((mos == null) || (mos.length < 1)) {
@@ -601,7 +605,9 @@ public class CidsAppBackend implements CidsBeanStore {
      */
     public HistoryObject[] getHistory(final int kassenzeichenId, final int howMuch) {
         try {
-            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(DOMAIN, "kassenzeichen");
+            final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(
+                    DOMAIN,
+                    VerdisMetaClassConstants.MC_KASSENZEICHEN);
             return proxy.getHistory(mcKassenzeichen.getId(),
                     kassenzeichenId,
                     DOMAIN,

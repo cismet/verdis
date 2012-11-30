@@ -39,7 +39,7 @@ import de.cismet.cismap.commons.gui.piccolo.FixedWidthStroke;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
-import de.cismet.verdis.gui.FlurstueckePanel;
+import de.cismet.verdis.gui.KassenzeichenGeometrienPanel;
 
 /**
  * DOCUMENT ME!
@@ -47,12 +47,12 @@ import de.cismet.verdis.gui.FlurstueckePanel;
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FlurstueckeFeatureRenderer extends CustomCidsFeatureRenderer {
+public class KassenzeichenGeometrieFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            FlurstueckeFeatureRenderer.class);
+            KassenzeichenGeometrieFeatureRenderer.class);
 
     //~ Methods ----------------------------------------------------------------
 
@@ -62,8 +62,8 @@ public class FlurstueckeFeatureRenderer extends CustomCidsFeatureRenderer {
         if (colorIndex < 0) {
             colorIndex = -colorIndex;
         }
-        colorIndex %= FlurstueckePanel.LANDPARCEL_COLORS.size();
-        return FlurstueckePanel.LANDPARCEL_COLORS.get(colorIndex);
+        colorIndex %= KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.size();
+        return KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.get(colorIndex);
     }
 
     @Override

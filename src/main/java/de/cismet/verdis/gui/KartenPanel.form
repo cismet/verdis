@@ -616,7 +616,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdOrthogonalRectangleActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JToggleButton" name="cmdSearchFlurstueck">
+            <Component class="javax.swing.JToggleButton" name="cmdSearchAlkisLandparcel">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="mainGroup"/>
@@ -642,7 +642,7 @@
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSearchFlurstueckActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSearchAlkisLandparcelActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="cmdSearchKassenzeichen">

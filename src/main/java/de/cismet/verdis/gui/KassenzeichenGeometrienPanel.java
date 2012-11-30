@@ -40,8 +40,6 @@ import edu.umd.cs.piccolox.event.PNotification;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -56,7 +54,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -66,7 +63,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import javax.swing.plaf.basic.BasicListUI;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -85,9 +81,13 @@ import de.cismet.cismap.navigatorplugin.CidsFeature;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 
@@ -96,14 +96,14 @@ import de.cismet.verdis.server.search.AlkisLandparcelSearch;
  *
  * @version  $Revision$, $Date$
  */
-public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStore,
+public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements CidsBeanStore,
     EditModeListener,
     FeatureCollectionListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            FlurstueckePanel.class);
+            KassenzeichenGeometrienPanel.class);
     private static final Color[] COLORS = new Color[] {
             new Color(41, 86, 178),
             new Color(101, 156, 239),
@@ -112,17 +112,18 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             new Color(255, 91, 0)
         };
     public static final List<Color> LANDPARCEL_COLORS = Collections.unmodifiableList(Arrays.asList(COLORS));
-    private static final double LANDPARCEL_GEOM_BUFFER = -0.05;
-    private static int NEW_FLURSTUECK_GEOM_ID = -1;
+    private static final double ALKIS_LANDPARCEL_GEOM_BUFFER = -0.05;
+    private static int NEW_KASSENZEICHEN_GEOMETRIE_ID = -1;
     private static AlkisLandparcelWorker WORKER;
 
     //~ Instance fields --------------------------------------------------------
 
-    private FlurstueckGeomListListener flurstueckGeomListListener = new FlurstueckGeomListListener();
+    private KassenzeichenGeometrieListListener kassenzeichenGeometrieListListener =
+        new KassenzeichenGeometrieListListener();
     private CidsBean kassenzeichenBean;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdAutoCreateGeometries;
-    private javax.swing.JButton cmdRemoveFlurstueckGeom;
+    private javax.swing.JButton cmdRemoveKassenzeichenGeometrien;
     private javax.swing.JButton cmdShowAlkisRenderer;
     private javax.swing.JButton cmdShowAlkisRendererForAll;
     private javax.swing.JButton cmdShowAlkisRendererForSelected;
@@ -136,9 +137,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList lstAlkisLandparcels;
-    private javax.swing.JList lstFlurstueckGeoms;
+    private javax.swing.JList lstKassenzeichenGeometrien;
     private javax.swing.JToggleButton tglShowAlkisLandparcelGeoms;
-    private javax.swing.JToggleButton tglShowFlurstueckGeoms;
+    private javax.swing.JToggleButton tglShowKassenzeichenGeometrien;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -147,9 +148,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     /**
      * Creates new form AllgemeineInfos.
      */
-    public FlurstueckePanel() {
+    public KassenzeichenGeometrienPanel() {
         initComponents();
-        lstFlurstueckGeoms.setCellRenderer(new FlurstueckGeomCellRenderer());
+        lstKassenzeichenGeometrien.setCellRenderer(new KassenzeichenGeometrieCellRenderer());
         lstAlkisLandparcels.setCellRenderer(new AlkisLandparcelListCellRenderer());
         lstAlkisLandparcels.getModel().addListDataListener(new ListDataListener() {
 
@@ -183,7 +184,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        lstFlurstueckGeoms = new javax.swing.JList();
+        lstKassenzeichenGeometrien = new javax.swing.JList();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstAlkisLandparcels = new javax.swing.JList();
         jPanel2 = new javax.swing.JPanel();
@@ -194,9 +195,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         cmdShowAlkisRendererForAll = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        tglShowFlurstueckGeoms = new javax.swing.JToggleButton();
+        tglShowKassenzeichenGeometrien = new javax.swing.JToggleButton();
         jPanel5 = new javax.swing.JPanel();
-        cmdRemoveFlurstueckGeom = new javax.swing.JButton();
+        cmdRemoveKassenzeichenGeometrien = new javax.swing.JButton();
         cmdShowAlkisRenderer = new javax.swing.JButton();
         cmdAutoCreateGeometries = new javax.swing.JButton();
 
@@ -209,35 +210,35 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         jScrollPane1.setOpaque(false);
         jScrollPane1.setPreferredSize(new java.awt.Dimension(258, 150));
 
-        lstFlurstueckGeoms.setBackground(new java.awt.Color(242, 241, 240));
-        lstFlurstueckGeoms.setOpaque(false);
+        lstKassenzeichenGeometrien.setBackground(new java.awt.Color(242, 241, 240));
+        lstKassenzeichenGeometrien.setOpaque(false);
 
         final org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create(
-                "${cidsBean.flurstuecke}");
+                "${cidsBean.kassenzeichen_geometrien}");
         final org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings
                     .createJListBinding(
                         org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                         this,
                         eLProperty,
-                        lstFlurstueckGeoms,
+                        lstKassenzeichenGeometrien,
                         "");
         bindingGroup.addBinding(jListBinding);
 
-        lstFlurstueckGeoms.addMouseListener(new java.awt.event.MouseAdapter() {
+        lstKassenzeichenGeometrien.addMouseListener(new java.awt.event.MouseAdapter() {
 
                 @Override
                 public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                    lstFlurstueckGeomsMouseClicked(evt);
+                    lstKassenzeichenGeometrienMouseClicked(evt);
                 }
             });
-        lstFlurstueckGeoms.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+        lstKassenzeichenGeometrien.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
 
                 @Override
                 public void valueChanged(final javax.swing.event.ListSelectionEvent evt) {
-                    lstFlurstueckGeomsValueChanged(evt);
+                    lstKassenzeichenGeometrienValueChanged(evt);
                 }
             });
-        jScrollPane1.setViewportView(lstFlurstueckGeoms);
+        jScrollPane1.setViewportView(lstKassenzeichenGeometrien);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -252,8 +253,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         lstAlkisLandparcels.setBackground(new java.awt.Color(242, 241, 240));
         lstAlkisLandparcels.setModel(new DefaultListModel());
         lstAlkisLandparcels.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.lstAlkisLandparcels.toolTipText")); // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.lstAlkisLandparcels.toolTipText")); // NOI18N
         lstAlkisLandparcels.setOpaque(false);
         lstAlkisLandparcels.addMouseListener(new java.awt.event.MouseAdapter() {
 
@@ -282,7 +283,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(FlurstueckePanel.class, "FlurstueckePanel.jLabel1.text")); // NOI18N
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -290,13 +293,13 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         jPanel2.add(jLabel1, gridBagConstraints);
 
         cmdShowAlkisRendererForSelected.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));     // NOI18N
         cmdShowAlkisRendererForSelected.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRendererForSelected.text"));                // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRendererForSelected.text"));        // NOI18N
         cmdShowAlkisRendererForSelected.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRendererForSelected.toolTipText"));         // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRendererForSelected.toolTipText")); // NOI18N
         cmdShowAlkisRendererForSelected.setBorderPainted(false);
         cmdShowAlkisRendererForSelected.setContentAreaFilled(false);
         cmdShowAlkisRendererForSelected.setEnabled(false);
@@ -316,8 +319,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         tglShowAlkisLandparcelGeoms.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png")));    // NOI18N
         tglShowAlkisLandparcelGeoms.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.tglShowAlkisLandparcelGeoms.text"));                              // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.tglShowAlkisLandparcelGeoms.text"));                  // NOI18N
         tglShowAlkisLandparcelGeoms.setBorderPainted(false);
         tglShowAlkisLandparcelGeoms.setContentAreaFilled(false);
         tglShowAlkisLandparcelGeoms.setRolloverEnabled(false);
@@ -344,11 +347,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         cmdShowAlkisRendererForAll.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alks.png"))); // NOI18N
         cmdShowAlkisRendererForAll.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRendererForAll.text"));                      // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRendererForAll.text"));          // NOI18N
         cmdShowAlkisRendererForAll.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRendererForAll.toolTipText"));               // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRendererForAll.toolTipText"));   // NOI18N
         cmdShowAlkisRendererForAll.setBorderPainted(false);
         cmdShowAlkisRendererForAll.setContentAreaFilled(false);
         cmdShowAlkisRendererForAll.setEnabled(false);
@@ -372,35 +375,37 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(FlurstueckePanel.class, "FlurstueckePanel.jLabel2.text")); // NOI18N
+        jLabel2.setText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanel3.add(jLabel2, gridBagConstraints);
 
-        tglShowFlurstueckGeoms.setIcon(new javax.swing.ImageIcon(
+        tglShowKassenzeichenGeometrien.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground.png")));    // NOI18N
-        tglShowFlurstueckGeoms.setSelected(true);
-        tglShowFlurstueckGeoms.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.tglShowFlurstueckGeoms.text"));                                   // NOI18N
-        tglShowFlurstueckGeoms.setBorderPainted(false);
-        tglShowFlurstueckGeoms.setContentAreaFilled(false);
-        tglShowFlurstueckGeoms.setRolloverEnabled(false);
-        tglShowFlurstueckGeoms.setSelectedIcon(new javax.swing.ImageIcon(
+        tglShowKassenzeichenGeometrien.setSelected(true);
+        tglShowKassenzeichenGeometrien.setText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.tglShowKassenzeichenGeometrien.text"));               // NOI18N
+        tglShowKassenzeichenGeometrien.setBorderPainted(false);
+        tglShowKassenzeichenGeometrien.setContentAreaFilled(false);
+        tglShowKassenzeichenGeometrien.setRolloverEnabled(false);
+        tglShowKassenzeichenGeometrien.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
-        tglShowFlurstueckGeoms.addActionListener(new java.awt.event.ActionListener() {
+        tglShowKassenzeichenGeometrien.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    tglShowFlurstueckGeomsActionPerformed(evt);
+                    tglShowKassenzeichenGeometrienActionPerformed(evt);
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(tglShowFlurstueckGeoms, gridBagConstraints);
+        jPanel3.add(tglShowKassenzeichenGeometrien, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -408,38 +413,38 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.weightx = 1.0;
         jPanel3.add(jPanel5, gridBagConstraints);
 
-        cmdRemoveFlurstueckGeom.setIcon(new javax.swing.ImageIcon(
+        cmdRemoveKassenzeichenGeometrien.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/removePoly.png"))); // NOI18N
-        cmdRemoveFlurstueckGeom.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdRemoveFlurstueckGeom.text"));                               // NOI18N
-        cmdRemoveFlurstueckGeom.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdRemoveFlurstueckGeom.toolTipText"));                        // NOI18N
-        cmdRemoveFlurstueckGeom.setBorderPainted(false);
-        cmdRemoveFlurstueckGeom.setContentAreaFilled(false);
-        cmdRemoveFlurstueckGeom.setEnabled(false);
-        cmdRemoveFlurstueckGeom.setFocusPainted(false);
-        cmdRemoveFlurstueckGeom.addActionListener(new java.awt.event.ActionListener() {
+        cmdRemoveKassenzeichenGeometrien.setText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdRemoveKassenzeichenGeometrien.text"));          // NOI18N
+        cmdRemoveKassenzeichenGeometrien.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdRemoveKassenzeichenGeometrien.toolTipText"));   // NOI18N
+        cmdRemoveKassenzeichenGeometrien.setBorderPainted(false);
+        cmdRemoveKassenzeichenGeometrien.setContentAreaFilled(false);
+        cmdRemoveKassenzeichenGeometrien.setEnabled(false);
+        cmdRemoveKassenzeichenGeometrien.setFocusPainted(false);
+        cmdRemoveKassenzeichenGeometrien.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdRemoveFlurstueckGeomActionPerformed(evt);
+                    cmdRemoveKassenzeichenGeometrienActionPerformed(evt);
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(cmdRemoveFlurstueckGeom, gridBagConstraints);
+        jPanel3.add(cmdRemoveKassenzeichenGeometrien, gridBagConstraints);
 
         cmdShowAlkisRenderer.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alks.png"))); // NOI18N
         cmdShowAlkisRenderer.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRenderer.text"));                            // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRenderer.text"));                // NOI18N
         cmdShowAlkisRenderer.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdShowAlkisRenderer.toolTipText"));                     // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdShowAlkisRenderer.toolTipText"));         // NOI18N
         cmdShowAlkisRenderer.setBorderPainted(false);
         cmdShowAlkisRenderer.setContentAreaFilled(false);
         cmdShowAlkisRenderer.setEnabled(false);
@@ -457,11 +462,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         jPanel3.add(cmdShowAlkisRenderer, gridBagConstraints);
 
         cmdAutoCreateGeometries.setText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdAutoCreateGeometries.text"));        // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.text"));        // NOI18N
         cmdAutoCreateGeometries.setToolTipText(org.openide.util.NbBundle.getMessage(
-                FlurstueckePanel.class,
-                "FlurstueckePanel.cmdAutoCreateGeometries.toolTipText")); // NOI18N
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.toolTipText")); // NOI18N
         cmdAutoCreateGeometries.setEnabled(false);
         cmdAutoCreateGeometries.addActionListener(new java.awt.event.ActionListener() {
 
@@ -491,8 +496,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      */
     private void refreshLstAlkisLandparcels() {
         final boolean enabled = CidsAppBackend.getInstance().isEditable()
-                    && (lstFlurstueckGeoms.getSelectedIndices().length > 0);
-        cmdRemoveFlurstueckGeom.setEnabled(enabled);
+                    && (lstKassenzeichenGeometrien.getSelectedIndices().length > 0);
+        cmdRemoveKassenzeichenGeometrien.setEnabled(enabled);
 
         final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
 
@@ -516,7 +521,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
             final DefaultListModel alkisLandparcelListModel = (DefaultListModel)lstAlkisLandparcels.getModel();
             alkisLandparcelListModel.clear();
-            final int[] selectedIndices = lstFlurstueckGeoms.getSelectedIndices();
+            final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
             if (selectedIndices.length == 0) {
                 try {
                     featureCollection.removeFeatureCollectionListener(this);
@@ -525,21 +530,21 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     featureCollection.addFeatureCollectionListener(this);
                 }
             } else {
-                alkisLandparcelListModel.addElement("Flurstücke werden geladen...");
+                alkisLandparcelListModel.addElement("Alkis-Flurstücke werden geladen...");
 
-                final Collection<CidsBean> selectedFlurstueckGeomBeans = new ArrayList<CidsBean>();
+                final Collection<CidsBean> selectedKassenzeichenGeometrieBeans = new ArrayList<CidsBean>();
                 final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
                 for (int index = 0; index < selectedIndices.length; ++index) {
                     final int selectedIndex = selectedIndices[index];
-                    final Object listObject = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
+                    final Object listObject = lstKassenzeichenGeometrien.getModel().getElementAt(selectedIndex);
                     if (listObject instanceof CidsBean) {
-                        final CidsBean flurstueckGeomBean = (CidsBean)listObject;
-                        final CidsFeature flurstueckGeomFeature = new CidsFeature(
-                                flurstueckGeomBean.getMetaObject());
+                        final CidsBean kassenzeichenGeometrieGeomBean = (CidsBean)listObject;
+                        final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(
+                                kassenzeichenGeometrieGeomBean.getMetaObject());
 
-                        selectedFlurstueckGeomBeans.add(flurstueckGeomBean);
-                        featuresToSelect.add(flurstueckGeomFeature);
-                        flurstueckGeomFeature.setEditable(CidsAppBackend.getInstance().isEditable());
+                        selectedKassenzeichenGeometrieBeans.add(kassenzeichenGeometrieGeomBean);
+                        featuresToSelect.add(kassenzeichenGeometrieFeature);
+                        kassenzeichenGeometrieFeature.setEditable(CidsAppBackend.getInstance().isEditable());
                     }
                 }
 
@@ -550,7 +555,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     featureCollection.addFeatureCollectionListener(this);
                 }
 
-                WORKER = new AlkisLandparcelWorker(selectedFlurstueckGeomBeans);
+                WORKER = new AlkisLandparcelWorker(selectedKassenzeichenGeometrieBeans);
                 WORKER.execute();
             }
         } catch (Exception ex) {
@@ -563,12 +568,12 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstFlurstueckGeomsValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstFlurstueckGeomsValueChanged
+    private void lstKassenzeichenGeometrienValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstKassenzeichenGeometrienValueChanged
         if (evt.getValueIsAdjusting()) {
             return;
         }
         refreshLstAlkisLandparcels();
-    }                                                                                             //GEN-LAST:event_lstFlurstueckGeomsValueChanged
+    }                                                                                                     //GEN-LAST:event_lstKassenzeichenGeometrienValueChanged
 
     /**
      * DOCUMENT ME!
@@ -648,8 +653,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             final int selectedIndex = selectedIndices[index];
             final Object listObject = lstAlkisLandparcels.getModel().getElementAt(selectedIndex);
             if (listObject instanceof CidsBean) {
-                final CidsBean flurstueckGeomBean = (CidsBean)listObject;
-                coll.add(flurstueckGeomBean.getMetaObject());
+                final CidsBean kassenzeichenGeometrieBean = (CidsBean)listObject;
+                coll.add(kassenzeichenGeometrieBean.getMetaObject());
             }
         }
         Main.getCurrentInstance().showRenderer(coll.toArray(new MetaObject[0]));
@@ -681,36 +686,39 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstFlurstueckGeomsMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lstFlurstueckGeomsMouseClicked
+    private void lstKassenzeichenGeometrienMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lstKassenzeichenGeometrienMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON3) {
-            lstFlurstueckGeoms.clearSelection();
+            lstKassenzeichenGeometrien.clearSelection();
         }
-    }                                                                                  //GEN-LAST:event_lstFlurstueckGeomsMouseClicked
+    }                                                                                          //GEN-LAST:event_lstKassenzeichenGeometrienMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tglShowFlurstueckGeomsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tglShowFlurstueckGeomsActionPerformed
+    private void tglShowKassenzeichenGeometrienActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tglShowKassenzeichenGeometrienActionPerformed
         final Collection<Feature> featuresToShow = new ArrayList<Feature>();
-        if (tglShowFlurstueckGeoms.isSelected()) {
-            for (final CidsBean flurstueckGeomBean : getCidsBean().getBeanCollectionProperty("flurstuecke")) {
-                final CidsFeature flurstueckGeomFeature = new CidsFeature(flurstueckGeomBean.getMetaObject());
-                featuresToShow.add(flurstueckGeomFeature);
+        if (tglShowKassenzeichenGeometrien.isSelected()) {
+            for (final CidsBean kassenzeichenGeometrieBean
+                        : getCidsBean().getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)) {
+                final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(
+                        kassenzeichenGeometrieBean.getMetaObject());
+                featuresToShow.add(kassenzeichenGeometrieFeature);
             }
         }
-        showThisFeatures(featuresToShow, "flurstuecke");
-    }                                                                                          //GEN-LAST:event_tglShowFlurstueckGeomsActionPerformed
+        showThisFeatures(featuresToShow, VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE);
+    }                                                                                                  //GEN-LAST:event_tglShowKassenzeichenGeometrienActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveFlurstueckGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveFlurstueckGeomActionPerformed
-        final int[] selectedIndices = lstFlurstueckGeoms.getSelectedIndices();
-        lstFlurstueckGeoms.clearSelection();
+    private void cmdRemoveKassenzeichenGeometrienActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
+        final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
+        lstKassenzeichenGeometrien.clearSelection();
         final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
 
         int firstSelectedIndex = -1;
@@ -722,25 +730,26 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 firstSelectedIndex = selectedIndex;
             }
 
-            final Object listObject = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
+            final Object listObject = lstKassenzeichenGeometrien.getModel().getElementAt(selectedIndex);
             if (listObject instanceof CidsBean) {
-                final CidsBean flurstueckGeomBean = (CidsBean)listObject;
-                beansToRemove.add(flurstueckGeomBean);
+                final CidsBean kassenzeichenGeometrieBean = (CidsBean)listObject;
+                beansToRemove.add(kassenzeichenGeometrieBean);
             }
         }
 
         for (final CidsBean beanToRemove : beansToRemove) {
-            final CidsFeature flurstueckGeomFeature = new CidsFeature(beanToRemove.getMetaObject());
-            getCidsBean().getBeanCollectionProperty("flurstuecke").remove(beanToRemove);
-            featureCollection.removeFeature(flurstueckGeomFeature);
+            final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
+            getCidsBean().getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+                    .remove(beanToRemove);
+            featureCollection.removeFeature(kassenzeichenGeometrieFeature);
         }
 
-        final int listSize = lstFlurstueckGeoms.getModel().getSize();
+        final int listSize = lstKassenzeichenGeometrien.getModel().getSize();
         if (firstSelectedIndex >= listSize) {
             firstSelectedIndex = listSize - 1;
         }
-        lstFlurstueckGeoms.setSelectedIndex(firstSelectedIndex);
-    } //GEN-LAST:event_cmdRemoveFlurstueckGeomActionPerformed
+        lstKassenzeichenGeometrien.setSelectedIndex(firstSelectedIndex);
+    } //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -773,8 +782,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
 
                 @Override
                 protected Collection<CidsBean> doInBackground() throws Exception {
-                    final Geometry unionGeom = getFlurstueckGeomUnionGeometry(getCidsBean().getBeanCollectionProperty(
-                                "flurstuecke"));
+                    final Geometry unionGeom = getKassenzeichenGeometrieUnionGeom(getCidsBean()
+                                    .getBeanCollectionProperty(
+                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN));
 
                     final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
                     return alkisLandparcelBeans;
@@ -815,7 +825,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                                 : (Collection<CidsBean>)getCidsBean().getBeanCollectionProperty(
                                     KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
                         final Geometry flaecheGeom = (Geometry)flaecheBean.getProperty(
-                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                        + "."
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
                         if (flaecheGeom != null) {
                             if (unionGeom == null) {
                                 unionGeom = (Geometry)flaecheGeom.clone();
@@ -834,7 +848,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                     try {
                         final Collection<CidsBean> alkisLandparcelBeans = get();
 
-                        final Collection<CidsBean> flurstueckGeomBeansToAdd = new ArrayList<CidsBean>();
+                        final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd = new ArrayList<CidsBean>();
                         for (final CidsBean alkisLandparcelBean : alkisLandparcelBeans) {
                             final String bezeichnung = (String)alkisLandparcelBean.getProperty("bezeichnung");
                             final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
@@ -846,15 +860,15 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                                     currentCrs);
                             transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
 
-                            final CidsBean flurstueckGeomBean = createNewFlurstueckGeomBean(
+                            final CidsBean kassenzeichenGeometrieBean = createNewKassenzeichenGeometrieBean(
                                     transformedAlkisLandparcelGeom,
                                     bezeichnung,
                                     false);
-                            flurstueckGeomBeansToAdd.add(flurstueckGeomBean);
+                            kassenzeichenGeometrieBeansToAdd.add(kassenzeichenGeometrieBean);
                         }
-                        addFlurstueckGeomBeans(flurstueckGeomBeansToAdd);
+                        addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeansToAdd);
                     } catch (final Exception ex) {
-                        LOG.error("error while creating flurstueckGeom beans", ex);
+                        LOG.error("error while creating kassenzeichenGeometrie beans", ex);
                     }
                 }
             }.execute();
@@ -871,65 +885,74 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public CidsBean createNewFlurstueckGeomBean(final Geometry geometry,
+    public CidsBean createNewKassenzeichenGeometrieBean(final Geometry geometry,
             final String bezeichnung,
             final boolean istFrei) throws Exception {
-        final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(VerdisConstants.DOMAIN, "geom");
-        geomBean.setProperty("geo_field", geometry);
-
-        final CidsBean flurstueckGeomBean = CidsBean.createNewCidsBeanFromTableName(
+        final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
                 VerdisConstants.DOMAIN,
-                "flurstuecke");
-        flurstueckGeomBean.setProperty("istfrei", istFrei);
-        flurstueckGeomBean.setProperty("geom", geomBean);
-        flurstueckGeomBean.setProperty("text", bezeichnung);
+                VerdisMetaClassConstants.MC_GEOM);
+        geomBean.setProperty(GeomPropertyConstants.PROP__GEO_FIELD, geometry);
 
-        flurstueckGeomBean.getMetaObject().setID(FlurstueckePanel.getNewFlurstueckGeomId());
+        final CidsBean kassenzeichenGeometrieBean = CidsBean.createNewCidsBeanFromTableName(
+                VerdisConstants.DOMAIN,
+                VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE);
+        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ISTFREI, istFrei);
+        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE, geomBean);
+        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__NAME, bezeichnung);
 
-        return flurstueckGeomBean;
+        kassenzeichenGeometrieBean.getMetaObject().setID(KassenzeichenGeometrienPanel.getNewKassenzeichenGeometrieId());
+
+        return kassenzeichenGeometrieBean;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  flurstueckGeomBeanToAdd  DOCUMENT ME!
+     * @param  kassenzeichenGeometrieBeanToAdd  DOCUMENT ME!
      */
-    public void addFlurstueckGeomBean(final CidsBean flurstueckGeomBeanToAdd) {
-        if (flurstueckGeomBeanToAdd != null) {
-            final Collection<CidsBean> flurstueckGeomBeanToAdds = new ArrayList<CidsBean>();
-            flurstueckGeomBeanToAdds.add(flurstueckGeomBeanToAdd);
-            addFlurstueckGeomBeans(flurstueckGeomBeanToAdds);
+    public void addKassenzeichenGeometrieBean(final CidsBean kassenzeichenGeometrieBeanToAdd) {
+        if (kassenzeichenGeometrieBeanToAdd != null) {
+            final Collection<CidsBean> kassenzeichenGeometrieBeanToAdds = new ArrayList<CidsBean>();
+            kassenzeichenGeometrieBeanToAdds.add(kassenzeichenGeometrieBeanToAdd);
+            addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeanToAdds);
         }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  flurstueckGeomBeansToAdd  DOCUMENT ME!
+     * @param  kassenzeichenGeometrieBeansToAdd  DOCUMENT ME!
      */
-    public void addFlurstueckGeomBeans(final Collection<CidsBean> flurstueckGeomBeansToAdd) {
+    public void addKassenzeichenGeometrieBeans(final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd) {
         final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
         final Collection<Feature> featuresToAdd = new ArrayList<Feature>();
         final Collection<CidsBean> beansToAdd = new ArrayList<CidsBean>();
 
-        for (final CidsBean flurstueckGeomBeanToAdd : flurstueckGeomBeansToAdd) {
-            final Geometry flurstueckGeomToAdd = (Geometry)flurstueckGeomBeanToAdd.getProperty("geom.geo_field");
-            final Collection<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+        for (final CidsBean kassenzeichenGeometrieBeanToAdd : kassenzeichenGeometrieBeansToAdd) {
+            final Geometry kassenzeichenGeometrieGeomToAdd = (Geometry)kassenzeichenGeometrieBeanToAdd.getProperty(
+                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            final Collection<CidsBean> kassenzeichenGeometrieBeans = getCidsBean().getBeanCollectionProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
             CidsFeature geomAlreadyInMapFeature = null;
-            for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
-                final Geometry flurstueckGeom = (Geometry)flurstueckGeomBean.getProperty("geom.geo_field");
-                if (flurstueckGeomToAdd.equals(flurstueckGeom)) {
+            for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
+                final Geometry kassenzeichenGeometrieGeom = (Geometry)kassenzeichenGeometrieBean.getProperty(
+                        KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                + "."
+                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                if (kassenzeichenGeometrieGeomToAdd.equals(kassenzeichenGeometrieGeom)) {
                     geomAlreadyInMapFeature = new CidsFeature(
-                            flurstueckGeomBean.getMetaObject());
+                            kassenzeichenGeometrieBean.getMetaObject());
                     break;
                 }
             }
 
             if (geomAlreadyInMapFeature == null) {
-                beansToAdd.add(flurstueckGeomBeanToAdd);
+                beansToAdd.add(kassenzeichenGeometrieBeanToAdd);
 
                 final CidsFeature cidsFeatureToAdd = new CidsFeature(
-                        flurstueckGeomBeanToAdd.getMetaObject());
+                        kassenzeichenGeometrieBeanToAdd.getMetaObject());
                 cidsFeatureToAdd.setEditable(CidsAppBackend.getInstance().isEditable());
                 featuresToAdd.add(cidsFeatureToAdd);
                 featuresToSelect.add(cidsFeatureToAdd);
@@ -938,7 +961,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             }
         }
 
-        getCidsBean().getBeanCollectionProperty("flurstuecke").addAll(beansToAdd);
+        getCidsBean().getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+                .addAll(beansToAdd);
 
         Main.getMappingComponent().getFeatureCollection().addFeatures(featuresToAdd);
         Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
@@ -963,15 +987,17 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     public void setCidsBean(final CidsBean cidsBean) {
         bindingGroup.unbind();
         if (kassenzeichenBean != null) {
-            final ObservableList<CidsBean> flurstueckGeomList = (ObservableList<CidsBean>)
-                kassenzeichenBean.getBeanCollectionProperty("flurstuecke");
-            flurstueckGeomList.removeObservableListListener(flurstueckGeomListListener);
+            final ObservableList<CidsBean> kassenzeichenGeometrieList = (ObservableList<CidsBean>)
+                kassenzeichenBean.getBeanCollectionProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+            kassenzeichenGeometrieList.removeObservableListListener(kassenzeichenGeometrieListListener);
         }
         kassenzeichenBean = cidsBean;
         if (kassenzeichenBean != null) {
-            final ObservableList<CidsBean> flurstueckGeomList = (ObservableList<CidsBean>)
-                kassenzeichenBean.getBeanCollectionProperty("flurstuecke");
-            flurstueckGeomList.addObservableListListener(flurstueckGeomListListener);
+            final ObservableList<CidsBean> kassenzeichenGeometrieList = (ObservableList<CidsBean>)
+                kassenzeichenBean.getBeanCollectionProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+            kassenzeichenGeometrieList.addObservableListListener(kassenzeichenGeometrieListListener);
         }
         bindingGroup.bind();
 
@@ -985,14 +1011,20 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     public void editModeChanged() {
         final boolean isEditable = CidsAppBackend.getInstance().isEditable();
         setEnabled(isEditable);
-        cmdRemoveFlurstueckGeom.setEnabled(isEditable && (lstFlurstueckGeoms.getSelectedIndices().length > 0));
+        cmdRemoveKassenzeichenGeometrien.setEnabled(isEditable
+                    && (lstKassenzeichenGeometrien.getSelectedIndices().length > 0));
 
         boolean hasFlaecheGeoms = false;
         if (getCidsBean() != null) {
             for (final CidsBean flaecheBean
                         : (Collection<CidsBean>)getCidsBean().getBeanCollectionProperty(
                             KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-                if (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null) {
+                if (
+                    flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE)
+                            != null) {
                     hasFlaecheGeoms = true;
                     break;
                 }
@@ -1024,8 +1056,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             if (addedFeature instanceof CidsFeature) {
                 final CidsFeature addedCidsFeature = (CidsFeature)addedFeature;
                 final String addedMCName = addedCidsFeature.getMetaClass().getTableName();
-                if (addedMCName.equalsIgnoreCase("flurstuecke")) {
-                    final boolean show = tglShowFlurstueckGeoms.isSelected();
+                if (addedMCName.equalsIgnoreCase(VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE)) {
+                    final boolean show = tglShowKassenzeichenGeometrien.isSelected();
                     CidsAppBackend.getInstance().getMainMap().getPFeatureHM().get(addedCidsFeature).setVisible(show);
                 }
             }
@@ -1049,13 +1081,14 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     @Override
     public void featuresRemoved(final FeatureCollectionEvent fce) {
         if (getCidsBean() != null) {
-            final Collection<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+            final Collection<CidsBean> kassenzeichenGeometrieBeans = getCidsBean().getBeanCollectionProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
             final Collection<Feature> removedFeatures = fce.getEventFeatures();
             for (final Feature feature : removedFeatures) {
                 if (feature instanceof CidsFeature) {
                     final CidsFeature cidsFeature = (CidsFeature)feature;
                     final CidsBean toRemoveBean = cidsFeature.getMetaObject().getBean();
-                    flurstueckGeomBeans.remove(toRemoveBean);
+                    kassenzeichenGeometrieBeans.remove(toRemoveBean);
                 }
             }
         }
@@ -1075,24 +1108,33 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 if (changedFeature instanceof CidsFeature) {
                     final CidsFeature changedCidsFeature = (CidsFeature)changedFeature;
                     if (changedCidsFeature.getMetaObject().getMetaClass().getTableName().equalsIgnoreCase(
-                                    "flurstuecke")) {
+                                    VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE)) {
                         try {
-                            final CidsBean flurstueckGeomBean = changedCidsFeature.getMetaObject().getBean();
-                            final String alterText = (String)flurstueckGeomBean.getProperty("text");
-                            final Boolean alterIstFrei = (Boolean)flurstueckGeomBean.getProperty("istfrei");
-                            flurstueckGeomBean.setProperty("istfrei", true);
+                            final CidsBean kassenzeichenGeometrieBean = changedCidsFeature.getMetaObject().getBean();
+                            final String alterText = (String)kassenzeichenGeometrieBean.getProperty(
+                                    KassenzeichenGeometriePropertyConstants.PROP__NAME);
+                            final Boolean alterIstFrei = (Boolean)kassenzeichenGeometrieBean.getProperty(
+                                    KassenzeichenGeometriePropertyConstants.PROP__ISTFREI);
+                            kassenzeichenGeometrieBean.setProperty(
+                                KassenzeichenGeometriePropertyConstants.PROP__ISTFREI,
+                                true);
                             if (!alterIstFrei) {
-                                flurstueckGeomBean.setProperty("text", "freie Geometrie (" + alterText + ")");
+                                kassenzeichenGeometrieBean.setProperty(
+                                    KassenzeichenGeometriePropertyConstants.PROP__NAME,
+                                    "freie Geometrie ("
+                                            + alterText
+                                            + ")");
                             }
 
                             if (!refreshNeeded) {
-                                final int[] selectedIndices = lstFlurstueckGeoms.getSelectedIndices();
+                                final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
                                 for (int index = 0; index < selectedIndices.length; index++) {
                                     final int selectedIndex = selectedIndices[index];
-                                    final Object lstItem = lstFlurstueckGeoms.getModel().getElementAt(selectedIndex);
+                                    final Object lstItem = lstKassenzeichenGeometrien.getModel()
+                                                .getElementAt(selectedIndex);
                                     if (lstItem instanceof CidsBean) {
-                                        final CidsBean selectedFlurstueckGeomBean = (CidsBean)lstItem;
-                                        if (selectedFlurstueckGeomBean.equals(flurstueckGeomBean)) {
+                                        final CidsBean selectedKassenzeichenGeometrieBean = (CidsBean)lstItem;
+                                        if (selectedKassenzeichenGeometrieBean.equals(kassenzeichenGeometrieBean)) {
                                             refreshNeeded = true;
                                         }
                                     }
@@ -1108,7 +1150,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 }
             }
         }
-        lstFlurstueckGeoms.repaint();
+        lstKassenzeichenGeometrien.repaint();
     }
 
     /**
@@ -1124,14 +1166,15 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
 
         final Collection<Feature> selectedFeatures = featureCollection.getSelectedFeatures();
-        final List<CidsBean> flurstueckGeomBeans = getCidsBean().getBeanCollectionProperty("flurstuecke");
+        final List<CidsBean> kassenzeichenGeometrieBeans = getCidsBean().getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
 
         final List<Integer> indicesToSelect = new ArrayList<Integer>();
         if (selectedFeatures != null) {
             for (final Feature selectedFeature : selectedFeatures) {
                 if (selectedFeature instanceof CidsFeature) {
                     final CidsFeature selectedCidsFeature = (CidsFeature)selectedFeature;
-                    final int indexToSelect = flurstueckGeomBeans.indexOf(selectedCidsFeature.getMetaObject()
+                    final int indexToSelect = kassenzeichenGeometrieBeans.indexOf(selectedCidsFeature.getMetaObject()
                                     .getBean());
                     if (indexToSelect >= 0) {
                         indicesToSelect.add(indexToSelect);
@@ -1144,7 +1187,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             indicesArr[index] = indicesToSelect.get(index);
         }
 
-        lstFlurstueckGeoms.setSelectedIndices(indicesArr);
+        lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
     }
 
     /**
@@ -1177,10 +1220,11 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                 try {
                     final Geometry geometry = pFeatureToAttach.getFeature().getGeometry();
 
-                    final CidsBean flurstueckGeomBean = createNewFlurstueckGeomBean(geometry,
+                    final CidsBean kassenzeichenGeometrieBean = createNewKassenzeichenGeometrieBean(
+                            geometry,
                             "freie Geometrie",
                             true);
-                    addFlurstueckGeomBean(flurstueckGeomBean);
+                    addKassenzeichenGeometrieBean(kassenzeichenGeometrieBean);
                     Main.getMappingComponent().getFeatureCollection().removeFeature(pFeatureToAttach.getFeature());
                 } catch (Exception ex) {
                     LOG.error("error while attaching feature", ex);
@@ -1198,22 +1242,25 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @return  DOCUMENT ME!
      */
-    public static int getNewFlurstueckGeomId() {
-        return NEW_FLURSTUECK_GEOM_ID--;
+    public static int getNewKassenzeichenGeometrieId() {
+        return NEW_KASSENZEICHEN_GEOMETRIE_ID--;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   flurstueckGeomBeans  DOCUMENT ME!
+     * @param   kassenzeichenGeometrieBeans  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private Geometry getFlurstueckGeomUnionGeometry(final Collection<CidsBean> flurstueckGeomBeans) {
+    private Geometry getKassenzeichenGeometrieUnionGeom(final Collection<CidsBean> kassenzeichenGeometrieBeans) {
         Geometry unionGeom = null;
-        for (final CidsBean flurstueckGeomBean : flurstueckGeomBeans) {
-            final Geometry geom = (Geometry)((CidsBean)flurstueckGeomBean.getProperty("geom")).getProperty("geo_field");
-            final Geometry bufferedGeom = geom.buffer(LANDPARCEL_GEOM_BUFFER);
+        for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
+            final Geometry geom = (Geometry)kassenzeichenGeometrieBean.getProperty(
+                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            final Geometry bufferedGeom = geom.buffer(ALKIS_LANDPARCEL_GEOM_BUFFER);
             if (unionGeom == null) {
                 unionGeom = (Geometry)bufferedGeom;
             } else {
@@ -1228,7 +1275,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
     /**
      * DOCUMENT ME!
      *
-     * @param   geometry  flurstueckGeomBeans DOCUMENT ME!
+     * @param   geometry  geometry DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -1284,7 +1331,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      * DOCUMENT ME!
      */
     private void refreshCmdShowAlkisRendererVisibility() {
-        final int size = lstFlurstueckGeoms.getModel().getSize();
+        final int size = lstKassenzeichenGeometrien.getModel().getSize();
         cmdShowAlkisRenderer.setEnabled(size > 0);
     }
 
@@ -1351,23 +1398,23 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         index,
                         isSelected,
                         cellHasFocus);
-                final List<CidsBean> flurstueckGeomBeans;
+                final List<CidsBean> kassenzeichenGeometrieBeans;
                 if (WORKER == null) {
-                    flurstueckGeomBeans = null;
+                    kassenzeichenGeometrieBeans = null;
                 } else {
-                    flurstueckGeomBeans = WORKER.getAlkisLandparcelToFlurstueckGeomMap().get(bean);
+                    kassenzeichenGeometrieBeans = WORKER.getAlkisLandparcelToKassenzeichenGeometrieMap().get(bean);
                 }
                 final Color color;
-                if ((flurstueckGeomBeans == null) || flurstueckGeomBeans.isEmpty()) {
+                if ((kassenzeichenGeometrieBeans == null) || kassenzeichenGeometrieBeans.isEmpty()) {
                     color = null;
-                } else if (flurstueckGeomBeans.size() > 1) {
+                } else if (kassenzeichenGeometrieBeans.size() > 1) {
                     color = Color.GRAY;
                 } else {
-                    int colorIndex = flurstueckGeomBeans.get(0).getMetaObject().getId();
+                    int colorIndex = kassenzeichenGeometrieBeans.get(0).getMetaObject().getId();
                     if (colorIndex < 0) {
                         colorIndex = -colorIndex;
                     }
-                    colorIndex %= FlurstueckePanel.LANDPARCEL_COLORS.size();
+                    colorIndex %= KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.size();
 
                     color = LANDPARCEL_COLORS.get(colorIndex);
                 }
@@ -1406,7 +1453,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @version  $Revision$, $Date$
      */
-    private static final class FlurstueckGeomCellRenderer extends DefaultListCellRenderer {
+    private static final class KassenzeichenGeometrieCellRenderer extends DefaultListCellRenderer {
 
         //~ Static fields/initializers -----------------------------------------
 
@@ -1422,7 +1469,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         /**
          * Creates a new FancyListCellRenderer object.
          */
-        public FlurstueckGeomCellRenderer() {
+        public KassenzeichenGeometrieCellRenderer() {
             setOpaque(false);
         }
 
@@ -1448,7 +1495,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             final CidsBean bean = (CidsBean)value;
             final Component comp = super.getListCellRendererComponent(
                     list,
-                    bean.getProperty("text"),
+                    bean.getProperty(KassenzeichenGeometriePropertyConstants.PROP__NAME),
                     index,
                     isSelected,
                     cellHasFocus);
@@ -1457,7 +1504,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
             if (colorIndex < 0) {
                 colorIndex = -colorIndex;
             }
-            colorIndex %= FlurstueckePanel.LANDPARCEL_COLORS.size();
+            colorIndex %= KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.size();
 
             setBackground(LANDPARCEL_COLORS.get(colorIndex));
             setBorder(BorderFactory.createEmptyBorder(1, (2 * SPACING) + MARKER_WIDTH, 1, 0));
@@ -1496,8 +1543,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         private final FeatureCollection featureCollection = CidsAppBackend.getInstance()
                     .getMainMap()
                     .getFeatureCollection();
-        private final Collection<CidsBean> flurstueckGeomBeans;
-        private final Map<CidsBean, List<CidsBean>> alkisLandparcelToFlurstueckGeomMap =
+        private final Collection<CidsBean> kassenzeichenGeometrieBeans;
+        private final Map<CidsBean, List<CidsBean>> alkisLandparcelToKassenzeichenGeometrieMap =
             new HashMap<CidsBean, List<CidsBean>>();
 
         //~ Constructors -------------------------------------------------------
@@ -1505,10 +1552,10 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
         /**
          * Creates a new AlkisLandparcelWorker object.
          *
-         * @param  flurstueckGeomBeans  serverSearch DOCUMENT ME!
+         * @param  kassenzeichenGeometrieBeans  serverSearch DOCUMENT ME!
          */
-        public AlkisLandparcelWorker(final Collection<CidsBean> flurstueckGeomBeans) {
-            this.flurstueckGeomBeans = flurstueckGeomBeans;
+        public AlkisLandparcelWorker(final Collection<CidsBean> kassenzeichenGeometrieBeans) {
+            this.kassenzeichenGeometrieBeans = kassenzeichenGeometrieBeans;
         }
 
         //~ Methods ------------------------------------------------------------
@@ -1522,27 +1569,29 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
          */
         @Override
         protected Collection<CidsBean> doInBackground() throws Exception {
-            final Geometry unionGeom = getFlurstueckGeomUnionGeometry(flurstueckGeomBeans);
+            final Geometry unionGeom = getKassenzeichenGeometrieUnionGeom(kassenzeichenGeometrieBeans);
             final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
             if (alkisLandparcelBeans != null) {
                 for (final CidsBean alkisLandparcelBean : alkisLandparcelBeans) {
-                    final List<CidsBean> assignedFlurstueckGeomBeans;
-                    if (alkisLandparcelToFlurstueckGeomMap.get(alkisLandparcelBean)
+                    final List<CidsBean> assignedKassenzeichenGeometrieBeans;
+                    if (alkisLandparcelToKassenzeichenGeometrieMap.get(alkisLandparcelBean)
                                 == null) {
-                        assignedFlurstueckGeomBeans = new ArrayList<CidsBean>();
-                        alkisLandparcelToFlurstueckGeomMap.put(
+                        assignedKassenzeichenGeometrieBeans = new ArrayList<CidsBean>();
+                        alkisLandparcelToKassenzeichenGeometrieMap.put(
                             alkisLandparcelBean,
-                            assignedFlurstueckGeomBeans);
+                            assignedKassenzeichenGeometrieBeans);
                     } else {
-                        assignedFlurstueckGeomBeans = alkisLandparcelToFlurstueckGeomMap.get(
+                        assignedKassenzeichenGeometrieBeans = alkisLandparcelToKassenzeichenGeometrieMap.get(
                                 alkisLandparcelBean);
                     }
 
-                    final List<CidsBean> allFlurstueckGeomBeans = getCidsBean().getBeanCollectionProperty(
-                            "flurstuecke");
-                    for (final CidsBean flurstueckGeomBean : allFlurstueckGeomBeans) {
-                        final Geometry flurstueckGeom = (Geometry)flurstueckGeomBean.getProperty(
-                                "geom.geo_field");
+                    final List<CidsBean> kassenzeichenGeometrieBeans = getCidsBean().getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
+                        final Geometry kassenzeichenGeometrieGeom = (Geometry)kassenzeichenGeometrieBean.getProperty(
+                                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                        + "."
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
 
                         final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
                                 "geometrie.geo_field");
@@ -1554,9 +1603,9 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                         transformedAlkisLandparcelGeom.setSRID(CrsTransformer.getCurrentSrid());
                         alkisLandparcelBean.setProperty("geometrie.geo_field", transformedAlkisLandparcelGeom);
 
-                        if (transformedAlkisLandparcelGeom.buffer(LANDPARCEL_GEOM_BUFFER).intersects(
-                                        flurstueckGeom)) {
-                            assignedFlurstueckGeomBeans.add(flurstueckGeomBean);
+                        if (transformedAlkisLandparcelGeom.buffer(ALKIS_LANDPARCEL_GEOM_BUFFER).intersects(
+                                        kassenzeichenGeometrieGeom)) {
+                            assignedKassenzeichenGeometrieBeans.add(kassenzeichenGeometrieBean);
                         }
                     }
                 }
@@ -1583,10 +1632,10 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
                             alkisLandparcelListModel.addElement(alkisLandparcelBean);
                             try {
                                 featureCollection.removeFeatureCollectionListener(
-                                    FlurstueckePanel.this);
+                                    KassenzeichenGeometrienPanel.this);
                                 featureCollection.addFeature(alkisLandparcelFeature);
                             } finally {
-                                featureCollection.addFeatureCollectionListener(FlurstueckePanel.this);
+                                featureCollection.addFeatureCollectionListener(KassenzeichenGeometrienPanel.this);
                             }
                             alkisLandparcelFeature.setEditable(false);
                             CidsAppBackend.getInstance()
@@ -1607,8 +1656,8 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
          *
          * @return  DOCUMENT ME!
          */
-        public Map<CidsBean, List<CidsBean>> getAlkisLandparcelToFlurstueckGeomMap() {
-            return alkisLandparcelToFlurstueckGeomMap;
+        public Map<CidsBean, List<CidsBean>> getAlkisLandparcelToKassenzeichenGeometrieMap() {
+            return alkisLandparcelToKassenzeichenGeometrieMap;
         }
     }
 
@@ -1617,7 +1666,7 @@ public class FlurstueckePanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @version  $Revision$, $Date$
      */
-    class FlurstueckGeomListListener implements ObservableListListener {
+    class KassenzeichenGeometrieListListener implements ObservableListListener {
 
         //~ Methods ------------------------------------------------------------
 

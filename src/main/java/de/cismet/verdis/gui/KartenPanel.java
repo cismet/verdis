@@ -291,7 +291,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdRemoveHandle;
     private javax.swing.JToggleButton cmdRemovePolygon;
     private javax.swing.JToggleButton cmdRotatePolygon;
-    private javax.swing.JToggleButton cmdSearchFlurstueck;
+    private javax.swing.JToggleButton cmdSearchAlkisLandparcel;
     private javax.swing.JButton cmdSearchKassenzeichen;
     private javax.swing.JToggleButton cmdSelect;
     private javax.swing.JToggleButton cmdSnap;
@@ -461,7 +461,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdNewLinestring = new javax.swing.JToggleButton();
         cmdNewPoint = new javax.swing.JToggleButton();
         cmdOrthogonalRectangle = new javax.swing.JToggleButton();
-        cmdSearchFlurstueck = new javax.swing.JToggleButton();
+        cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
         cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(
                 Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER,
                 mappingComp,
@@ -913,28 +913,28 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdOrthogonalRectangle);
 
-        mainGroup.add(cmdSearchFlurstueck);
-        cmdSearchFlurstueck.setIcon(new javax.swing.ImageIcon(
+        mainGroup.add(cmdSearchAlkisLandparcel);
+        cmdSearchAlkisLandparcel.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
-        cmdSearchFlurstueck.setToolTipText("Alkis Renderer");
-        cmdSearchFlurstueck.setBorderPainted(false);
-        cmdSearchFlurstueck.setContentAreaFilled(false);
-        cmdSearchFlurstueck.setFocusPainted(false);
-        cmdSearchFlurstueck.setFocusable(false);
-        cmdSearchFlurstueck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchFlurstueck.setMaximumSize(new java.awt.Dimension(28, 20));
-        cmdSearchFlurstueck.setPreferredSize(new java.awt.Dimension(28, 20));
-        cmdSearchFlurstueck.setSelectedIcon(new javax.swing.ImageIcon(
+        cmdSearchAlkisLandparcel.setToolTipText("Alkis Renderer");
+        cmdSearchAlkisLandparcel.setBorderPainted(false);
+        cmdSearchAlkisLandparcel.setContentAreaFilled(false);
+        cmdSearchAlkisLandparcel.setFocusPainted(false);
+        cmdSearchAlkisLandparcel.setFocusable(false);
+        cmdSearchAlkisLandparcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchAlkisLandparcel.setMaximumSize(new java.awt.Dimension(28, 20));
+        cmdSearchAlkisLandparcel.setPreferredSize(new java.awt.Dimension(28, 20));
+        cmdSearchAlkisLandparcel.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
-        cmdSearchFlurstueck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSearchFlurstueck.addActionListener(new java.awt.event.ActionListener() {
+        cmdSearchAlkisLandparcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchAlkisLandparcel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSearchFlurstueckActionPerformed(evt);
+                    cmdSearchAlkisLandparcelActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdSearchFlurstueck);
+        tobVerdis.add(cmdSearchAlkisLandparcel);
 
         cmdSearchKassenzeichen.setAction(searchAction);
         cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(
@@ -1509,9 +1509,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSearchFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchFlurstueckActionPerformed
-        mappingComp.setInteractionMode(Main.FLURSTUECK_SEARCH_GEOMETRY_LISTENER);
-    }                                                                                       //GEN-LAST:event_cmdSearchFlurstueckActionPerformed
+    private void cmdSearchAlkisLandparcelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchAlkisLandparcelActionPerformed
+        mappingComp.setInteractionMode(Main.ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER);
+    }                                                                                            //GEN-LAST:event_cmdSearchAlkisLandparcelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1538,7 +1538,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void cmdCreateLandparcelGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCreateLandparcelGeomActionPerformed
         isAssignLandparcel = cmdCreateLandparcelGeom.isSelected();
         if (isAssignLandparcel) {
-            mappingComp.setInteractionMode(Main.FLURSTUECK_ASSIGN_GEOMETRY_LISTENER);
+            mappingComp.setInteractionMode(Main.KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER);
         }
     }                                                                                           //GEN-LAST:event_cmdCreateLandparcelGeomActionPerformed
 
@@ -1819,10 +1819,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     final int kassenzeichenNummer = (Integer)getCidsBean().getProperty(
                             KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
                     final String bezeichnung = (String)cb.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
 
                     final String anschlussGrad = (String)cb.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__GRAD);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                    + "."
+                                    + AnschlussgradPropertyConstants.PROP__GRAD);
 
                     lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + bezeichnung
                                 + " - " + anschlussGrad);
@@ -1895,14 +1899,30 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                     final CidsBean cbTwo = cfTwo.getMetaObject().getBean();
 
                                     final int artOne = (Integer)cbOne.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                    + "."
+                                                    + FlaechenartPropertyConstants.PROP__ID);
                                     final int artTwo = (Integer)cbTwo.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                    + "."
+                                                    + FlaechenartPropertyConstants.PROP__ID);
 
                                     final int gradOne = (Integer)cbOne.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                    + "."
+                                                    + AnschlussgradPropertyConstants.PROP__ID);
                                     final int gradTwo = (Integer)cbTwo.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ANSCHLUSSGRAD__ID);
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                    + "."
+                                                    + AnschlussgradPropertyConstants.PROP__ID);
 
                                     if ((artOne != artTwo) || (gradOne != gradTwo)) {
                                         JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
@@ -1914,9 +1934,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                     }
 
                                     final Integer anteilOne = (Integer)cbOne.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                                            FlaechePropertyConstants.PROP__ANTEIL);
                                     final Integer anteilTwo = (Integer)cbTwo.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                                            FlaechePropertyConstants.PROP__ANTEIL);
 
                                     // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
                                     if ((anteilOne != null) || (anteilTwo != null)) {
@@ -1931,38 +1951,40 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                     Main.getCurrentInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
 
                                     cbOne.setProperty(
-                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                + "."
+                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
                                         new Integer((int)(newGeom.getArea())));
 
                                     final String bemerkungOne = (String)cbOne.getProperty(
-                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
+                                            FlaechePropertyConstants.PROP__BEMERKUNG);
 
                                     if ((bemerkungOne != null) && (bemerkungOne.trim().length() > 0)) {
                                         cbOne.setProperty(
-                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG,
+                                            FlaechePropertyConstants.PROP__BEMERKUNG,
                                             bemerkungOne
                                                     + "\n");
                                     }
                                     cbOne.setProperty(
-                                        RegenFlaechenPropertyConstants.PROP__BEMERKUNG,
+                                        FlaechePropertyConstants.PROP__BEMERKUNG,
                                         getJoinBackupString(cbTwo));
 
                                     final boolean sperreOne = (cbOne.getProperty(
-                                                RegenFlaechenPropertyConstants.PROP__SPERRE) != null)
+                                                FlaechePropertyConstants.PROP__SPERRE) != null)
                                                 && (Boolean)cbOne.getProperty(
-                                                    RegenFlaechenPropertyConstants.PROP__SPERRE);
+                                                    FlaechePropertyConstants.PROP__SPERRE);
                                     final boolean sperreTwo = (cbTwo.getProperty(
-                                                RegenFlaechenPropertyConstants.PROP__SPERRE) != null)
+                                                FlaechePropertyConstants.PROP__SPERRE) != null)
                                                 && (Boolean)cbTwo.getProperty(
-                                                    RegenFlaechenPropertyConstants.PROP__SPERRE);
+                                                    FlaechePropertyConstants.PROP__SPERRE);
 
                                     if (!sperreOne && sperreTwo) {
-                                        cbOne.setProperty(RegenFlaechenPropertyConstants.PROP__SPERRE, true);
+                                        cbOne.setProperty(FlaechePropertyConstants.PROP__SPERRE, true);
                                         cbOne.setProperty(
-                                            RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
                                             "JOIN::"
                                                     + cbTwo.getProperty(
-                                                        RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE));
+                                                        FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE));
                                     }
                                 }
                                 if (one.getFeature() instanceof CidsFeature) {
@@ -1972,7 +1994,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                     // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
                                     RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
                                     cbOne.setProperty(
-                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                + "."
+                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
                                         (int)newGeom.getArea());
                                 }
                                 if (LOG.isDebugEnabled()) {
@@ -2016,21 +2040,25 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     private static String getJoinBackupString(final CidsBean flaecheBean) {
         final String bezeichnung = (String)flaecheBean.getProperty(
-                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
         final String gr_grafik = Integer.toString((Integer)flaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK));
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK));
         final String gr_korrektur = Integer.toString((Integer)flaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR));
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR));
         final String erfassungsdatum =
             ((Date)flaecheBean.getProperty(KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG)).toString();
         final String veranlagungsdatum = (String)flaecheBean.getProperty(
-                RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG);
-        final String sperre = Boolean.toString((flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE)
-                            != null) && (Boolean)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__SPERRE));
+                FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG);
+        final String sperre = Boolean.toString((flaecheBean.getProperty(FlaechePropertyConstants.PROP__SPERRE)
+                            != null) && (Boolean)flaecheBean.getProperty(FlaechePropertyConstants.PROP__SPERRE));
         final String bem_sperre = (String)flaecheBean.getProperty(
-                RegenFlaechenPropertyConstants.PROP__BEMERKUNG_SPERRE);
-        final String feb_id = (String)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FEB_ID);
-        final String bemerkung = (String)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG);
+                FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE);
+        final String feb_id = (String)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FEB_ID);
+        final String bemerkung = (String)flaecheBean.getProperty(FlaechePropertyConstants.PROP__BEMERKUNG);
 
         String ret = "<JOIN ";
         ret += "bez=\"" + bezeichnung
@@ -2069,10 +2097,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (cidsBean != null) {
             switch (CidsAppBackend.getInstance().getMode()) {
                 case ALLGEMEIN: {
-                    final List<CidsBean> flurstueckGeometrien = (List<CidsBean>)cidsBean.getProperty("flurstuecke");
-                    for (final CidsBean flurstueckGeometrie : flurstueckGeometrien) {
-                        final Feature add = new BeanUpdatingCidsFeature(flurstueckGeometrie,
-                                "geom.geo_field");
+                    final Collection<CidsBean> kassenzeichenGeometrieBeans = cidsBean.getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
+                        final Feature add = new BeanUpdatingCidsFeature(
+                                kassenzeichenGeometrieBean,
+                                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                        + "."
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
@@ -2084,7 +2116,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     for (final CidsBean flaeche : flaechen) {
                         final Feature add = new BeanUpdatingCidsFeature(
                                 flaeche,
-                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                        + "."
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
@@ -2096,7 +2132,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     for (final CidsBean front : fronten) {
                         final Feature add = new BeanUpdatingCidsFeature(
                                 front,
-                                FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+                                FrontinfoPropertyConstants.PROP__GEOMETRIE
+                                        + "."
+                                        + GeomPropertyConstants.PROP__GEO_FIELD);
                         add.setEditable(editable);
                         featureCollection.addFeature(add);
                     }
@@ -2219,7 +2257,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 try {
                     final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
-                    cb.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, null);
+                    cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                        null);
                 } catch (Exception ex) {
                     LOG.error("error while removing feature", ex);
                 }
@@ -2245,7 +2285,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
                     try {
-                        cb.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, null);
+                        cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                            null);
                     } catch (Exception ex) {
                         LOG.error("error while removing geometry", ex);
                     }

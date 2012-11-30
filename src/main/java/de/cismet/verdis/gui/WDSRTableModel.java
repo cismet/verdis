@@ -26,6 +26,8 @@ package de.cismet.verdis.gui;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -96,7 +98,8 @@ public class WDSRTableModel extends CidsBeanTableModel {
                         FrontinfoPropertyConstants.PROP__LAGE_SR);
                 final String srKey;
                 if (satzung_strassenreinigung == null) {
-                    srKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY);
+                    srKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                    + StrassenreinigungPropertyConstants.PROP__KEY);
                 } else {
                     srKey = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
                 }
@@ -111,7 +114,8 @@ public class WDSRTableModel extends CidsBeanTableModel {
                         FrontinfoPropertyConstants.PROP__LAGE_WD);
                 final String wdKey;
                 if (satzung_winterdienst == null) {
-                    wdKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY);
+                    wdKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                                    + WinterdienstPropertyConstants.PROP__KEY);
                 } else {
                     wdKey = (String)satzung_winterdienst.getProperty("wd_prio.key");
                 }
