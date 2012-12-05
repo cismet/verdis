@@ -31,6 +31,7 @@ import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
 
+import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -142,10 +143,19 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.FlaechenClipboardListener;
 
+import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.VeranlagungPropertyConstants;
+import de.cismet.verdis.commons.constants.VeranlagungsgrundlagePropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
@@ -211,6 +221,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private static JFrame SPLASH;
 
     //~ Instance fields --------------------------------------------------------
+
+    private final Collection<String> veranlagungsgrundlageBezeichners = new ArrayList<String>();
+    private final Collection<String> winterdienstBezeichners = new ArrayList<String>();
+    private final Collection<String> strassenreinigungBezeichners = new ArrayList<String>();
+    private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<String, CidsBean>();
+    private final Map<String, CidsBean> winterdienstMap = new HashMap<String, CidsBean>();
+    private final Map<String, CidsBean> strassenreinigungMap = new HashMap<String, CidsBean>();
+//    private final Map<String, Double> veranlagungSchluesselSummeMap = new HashMap<String, Double>();
+    private final Map<String, Double> veranlagungSummeMap = new HashMap<String, Double>();
+//    private final Map<String, Integer> strassenreinigungSummeMap = new HashMap<String, Integer>();
+//    private final Map<String, Integer> winterdienstSummeMap = new HashMap<String, Integer>();
 
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
@@ -1042,6 +1063,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         setPostgisFlaechenSnappable(true);
 
         initGeomServerSearches();
+
+        initVeranlagung();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -4206,7 +4229,142 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void storeChanges() {
-        storeChanges(false);
+        final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
+        fillVeranlagungSummeMap(newVeranlagungSummeMap);
+
+        final Date datumJetzt = new Date();
+        final Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(datumJetzt);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.add(Calendar.MONTH, 1);
+        final Date datumVeranlagung = cal.getTime();
+
+        final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
+        assessmentDialog.setDatum(datumJetzt);
+        assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
+        final Collection<String> veranlagungBezeichners = new ArrayList<String>();
+        veranlagungBezeichners.addAll(veranlagungsgrundlageBezeichners);
+        veranlagungBezeichners.addAll(strassenreinigungBezeichners);
+        veranlagungBezeichners.addAll(winterdienstBezeichners);
+        assessmentDialog.setBezeichners(veranlagungBezeichners);
+        assessmentDialog.setOldSchluesselSummeMap(veranlagungSummeMap);
+        assessmentDialog.setNewSchluesselSummeMap(newVeranlagungSummeMap);
+        StaticSwingTools.showDialog(assessmentDialog, true);
+
+        final int returnType = assessmentDialog.getReturnType();
+        if (returnType != AssessmentDialog.RETURN_CANCEL) {
+            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                try {
+                    final MetaObject veranlagungMo = CidsAppBackend.getInstance()
+                                .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
+                                .getEmptyInstance();
+                    final CidsBean veranlagungBean = veranlagungMo.getBean();
+                    veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__DATUM,
+                        new java.sql.Date(assessmentDialog.getDatum().getTime()));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+                        new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G_200,
+                        newVeranlagungSummeMap.get("null--200"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G_100,
+                        newVeranlagungSummeMap.get("null--100"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G305,
+                        newVeranlagungSummeMap.get("A1-305"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G305,
+                        newVeranlagungSummeMap.get("Z1-306"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G310,
+                        newVeranlagungSummeMap.get("A1V-310"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G311,
+                        newVeranlagungSummeMap.get("Z1V-311"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G315,
+                        newVeranlagungSummeMap.get("A2-315"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G320,
+                        newVeranlagungSummeMap.get("A2V-320"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G321,
+                        newVeranlagungSummeMap.get("A3-321"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G322,
+                        newVeranlagungSummeMap.get("A3V-322"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G325,
+                        newVeranlagungSummeMap.get("B1-325"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G330,
+                        newVeranlagungSummeMap.get("B1V-330"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G335,
+                        newVeranlagungSummeMap.get("B2-335"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G340,
+                        newVeranlagungSummeMap.get("B2V-340"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G345,
+                        newVeranlagungSummeMap.get("D1-345"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G350,
+                        newVeranlagungSummeMap.get("D2-350"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G361,
+                        newVeranlagungSummeMap.get("P1-361"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G362,
+                        newVeranlagungSummeMap.get("P2-362"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G710,
+                        newVeranlagungSummeMap.get("710-DF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G715,
+                        newVeranlagungSummeMap.get("715-GDF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G720,
+                        newVeranlagungSummeMap.get("720-VF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G725,
+                        newVeranlagungSummeMap.get("725-VFÖ"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G730,
+                        newVeranlagungSummeMap.get("730-Va-über"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G740,
+                        newVeranlagungSummeMap.get("740-VFS"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G999,
+                        newVeranlagungSummeMap.get("999-Rest"));
+
+                    veranlagungBean.persist();
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
+                } catch (Exception ex) {
+                    LOG.error("error while storing veranlagung", ex);
+                }
+            } else {
+                try {
+                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                        veranlagungszettel);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                        "beim letzten Speichern nicht veranlagt");
+                } catch (Exception ex) {
+                    LOG.error("error while storing veranlagungszettel", ex);
+                }
+            }
+            storeChanges(false);
+        }
     }
 
     /**
@@ -4497,6 +4655,220 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
+
+        veranlagungSummeMap.clear();
+
+        if (cidsBean != null) {
+            fillVeranlagungSummeMap(veranlagungSummeMap);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initVeranlagung() {
+        final MetaClass veranlagungsgrundlageMc = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNGSGRUNDLAGE);
+        final MetaClass winterdienstMc = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_WINTERDIENST);
+        final MetaClass strassenreinigungMc = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG);
+        final MetaObject[] veranlagungsgrundlageMos = CidsAppBackend.getInstance()
+                    .getMetaObject(""
+                        + "SELECT " + veranlagungsgrundlageMc.getId() + ", id "
+                        + "FROM " + veranlagungsgrundlageMc.getTableName() + " "
+                        + "ORDER BY " + VeranlagungsgrundlagePropertyConstants.PROP__BEZEICHNER,
+                        VerdisConstants.DOMAIN);
+
+        final MetaObject[] winterdienstMos = CidsAppBackend.getInstance()
+                    .getMetaObject(""
+                        + "SELECT " + winterdienstMc.getId() + ", id "
+                        + "FROM " + winterdienstMc.getTableName() + " "
+                        + "ORDER BY " + WinterdienstPropertyConstants.PROP__SCHLUESSEL,
+                        VerdisConstants.DOMAIN);
+        final MetaObject[] strassenreinigungMos = CidsAppBackend.getInstance()
+                    .getMetaObject(""
+                        + "SELECT " + strassenreinigungMc.getId() + ", id "
+                        + "FROM " + strassenreinigungMc.getTableName() + " "
+                        + "ORDER BY " + WinterdienstPropertyConstants.PROP__SCHLUESSEL,
+                        VerdisConstants.DOMAIN);
+
+        for (final MetaObject veranlagungsgrundlageMo : veranlagungsgrundlageMos) {
+            final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMo.getBean();
+            final Integer flaechenart = (Integer)veranlagungsgrundlageBean.getProperty("flaechenart.id");
+            final Integer anschlussgrad = (Integer)veranlagungsgrundlageBean.getProperty("anschlussgrad.id");
+            final String bezeichner = (String)veranlagungsgrundlageBean.getProperty("bezeichner");
+            final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
+
+            veranlagungsgrundlageMap.put(mapKey, veranlagungsgrundlageBean);
+
+            if (!veranlagungsgrundlageBezeichners.contains(bezeichner)) {
+                veranlagungsgrundlageBezeichners.add(bezeichner);
+            }
+        }
+        for (final MetaObject winterdienstMo : winterdienstMos) {
+            final CidsBean winterdienstBean = winterdienstMo.getBean();
+            final String key = (String)winterdienstBean.getProperty("key");
+            final Integer schluessel = (Integer)winterdienstBean.getProperty("schluessel");
+            final String bezeichner = key + "-" + Integer.toString(schluessel);
+            winterdienstMap.put(bezeichner, winterdienstBean);
+
+            if (!winterdienstBezeichners.contains(bezeichner)) {
+                winterdienstBezeichners.add(bezeichner);
+            }
+        }
+        for (final MetaObject strassenreinigungMo : strassenreinigungMos) {
+            final CidsBean strassenreinigungBean = strassenreinigungMo.getBean();
+            final String key = (String)strassenreinigungBean.getProperty("key");
+            final Integer schluessel = (Integer)strassenreinigungBean.getProperty("schluessel");
+            final String bezeichner = key + "-" + Integer.toString(schluessel);
+
+            strassenreinigungMap.put(key + "-" + schluessel, strassenreinigungBean);
+            if (!strassenreinigungBezeichners.contains(bezeichner)) {
+                strassenreinigungBezeichners.add(bezeichner);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungSummeMap  DOCUMENT ME!
+     */
+    private void fillVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap) {
+        fillVeranlagungSchluesselSummeMap(veranlagungSummeMap);
+        fillWinterdienstSummeMap(veranlagungSummeMap);
+        fillStrassenreinigungSummeMap(veranlagungSummeMap);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungSummeMap  DOCUMENT ME!
+     */
+    public void fillVeranlagungSchluesselSummeMap(final Map<String, Double> veranlagungSummeMap) {
+        final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+
+        for (final String bezeichner : veranlagungsgrundlageBezeichners) {
+//            schluesselSummeMap.put(bezeichner, 0d);
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+
+        for (final CidsBean flaeche : flaechen) {
+            final Double anteil = (Double)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+            final Integer flaechenart = (Integer)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
+                            + FlaechenartPropertyConstants.PROP__ID);
+            final Integer anschlussgrad = (Integer)flaeche.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + "."
+                            + AnschlussgradPropertyConstants.PROP__ID);
+            final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
+
+            final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
+            final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
+                    "veranlagungsschluessel");
+            final String bezeichner = (String)veranlagungsgrundlageBean.getProperty("bezeichner");
+
+            final double groesse;
+            if (anteil == null) {
+                groesse = (Integer)flaeche.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+            } else {
+                groesse = (Double)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+            }
+            final double groesseGewichtet = Math.round((groesse * veranlagungsschluessel) * 1000) / 1000;
+
+//            final double summe = schluesselSummeMap.get(bezeichner);
+            final double summeveranlagt = veranlagungSummeMap.get(bezeichner);
+
+//            schluesselSummeMap.put(bezeichner, summe + groesse);
+            if (groesseGewichtet > 0) {
+                veranlagungSummeMap.put(bezeichner, summeveranlagt + groesseGewichtet);
+            } else {
+                veranlagungSummeMap.put(bezeichner, summeveranlagt + groesse);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungSummeMap  DOCUMENT ME!
+     */
+    public void fillStrassenreinigungSummeMap(final Map<String, Double> veranlagungSummeMap) {
+        final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
+
+        for (final String bezeichner : strassenreinigungBezeichners) {
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+
+        for (final CidsBean front : fronten) {
+            final Integer laenge = (Integer)front.getProperty(
+                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+
+            final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
+                    FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final String key;
+            final Integer schluessel;
+            if (satzung_strassenreinigung == null) {
+                key = (String)front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                + StrassenreinigungPropertyConstants.PROP__KEY);
+                schluessel = (Integer)front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                + StrassenreinigungPropertyConstants.PROP__SCHLUESSEL);
+            } else {
+                key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
+                schluessel = (Integer)satzung_strassenreinigung.getProperty("sr_klasse.schluessel");
+            }
+
+            final String srKey = key + "-" + schluessel;
+            final double summe = veranlagungSummeMap.get(srKey);
+            veranlagungSummeMap.put(srKey, summe + laenge);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungSummeMap  DOCUMENT ME!
+     */
+    public void fillWinterdienstSummeMap(final Map<String, Double> veranlagungSummeMap) {
+        final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
+
+        for (final String bezeichner : winterdienstBezeichners) {
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+
+        for (final CidsBean front : fronten) {
+            final Integer laenge = (Integer)front.getProperty(
+                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+
+            final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
+                    FrontinfoPropertyConstants.PROP__LAGE_WD);
+
+            final String key;
+            final Integer schluessel;
+            if (satzung_winterdienst == null) {
+                key = (String)front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                                + WinterdienstPropertyConstants.PROP__KEY);
+                schluessel = (Integer)front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                                + WinterdienstPropertyConstants.PROP__SCHLUESSEL);
+            } else {
+                key = (String)satzung_winterdienst.getProperty("wd_prio.key");
+                schluessel = (Integer)satzung_winterdienst.getProperty("wd_prio.schluessel");
+            }
+
+            final String wdKey = key + "-" + schluessel;
+            final double summe = veranlagungSummeMap.get(wdKey);
+            veranlagungSummeMap.put(wdKey, summe + laenge);
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
