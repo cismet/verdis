@@ -166,6 +166,8 @@ public class AssessmentDialog extends javax.swing.JDialog {
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
+        cmdWithAssessement.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/ok.png")));                               // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             cmdWithAssessement,
             org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.cmdWithAssessement.text")); // NOI18N
@@ -182,11 +184,13 @@ public class AssessmentDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         jPanel3.add(cmdWithAssessement, gridBagConstraints);
 
+        cmdWithoutAssessement.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/ok_without_assessment.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             cmdWithoutAssessement,
             org.openide.util.NbBundle.getMessage(
                 AssessmentDialog.class,
-                "AssessmentDialog.cmdWithoutAssessement.text")); // NOI18N
+                "AssessmentDialog.cmdWithoutAssessement.text"));                                            // NOI18N
         cmdWithoutAssessement.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -200,6 +204,8 @@ public class AssessmentDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         jPanel3.add(cmdWithoutAssessement, gridBagConstraints);
 
+        cmdCancel.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png")));                  // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             cmdCancel,
             org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.cmdCancel.text")); // NOI18N
@@ -221,12 +227,12 @@ public class AssessmentDialog extends javax.swing.JDialog {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
                 0,
-                122,
+                21,
                 Short.MAX_VALUE));
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
                 0,
-                29,
+                34,
                 Short.MAX_VALUE));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
