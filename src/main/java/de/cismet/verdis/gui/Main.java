@@ -1728,6 +1728,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdOk = new javax.swing.JButton();
         cmdDeleteKassenzeichen = new javax.swing.JButton();
         cmdNewKassenzeichen = new javax.swing.JButton();
+        cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
         jSeparator6 = new javax.swing.JSeparator();
         cmdCutFlaeche = new javax.swing.JButton();
         cmdCopyFlaeche = new javax.swing.JButton();
@@ -1749,7 +1750,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         btnHistory = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
-        cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -1928,6 +1928,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
             });
         tobVerdis.add(cmdNewKassenzeichen);
+
+        cmdNextKassenzeichenWithoutGeom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource(
+                    "/de/cismet/verdis/res/images/toolbar/next_kassenzeichen_without_geometries.png"))); // NOI18N
+        cmdNextKassenzeichenWithoutGeom.setToolTipText("Nächstes Kassenzeichen ohne allgemeine Geometrien");
+        cmdNextKassenzeichenWithoutGeom.setFocusable(false);
+        cmdNextKassenzeichenWithoutGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdNextKassenzeichenWithoutGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdNextKassenzeichenWithoutGeom.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdNextKassenzeichenWithoutGeom);
 
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
@@ -2157,20 +2173,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdFortfuehrung);
-
-        cmdNextKassenzeichenWithoutGeom.setText("n.K.o.a.G.");
-        cmdNextKassenzeichenWithoutGeom.setToolTipText("Nächstes Kassenzeichen ohne allgemeine Geometrien");
-        cmdNextKassenzeichenWithoutGeom.setFocusable(false);
-        cmdNextKassenzeichenWithoutGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdNextKassenzeichenWithoutGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdNextKassenzeichenWithoutGeom.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdNextKassenzeichenWithoutGeom);
 
         getContentPane().add(tobVerdis, java.awt.BorderLayout.NORTH);
 

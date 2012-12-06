@@ -268,7 +268,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         };
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton cmdALB;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JToggleButton cmdAddHandle;
     private javax.swing.JToggleButton cmdAttachPolyToAlphadata;
@@ -455,7 +454,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdZoom = new javax.swing.JToggleButton();
         cmdPan = new javax.swing.JToggleButton();
         cmdSelect = new javax.swing.JToggleButton();
-        cmdALB = new javax.swing.JToggleButton();
         cmdMovePolygon = new javax.swing.JToggleButton();
         cmdNewPolygon = new javax.swing.JToggleButton();
         cmdNewLinestring = new javax.swing.JToggleButton();
@@ -791,27 +789,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdSelect);
 
-        mainGroup.add(cmdALB);
-        cmdALB.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb.png")));          // NOI18N
-        cmdALB.setToolTipText("ALB");
-        cmdALB.setBorderPainted(false);
-        cmdALB.setContentAreaFilled(false);
-        cmdALB.setFocusPainted(false);
-        cmdALB.setFocusable(false);
-        cmdALB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdALB.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alb_selected.png"))); // NOI18N
-        cmdALB.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdALB.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdALBActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdALB);
-
         mainGroup.add(cmdMovePolygon);
         cmdMovePolygon.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/movePoly.png")));          // NOI18N
@@ -1036,7 +1013,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(cmdJoinPoly);
 
         mainGroup.add(cmdCreateLandparcelGeom);
-        cmdCreateLandparcelGeom.setText("FSG");
+        cmdCreateLandparcelGeom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/new_kassenzeichen_geometry.png"))); // NOI18N
+        cmdCreateLandparcelGeom.setToolTipText("Kassenzeichen-Geometrie aus Flurstück erzeugen");
         cmdCreateLandparcelGeom.setBorderPainted(false);
         cmdCreateLandparcelGeom.setFocusable(false);
         cmdCreateLandparcelGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1447,16 +1426,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdMoveHandle.setSelected(true);
         cmdMoveHandleActionPerformed(null);
     }                                                                             //GEN-LAST:event_cmdSelectActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdALBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdALBActionPerformed
-        mappingComp.setInteractionMode(MappingComponent.CUSTOM_FEATUREINFO);
-        cmdALB.isSelected();
-    }                                                                          //GEN-LAST:event_cmdALBActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2186,9 +2155,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (im.equals(MappingComponent.ZOOM)) {
             cmdZoom.setSelected(true);
         }
-        if (im.equals(MappingComponent.CUSTOM_FEATUREINFO)) {
-            cmdALB.setSelected(true);
-        } else if (im.equals(MappingComponent.PAN)) {
+        if (im.equals(MappingComponent.PAN)) {
             cmdPan.setSelected(true);
         } else if (im.equals(MappingComponent.SELECT)) {
             cmdSelect.setSelected(true);

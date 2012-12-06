@@ -321,6 +321,9 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         tglShowAlkisLandparcelGeoms.setText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenGeometrienPanel.class,
                 "KassenzeichenGeometrienPanel.tglShowAlkisLandparcelGeoms.text"));                  // NOI18N
+        tglShowAlkisLandparcelGeoms.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.tglShowAlkisLandparcelGeoms.toolTipText"));           // NOI18N
         tglShowAlkisLandparcelGeoms.setBorderPainted(false);
         tglShowAlkisLandparcelGeoms.setContentAreaFilled(false);
         tglShowAlkisLandparcelGeoms.setRolloverEnabled(false);
@@ -390,6 +393,9 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         tglShowKassenzeichenGeometrien.setText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenGeometrienPanel.class,
                 "KassenzeichenGeometrienPanel.tglShowKassenzeichenGeometrien.text"));               // NOI18N
+        tglShowKassenzeichenGeometrien.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenGeometrienPanel.class,
+                "KassenzeichenGeometrienPanel.tglShowKassenzeichenGeometrien.toolTipText"));        // NOI18N
         tglShowKassenzeichenGeometrien.setBorderPainted(false);
         tglShowKassenzeichenGeometrien.setContentAreaFilled(false);
         tglShowKassenzeichenGeometrien.setRolloverEnabled(false);
@@ -461,13 +467,18 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         gridBagConstraints.gridy = 0;
         jPanel3.add(cmdShowAlkisRenderer, gridBagConstraints);
 
+        cmdAutoCreateGeometries.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/new_kassenzeichen_geometries.png"))); // NOI18N
         cmdAutoCreateGeometries.setText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenGeometrienPanel.class,
-                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.text"));        // NOI18N
+                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.text"));                                     // NOI18N
         cmdAutoCreateGeometries.setToolTipText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenGeometrienPanel.class,
-                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.toolTipText")); // NOI18N
+                "KassenzeichenGeometrienPanel.cmdAutoCreateGeometries.toolTipText"));                              // NOI18N
+        cmdAutoCreateGeometries.setBorderPainted(false);
+        cmdAutoCreateGeometries.setContentAreaFilled(false);
         cmdAutoCreateGeometries.setEnabled(false);
+        cmdAutoCreateGeometries.setFocusPainted(false);
         cmdAutoCreateGeometries.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
