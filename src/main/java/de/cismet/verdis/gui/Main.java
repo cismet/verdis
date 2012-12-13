@@ -33,6 +33,8 @@ import Sirius.navigator.ui.DescriptionPaneFS;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
@@ -259,7 +261,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /** Creates new form Main. */
     private String userString;
     private String kassenzeichenSuche = "kassenzeichenSuche";
-    private String userGroup = "noGroup";
+    private String userGroupString = "noGroup";
     private FlaechenClipboard flaechenClipboard;
     private AppPreferences prefs;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -920,19 +922,26 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
 
                 this.context.getMetadata().addMetaNodeSelectionListener(new NodeChangeListener());
-                userString = Sirius.navigator.connection.SessionManager.getSession().getUser().getName() + "@"
-                            + Sirius.navigator.connection.SessionManager.getSession()
-                            .getUser()
-                            .getUserGroup()
-                            .getName();
-                userGroup = Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup().toString();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("prefs: Vector index of " + (prefs.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0));
+                final User user = SessionManager.getSession().getUser();
+                final UserGroup userGroup = user.getUserGroup();
+                if (userGroup != null) {
+                    userString = user.getName() + "@" + userGroup.getName();
+                } else {
+                    userString = user.getName();
+                }
+                if (userGroup != null) {
+                    userGroupString = userGroup.toString();
+                } else {
+                    userGroupString = "";
                 }
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("prefs: userGroup " + userGroup.toLowerCase());
+                    LOG.debug("prefs: Vector index of "
+                                + (prefs.getRwGroups().indexOf(userGroupString.toLowerCase()) >= 0));
                 }
-                if (prefs.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("prefs: userGroup " + userGroupString.toLowerCase());
+                }
+                if (prefs.getRwGroups().indexOf(userGroupString.toLowerCase()) >= 0) {
                     readonly = false;
                 } else {
                     readonly = true;
@@ -4981,8 +4990,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         @Override
         public boolean authenticate(final String name, final char[] password, final String server) throws Exception {
             System.setProperty("sun.rmi.transport.connectionTimeout", "15");
-            final String user = name.split("@")[0];
-            final String group = name.split("@")[1];
+            final String username;
+            final String groupname;
+            if (name.contains("@")) {
+                username = name.split("@")[0];
+                groupname = name.split("@")[1];
+            } else {
+                username = name;
+                groupname = null;
+            }
 
             final String callServerURL = prefs.getAppbackendCallserverurl();
             if (LOG.isDebugEnabled()) {
@@ -4998,22 +5014,47 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
                 connectionInfo.setUserDomain(domain);
-                connectionInfo.setUsergroup(group);
-                connectionInfo.setUsergroupDomain(domain);
-                connectionInfo.setUsername(user);
+                connectionInfo.setUsergroup(groupname);
+                if (groupname != null) {
+                    connectionInfo.setUsergroupDomain(domain);
+                } else {
+                    connectionInfo.setUsergroupDomain(null);
+                }
+                connectionInfo.setUsername(username);
                 final ConnectionSession session = ConnectionFactory.getFactory()
                             .createSession(connection, connectionInfo, true);
                 final ConnectionProxy proxy = ConnectionFactory.getFactory()
                             .createProxy(CONNECTION_PROXY_CLASS, session);
                 CidsAppBackend.init(proxy);
 
-                final String tester = (group + "@" + domain).toLowerCase();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("authentication: tester = :" + tester);
-                    LOG.debug("authentication: name = :" + name);
-                    LOG.debug("authentication: RM Plugin key = :" + name + "@" + domain);
+                final User user = SessionManager.getSession().getUser();
+                final UserGroup userGroup = user.getUserGroup();
+                final Collection<UserGroup> userGroups = new ArrayList<UserGroup>();
+                if (userGroup != null) {
+                    userGroups.add(userGroup);
+                } else {
+                    userGroups.addAll(user.getPotentialUserGroups());
                 }
-                if (prefs.getRwGroups().contains(tester)) {
+
+                boolean isRw = false;
+                boolean isR = false;
+                for (final UserGroup ug : userGroups) {
+                    final String tester = (ug.getName() + "@" + ug.getDomain()).toLowerCase();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("authentication: tester = :" + tester);
+                        LOG.debug("authentication: name = :" + name);
+                        LOG.debug("authentication: RM Plugin key = :" + name + "@" + domain);
+                    }
+                    if (prefs.getRwGroups().contains(tester)) {
+                        isRw = true;
+                        break;
+                    }
+                    if (prefs.getUsergroups().contains(tester)) {
+                        isR = true;
+                    }
+                }
+
+                if (isRw) {
                     Main.this.readonly = false;
                     setUserString(name);
                     if (LOG.isDebugEnabled()) {
@@ -5045,7 +5086,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         }
                     }
                     return true;
-                } else if (prefs.getUsergroups().contains(tester)) {
+                } else if (isR) {
                     readonly = true;
                     setUserString(name);
                     if (prefs.getRmRegistryServerPath() != null) {

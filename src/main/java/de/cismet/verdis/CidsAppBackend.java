@@ -32,6 +32,7 @@ import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 
 import Sirius.util.collections.MultiMap;
 
@@ -668,8 +669,14 @@ public class CidsAppBackend implements CidsBeanStore {
     private String getAccountName() {
         final ConnectionSession session = SessionManager.getSession();
         final User user = session.getUser();
+        final UserGroup userGroup = user.getUserGroup();
 
-        final String userString = user.getName() + "@" + user.getUserGroup().getName();
+        final String userString;
+        if (userGroup != null) {
+            userString = user.getName() + "@" + userGroup.getName();
+        } else {
+            userString = user.getName();
+        }
         return userString;
     }
 
