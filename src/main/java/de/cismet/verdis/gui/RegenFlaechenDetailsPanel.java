@@ -349,7 +349,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaechenbezeichnung}"),
                 txtBezeichnung,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -396,7 +396,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
                 txtGroesseKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FlaechePropertyConstants.PROP__FLAECHENINFO
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
                         + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
         binding.setSourceNullValue("");
@@ -458,9 +458,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.anteil}"),
                 txtAnteil,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FlaechePropertyConstants.PROP__ANTEIL);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
+        binding.setConverter(new EmptyFloatToStringConverter());
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -621,7 +622,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.feb_id}"),
                 txtFEB_ID,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FlaechePropertyConstants.PROP__FEB_ID);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FEB_ID);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
