@@ -30,6 +30,7 @@ package de.cismet.verdis.gui;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.table.DefaultTableModel;
@@ -39,6 +40,8 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -157,55 +160,33 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         try {
+            final Map<String, Double> srHash = new HashMap<String, Double>();
+            final Map<String, Double> wdHash = new HashMap<String, Double>();
+
+            Main.getCurrentInstance().fillStrassenreinigungSummeMap(srHash);
+            Main.getCurrentInstance().fillWinterdienstSummeMap(wdHash);
+
             kassenzeichenBean = cidsBean;
             if (cidsBean != null) {
-                final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
-                        KassenzeichenPropertyConstants.PROP__FRONTEN);
-                final SumHashMap srHash = new SumHashMap();
-                final SumHashMap wdHash = new SumHashMap();
-
-                for (final CidsBean front : fronten) {
-                    final Integer laenge = (Integer)front.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
-
-                    final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAGE_SR);
-                    final String srKey;
-                    if (satzung_strassenreinigung == null) {
-                        srKey = front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY) + "-"
-                                    + front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__SCHLUESSEL);
-                    } else {
-                        srKey = satzung_strassenreinigung.getProperty("sr_klasse.key") + "-"
-                                    + satzung_strassenreinigung.getProperty("sr_klasse.schluessel");
-                    }
-                    srHash.add(srKey, laenge);
-
-                    final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAGE_WD);
-                    final String wdKey;
-                    if (satzung_winterdienst == null) {
-                        wdKey = front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY) + "-"
-                                    + front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__SCHLUESSEL);
-                    } else {
-                        wdKey = satzung_winterdienst.getProperty("wd_prio.key") + "-"
-                                    + satzung_winterdienst.getProperty("wd_prio.schluessel");
-                    }
-                    wdHash.add(wdKey, laenge);
-                }
-
                 final Vector srData = new Vector();
                 for (final String key : srHash.keySet()) {
-                    final Vector row = new Vector();
-                    row.add(key);
-                    row.add(srHash.get(key) + " m");
-                    srData.add(row);
+                    final double value = srHash.get(key);
+                    if (value > 0) {
+                        final Vector row = new Vector();
+                        row.add(key);
+                        row.add(value + " m");
+                        srData.add(row);
+                    }
                 }
                 final Vector wdData = new Vector();
                 for (final String key : wdHash.keySet()) {
-                    final Vector row = new Vector();
-                    row.add(key);
-                    row.add(wdHash.get(key) + " m");
-                    wdData.add(row);
+                    final double value = wdHash.get(key);
+                    if (value > 0) {
+                        final Vector row = new Vector();
+                        row.add(key);
+                        row.add(value + " m");
+                        wdData.add(row);
+                    }
                 }
 
                 final Vector header = new Vector();
@@ -218,31 +199,6 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
             }
         } catch (Exception e) {
             log.error("error in setCidsBean", e);
-        }
-    }
-}
-
-/**
- * DOCUMENT ME!
- *
- * @version  $Revision$, $Date$
- */
-class SumHashMap extends HashMap<String, Integer> {
-
-    //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  key     DOCUMENT ME!
-     * @param  number  DOCUMENT ME!
-     */
-    public void add(final String key, final Integer number) {
-        final Integer x = super.get(key);
-        if (x == null) {
-            super.put(key, number);
-        } else {
-            super.put(key, number.intValue() + x.intValue());
         }
     }
 }

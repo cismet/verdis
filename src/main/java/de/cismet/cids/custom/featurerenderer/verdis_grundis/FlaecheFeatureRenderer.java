@@ -31,7 +31,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 
 import de.cismet.verdis.gui.Main;
 
@@ -59,15 +61,21 @@ public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
         int art = -1;
         try {
             art = (Integer)super.cidsBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + "."
+                            + FlaechenartPropertyConstants.PROP__ID);
         } catch (Exception e) {
             LOG.error("error during getting the flaechenart", e);
         }
         boolean markedForDeletion = false;
         try {
-            final CidsBean geom = (CidsBean)cidsBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE);
-            markedForDeletion = geom.getMetaObject().getStatus() == MetaObject.TO_DELETE;
+            final CidsBean geomBean = (CidsBean)cidsBean.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE);
+            markedForDeletion = geomBean.getMetaObject().getStatus() == MetaObject.TO_DELETE;
         } catch (Exception e) {
             LOG.error("error during markedForDeletionCheck", e);
         }

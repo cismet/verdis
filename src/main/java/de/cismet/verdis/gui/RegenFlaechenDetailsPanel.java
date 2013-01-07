@@ -62,8 +62,11 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
@@ -170,10 +173,17 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      */
     public static Geometry getGeometry(final CidsBean flaecheBean) {
         if ((flaecheBean != null)
-                    && (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO) != null)
-                    && (flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null)) {
+                    && (flaecheBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO) != null)
+                    && (flaecheBean.getProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE) != null)) {
             return (Geometry)flaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
         } else {
             return null;
         }
@@ -189,14 +199,23 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      */
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
         Main.transformToDefaultCrsNeeded(geom);
-        if (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) == null) {
+        if (
+            cidsBean.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE)
+                    == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
                         .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE, emptyGeoBean);
+            cidsBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                emptyGeoBean);
         }
-        cidsBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE__GEO_FIELD, geom);
+        cidsBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + GeomPropertyConstants.PROP__GEO_FIELD,
+            geom);
     }
 
     /**
@@ -330,7 +349,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaechenbezeichnung}"),
                 txtBezeichnung,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -349,7 +368,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_aus_grafik}"),
                 txtGroesseGrafik,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -375,7 +396,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
                 txtGroesseKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -435,9 +458,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.anteil}"),
                 txtAnteil,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
+        binding.setConverter(new EmptyFloatToStringConverter());
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -598,7 +622,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.feb_id}"),
                 txtFEB_ID,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                RegenFlaechenPropertyConstants.PROP__FEB_ID);
+                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FEB_ID);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -622,8 +646,8 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
         bpanRegenFlDetails.add(lblFEB_ID, gridBagConstraints);
 
-        txtSperreBemerkung.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
         txtSperreBemerkung.setEditable(false);
+        txtSperreBemerkung.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
         txtSperreBemerkung.setForeground(java.awt.Color.red);
         txtSperreBemerkung.setBorder(null);
 
@@ -764,7 +788,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
         try {
             if ((cidsBean != null)
-                        && (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GEOMETRIE) != null)) {
+                        && (cidsBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE) != null)) {
                 bpanRegenFlDetails.setBackgroundEnabled(true);
             } else {
                 bpanRegenFlDetails.setBackgroundEnabled(false);
@@ -896,11 +923,12 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorFlaechenBezeichnung(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG) {
+        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG) {
 
                 @Override
                 protected void init() {
-                    addTriggerProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART);
+                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
                 }
 
                 @Override
@@ -911,13 +939,22 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                     }
 
                     final String bezeichnung = (String)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
                     final int art =
-                        (cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID)
+                        (cidsBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                        + "."
+                                        + FlaechenartPropertyConstants.PROP__ID)
                                     == null)
                         ? 0
                         : (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                    + "."
+                                    + FlaechenartPropertyConstants.PROP__ID);
                     final Action action = new AbstractAction() {
 
                             @Override
@@ -932,7 +969,11 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                                     int art;
                                     try {
                                         art = (Integer)cidsBean.getProperty(
-                                                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID);
+                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                        + "."
+                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID);
                                     } catch (final NumberFormatException ex) {
                                         art = 0;
                                     }
@@ -941,7 +982,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                                                 .getValidFlaechenname(art);
                                     try {
                                         cidsBean.setProperty(
-                                            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
                                             newValue);
                                     } catch (Exception ex) {
                                         if (LOG.isDebugEnabled()) {
@@ -999,7 +1040,11 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorGroesseGrafik(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK) {
+        return new CidsBeanValidator(
+                flaecheBean,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1009,7 +1054,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                     }
 
                     final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                     final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
                     final Action action = new AbstractAction() {
 
@@ -1029,7 +1076,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                                             try {
                                                 final Integer gr_grafik = new Integer((int)(geom.getArea()));
                                                 cidsBean.setProperty(
-                                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK,
+                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                            + "."
+                                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
                                                     gr_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1068,11 +1117,14 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     public static Validator getValidatorGroesseKorrektur(final CidsBean flaecheBean) {
         return new CidsBeanValidator(
                 flaecheBean,
-                RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR) {
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR) {
 
                 @Override
                 protected void init() {
-                    addTriggerProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                 }
 
                 @Override
@@ -1083,9 +1135,13 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                     }
 
                     final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                     final Integer gr_korrektur = (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
 
                     final Action action = new AbstractAction() {
 
@@ -1104,9 +1160,13 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                                         if (answer == JOptionPane.YES_OPTION) {
                                             try {
                                                 final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                                                        RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                                + "."
+                                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                                                 cidsBean.setProperty(
-                                                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR,
+                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                            + "."
+                                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
                                                     gr_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1142,7 +1202,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorAnteil(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__ANTEIL) {
+        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__ANTEIL) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1151,11 +1211,15 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                         return null;
                     }
 
-                    final Float anteil = (Float)cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__ANTEIL);
+                    final Float anteil = (Float)cidsBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
                     final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                     final Integer gr_korrektur = (Integer)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR);
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
 
                     if (anteil != null) {
                         if ((gr_korrektur != null) && (anteil.intValue() > gr_korrektur.intValue())) {
@@ -1181,7 +1245,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumErfassung(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG) {
+        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__DATUM_ERFASSUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1204,7 +1268,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumVeranlagung(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG) {
+        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1214,7 +1278,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG);
+                            FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(
@@ -1239,7 +1303,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorFebId(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, RegenFlaechenPropertyConstants.PROP__FEB_ID) {
+        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__FEB_ID) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1248,7 +1312,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                         return null;
                     }
 
-                    final String febId = (String)cidsBean.getProperty(RegenFlaechenPropertyConstants.PROP__FEB_ID);
+                    final String febId = (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FEB_ID);
                     if ((febId == null) || febId.trim().isEmpty()) {
                         return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }

@@ -104,7 +104,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG" type="code"/>
+                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -121,7 +121,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_GRAFIK" type="code"/>
+                    <Connection code="FlaechePropertyConstants.PROP__FLAECHENINFO&#xa;                        + &quot;.&quot;&#xa;                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -141,7 +141,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__GROESSE_KORREKTUR" type="code"/>
+                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENINFO + &quot;.&quot; + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -205,8 +205,11 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
+                  <Property name="converter" type="org.jdesktop.beansbinding.Converter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                    <Connection code="new de.cismet.verdis.gui.EmptyFloatToStringConverter()" type="code"/>
+                  </Property>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="RegenFlaechenPropertyConstants.PROP__ANTEIL" type="code"/>
+                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -379,7 +382,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="RegenFlaechenPropertyConstants.PROP__FEB_ID" type="code"/>
+                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FEB_ID" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -403,10 +406,10 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtSperreBemerkung">
               <Properties>
+                <Property name="editable" type="boolean" value="false"/>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="d8" green="e9" id="Button.background" palette="3" red="ec" type="palette"/>
                 </Property>
-                <Property name="editable" type="boolean" value="false"/>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
                 </Property>
