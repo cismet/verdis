@@ -63,10 +63,10 @@ public class FEBReportTester {
             LOG.debug("Anzahl:" + beans.length);
         }
 //        final CidsBean[] reportBeans = new CidsBean[beans.length];
-        final List<FebReportBean> reportbeans = new ArrayList<FebReportBean>();
+        final List<FEBReportBean> reportbeans = new ArrayList<FEBReportBean>();
         final int i = 0;
         for (final CidsBean kassenzeichen : beans) {
-            final FebReportBean x = new FebReportBean(kassenzeichen, null);
+            final FEBReportBean x = new FEBReportBean(kassenzeichen, null, 500, 500, null);
             reportbeans.add(x);
         }
 
@@ -97,7 +97,7 @@ public class FEBReportTester {
         boolean ready = false;
         do {
             ready = true;
-            for (final FebReportBean f : reportbeans) {
+            for (final FEBReportBean f : reportbeans) {
                 if (!f.isReadyToProceed()) {
                     ready = false;
                     break;

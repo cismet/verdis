@@ -15,21 +15,16 @@ import Sirius.navigator.exception.ConnectionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import org.apache.bcel.generic.D2F;
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import java.io.IOException;
-
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.File;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,11 +34,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
-import de.cismet.cids.custom.reports.wunda_blau.MauernReportBeanWithMapAndImages;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.Crs;
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.features.DefaultStyledFeature;
@@ -65,11 +58,11 @@ import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
-public class FebReportBean {
+public class FEBReportBean {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger LOG = Logger.getLogger(FebReportBean.class);
+    private static final Logger LOG = Logger.getLogger(FEBReportBean.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -78,29 +71,43 @@ public class FebReportBean {
     private List<CidsBean> versiegelteflaechen = new LinkedList<CidsBean>();
     private String kznr;
     private String hinweise;
+    private String scale;
     private Image mapImage = null;
     private boolean mapError = false;
+    private int mapWidth;
+    private int mapHeight;
+    private Double scaleDenominator;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FebBean object.
      *
-     * @param  kassenzeichen  DOCUMENT ME!
-     * @param  hinweise       DOCUMENT ME!
+     * @param  kassenzeichen     DOCUMENT ME!
+     * @param  hinweise          DOCUMENT ME!
+     * @param  mapWidth          DOCUMENT ME!
+     * @param  mapHeight         DOCUMENT ME!
+     * @param  scaleDenominator  DOCUMENT ME!
      */
-    public FebReportBean(final CidsBean kassenzeichen, final String hinweise) {
+    public FEBReportBean(final CidsBean kassenzeichen,
+            final String hinweise,
+            final int mapWidth,
+            final int mapHeight,
+            final Double scaleDenominator) {
         this.hinweise = hinweise;
         this.kassenzeichen = kassenzeichen;
-        // loadMap();
-        try {
-            mapImage = ImageIO.read(new URL(
-                        "https://a248.e.akamai.net/camo.github.com/cb9fb6dbdfbac1f2d42e7fd6a710ef6e245b97c6/687474703a2f2f7777772e6369736d65742e64652f696d616765732f70726f6a656374732f73637265656e65722f77756e64612e706e67"));
-        } catch (MalformedURLException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        this.mapHeight = mapHeight;
+        this.mapWidth = mapWidth;
+        this.scaleDenominator = scaleDenominator;
+        loadMap();
+//        try {
+//            mapImage = ImageIO.read(new URL(
+//                    "https://a248.e.akamai.net/camo.github.com/c4062119d25b4965518ed8d0fda31ae2f2c1ab7b/687474703a2f2f7777772e6369736d65742e64652f696d616765732f70726f6a656374732f73637265656e65722f7665726469732e706e67"));
+//        } catch (MalformedURLException ex) {
+//            Exceptions.printStackTrace(ex);
+//        } catch (IOException ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
         kznr = ""
                     + (Integer)this.kassenzeichen.getProperty(
                         KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
@@ -219,6 +226,24 @@ public class FebReportBean {
      *
      * @return  DOCUMENT ME!
      */
+    public String getScale() {
+        return scale;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  scale  DOCUMENT ME!
+     */
+    public void setScale(final String scale) {
+        this.scale = scale;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Image getMapImage() {
         return mapImage;
     }
@@ -247,7 +272,7 @@ public class FebReportBean {
      */
     private void loadMap() {
         final SimpleWMS s = new SimpleWMS(new SimpleWmsGetMapUrl(
-                    "http://s102x284:8399/arcgis/services/WuNDa-Grundlagenkarten/MapServer/WMSServer?service=WMS&VERSION=1.1.1&REQUEST=GetMap&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&BBOX=<cismap:boundingBox>&SRS=EPSG:25832&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=0&STYLES=default"));
+                    "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:25832&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
         final MappingComponent map = new MappingComponent(false);
 
         final ActiveLayerModel mappingModel = new ActiveLayerModel();
@@ -264,6 +289,7 @@ public class FebReportBean {
 
                 @Override
                 public void retrievalComplete(final RetrievalEvent e) {
+                    LOG.fatal("map retrieval for feb report complete");
                     new Thread() {
 
                         @Override
@@ -283,9 +309,8 @@ public class FebReportBean {
                                 // Draw img into bi so we can write it to file.
                                 g2.drawImage(img, 0, 0, null);
                                 g2.dispose();
-                                final BoundingBox bb = map.getCurrentBoundingBox();
-                                final String geolink = "http://localhost:" + 9098 + "/gotoBoundingBox?x1=" + bb.getX1()
-                                            + "&y1=" + bb.getY1() + "&x2=" + bb.getX2() + "&y2=" + bb.getY2();     // NOI18N
+                                final File outputfile = new File("saved.png");
+                                ImageIO.write(bi, "png", outputfile);
                                 mapImage = bi;
                                 System.out.println("karte geladen " + bi);
                             } catch (Exception ex) {
@@ -297,11 +322,13 @@ public class FebReportBean {
 
                 @Override
                 public void retrievalAborted(final RetrievalEvent e) {
+                    LOG.fatal("map retrieval for feb report aborted");
                     mapError = true;
                 }
 
                 @Override
                 public void retrievalError(final RetrievalEvent e) {
+                    LOG.fatal("map retrieval error for feb report");
                     mapError = true;
                 }
             });
@@ -309,26 +336,23 @@ public class FebReportBean {
         map.setInternalLayerWidgetAvailable(false);
         mappingModel.setSrs(new Crs("EPSG:25832", "", "", true, true));
         mappingModel.addHome(new XBoundingBox(
-                374271.251964098,
-                5681514.032498134,
-                374682.9413952776,
-                5681773.852810634,
+                579146.311157169,
+                5679930.726695932,
+                2579645.8713909937,
+                5680274.612347874,
                 "EPSG:25832",
                 true));
+
         // set the model
         map.setMappingModel(mappingModel);
-//        final int height = Integer.parseInt(NbBundle.getMessage(
-//                    MauernReportBeanWithMapAndImages.class,
-//                    "MauernReportBeanWithMapAndImages.mapHeight"));
-//        final int width = Integer.parseInt(NbBundle.getMessage(
-//                    MauernReportBeanWithMapAndImages.class,
-//                    "MauernReportBeanWithMapAndImages.mapWidth"));
-//        map.setSize(width, height);
-        map.setSize(540, 219);
+        map.setSize(mapWidth, mapHeight);
         // initial positioning of the map
         map.setAnimationDuration(0);
         map.gotoInitialBoundingBox();
         map.unlock();
+//        if (scaleDenominator != null) {
+//            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(scaleDenominator));
+//        }
 
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -354,6 +378,8 @@ public class FebReportBean {
         map.setInteractionMode(MappingComponent.SELECT);
 
         mappingModel.addLayer(s);
+        final int sd = (int)(map.getScaleDenominator() + 0.5);
+        scale = "1:" + sd;
     }
 
     //~ Inner Classes ----------------------------------------------------------
