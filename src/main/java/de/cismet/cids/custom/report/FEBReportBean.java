@@ -183,7 +183,7 @@ public class FebReportBean {
      *
      * @return  DOCUMENT ME!
      */
-    public String getKassenzeichennummer() {
+    public String getKznr() {
         return kznr;
     }
 
@@ -192,7 +192,7 @@ public class FebReportBean {
      *
      * @param  kassenzeichennummer  DOCUMENT ME!
      */
-    public void setKassenzeichennummer(final String kassenzeichennummer) {
+    public void setKznr(final String kassenzeichennummer) {
         this.kznr = kassenzeichennummer;
     }
 

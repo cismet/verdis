@@ -8,16 +8,19 @@
 	<field name="kznr" class="java.lang.String"/>
 	<field name="hinweise" class="java.lang.String"/>
 	<field name="mapImage" class="java.lang.Object"/>
+	<variable name="DATE" class="java.util.Date">
+		<variableExpression><![CDATA[new Date()]]></variableExpression>
+	</variable>
 	<pageHeader>
 		<band height="48">
 			<staticText>
 				<reportElement x="2" y="20" width="551" height="20"/>
-				<textElement/>
+				<textElement textAlignment="Center"/>
 				<text><![CDATA[Die folgenden Angaben beziehen sich auf den Kartenausschnitt Ihres Grundstückes auf Seite 1]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="2" y="0" width="551" height="20"/>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Flächenerfassungsbogen zum Kassenzeichen "+ $F{kznr}]]></textFieldExpression>
@@ -25,104 +28,84 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="731">
-			<subreport>
-				<reportElement x="0" y="12" width="555" height="300"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{dachflaechen}, false)]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_dachflaechen.jasper"]]></subreportExpression>
-			</subreport>
-			<subreport>
-				<reportElement positionType="null" x="0" y="330" width="555" height="300"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{versiegelteflaechen}, false)]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_versiegelteFlaechen.jasper"]]></subreportExpression>
-			</subreport>
-			<staticText>
-				<reportElement positionType="null" x="0" y="638" width="553" height="29"/>
-				<textElement/>
-				<text><![CDATA[* Sind Sonderflächen angekreuzt, wird ein Nachweis benötigt (siehe Beiblatt). Ohne Nachweis können Sonderflächen nicht anerkannt werden]]></text>
-			</staticText>
-			<break>
-				<reportElement positionType="null" x="0" y="681" width="100" height="1"/>
-			</break>
-		</band>
 		<band height="600">
 			<rectangle>
-				<reportElement x="0" y="224" width="555" height="207"/>
+				<reportElement positionType="Float" x="0" y="224" width="555" height="207"/>
 			</rectangle>
 			<rectangle>
-				<reportElement positionType="null" x="0" y="102" width="555" height="111"/>
+				<reportElement positionType="Float" x="0" y="102" width="555" height="111"/>
 			</rectangle>
 			<line>
-				<reportElement x="92" y="328" width="161" height="1"/>
+				<reportElement positionType="Float" x="92" y="328" width="161" height="1"/>
 			</line>
 			<line>
-				<reportElement x="346" y="358" width="207" height="1"/>
+				<reportElement positionType="Float" x="346" y="358" width="207" height="1"/>
 			</line>
 			<staticText>
-				<reportElement x="265" y="309" width="77" height="19"/>
+				<reportElement positionType="Float" x="265" y="309" width="77" height="19"/>
 				<textElement>
 					<font size="12" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
 				<text><![CDATA[Unterschrift:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="null" x="8" y="102" width="545" height="20"/>
+				<reportElement positionType="Float" x="8" y="102" width="545" height="30"/>
 				<textElement/>
 				<text><![CDATA[Raum für Bemerkungen (insbesondere bei Abweichungen von den amtlicherseits ermittelteten Flächenangaben)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="8" y="228" width="60" height="16"/>
+				<reportElement positionType="Float" x="8" y="228" width="60" height="16"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Erklärung]]></text>
 			</staticText>
 			<line>
-				<reportElement x="346" y="387" width="207" height="1"/>
+				<reportElement positionType="Float" x="346" y="387" width="207" height="1"/>
 			</line>
 			<line>
-				<reportElement x="346" y="328" width="207" height="1"/>
+				<reportElement positionType="Float" x="346" y="328" width="207" height="1"/>
 			</line>
 			<staticText>
-				<reportElement x="8" y="244" width="545" height="52"/>
+				<reportElement positionType="Float" x="8" y="244" width="545" height="52"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Die auf dem Flächenerfassungsbogen angegebenen und in der Grafik ausgewiesenen Flächen zum o.g. Grundstück wurden von mir bestätigt bzw. korrigiert/ergänzt. Der Verbleib des Regenwassers ist angegeben. Ich habe alle Angaben-auch zu einem eventuellen Ermäßigungsantrag- nach bestem Wissen gemacht und werde zukünftig gemäß der Mitwirkungspflicht nach der Satzung über die Abwasserbeseitigung jede Veränderung an den Dachflächen und/oder den versiegelten Flächen sowie an der Regenwassernutzung innerhalb eines Monats nach Eintritt der Änderung mitteilen.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="209" y="369" width="133" height="19"/>
+				<reportElement positionType="Float" x="209" y="369" width="133" height="19"/>
 				<textElement>
 					<font size="12" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
 				<text><![CDATA[Email für Rückfragen:]]></text>
 			</staticText>
 			<line>
-				<reportElement x="346" y="418" width="207" height="1"/>
+				<reportElement positionType="Float" x="346" y="418" width="207" height="1"/>
 			</line>
 			<staticText>
-				<reportElement x="147" y="399" width="195" height="19"/>
+				<reportElement positionType="Float" x="147" y="399" width="195" height="19"/>
 				<textElement>
 					<font size="12" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
 				<text><![CDATA[Telefonnummer für Rückfragen:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="174" y="339" width="168" height="19"/>
+				<reportElement positionType="Float" x="174" y="339" width="168" height="19"/>
 				<textElement>
 					<font size="12" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
 				<text><![CDATA[Name in Druckbuchstaben:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="442" width="555" height="47"/>
+				<reportElement positionType="Float" x="8" y="442" width="102" height="17"/>
 				<textElement>
 					<font size="12" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Bitte senden Sie ein Exemplar dieses Flächenerfassungsbogen ausgefüllt und unterschrieben an die Stadt Wuppertal zurück. Bitte nicht heften.]]></text>
+				<text><![CDATA[Bitte senden Sie ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="18" y="309" width="74" height="19"/>
+				<reportElement positionType="Float" x="18" y="309" width="74" height="19"/>
 				<textElement>
 					<font size="12" isUnderline="false" isStrikeThrough="false"/>
 				</textElement>
@@ -149,22 +132,61 @@
 				</textElement>
 				<text><![CDATA[Hinweise]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="110" y="442" width="19" height="17"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ein]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="129" y="442" width="348" height="17"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ Exemplar dieses Flächenerfassungsbogen ausgefüllt und]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="459" width="60" height="20"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[schrieben]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="459" width="194" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ an die Stadt Wuppertal zurück.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="459" width="181" height="20"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Bitte nicht heften.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="477" y="442" width="38" height="17"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[unter-]]></text>
+			</staticText>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="23" splitType="null">
+		<band height="23">
 			<line>
 				<reportElement x="2" y="0" width="551" height="1"/>
 			</line>
-			<textField>
-				<reportElement x="285" y="4" width="272" height="15"/>
-				<textElement verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Seite " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="2" y="4" width="283" height="15"/>
-				<textElement/>
-				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			<textField isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="3" y="2" width="283" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="sansserif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[DateFormat.getDateInstance(DateFormat.FULL).format($V{DATE})+""]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

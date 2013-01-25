@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<field name="dachflaechen" class="java.util.Collection"/>
+	<field name="kznr" class="java.lang.String"/>
+	<field name="versiegelteflaechen" class="java.util.Collection"/>
+	<variable name="DATE" class="java.util.Date">
+		<variableExpression><![CDATA[new Date()]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="48">
+			<staticText>
+				<reportElement x="2" y="20" width="551" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Die folgenden Angaben beziehen sich auf den Kartenausschnitt Ihres Grundstückes auf Seite 1]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="2" y="0" width="551" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Flächenerfassungsbogen zum Kassenzeichen "+ $F{kznr}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="683">
+			<subreport>
+				<reportElement x="0" y="12" width="555" height="300"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{dachflaechen}, false)]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_dachflaechen.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="330" width="555" height="300"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{versiegelteflaechen}, false)]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_versiegelteFlaechen.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="638" width="553" height="29" forecolor="#010101"/>
+				<textElement/>
+				<text><![CDATA[* Sind Sonderflächen angekreuzt, wird ein Nachweis benötigt (siehe Beiblatt). Ohne Nachweis können Sonderflächen nicht anerkannt werden]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30">
+			<textField isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="1" y="2" width="283" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="sansserif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[DateFormat.getDateInstance(DateFormat.FULL).format($V{DATE})+""]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="553" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

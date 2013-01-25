@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import org.openide.util.NbBundle;
+
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +48,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+
+import de.cismet.cids.client.tools.DevelopmentTools;
+
+import de.cismet.cids.custom.reports.wunda_blau.MauernReportBeanWithMapAndImages;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -75,6 +81,11 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(FEPGeneratorDialog.class);
+    private static final String MAP_REPORT = "/de/cismet/cids/custom/report/feb_map<format><orientation>.jasper";
+    private static final String A4_FORMAT = "A4";
+    private static final String A3_FORMAT = "A3";
+    private static final String LANDSCAPE_ORIENTATION = "LS";
+    private static final String PORTRAIT_ORIENTATION = "P";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -85,7 +96,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup btnGroupOrientation;
     private javax.swing.JButton btnPrint;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblFiller;
     private javax.swing.JLabel lblFiller2;
     private javax.swing.JLabel lblFiller3;
     private javax.swing.JLabel lblFormat;
@@ -136,7 +146,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         taHinweise = new javax.swing.JTextArea();
         lblFormat = new javax.swing.JLabel();
         lblOrientation = new javax.swing.JLabel();
-        lblFiller = new javax.swing.JLabel();
         pnlFormat = new javax.swing.JPanel();
         rbA4 = new javax.swing.JRadioButton();
         rbA3 = new javax.swing.JRadioButton();
@@ -150,6 +159,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(311, 250));
+        setPreferredSize(new java.awt.Dimension(500, 300));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -171,7 +181,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
@@ -195,18 +207,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         getContentPane().add(lblOrientation, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblFiller,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(lblFiller, gridBagConstraints);
-
         pnlFormat.setLayout(new java.awt.GridBagLayout());
 
         btnGroupFormat.add(rbA4);
@@ -214,6 +214,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         org.openide.awt.Mnemonics.setLocalizedText(
             rbA4,
             org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.text")); // NOI18N
+        rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbA4.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -224,6 +227,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         org.openide.awt.Mnemonics.setLocalizedText(
             rbA3,
             org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.text")); // NOI18N
+        rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbA3.actionCommand"));                                                   // NOI18N
         rbA3.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -261,6 +267,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         org.openide.awt.Mnemonics.setLocalizedText(
             rbPortraitMode,
             org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.text")); // NOI18N
+        rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbPortraitMode.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -271,6 +280,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         org.openide.awt.Mnemonics.setLocalizedText(
             rbLandscapeMode,
             org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.text")); // NOI18N
+        rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbLandscapeMode.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -309,7 +321,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         getContentPane().add(btnPrint, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
@@ -340,7 +352,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
      * @param  hints  DOCUMENT ME!
      */
     private void generateReport(final String hints) {
-        LOG.fatal("starting report generation for feb report");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("starting report generation for feb report");
+        }
 
         final SwingWorker<Boolean, Object> worker = new SwingWorker<Boolean, Object>() {
 
@@ -353,13 +367,46 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
                             @Override
                             public void run() {
-                                LOG.fatal("show report generation dialog");
                                 StaticSwingTools.showDialog(dialog);
                             }
                         });
-                    LOG.fatal("generating report beans");
-                    final Collection<FebReportBean> reportBeans = new LinkedList<FebReportBean>();
-                    reportBeans.add(new FebReportBean(kassenzeichen, hints));
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("generating report beans");
+                    }
+                    String repMap = "";
+                    String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
+                    String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
+                    if (btnGroupFormat.getSelection().getActionCommand().equals(rbA4.getActionCommand())) {
+                        repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
+                        mapHeightPropkey += A4_FORMAT;
+                        mapWidthPropkey += A4_FORMAT;
+                    } else {
+                        repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
+                        mapHeightPropkey += A3_FORMAT;
+                        mapWidthPropkey += A3_FORMAT;
+                    }
+
+                    if (btnGroupOrientation.getSelection().getActionCommand().equals(
+                                    rbLandscapeMode.getActionCommand())) {
+                        repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
+                        mapHeightPropkey += LANDSCAPE_ORIENTATION;
+                        mapWidthPropkey += LANDSCAPE_ORIENTATION;
+                    } else {
+                        repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
+                        mapHeightPropkey += PORTRAIT_ORIENTATION;
+                        mapWidthPropkey += PORTRAIT_ORIENTATION;
+                    }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Report File for FEB Map: " + repMap);
+                    }
+                    final int mapWidth = Integer.parseInt(NbBundle.getMessage(
+                                FEPGeneratorDialog.class,
+                                mapWidthPropkey));
+                    final int mapHeight = Integer.parseInt(NbBundle.getMessage(
+                                FEPGeneratorDialog.class,
+                                mapHeightPropkey));
+                    final Collection<FEBReportBean> reportBeans = new LinkedList<FEBReportBean>();
+                    reportBeans.add(new FEBReportBean(kassenzeichen, hints, mapHeight, mapWidth, null));
                     boolean ready = false;
 
 //                final Timer timer = new Timer(10000, new ActionListener() {
@@ -370,32 +417,37 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 //                });
                     do {
                         ready = true;
-                        for (final FebReportBean rb : reportBeans) {
+                        for (final FEBReportBean rb : reportBeans) {
                             if (!rb.isReadyToProceed() || forceQuit) {
                                 ready = false;
                                 break;
                             }
                         }
                     } while (!ready);
-                    LOG.fatal("ready to procced");
-                    final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("ready to procced");
+                    }
                     final HashMap parameters = new HashMap();
 
                     final ArrayList<String> reports = new ArrayList<String>();
-                    reports.add("/de/cismet/cids/custom/report/feb_map.jasper");
+
+                    reports.add(repMap);
+                    reports.add("/de/cismet/cids/custom/report/feb_flaechen.jasper");
                     reports.add("/de/cismet/cids/custom/report/feb.jasper");
 
-                    FileOutputStream fos = null;
                     final List<InputStream> ins = new ArrayList<InputStream>();
                     for (final String report : reports) {
                         final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(FEPGeneratorDialog.class
                                         .getResourceAsStream(report));
 
+                        final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
                         // print aus report und daten erzeugen
                         final JasperPrint jasperPrint = JasperFillManager.fillReport(
                                 jasperReport,
                                 parameters,
                                 dataSource);
+                        jasperPrint.setOrientation(jasperReport.getOrientation());
+
                         final ByteArrayOutputStream outTmp = new ByteArrayOutputStream();
                         JasperExportManager.exportReportToPdfStream(jasperPrint, outTmp);
                         ins.add(new ByteArrayInputStream(outTmp.toByteArray()));
@@ -404,10 +456,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                     final ByteArrayOutputStream out = new ByteArrayOutputStream();
                     ReportHelper.concatPDFs(ins, out, true);
                     // zusammengefügten pdfStream in Datei schreiben
-                    final File file = new File("", "report.pdf");
-                    file.getParentFile().mkdirs();
-                    fos = new FileOutputStream(file);
-                    fos.write(out.toByteArray());
 
                     if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
                         final String jobname = DownloadManagerDialog.getJobname();
@@ -415,9 +463,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                         DownloadManager.instance()
                                 .add(new ByteArrayDownload(out.toByteArray(), "", jobname, "feb_report", ".pdf"));
                     }
-                    BrowserLauncher.openURL("file:///" + file);
 
-                    LOG.fatal("starting download job");
                     return true;
                 }
 
