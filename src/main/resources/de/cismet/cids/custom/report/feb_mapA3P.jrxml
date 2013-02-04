@@ -27,9 +27,6 @@
 			<rectangle>
 				<reportElement x="0" y="1009" width="802" height="65"/>
 			</rectangle>
-			<rectangle>
-				<reportElement x="1" y="1" width="798" height="998"/>
-			</rectangle>
 			<staticText>
 				<reportElement x="437" y="1041" width="70" height="17"/>
 				<textElement/>
@@ -39,9 +36,12 @@
 				<reportElement mode="Opaque" x="263" y="1038" width="20" height="20" backcolor="#788180"/>
 			</rectangle>
 			<image>
-				<reportElement x="1" y="1" width="798" height="998"/>
+				<reportElement x="0" y="0" width="802" height="998"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="802" height="998"/>
+			</rectangle>
 			<rectangle>
 				<reportElement x="118" y="1038" width="20" height="20" backcolor="#6A7A17"/>
 			</rectangle>
@@ -93,6 +93,11 @@
 					<font fontName="sansserif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[DateFormat.getDateInstance(DateFormat.FULL).format($V{DATE})+""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="533" y="0" width="269" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Seite "+$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

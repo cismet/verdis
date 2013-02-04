@@ -3,7 +3,9 @@
 	<field name="kznr" class="java.lang.String"/>
 	<field name="mapImage" class="java.lang.Object"/>
 	<field name="scale" class="java.lang.String"/>
-	<variable name="DATE" class="java.util.Date"/>
+	<variable name="DATE" class="java.util.Date">
+		<variableExpression><![CDATA[new Date()]]></variableExpression>
+	</variable>
 	<background>
 		<band/>
 	</background>
@@ -77,13 +79,13 @@
 				<textElement/>
 				<text><![CDATA[versiegelte Flächen]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="2" y="1" width="800" height="411"/>
-			</rectangle>
 			<image>
-				<reportElement x="1" y="1" width="801" height="411"/>
+				<reportElement x="0" y="0" width="802" height="411"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="802" height="411"/>
+			</rectangle>
 		</band>
 	</detail>
 	<pageFooter>
@@ -94,6 +96,11 @@
 					<font fontName="sansserif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[DateFormat.getDateInstance(DateFormat.FULL).format($V{DATE})+""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="533" y="0" width="269" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Seite "+ $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

@@ -71,18 +71,18 @@
 				<textElement/>
 				<text><![CDATA[Maßstab ca. ]]></text>
 			</staticText>
+			<image scaleImage="RetainShape">
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="635"/>
+				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
+			</image>
 			<rectangle>
-				<reportElement x="0" y="0" width="555" height="635"/>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="635"/>
 			</rectangle>
 			<textField>
 				<reportElement x="82" y="700" width="78" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{scale}]]></textFieldExpression>
 			</textField>
-			<image>
-				<reportElement mode="Opaque" x="1" y="1" width="553" height="633"/>
-				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
-			</image>
 		</band>
 	</detail>
 	<pageFooter>
@@ -93,6 +93,11 @@
 					<font fontName="sansserif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[DateFormat.getDateInstance(DateFormat.FULL).format($V{DATE})+""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="297" y="1" width="257" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Seite "+ $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
