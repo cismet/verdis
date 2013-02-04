@@ -26,13 +26,9 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import org.openide.util.NbBundle;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import java.util.ArrayList;
@@ -40,33 +36,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.Timer;
-
-import de.cismet.cids.client.tools.DevelopmentTools;
-
-import de.cismet.cids.custom.reports.wunda_blau.MauernReportBeanWithMapAndImages;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.utils.jasperreports.ReportHelper;
 import de.cismet.cids.utils.jasperreports.ReportSwingWorkerDialog;
 
-import de.cismet.cismap.commons.gui.printing.JasperDownload;
-
-import de.cismet.tools.BrowserLauncher;
-
 import de.cismet.tools.gui.StaticSwingTools;
-import de.cismet.tools.gui.downloadmanager.AbstractDownload;
 import de.cismet.tools.gui.downloadmanager.ByteArrayDownload;
-import de.cismet.tools.gui.downloadmanager.Download;
-import de.cismet.tools.gui.downloadmanager.Download.State;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
@@ -95,12 +77,14 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup btnGroupFormat;
     private javax.swing.ButtonGroup btnGroupOrientation;
     private javax.swing.JButton btnPrint;
+    private javax.swing.JComboBox cbScale;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFiller2;
     private javax.swing.JLabel lblFiller3;
     private javax.swing.JLabel lblFormat;
     private javax.swing.JLabel lblHinweise;
     private javax.swing.JLabel lblOrientation;
+    private javax.swing.JLabel lblScale;
     private javax.swing.JPanel pnlFormat;
     private javax.swing.JPanel pnlOrientation;
     private javax.swing.JRadioButton rbA3;
@@ -155,16 +139,16 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         rbLandscapeMode = new javax.swing.JRadioButton();
         lblFiller3 = new javax.swing.JLabel();
         btnPrint = new javax.swing.JButton();
+        lblScale = new javax.swing.JLabel();
+        cbScale = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.title")); // NOI18N
-        setMinimumSize(new java.awt.Dimension(311, 250));
-        setPreferredSize(new java.awt.Dimension(500, 300));
+        setMinimumSize(new java.awt.Dimension(450, 250));
+        setPreferredSize(new java.awt.Dimension(450, 250));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblHinweise,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblHinweise.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblHinweise, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblHinweise.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -173,8 +157,10 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         getContentPane().add(lblHinweise, gridBagConstraints);
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(26, 50));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(262, 80));
 
         taHinweise.setColumns(20);
+        taHinweise.setLineWrap(true);
         taHinweise.setRows(5);
         jScrollPane1.setViewportView(taHinweise);
 
@@ -187,22 +173,18 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblFormat,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFormat.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblFormat, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFormat.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         getContentPane().add(lblFormat, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblOrientation,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblOrientation.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblOrientation, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblOrientation.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         getContentPane().add(lblOrientation, gridBagConstraints);
@@ -211,12 +193,8 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         btnGroupFormat.add(rbA4);
         rbA4.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(
-            rbA4,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.text")); // NOI18N
-        rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(
-                FEPGeneratorDialog.class,
-                "FEPGeneratorDialog.rbA4.actionCommand"));                                                   // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(rbA4, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.text")); // NOI18N
+        rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.actionCommand")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -224,28 +202,21 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         pnlFormat.add(rbA4, gridBagConstraints);
 
         btnGroupFormat.add(rbA3);
-        org.openide.awt.Mnemonics.setLocalizedText(
-            rbA3,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.text")); // NOI18N
-        rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(
-                FEPGeneratorDialog.class,
-                "FEPGeneratorDialog.rbA3.actionCommand"));                                                   // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(rbA3, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.text")); // NOI18N
+        rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.actionCommand")); // NOI18N
         rbA3.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    rbA3ActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbA3ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlFormat.add(rbA3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblFiller2,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblFiller2, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -255,7 +226,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(pnlFormat, gridBagConstraints);
@@ -264,12 +235,8 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         btnGroupOrientation.add(rbPortraitMode);
         rbPortraitMode.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(
-            rbPortraitMode,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.text")); // NOI18N
-        rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(
-                FEPGeneratorDialog.class,
-                "FEPGeneratorDialog.rbPortraitMode.actionCommand"));                                                   // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(rbPortraitMode, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.text")); // NOI18N
+        rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.actionCommand")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -277,21 +244,16 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         pnlOrientation.add(rbPortraitMode, gridBagConstraints);
 
         btnGroupOrientation.add(rbLandscapeMode);
-        org.openide.awt.Mnemonics.setLocalizedText(
-            rbLandscapeMode,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.text")); // NOI18N
-        rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(
-                FEPGeneratorDialog.class,
-                "FEPGeneratorDialog.rbLandscapeMode.actionCommand"));                                                   // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(rbLandscapeMode, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.text")); // NOI18N
+        rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.actionCommand")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlOrientation.add(rbLandscapeMode, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            lblFiller3,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblFiller3, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -301,50 +263,79 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(pnlOrientation, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            btnPrint,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnPrint, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnPrintActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         getContentPane().add(btnPrint, gridBagConstraints);
-    } // </editor-fold>//GEN-END:initComponents
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblScale, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblScale.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
+        getContentPane().add(lblScale, gridBagConstraints);
+
+        cbScale.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "optimal angepasst", "1:500", " " }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
+        getContentPane().add(cbScale, gridBagConstraints);
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_rbA3ActionPerformed
-    }                                                                        //GEN-LAST:event_rbA3ActionPerformed
+    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbA3ActionPerformed
+    }//GEN-LAST:event_rbA3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
+    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         final List<CidsBean> beans = new LinkedList<CidsBean>();
         beans.add(kassenzeichen);
 //        FebReportGenerator.generateFEBReport(beans, hints, parent);
         generateReport(taHinweise.getText());
         this.setVisible(false);
-    }                                                                            //GEN-LAST:event_btnPrintActionPerformed
+    }//GEN-LAST:event_btnPrintActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Double getSelectedScaleDenominator() {
+        final String scale = (String)cbScale.getSelectedItem();
+        if (scale.matches("1:[0-9]+")) {
+            // format of string eg 1:500
+            LOG.fatal("Scale 1:500");
+            final String[] splittedScale = scale.split(":");
+            return Double.parseDouble(splittedScale[1]);
+        } else {
+            return null;
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -405,8 +396,14 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                     final int mapHeight = Integer.parseInt(NbBundle.getMessage(
                                 FEPGeneratorDialog.class,
                                 mapHeightPropkey));
+
                     final Collection<FEBReportBean> reportBeans = new LinkedList<FEBReportBean>();
-                    reportBeans.add(new FEBReportBean(kassenzeichen, hints, mapHeight, mapWidth, null));
+                    reportBeans.add(new FEBReportBean(
+                            kassenzeichen,
+                            hints,
+                            mapHeight,
+                            mapWidth,
+                            getSelectedScaleDenominator()));
                     boolean ready = false;
 
 //                final Timer timer = new Timer(10000, new ActionListener() {
@@ -433,7 +430,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
                     reports.add(repMap);
                     reports.add("/de/cismet/cids/custom/report/feb_flaechen.jasper");
-                    reports.add("/de/cismet/cids/custom/report/feb.jasper");
 
                     final List<InputStream> ins = new ArrayList<InputStream>();
                     for (final String report : reports) {
@@ -454,7 +450,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                         outTmp.close();
                     }
                     final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    ReportHelper.concatPDFs(ins, out, true);
+                    ReportHelper.concatPDFs(ins, out, false);
                     // zusammengefügten pdfStream in Datei schreiben
 
                     if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
@@ -481,8 +477,8 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                     dialog.setVisible(false);
                     if (error) {
                         final ErrorInfo ei = new ErrorInfo(
-                                "foo", // NOI18N
-                                "bar", // NOI18N
+                                "Error",                           // NOI18N
+                                "Error during report generation.", // NOI18N
                                 null,
                                 null,
                                 null,

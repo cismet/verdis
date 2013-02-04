@@ -11,12 +11,13 @@
  */
 package de.cismet.cids.custom.report;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.swing.JFrame;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
 
@@ -55,62 +56,17 @@ public class FEBReportTester {
                 "SteinbacherD102",
                 "kif",
                 "kassenzeichen",
-                74211);
-//                41);
+//                74211);
+                41);
         final CidsBean[] beans = new CidsBean[1];
         beans[0] = kassenzeiechenBean;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Anzahl:" + beans.length);
         }
 //        final CidsBean[] reportBeans = new CidsBean[beans.length];
-        final List<FEBReportBean> reportbeans = new ArrayList<FEBReportBean>();
-        final int i = 0;
-        for (final CidsBean kassenzeichen : beans) {
-            final FEBReportBean x = new FEBReportBean(kassenzeichen, null, 500, 500, null);
-            reportbeans.add(x);
-        }
 
-        final ArrayList<String> fields = new ArrayList<String>(Arrays.asList(
-                    KassenzeichenPropertyConstants.PROP__FLAECHEN
-                            + "."
-                            + FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
-                    KassenzeichenPropertyConstants.PROP__FLAECHEN
-                            + "."
-                            + FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
-        LOG.fatal(Arrays.toString(fields.toArray()));
-
-        for (final String pv : fields) {
-            try {
-//                final Object out = BeanUtils.getProperty(beans[0], pv);
-                System.out.println("<field name=\"" + pv + "\" class=\"java.lang.String\"/>");
-            } catch (Exception skip) {
-                LOG.fatal(skip, skip);
-
-                System.out.println("!" + pv + "-->Problem");
-            }
-        }
-
-        boolean ready = false;
-        do {
-            ready = true;
-            for (final FEBReportBean f : reportbeans) {
-                if (!f.isReadyToProceed()) {
-                    ready = false;
-                    break;
-                }
-            }
-        } while (!ready);
-
-        DevelopmentTools.showReportForBeans(
-            "/de/cismet/cids/custom/report/feb.jasper",
-            reportbeans);
-        DevelopmentTools.showReportForBeans(
-            "/de/cismet/cids/custom/report/feb_map.jasper",
-            reportbeans);
+        final FEPGeneratorDialog dialog = new FEPGeneratorDialog(kassenzeiechenBean, new JFrame());
+        dialog.show();
         System.out.println("alles fertich.ok");
     }
 }

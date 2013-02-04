@@ -26,6 +26,8 @@ import java.awt.image.BufferedImage;
 
 import java.io.File;
 
+import java.text.NumberFormat;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -85,14 +87,14 @@ public class FEBReportBean {
      *
      * @param  kassenzeichen     DOCUMENT ME!
      * @param  hinweise          DOCUMENT ME!
-     * @param  mapWidth          DOCUMENT ME!
      * @param  mapHeight         DOCUMENT ME!
+     * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      */
     public FEBReportBean(final CidsBean kassenzeichen,
             final String hinweise,
-            final int mapWidth,
             final int mapHeight,
+            final int mapWidth,
             final Double scaleDenominator) {
         this.hinweise = hinweise;
         this.kassenzeichen = kassenzeichen;
@@ -100,14 +102,6 @@ public class FEBReportBean {
         this.mapWidth = mapWidth;
         this.scaleDenominator = scaleDenominator;
         loadMap();
-//        try {
-//            mapImage = ImageIO.read(new URL(
-//                    "https://a248.e.akamai.net/camo.github.com/c4062119d25b4965518ed8d0fda31ae2f2c1ab7b/687474703a2f2f7777772e6369736d65742e64652f696d616765732f70726f6a656374732f73637265656e65722f7665726469732e706e67"));
-//        } catch (MalformedURLException ex) {
-//            Exceptions.printStackTrace(ex);
-//        } catch (IOException ex) {
-//            Exceptions.printStackTrace(ex);
-//        }
         kznr = ""
                     + (Integer)this.kassenzeichen.getProperty(
                         KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
@@ -126,7 +120,7 @@ public class FEBReportBean {
             }
         }
         Collections.sort(dachflaechen, new DachflaechenComparator());
-        Collections.sort(versiegelteflaechen, new DachflaechenComparator());
+        Collections.sort(versiegelteflaechen, new VersiegelteFlaechenComparator());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -272,7 +266,7 @@ public class FEBReportBean {
      */
     private void loadMap() {
         final SimpleWMS s = new SimpleWMS(new SimpleWmsGetMapUrl(
-                    "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:25832&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
+                    "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
         final MappingComponent map = new MappingComponent(false);
 
         final ActiveLayerModel mappingModel = new ActiveLayerModel();
@@ -280,7 +274,9 @@ public class FEBReportBean {
 
                 @Override
                 public void retrievalStarted(final RetrievalEvent e) {
-                    System.out.println("Start");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("start map retrieval for feb report");
+                    }
                 }
 
                 @Override
@@ -309,8 +305,9 @@ public class FEBReportBean {
                                 // Draw img into bi so we can write it to file.
                                 g2.drawImage(img, 0, 0, null);
                                 g2.dispose();
-                                final File outputfile = new File("saved.png");
-                                ImageIO.write(bi, "png", outputfile);
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("bi size (h/w): " + bi.getHeight() + "/" + bi.getWidth());
+                                }
                                 mapImage = bi;
                                 System.out.println("karte geladen " + bi);
                             } catch (Exception ex) {
@@ -322,37 +319,47 @@ public class FEBReportBean {
 
                 @Override
                 public void retrievalAborted(final RetrievalEvent e) {
-                    LOG.fatal("map retrieval for feb report aborted");
-                    mapError = true;
+//                    LOG.fatal("map retrieval for feb report aborted");
+//                    LOG.fatal("map retrieval for feb report aborted: " + e.getErrorType() + " " + e.toString());
+                    LOG.fatal(
+                        "map retrieval for feb report aborted: "
+                                + e.getErrorType() // NOI18N
+                                + " Errors: "      // NOI18N
+                                + e.getErrors()
+                                + " Cause: "
+                                + e.getRetrievedObject()); // NOI18N
+//                    mapError = true;
                 }
 
                 @Override
                 public void retrievalError(final RetrievalEvent e) {
-                    LOG.fatal("map retrieval error for feb report");
+//                    LOG.fatal("map retrieval error for feb report");
+                    LOG.fatal("map retrieval error for feb report: " + e.getErrorType() + " " + e.toString());
                     mapError = true;
                 }
             });
         // disable internal layer widget
         map.setInternalLayerWidgetAvailable(false);
-        mappingModel.setSrs(new Crs("EPSG:25832", "", "", true, true));
+        mappingModel.setSrs(new Crs("EPSG:31466", "", "", true, true));
         mappingModel.addHome(new XBoundingBox(
                 579146.311157169,
                 5679930.726695932,
                 2579645.8713909937,
                 5680274.612347874,
-                "EPSG:25832",
+                "EPSG:31466",
                 true));
 
         // set the model
         map.setMappingModel(mappingModel);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("setting map size(h/w) to: " + mapHeight + "/" + mapWidth);
+        }
         map.setSize(mapWidth, mapHeight);
         // initial positioning of the map
         map.setAnimationDuration(0);
         map.gotoInitialBoundingBox();
+
         map.unlock();
-//        if (scaleDenominator != null) {
-//            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(scaleDenominator));
-//        }
 
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -375,11 +382,23 @@ public class FEBReportBean {
         }
         map.zoomToFeatureCollection();
 
+        if (scaleDenominator != null) {
+            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(scaleDenominator));
+            scale = "1:" + NumberFormat.getIntegerInstance().format(scaleDenominator);
+        } else {
+            double so;
+            if (map.getScaleDenominator() > 1000) {
+                so = Math.round((map.getScaleDenominator() / 100) + 0.5d) * 100;
+            } else {
+                so = Math.round((map.getScaleDenominator() / 10) + 0.5) * 10;
+            }
+            scale = "1:" + NumberFormat.getIntegerInstance().format(so);
+
+            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(so));
+        }
         map.setInteractionMode(MappingComponent.SELECT);
 
         mappingModel.addLayer(s);
-        final int sd = (int)(map.getScaleDenominator() + 0.5);
-        scale = "1:" + sd;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -390,6 +409,26 @@ public class FEBReportBean {
      * @version  $Revision$, $Date$
      */
     private final class DachflaechenComparator implements Comparator<CidsBean> {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public int compare(final CidsBean df1, final CidsBean df2) {
+            final Integer df1Name = Integer.parseInt((String)df1.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
+            final Integer df2Name = Integer.parseInt((String)df2.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
+
+            return df1Name.compareTo(df2Name);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private final class VersiegelteFlaechenComparator implements Comparator<CidsBean> {
 
         //~ Methods ------------------------------------------------------------
 
