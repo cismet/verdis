@@ -22,6 +22,7 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
@@ -54,6 +55,8 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
+import de.cismet.verdis.gui.Main;
+
 /**
  * DOCUMENT ME!
  *
@@ -65,6 +68,8 @@ public class FEBReportBean {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(FEBReportBean.class);
+    private static final int FLAECHE_TRANSPARENCY = 150;
+    private static final Color FEB_REPORT_OEKOPFLASTER_COLOR = new Color(140, 198, 96, FLAECHE_TRANSPARENCY);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -374,10 +379,12 @@ public class FEBReportBean {
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
             final DefaultStyledFeature dsf = new DefaultStyledFeature();
             dsf.setGeometry(g);
-            dsf.setFillingPaint(fr.getFillingStyle());
+            final Color c = (Color)fr.getFillingStyle();
+            final Color c2;
+            c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
+            dsf.setFillingPaint(c2);
             dsf.setLineWidth(1);
-            dsf.setLinePaint(Color.BLACK);
-            dsf.setTransparency(0.8f);
+            dsf.setLinePaint(Color.RED);
             map.getFeatureCollection().addFeature(dsf);
         }
         map.zoomToFeatureCollection();
