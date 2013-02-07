@@ -8,11 +8,6 @@
 	</variable>
 	<pageHeader>
 		<band height="52">
-			<staticText>
-				<reportElement x="0" y="20" width="802" height="20"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[Die folgenden Angaben beziehen sich auf den Kartenausschnitt Ihres Grundstückes auf Seite 1]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="0" y="0" width="802" height="20"/>
 				<textElement textAlignment="Center">

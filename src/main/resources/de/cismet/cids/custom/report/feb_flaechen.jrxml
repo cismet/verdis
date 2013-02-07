@@ -39,7 +39,7 @@
 				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_versiegelteFlaechen.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement positionType="Float" x="2" y="106" width="570" height="12" forecolor="#010101"/>
+				<reportElement positionType="Float" x="2" y="106" width="570" height="12" forecolor="#FF0000"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>

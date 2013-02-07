@@ -28,10 +28,10 @@
 			</staticText>
 			<staticText>
 				<reportElement x="490" y="0" width="64" height="31"/>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Bottom" markup="styled">
 					<font size="10"/>
 				</textElement>
-				<text><![CDATA[Sonder-flächen*]]></text>
+				<text><![CDATA[Sonder-flächen<style forecolor="red">*</style>]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="200" y="0" width="290" height="31"/>

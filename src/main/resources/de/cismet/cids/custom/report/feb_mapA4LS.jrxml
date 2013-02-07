@@ -18,11 +18,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Flächenerfassungsbogen zum Kassenzeichen "+ $F{kznr}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="2" y="22" width="800" height="20"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[Die folgenden Angaben beziehen sich auf den Kartenausschnitt Ihres Grundstückes auf Seite 1]]></text>
-			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
@@ -79,7 +74,7 @@
 				<textElement/>
 				<text><![CDATA[versiegelte Flächen]]></text>
 			</staticText>
-			<image>
+			<image scaleImage="RealSize">
 				<reportElement x="0" y="0" width="802" height="411"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>

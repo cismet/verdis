@@ -8,11 +8,6 @@
 	</variable>
 	<pageHeader>
 		<band height="52">
-			<staticText>
-				<reportElement x="0" y="30" width="555" height="20"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[Die folgenden Angaben beziehen sich auf den Kartenausschnitt Ihres Grundstückes auf Seite 1]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="0" y="10" width="555" height="20"/>
 				<textElement textAlignment="Center">
@@ -35,16 +30,16 @@
 				<text><![CDATA[Legende]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="16" y="675" width="20" height="20" backcolor="#A24C29"/>
+				<reportElement x="16" y="675" width="20" height="20" backcolor="#C89580"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="117" y="675" width="20" height="20" backcolor="#6A7A17"/>
+				<reportElement x="117" y="675" width="20" height="20" backcolor="#929B62"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Opaque" x="263" y="675" width="20" height="20" backcolor="#788180"/>
+				<reportElement mode="Opaque" x="263" y="675" width="20" height="20" backcolor="#AFB3B2"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="404" y="675" width="20" height="20" backcolor="#9F9B6C"/>
+				<reportElement x="404" y="675" width="20" height="20" backcolor="#C8C2AA"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="39" y="678" width="68" height="20"/>
@@ -71,7 +66,7 @@
 				<textElement/>
 				<text><![CDATA[Maßstab ca. ]]></text>
 			</staticText>
-			<image scaleImage="RetainShape">
+			<image scaleImage="RealSize">
 				<reportElement mode="Opaque" x="0" y="0" width="555" height="635"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
