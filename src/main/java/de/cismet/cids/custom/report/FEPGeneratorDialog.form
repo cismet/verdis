@@ -258,7 +258,7 @@
           <StringArray count="3">
             <StringItem index="0" value="optimal angepasst"/>
             <StringItem index="1" value="1:500"/>
-            <StringItem index="2" value=" "/>
+            <StringItem index="2" value="1:1000"/>
           </StringArray>
         </Property>
       </Properties>

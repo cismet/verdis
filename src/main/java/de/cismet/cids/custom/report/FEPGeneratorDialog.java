@@ -148,7 +148,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         setPreferredSize(new java.awt.Dimension(450, 250));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblHinweise, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblHinweise.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblHinweise,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblHinweise.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -173,7 +175,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblFormat, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFormat.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblFormat,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFormat.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -181,7 +185,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         getContentPane().add(lblFormat, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblOrientation, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblOrientation.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblOrientation,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblOrientation.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -193,8 +199,12 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         btnGroupFormat.add(rbA4);
         rbA4.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(rbA4, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.text")); // NOI18N
-        rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            rbA4,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA4.text")); // NOI18N
+        rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbA4.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -202,13 +212,19 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         pnlFormat.add(rbA4, gridBagConstraints);
 
         btnGroupFormat.add(rbA3);
-        org.openide.awt.Mnemonics.setLocalizedText(rbA3, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.text")); // NOI18N
-        rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            rbA3,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbA3.text")); // NOI18N
+        rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbA3.actionCommand"));                                                   // NOI18N
         rbA3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbA3ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    rbA3ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -216,7 +232,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlFormat.add(rbA3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblFiller2, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblFiller2,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -235,8 +253,12 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
 
         btnGroupOrientation.add(rbPortraitMode);
         rbPortraitMode.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(rbPortraitMode, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.text")); // NOI18N
-        rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            rbPortraitMode,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbPortraitMode.text")); // NOI18N
+        rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbPortraitMode.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -244,8 +266,12 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         pnlOrientation.add(rbPortraitMode, gridBagConstraints);
 
         btnGroupOrientation.add(rbLandscapeMode);
-        org.openide.awt.Mnemonics.setLocalizedText(rbLandscapeMode, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.text")); // NOI18N
-        rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            rbLandscapeMode,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.rbLandscapeMode.text")); // NOI18N
+        rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(
+                FEPGeneratorDialog.class,
+                "FEPGeneratorDialog.rbLandscapeMode.actionCommand"));                                                   // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -253,7 +279,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlOrientation.add(rbLandscapeMode, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblFiller3, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblFiller3,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblFiller3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -269,12 +297,16 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(pnlOrientation, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(btnPrint, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnPrint,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
         btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnPrintActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -282,7 +314,9 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         getContentPane().add(btnPrint, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblScale, org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblScale.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblScale,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblScale.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -290,35 +324,35 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         getContentPane().add(lblScale, gridBagConstraints);
 
-        cbScale.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "optimal angepasst", "1:500", " " }));
+        cbScale.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "optimal angepasst", "1:500", "1:1000" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(cbScale, gridBagConstraints);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbA3ActionPerformed
-    }//GEN-LAST:event_rbA3ActionPerformed
+    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_rbA3ActionPerformed
+    }                                                                        //GEN-LAST:event_rbA3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
         final List<CidsBean> beans = new LinkedList<CidsBean>();
         beans.add(kassenzeichen);
 //        FebReportGenerator.generateFEBReport(beans, hints, parent);
         generateReport(taHinweise.getText());
         this.setVisible(false);
-    }//GEN-LAST:event_btnPrintActionPerformed
+    }                                                                            //GEN-LAST:event_btnPrintActionPerformed
 
     /**
      * DOCUMENT ME!
