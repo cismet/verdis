@@ -118,9 +118,9 @@ public class FEBReportBean {
                             + "."
                             + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
                             + FlaechenartPropertyConstants.PROP__ART);
-            if (flaechenart.equals("Dachfläche")) {
+            if (flaechenart.equals("Dachfläche") || flaechenart.equals("Gründach")) {
                 dachflaechen.add(flaeche);
-            } else if (flaechenart.equals("versiegelte Fläche")) {
+            } else if (flaechenart.equals("versiegelte Fläche") || flaechenart.equals("Ökopflaster")) {
                 versiegelteflaechen.add(flaeche);
             }
         }
