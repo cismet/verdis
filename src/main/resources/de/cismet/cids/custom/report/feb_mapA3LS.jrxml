@@ -33,10 +33,10 @@
 				<reportElement x="2" y="643" width="1148" height="60"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="471" y="672" width="20" height="20" backcolor="#8CC660"/>
+				<reportElement x="471" y="672" width="20" height="20" backcolor="#C8C2AA"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="17" y="672" width="20" height="20" backcolor="#A24C29"/>
+				<reportElement x="17" y="672" width="20" height="20" backcolor="#C89580"/>
 			</rectangle>
 			<textField>
 				<reportElement x="648" y="674" width="78" height="20"/>
@@ -66,10 +66,10 @@
 				<text><![CDATA[Legende]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="132" y="672" width="20" height="20" backcolor="#6A7A17"/>
+				<reportElement x="132" y="672" width="20" height="20" backcolor="#929B62"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Opaque" x="297" y="672" width="20" height="20" backcolor="#788180"/>
+				<reportElement mode="Opaque" x="297" y="672" width="20" height="20" backcolor="#AFB3B2"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="582" y="674" width="66" height="20"/>

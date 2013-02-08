@@ -31,10 +31,10 @@
 				<text><![CDATA[Ökopflaster]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement mode="Opaque" x="295" y="451" width="20" height="20" backcolor="#788180"/>
+				<reportElement mode="Opaque" x="295" y="451" width="20" height="20" backcolor="#AFB3B2"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="130" y="451" width="20" height="20" backcolor="#6A7A17"/>
+				<reportElement x="130" y="451" width="20" height="20" backcolor="#929B62"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="153" y="455" width="120" height="19"/>
@@ -52,7 +52,7 @@
 				<text><![CDATA[Dachflächen]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="466" y="451" width="20" height="20" backcolor="#9F9B6C"/>
+				<reportElement x="466" y="451" width="20" height="20" backcolor="#C8C2AA"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="580" y="453" width="66" height="20"/>
@@ -60,7 +60,7 @@
 				<text><![CDATA[Maßstab ca. ]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="15" y="451" width="20" height="20" backcolor="#A24C29"/>
+				<reportElement x="15" y="451" width="20" height="20" backcolor="#C89580"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="15" y="427" width="100" height="20"/>
