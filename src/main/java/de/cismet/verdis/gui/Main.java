@@ -66,8 +66,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Element;
 
-import java.applet.AppletContext;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,6 +87,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+
+import de.cismet.cids.custom.report.FEPGeneratorDialog;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -232,7 +232,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private final Map<String, Double> veranlagungSummeMap = new HashMap<String, Double>();
 //    private final Map<String, Integer> strassenreinigungSummeMap = new HashMap<String, Integer>();
 //    private final Map<String, Integer> winterdienstSummeMap = new HashMap<String, Integer>();
-
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -302,7 +301,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private PluginContext context;
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
@@ -2912,34 +2910,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
-            final Integer kassenzeichen = (Integer)kassenzeichenBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-            if (kassenzeichen != null) {
-                try {
-                    final String gotoUrl = prefs.getReportUrl() + kassenzeichen;
-                    AppletContext appletContext = null;
-                    try {
-                        appletContext = context.getEnvironment().getAppletContext();
-                    } catch (Exception npe) {
-                        // nothing to do
+            final FEPGeneratorDialog dialog = new FEPGeneratorDialog(kassenzeichenBean, this);
+
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        StaticSwingTools.showDialog(dialog);
                     }
-                    if (appletContext == null) {
-                        de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
-                    } else {
-                        final java.net.URL u = new java.net.URL(gotoUrl);
-                        appletContext.showDocument(u, "verdisReportFrame");
-                    }
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Fehler beim Anzeigen des VERDIS-Reports",
-                        "Fehler",
-                        JOptionPane.ERROR_MESSAGE);
-                    LOG.error("Fehler beim Anzeigen des VERDIS-Reports", e);
-                }
-            }
+                });
         }
-    }                                                                          //GEN-LAST:event_cmdPdfActionPerformed
+    } //GEN-LAST:event_cmdPdfActionPerformed
 
     /**
      * DOCUMENT ME!
