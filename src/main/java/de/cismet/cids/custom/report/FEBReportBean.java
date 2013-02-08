@@ -20,21 +20,18 @@ import org.apache.log4j.Logger;
 import org.openide.util.Exceptions;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Paint;
 import java.awt.image.BufferedImage;
-
-import java.io.File;
 
 import java.text.NumberFormat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
 
@@ -43,6 +40,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cismap.commons.Crs;
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.features.DefaultStyledFeature;
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollection;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
@@ -54,8 +53,6 @@ import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-
-import de.cismet.verdis.gui.Main;
 
 /**
  * DOCUMENT ME!
@@ -353,7 +350,6 @@ public class FEBReportBean {
                 5680274.612347874,
                 "EPSG:31466",
                 true));
-
         // set the model
         map.setMappingModel(mappingModel);
         if (LOG.isDebugEnabled()) {
@@ -377,6 +373,7 @@ public class FEBReportBean {
             }
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
+            final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
             final DefaultStyledFeature dsf = new DefaultStyledFeature();
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
@@ -385,6 +382,10 @@ public class FEBReportBean {
             dsf.setFillingPaint(c2);
             dsf.setLineWidth(1);
             dsf.setLinePaint(Color.RED);
+            dsf.setPrimaryAnnotation("(" + flaechenbez + ")");
+            dsf.setPrimaryAnnotationPaint(Color.RED);
+            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, 2));
+            dsf.setPrimaryAnnotationScaling(1);
             map.getFeatureCollection().addFeature(dsf);
         }
         map.zoomToFeatureCollection();
@@ -404,7 +405,20 @@ public class FEBReportBean {
             map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(so));
         }
         map.setInteractionMode(MappingComponent.SELECT);
-
+        // since the scale could have changed we have to ensure that the annotations will get to big or to small
+        final FeatureCollection fc = map.getFeatureCollection();
+        final ArrayList<DefaultStyledFeature> newFeatures = new ArrayList<DefaultStyledFeature>();
+        for (final Feature f : fc.getAllFeatures()) {
+            final DefaultStyledFeature newDsf = new DefaultStyledFeature((DefaultStyledFeature)f);
+            if (map.getScaleDenominator() < 200) {
+                newDsf.setPrimaryAnnotationScaling(0.2);
+            } else if (map.getScaleDenominator() > 1000) {
+                newDsf.setPrimaryAnnotationScaling(1.5);
+            }
+            newFeatures.add(newDsf);
+        }
+        fc.removeAllFeatures();
+        fc.addFeatures(newFeatures);
         mappingModel.addLayer(s);
     }
 
