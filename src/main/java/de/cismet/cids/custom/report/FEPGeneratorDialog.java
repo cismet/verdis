@@ -74,6 +74,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     private CidsBean kassenzeichen;
     private Frame parent;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
     private javax.swing.ButtonGroup btnGroupFormat;
     private javax.swing.ButtonGroup btnGroupOrientation;
     private javax.swing.JButton btnPrint;
@@ -85,6 +86,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblHinweise;
     private javax.swing.JLabel lblOrientation;
     private javax.swing.JLabel lblScale;
+    private javax.swing.JPanel pnlButtons;
     private javax.swing.JPanel pnlFormat;
     private javax.swing.JPanel pnlOrientation;
     private javax.swing.JRadioButton rbA3;
@@ -138,9 +140,11 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         rbPortraitMode = new javax.swing.JRadioButton();
         rbLandscapeMode = new javax.swing.JRadioButton();
         lblFiller3 = new javax.swing.JLabel();
-        btnPrint = new javax.swing.JButton();
         lblScale = new javax.swing.JLabel();
         cbScale = new javax.swing.JComboBox();
+        pnlButtons = new javax.swing.JPanel();
+        btnPrint = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.title")); // NOI18N
@@ -298,23 +302,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         getContentPane().add(pnlOrientation, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
-            btnPrint,
-            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnPrintActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
-        getContentPane().add(btnPrint, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
             lblScale,
             org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.lblScale.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -331,6 +318,47 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(cbScale, gridBagConstraints);
+
+        pnlButtons.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnPrint,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnPrint.text")); // NOI18N
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnPrintActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
+        pnlButtons.add(btnPrint, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnCancel,
+            org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.btnCancel.text")); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnCancelActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
+        pnlButtons.add(btnCancel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        getContentPane().add(pnlButtons, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -353,6 +381,15 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         generateReport(taHinweise.getText());
         this.setVisible(false);
     }                                                                            //GEN-LAST:event_btnPrintActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+        this.setVisible(false);
+    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
