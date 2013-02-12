@@ -66,7 +66,7 @@
 				<textElement/>
 				<text><![CDATA[Maßstab ca. ]]></text>
 			</staticText>
-			<image scaleImage="RealSize">
+			<image scaleImage="RetainShape">
 				<reportElement mode="Opaque" x="0" y="0" width="555" height="635"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
