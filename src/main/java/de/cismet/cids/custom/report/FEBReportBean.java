@@ -27,11 +27,11 @@ import java.awt.image.BufferedImage;
 
 import java.text.NumberFormat;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
 
@@ -39,20 +39,21 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.Crs;
 import de.cismet.cismap.commons.XBoundingBox;
-import de.cismet.cismap.commons.features.DefaultStyledFeature;
-import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollection;
+import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
+import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 
+
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -365,6 +366,9 @@ public class FEBReportBean {
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
+        final int fontSize = Integer.parseInt(NbBundle.getMessage(
+                                FEBReportBean.class,
+                                "FEBReportBean.annotationFontSize"));
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());
@@ -374,7 +378,12 @@ public class FEBReportBean {
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
             final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            final DefaultStyledFeature dsf = new DefaultStyledFeature();
+            final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
+                    null,
+                    "",
+                    "",
+                    null,
+                    new CustomFixedWidthStroke(1f));
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
             final Color c2;
@@ -382,10 +391,10 @@ public class FEBReportBean {
             dsf.setFillingPaint(c2);
             dsf.setLineWidth(1);
             dsf.setLinePaint(Color.RED);
-            dsf.setPrimaryAnnotation("(" + flaechenbez + ")");
+            dsf.setPrimaryAnnotation(flaechenbez);
             dsf.setPrimaryAnnotationPaint(Color.RED);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, 2));
-            dsf.setPrimaryAnnotationScaling(1);
+            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            dsf.setAutoScale(true);
             map.getFeatureCollection().addFeature(dsf);
         }
         map.zoomToFeatureCollection();
@@ -405,20 +414,6 @@ public class FEBReportBean {
             map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(so));
         }
         map.setInteractionMode(MappingComponent.SELECT);
-        // since the scale could have changed we have to ensure that the annotations will get to big or to small
-        final FeatureCollection fc = map.getFeatureCollection();
-        final ArrayList<DefaultStyledFeature> newFeatures = new ArrayList<DefaultStyledFeature>();
-        for (final Feature f : fc.getAllFeatures()) {
-            final DefaultStyledFeature newDsf = new DefaultStyledFeature((DefaultStyledFeature)f);
-            if (map.getScaleDenominator() < 200) {
-                newDsf.setPrimaryAnnotationScaling(0.2);
-            } else if (map.getScaleDenominator() > 1000) {
-                newDsf.setPrimaryAnnotationScaling(1.5);
-            }
-            newFeatures.add(newDsf);
-        }
-        fc.removeAllFeatures();
-        fc.addFeatures(newFeatures);
         mappingModel.addLayer(s);
     }
 
