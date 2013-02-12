@@ -467,13 +467,19 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                     final int mapHeight = Integer.parseInt(NbBundle.getMessage(
                                 FEPGeneratorDialog.class,
                                 mapHeightPropkey));
+                    final int mapDPI = Integer.parseInt(NbBundle.getMessage(
+                                FEPGeneratorDialog.class,
+                                "FEPGeneratorDialog.mapDPI"));
+                    final int factor = mapDPI / 72;
 
                     final Collection<FEBReportBean> reportBeans = new LinkedList<FEBReportBean>();
                     reportBeans.add(new FEBReportBean(
                             kassenzeichen,
                             hints,
-                            mapHeight,
-                            mapWidth,
+                            mapHeight
+                                    * factor,
+                            mapWidth
+                                    * factor,
                             getSelectedScaleDenominator()));
                     boolean ready = false;
 

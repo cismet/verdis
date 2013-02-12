@@ -74,7 +74,7 @@
 				<textElement/>
 				<text><![CDATA[versiegelte Flächen]]></text>
 			</staticText>
-			<image scaleImage="RealSize">
+			<image scaleImage="RetainShape">
 				<reportElement x="0" y="0" width="802" height="411"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
