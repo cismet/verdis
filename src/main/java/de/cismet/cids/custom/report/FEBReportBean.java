@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -32,11 +33,11 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.Crs;
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
@@ -48,12 +49,10 @@ import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 
-
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -68,6 +67,7 @@ public class FEBReportBean {
     private static final Logger LOG = Logger.getLogger(FEBReportBean.class);
     private static final int FLAECHE_TRANSPARENCY = 150;
     private static final Color FEB_REPORT_OEKOPFLASTER_COLOR = new Color(140, 198, 96, FLAECHE_TRANSPARENCY);
+    private static final double ppi = 72.156d;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -288,7 +288,9 @@ public class FEBReportBean {
 
                 @Override
                 public void retrievalComplete(final RetrievalEvent e) {
-                    LOG.fatal("map retrieval for feb report complete");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("map retrieval for feb report complete");
+                    }
                     new Thread() {
 
                         @Override
@@ -312,7 +314,6 @@ public class FEBReportBean {
                                     LOG.debug("bi size (h/w): " + bi.getHeight() + "/" + bi.getWidth());
                                 }
                                 mapImage = bi;
-                                System.out.println("karte geladen " + bi);
                             } catch (Exception ex) {
                                 Exceptions.printStackTrace(ex);
                             }
@@ -322,8 +323,6 @@ public class FEBReportBean {
 
                 @Override
                 public void retrievalAborted(final RetrievalEvent e) {
-//                    LOG.fatal("map retrieval for feb report aborted");
-//                    LOG.fatal("map retrieval for feb report aborted: " + e.getErrorType() + " " + e.toString());
                     LOG.fatal(
                         "map retrieval for feb report aborted: "
                                 + e.getErrorType() // NOI18N
@@ -336,7 +335,6 @@ public class FEBReportBean {
 
                 @Override
                 public void retrievalError(final RetrievalEvent e) {
-//                    LOG.fatal("map retrieval error for feb report");
                     LOG.fatal("map retrieval error for feb report: " + e.getErrorType() + " " + e.toString());
                     mapError = true;
                 }
@@ -353,10 +351,11 @@ public class FEBReportBean {
                 true));
         // set the model
         map.setMappingModel(mappingModel);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("setting map size(h/w) to: " + mapHeight + "/" + mapWidth);
-        }
-        map.setSize(mapWidth, mapHeight);
+        final int mapDPI = Integer.parseInt(NbBundle.getMessage(
+                    FEBReportBean.class,
+                    "FEBReportBean.mapDPI"));
+        final int factor = mapDPI / 72;
+        map.setSize(mapWidth * factor, mapHeight * factor);
         // initial positioning of the map
         map.setAnimationDuration(0);
         map.gotoInitialBoundingBox();
@@ -367,8 +366,8 @@ public class FEBReportBean {
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
         final int fontSize = Integer.parseInt(NbBundle.getMessage(
-                                FEBReportBean.class,
-                                "FEBReportBean.annotationFontSize"));
+                    FEBReportBean.class,
+                    "FEBReportBean.annotationFontSize"));
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());
@@ -389,32 +388,71 @@ public class FEBReportBean {
             final Color c2;
             c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
             dsf.setFillingPaint(c2);
-            dsf.setLineWidth(1);
             dsf.setLinePaint(Color.RED);
             dsf.setPrimaryAnnotation(flaechenbez);
             dsf.setPrimaryAnnotationPaint(Color.RED);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
             dsf.setAutoScale(true);
+            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
             map.getFeatureCollection().addFeature(dsf);
         }
         map.zoomToFeatureCollection();
 
         if (scaleDenominator != null) {
-            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(scaleDenominator));
-            scale = "1:" + NumberFormat.getIntegerInstance().format(scaleDenominator);
-        } else {
-            double so;
-            if (map.getScaleDenominator() > 1000) {
-                so = Math.round((map.getScaleDenominator() / 100) + 0.5d) * 100;
-            } else {
-                so = Math.round((map.getScaleDenominator() / 10) + 0.5) * 10;
-            }
-            scale = "1:" + NumberFormat.getIntegerInstance().format(so);
+            final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
+            final double realWorldWidthInMeter = bbox.getWidth();
 
-            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(so));
+            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
+                    getMapScaleDenom(scaleDenominator, map.getScaleDenominator(), realWorldWidthInMeter)));
+        } else {
+            final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
+            final double realWorldWidthInMeter = bbox.getWidth();
+            double roundScale = getReportScaleDenom(realWorldWidthInMeter);
+            if (roundScale > 1000) {
+                roundScale = Math.round((roundScale / 100) + 0.5d) * 100;
+            } else {
+                roundScale = Math.round((roundScale / 10) + 0.5) * 10;
+            }
+            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
+                    getMapScaleDenom(roundScale, map.getScaleDenominator(), realWorldWidthInMeter)));
         }
+
+        // lets calculate the correct scale for the printed report
+        final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
+        final double realWorldWidthInMeter = bbox.getWidth();
+        final double so = getReportScaleDenom(realWorldWidthInMeter);
+        scale = "1:" + NumberFormat.getIntegerInstance().format(so);
+
         map.setInteractionMode(MappingComponent.SELECT);
         mappingModel.addLayer(s);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   realWorldWidthInMeter  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private double getReportScaleDenom(final double realWorldWidthInMeter) {
+        final double mapReportWidthInMeter = (mapWidth / ppi) * 0.0254d;
+        return realWorldWidthInMeter / mapReportWidthInMeter;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   wishedScale           DOCUMENT ME!
+     * @param   oldScale              DOCUMENT ME!
+     * @param   realWorldWithInMeter  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private double getMapScaleDenom(final double wishedScale,
+            final double oldScale,
+            final double realWorldWithInMeter) {
+        final double mapReportWidthInMeter = (mapWidth / ppi) * 0.0254d;
+        final double mapBoundingBoxWidth = wishedScale * mapReportWidthInMeter;
+        return mapBoundingBoxWidth * oldScale / realWorldWithInMeter;
     }
 
     //~ Inner Classes ----------------------------------------------------------
