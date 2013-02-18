@@ -9,7 +9,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cismet.cids.custom.report;
+package de.cismet.cids.custom.reports.verdis;
 
 import Sirius.navigator.exception.ConnectionException;
 
@@ -407,11 +407,7 @@ public class FEBReportBean {
             final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
             final double realWorldWidthInMeter = bbox.getWidth();
             double roundScale = getReportScaleDenom(realWorldWidthInMeter);
-            if (roundScale > 1000) {
-                roundScale = Math.round((roundScale / 100) + 0.5d) * 100;
-            } else {
-                roundScale = Math.round((roundScale / 10) + 0.5) * 10;
-            }
+            roundScale = Math.round((roundScale / 100) + 0.5d) * 100;
             map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
                     getMapScaleDenom(roundScale, map.getScaleDenominator(), realWorldWidthInMeter)));
         }

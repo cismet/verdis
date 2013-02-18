@@ -9,7 +9,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cismet.cids.custom.report;
+package de.cismet.cids.custom.reports.verdis;
 
 import org.apache.log4j.Logger;
 

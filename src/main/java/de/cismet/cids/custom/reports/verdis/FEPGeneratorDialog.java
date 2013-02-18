@@ -9,7 +9,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cismet.cids.custom.report;
+package de.cismet.cids.custom.reports.verdis;
 
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -63,7 +63,8 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(FEPGeneratorDialog.class);
-    private static final String MAP_REPORT = "/de/cismet/cids/custom/report/feb_map<format><orientation>.jasper";
+    private static final String MAP_REPORT =
+        "/de/cismet/cids/custom/reports/verdis/feb_map<format><orientation>.jasper";
     private static final String A4_FORMAT = "A4";
     private static final String A3_FORMAT = "A3";
     private static final String LANDSCAPE_ORIENTATION = "LS";
@@ -149,7 +150,6 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(FEPGeneratorDialog.class, "FEPGeneratorDialog.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(450, 250));
-        setPreferredSize(new java.awt.Dimension(450, 250));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -500,7 +500,7 @@ public class FEPGeneratorDialog extends javax.swing.JDialog {
                     final ArrayList<String> reports = new ArrayList<String>();
 
                     reports.add(repMap);
-                    reports.add("/de/cismet/cids/custom/report/feb_flaechen.jasper");
+                    reports.add("/de/cismet/cids/custom/reports/verdis/feb_flaechen.jasper");
 
                     final List<InputStream> ins = new ArrayList<InputStream>();
                     for (final String report : reports) {
