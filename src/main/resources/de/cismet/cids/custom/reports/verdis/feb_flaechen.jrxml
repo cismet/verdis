@@ -31,12 +31,12 @@
 			<subreport>
 				<reportElement x="0" y="3" width="555" height="43"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{dachflaechen}, false)]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_dachflaechen.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/reports/verdis/feb_dachflaechen.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
 				<reportElement positionType="Float" x="0" y="53" width="555" height="51"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{versiegelteflaechen}, false)]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_versiegelteFlaechen.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/reports/verdis/feb_versiegelteFlaechen.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
 				<reportElement positionType="Float" x="2" y="106" width="570" height="12" forecolor="#FF0000"/>
@@ -51,7 +51,7 @@
 					<subreportParameterExpression><![CDATA[$F{hinweise}.toString()]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(null, false)]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/report/feb_hinweise.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["de/cismet/cids/custom/reports/verdis/feb_hinweise.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
