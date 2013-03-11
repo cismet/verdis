@@ -52,7 +52,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
     //~ Instance fields --------------------------------------------------------
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private java.applet.AppletContext ac = null;
+    // private java.applet.AppletContext ac = null;
     private boolean inEditMode = false;
     private CidsBean kassenzeichenBean;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -70,15 +70,6 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  ac  DOCUMENT ME!
-     */
-    public void setAppletContext(final java.applet.AppletContext ac) {
-        this.ac = ac;
-    }
 
     /**
      * DOCUMENT ME!
@@ -102,7 +93,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
 
             for (final CidsBean url : urls) {
 //                if (url.getProperty("typ") != null && (Integer) url.getProperty("typ") != 0) {
-                addNewDocPanel(ac, url);
+                addNewDocPanel(url);
 //                }
             }
         }
@@ -111,12 +102,11 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
     /**
      * DOCUMENT ME!
      *
-     * @param   ac  DOCUMENT ME!
      * @param   cb  description DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public DocPanel addNewDocPanel(final AppletContext ac, final CidsBean cb) {
+    public DocPanel addNewDocPanel(final CidsBean cb) {
         final String name = (String)cb.getProperty("name");
 
         final int typ = (Integer)cb.getProperty("typ");
@@ -157,7 +147,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
         }
 
         final DocPanel dp = new DocPanel();
-        dp.setAplettContext(ac);
+//        dp.setAplettContext(ac);
         dp.setDesc(name);
         dp.setGotoUrl(urlString);
         dp.setIcon(ic);
@@ -273,7 +263,6 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
 
                     urls.add(dmsUrlCB);
 
-                    final DocPanel dp = addNewDocPanel(ac, dmsUrlCB);
                     this.repaint();
                 } catch (Exception e) {
                     log.fatal("Fehler beim Fuellen der CidsBeans", e);
