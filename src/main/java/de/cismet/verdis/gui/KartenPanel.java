@@ -34,6 +34,8 @@ import com.vividsolutions.jts.geom.Polygon;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 
+import org.deegree.model.feature.DefaultFeature;
+
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -1177,49 +1179,49 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         try {
             mappingComp.showInternalLayerWidget(!mappingComp.isInternalLayerWidgetVisible(), 500);
         } catch (Throwable t) {
             LOG.error("Fehler beim Anzeigen des Layersteuerelements", t);
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblScaleMousePressed(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblScaleMousePressed
+    private void lblScaleMousePressed(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblScaleMousePressed
         if (evt.isPopupTrigger()) {
             pomScale.setVisible(true);
         }
-    }//GEN-LAST:event_lblScaleMousePressed
+    }                                                                        //GEN-LAST:event_lblScaleMousePressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdFullPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPolyActionPerformed
+    private void cmdFullPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPolyActionPerformed
         mappingComp.zoomToFullFeatureCollectionBounds();
-    }//GEN-LAST:event_cmdFullPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdFullPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFullPoly1ActionPerformed
+    private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPoly1ActionPerformed
         mappingComp.zoomToSelectedNode();
-    }//GEN-LAST:event_cmdFullPoly1ActionPerformed
+    }                                                                                //GEN-LAST:event_cmdFullPoly1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWmsBackgroundActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWmsBackgroundActionPerformed
+    private void cmdWmsBackgroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWmsBackgroundActionPerformed
         if (mappingComp.isBackgroundEnabled()) {
             mappingComp.setBackgroundEnabled(false);
             cmdWmsBackground.setSelected(false);
@@ -1228,14 +1230,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             cmdWmsBackground.setSelected(true);
             mappingComp.queryServices();
         }
-    }//GEN-LAST:event_cmdWmsBackgroundActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdWmsBackgroundActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdForegroundActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdForegroundActionPerformed
+    private void cmdForegroundActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdForegroundActionPerformed
         if (mappingComp.isFeatureCollectionVisible()) {
             mappingComp.setFeatureCollectionVisibility(false);
             cmdForeground.setSelected(false);
@@ -1243,61 +1245,61 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             mappingComp.setFeatureCollectionVisibility(true);
             cmdForeground.setSelected(true);
         }
-    }//GEN-LAST:event_cmdForegroundActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdForegroundActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSnapActionPerformed
+    private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSnapActionPerformed
         mappingComp.setSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
-    }//GEN-LAST:event_cmdSnapActionPerformed
+    }                                                                           //GEN-LAST:event_cmdSnapActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMoveHandleActionPerformed
+    private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMoveHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.MOVE_HANDLE);
-    }//GEN-LAST:event_cmdMoveHandleActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdMoveHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddHandleActionPerformed
+    private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
-    }//GEN-LAST:event_cmdAddHandleActionPerformed
+    }                                                                                //GEN-LAST:event_cmdAddHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveHandleActionPerformed
+    private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveHandleActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.REMOVE_HANDLE);
-    }//GEN-LAST:event_cmdRemoveHandleActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdRemoveHandleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRotatePolygonActionPerformed
+    private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRotatePolygonActionPerformed
         mappingComp.setHandleInteractionMode(MappingComponent.ROTATE_POLYGON);
-    }//GEN-LAST:event_cmdRotatePolygonActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdRotatePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
         LOG.info("UNDO");
         final CustomAction a = mappingComp.getMemUndo().getLastAction();
         if (LOG.isDebugEnabled()) {
@@ -1314,14 +1316,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             LOG.debug("... neue Aktion auf REDO-Stack: " + inverse);
             LOG.debug("... fertig");
         }
-    }//GEN-LAST:event_cmdUndoActionPerformed
+    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRedoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRedoActionPerformed
+    private void cmdRedoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRedoActionPerformed
         LOG.info("REDO");
         final CustomAction a = mappingComp.getMemRedo().getLastAction();
         if (LOG.isDebugEnabled()) {
@@ -1338,176 +1340,176 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             LOG.debug("... neue Aktion auf UNDO-Stack: " + inverse);
             LOG.debug("... fertig");
         }
-    }//GEN-LAST:event_cmdRedoActionPerformed
+    }                                                                           //GEN-LAST:event_cmdRedoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void popMenSearchPopupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
-    }//GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
+    private void popMenSearchPopupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) { //GEN-FIRST:event_popMenSearchPopupMenuWillBecomeVisible
+    }                                                                                                 //GEN-LAST:event_popMenSearchPopupMenuWillBecomeVisible
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSplitPolyActionPerformed
+    private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSplitPolyActionPerformed
         mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
         cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSplitPolyActionPerformed
+    }                                                                                //GEN-LAST:event_cmdSplitPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdJoinPolyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdJoinPolyActionPerformed
+    private void cmdJoinPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdJoinPolyActionPerformed
         mappingComp.setInteractionMode(MappingComponent.JOIN_POLYGONS);
-    }//GEN-LAST:event_cmdJoinPolyActionPerformed
+    }                                                                               //GEN-LAST:event_cmdJoinPolyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
+    private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
         mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
-    }//GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
+    }                                                                                            //GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemovePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemovePolygonActionPerformed
+    private void cmdRemovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemovePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.REMOVE_POLYGON);
-    }//GEN-LAST:event_cmdRemovePolygonActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdRemovePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRaisePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRaisePolygonActionPerformed
+    private void cmdRaisePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRaisePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.RAISE_POLYGON);
-    }//GEN-LAST:event_cmdRaisePolygonActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdRaisePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewPointActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPointActionPerformed
+    private void cmdNewPointActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPointActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
             CreateGeometryListener.POINT);
-    }//GEN-LAST:event_cmdNewPointActionPerformed
+    }                                                                               //GEN-LAST:event_cmdNewPointActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPanActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPanActionPerformed
+    private void cmdPanActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPanActionPerformed
         mappingComp.setInteractionMode(MappingComponent.PAN);
-    }//GEN-LAST:event_cmdPanActionPerformed
+    }                                                                          //GEN-LAST:event_cmdPanActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSelectActionPerformed
+    private void cmdSelectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSelectActionPerformed
         mappingComp.setInteractionMode(MappingComponent.SELECT);
         cmdMoveHandle.setSelected(true);
         cmdMoveHandleActionPerformed(null);
-    }//GEN-LAST:event_cmdSelectActionPerformed
+    }                                                                             //GEN-LAST:event_cmdSelectActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdMovePolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMovePolygonActionPerformed
+    private void cmdMovePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMovePolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.MOVE_POLYGON);
-    }//GEN-LAST:event_cmdMovePolygonActionPerformed
+    }                                                                                  //GEN-LAST:event_cmdMovePolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewPolygonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewPolygonActionPerformed
+    private void cmdNewPolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewPolygonActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
             CreateGeometryListener.POLYGON);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
             PureNewFeature.class);
-    }//GEN-LAST:event_cmdNewPolygonActionPerformed
+    }                                                                                 //GEN-LAST:event_cmdNewPolygonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewLinestringActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewLinestringActionPerformed
+    private void cmdNewLinestringActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewLinestringActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
             CreateGeometryListener.LINESTRING);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setGeometryFeatureClass(
             PureNewFeatureWithThickerLineString.class);
-    }//GEN-LAST:event_cmdNewLinestringActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdNewLinestringActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOrthogonalRectangleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
+    private void cmdOrthogonalRectangleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOrthogonalRectangleActionPerformed
         mappingComp.setInteractionMode(MappingComponent.NEW_POLYGON);
         ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).setMode(
             CreateGeometryListener.RECTANGLE_FROM_LINE);
-    }//GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdOrthogonalRectangleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSearchAlkisLandparcelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchAlkisLandparcelActionPerformed
+    private void cmdSearchAlkisLandparcelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchAlkisLandparcelActionPerformed
         mappingComp.setInteractionMode(Main.ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER);
-    }//GEN-LAST:event_cmdSearchAlkisLandparcelActionPerformed
+    }                                                                                            //GEN-LAST:event_cmdSearchAlkisLandparcelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSearchKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
-    }//GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
+    private void cmdSearchKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchKassenzeichenActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdSearchKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdZoomActionPerformed
+    private void cmdZoomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdZoomActionPerformed
         mappingComp.setInteractionMode(MappingComponent.ZOOM);
-    }//GEN-LAST:event_cmdZoomActionPerformed
+    }                                                                           //GEN-LAST:event_cmdZoomActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCreateLandparcelGeomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCreateLandparcelGeomActionPerformed
+    private void cmdCreateLandparcelGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCreateLandparcelGeomActionPerformed
         isAssignLandparcel = cmdCreateLandparcelGeom.isSelected();
         if (isAssignLandparcel) {
             mappingComp.setInteractionMode(Main.KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER);
         }
-    }//GEN-LAST:event_cmdCreateLandparcelGeomActionPerformed
+    }                                                                                           //GEN-LAST:event_cmdCreateLandparcelGeomActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2057,7 +2059,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
         final boolean editable = CidsAppBackend.getInstance().isEditable();
-        
+
         featureCollection.removeAllFeatures();
 
         final CidsBean cidsBean = getCidsBean();
@@ -2077,12 +2079,39 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 break;
             }
             if (withZoom) {
-                mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
-                    true,
-                    mappingComp.isFixedMapScale());
-                
-                
-                
+                if (featureCollection.getFeatureCount() != 0) {
+                    mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                } else {
+                    final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
+                    switch (CidsAppBackend.getInstance().getMode()) {
+                        case ALLGEMEIN: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                            }
+                        }
+                        break;
+                        case REGEN: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                            }
+                        }
+                        break;
+                        case ESW: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                            }
+                        }
+                        break;
+                    }
+                    mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                }
             }
         }
     }
