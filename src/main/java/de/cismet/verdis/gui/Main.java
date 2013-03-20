@@ -4234,6 +4234,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         StaticSwingTools.showDialog(assessmentDialog, true);
 
         final int returnType = assessmentDialog.getReturnType();
+        storeChanges(false);
+
         if (returnType != AssessmentDialog.RETURN_CANCEL) {
             if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
                 try {
@@ -4345,7 +4347,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     LOG.error("error while storing veranlagungszettel", ex);
                 }
             }
-            storeChanges(false);
         }
     }
 
