@@ -104,7 +104,7 @@ einleitung in Gewässser]]></text>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Dachbe-grünung?]]></text>
+				<text><![CDATA[Ökopflaster?]]></text>
 			</staticText>
 			<line>
 				<reportElement x="0" y="31" width="1" height="31"/>

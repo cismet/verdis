@@ -338,7 +338,9 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 try {
                     final Geometry geom = sole.getFeature().getGeometry();
                     // größe berechnen und zuweisen
-                    final int laenge = (int)Math.abs(geom.getLength());
+                    final double abs_laenge = Math.abs(geom.getLength());
+                    //round to second decimal place 
+                    final int laenge = (int) Math.round(abs_laenge*100)/100;
                     frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK, laenge);
                     frontinfoBean.setProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR, laenge);
                     setGeometry(geom, frontinfoBean);
