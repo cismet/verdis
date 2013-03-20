@@ -34,6 +34,8 @@ import com.vividsolutions.jts.geom.Polygon;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 
+import org.deegree.model.feature.DefaultFeature;
+
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -106,9 +108,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private final HashSet activeRetrievalServices = new HashSet();
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
-
     private boolean isAssignLandparcel = false;
-
     private Action searchAction = new AbstractAction() {
 
             @Override
@@ -2052,9 +2052,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     }
 
     /**
-     * DOCUMENT ME!
+     * Draws the features of the <Code>kassenzeichenBean</Code> for the selected mode (Allgemein, Regen, ESW) in the
+     * map. If withZoom is true, then zooms to the position of the Kassenzeichen in the map (if possible).
      *
-     * @param  withZoom  DOCUMENT ME!
+     * @param  withZoom  true, zooms to the position of the Kassenzeichen
      */
     private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
@@ -2066,56 +2067,134 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         if (cidsBean != null) {
             switch (CidsAppBackend.getInstance().getMode()) {
                 case ALLGEMEIN: {
-                    final Collection<CidsBean> kassenzeichenGeometrieBeans = cidsBean.getBeanCollectionProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
-                    for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
-                        final Feature add = new BeanUpdatingCidsFeature(
-                                kassenzeichenGeometrieBean,
-                                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
-                                        + "."
-                                        + GeomPropertyConstants.PROP__GEO_FIELD);
-                        add.setEditable(editable);
-                        featureCollection.addFeature(add);
-                    }
+                    featureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
                 }
                 break;
                 case REGEN: {
-                    final List<CidsBean> flaechen = (List<CidsBean>)cidsBean.getProperty(
-                            KassenzeichenPropertyConstants.PROP__FLAECHEN);
-                    for (final CidsBean flaeche : flaechen) {
-                        final Feature add = new BeanUpdatingCidsFeature(
-                                flaeche,
-                                FlaechePropertyConstants.PROP__FLAECHENINFO
-                                        + "."
-                                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
-                                        + "."
-                                        + GeomPropertyConstants.PROP__GEO_FIELD);
-                        add.setEditable(editable);
-                        featureCollection.addFeature(add);
-                    }
+                    featureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
                 }
                 break;
                 case ESW: {
-                    final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
-                            KassenzeichenPropertyConstants.PROP__FRONTEN);
-                    for (final CidsBean front : fronten) {
-                        final Feature add = new BeanUpdatingCidsFeature(
-                                front,
-                                FrontinfoPropertyConstants.PROP__GEOMETRIE
-                                        + "."
-                                        + GeomPropertyConstants.PROP__GEO_FIELD);
-                        add.setEditable(editable);
-                        featureCollection.addFeature(add);
-                    }
+                    featureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
                 }
                 break;
             }
             if (withZoom) {
-                mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
-                    true,
-                    mappingComp.isFixedMapScale());
+                if (featureCollection.getFeatureCount() != 0) {
+                    mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                } else {
+                    /* No features found for the currently selected mode, try to fetch features for the Kassenzeichen
+                     * but from other modes.
+                     * To not draw the features in the map, a new FeatureCollection must be used.*/
+                    final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
+                    switch (CidsAppBackend.getInstance().getMode()) {
+                        case ALLGEMEIN: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                            }
+                        }
+                        break;
+                        case REGEN: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                            }
+                        }
+                        break;
+                        case ESW: {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                            if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                                zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                            }
+                        }
+                        break;
+                    }
+                    mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                }
             }
         }
+    }
+
+    /**
+     * Fetches and returns the features from a Kassenzeichen CidsBean for the mode Allgemein (also called Info).
+     *
+     * @param   kassenzeichen  a Kassenzeichen CidsBean
+     * @param   editable       should the features be editable or not
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Collection<Feature> fetchFeaturesAllgemein(final CidsBean kassenzeichen, final boolean editable) {
+        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+
+        final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzeichen.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+        for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
+            final Feature add = new BeanUpdatingCidsFeature(
+                    kassenzeichenGeometrieBean,
+                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            add.setEditable(editable);
+            featureCollection.add(add);
+        }
+
+        return featureCollection;
+    }
+
+    /**
+     * Fetches and returns the features from a Kassenzeichen CidsBean for the mode Regen (also called versiegelte
+     * Flächen).
+     *
+     * @param   kassenzeichen  a Kassenzeichen CidsBean
+     * @param   editable       should the features be editable or not
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Collection<Feature> fetchFeaturesRegen(final CidsBean kassenzeichen, final boolean editable) {
+        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+        for (final CidsBean flaeche : flaechen) {
+            final Feature add = new BeanUpdatingCidsFeature(
+                    flaeche,
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            add.setEditable(editable);
+            featureCollection.add(add);
+        }
+        return featureCollection;
+    }
+
+    /**
+     * Fetches and returns the features from a Kassenzeichen CidsBean for the mode ESW.
+     *
+     * @param   cidsBean  a Kassenzeichen CidsBean
+     * @param   editable  should the features be editable or not
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Collection<Feature> fetchFeaturesESW(final CidsBean cidsBean, final boolean editable) {
+        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
+        for (final CidsBean front : fronten) {
+            final Feature add = new BeanUpdatingCidsFeature(
+                    front,
+                    FrontinfoPropertyConstants.PROP__GEOMETRIE
+                            + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
+            add.setEditable(editable);
+            featureCollection.add(add);
+        }
+        return featureCollection;
     }
 
     @Override
