@@ -66,6 +66,8 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Element;
 
+import org.openide.util.Exceptions;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -4236,118 +4238,118 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final int returnType = assessmentDialog.getReturnType();
 
         if (returnType != AssessmentDialog.RETURN_CANCEL) {
-            storeChanges(false);
-            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
-                try {
-                    final MetaObject veranlagungMo = CidsAppBackend.getInstance()
-                                .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
-                                .getEmptyInstance();
-                    final CidsBean veranlagungBean = veranlagungMo.getBean();
-                    veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__DATUM,
-                        new java.sql.Date(assessmentDialog.getDatum().getTime()));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
-                        new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G_200,
-                        newVeranlagungSummeMap.get("null--200"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G_100,
-                        newVeranlagungSummeMap.get("null--100"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G305,
-                        newVeranlagungSummeMap.get("A1-305"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G306,
-                        newVeranlagungSummeMap.get("Z1-306"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G310,
-                        newVeranlagungSummeMap.get("A1V-310"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G311,
-                        newVeranlagungSummeMap.get("Z1V-311"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G315,
-                        newVeranlagungSummeMap.get("A2-315"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G320,
-                        newVeranlagungSummeMap.get("A2V-320"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G321,
-                        newVeranlagungSummeMap.get("A3-321"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G322,
-                        newVeranlagungSummeMap.get("A3V-322"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G325,
-                        newVeranlagungSummeMap.get("B1-325"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G330,
-                        newVeranlagungSummeMap.get("B1V-330"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G335,
-                        newVeranlagungSummeMap.get("B2-335"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G340,
-                        newVeranlagungSummeMap.get("B2V-340"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G345,
-                        newVeranlagungSummeMap.get("D1-345"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G350,
-                        newVeranlagungSummeMap.get("D2-350"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G361,
-                        newVeranlagungSummeMap.get("P1-361"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G362,
-                        newVeranlagungSummeMap.get("P2-362"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G710,
-                        newVeranlagungSummeMap.get("710-DF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G715,
-                        newVeranlagungSummeMap.get("715-GDF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G720,
-                        newVeranlagungSummeMap.get("720-VF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G725,
-                        newVeranlagungSummeMap.get("725-VFÖ"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G730,
-                        newVeranlagungSummeMap.get("730-Va-über"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G740,
-                        newVeranlagungSummeMap.get("740-VFS"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G999,
-                        newVeranlagungSummeMap.get("999-Rest"));
+            if (persistKassenzeichenBean()) {
+                if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                    try {
+                        final MetaObject veranlagungMo = CidsAppBackend.getInstance()
+                                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
+                                    .getEmptyInstance();
+                        final CidsBean veranlagungBean = veranlagungMo.getBean();
+                        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__DATUM,
+                            new java.sql.Date(assessmentDialog.getDatum().getTime()));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+                            new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G_200,
+                            newVeranlagungSummeMap.get("null--200"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G_100,
+                            newVeranlagungSummeMap.get("null--100"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G305,
+                            newVeranlagungSummeMap.get("A1-305"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G306,
+                            newVeranlagungSummeMap.get("Z1-306"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G310,
+                            newVeranlagungSummeMap.get("A1V-310"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G311,
+                            newVeranlagungSummeMap.get("Z1V-311"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G315,
+                            newVeranlagungSummeMap.get("A2-315"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G320,
+                            newVeranlagungSummeMap.get("A2V-320"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G321,
+                            newVeranlagungSummeMap.get("A3-321"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G322,
+                            newVeranlagungSummeMap.get("A3V-322"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G325,
+                            newVeranlagungSummeMap.get("B1-325"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G330,
+                            newVeranlagungSummeMap.get("B1V-330"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G335,
+                            newVeranlagungSummeMap.get("B2-335"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G340,
+                            newVeranlagungSummeMap.get("B2V-340"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G345,
+                            newVeranlagungSummeMap.get("D1-345"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G350,
+                            newVeranlagungSummeMap.get("D2-350"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G361,
+                            newVeranlagungSummeMap.get("P1-361"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G362,
+                            newVeranlagungSummeMap.get("P2-362"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G710,
+                            newVeranlagungSummeMap.get("710-DF"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G715,
+                            newVeranlagungSummeMap.get("715-GDF"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G720,
+                            newVeranlagungSummeMap.get("720-VF"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G725,
+                            newVeranlagungSummeMap.get("725-VFÖ"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G730,
+                            newVeranlagungSummeMap.get("730-Va-über"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G740,
+                            newVeranlagungSummeMap.get("740-VFS"));
+                        veranlagungBean.setProperty(
+                            VeranlagungPropertyConstants.PROP__G999,
+                            newVeranlagungSummeMap.get("999-Rest"));
 
-                    veranlagungBean.persist();
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
-                    kassenzeichenBean.persist();
-                } catch (Exception ex) {
-                    LOG.error("error while storing veranlagung", ex);
+                        veranlagungBean.persist();
+                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
+                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
+                    } catch (Exception ex) {
+                        LOG.error("error while storing veranlagung", ex);
+                    }
+                } else {
+                    try {
+                        final String veranlagungszettel = assessmentDialog.getZettelHtml();
+                        kassenzeichenBean.setProperty(
+                            KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                            veranlagungszettel);
+                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                        kassenzeichenBean.setProperty(
+                            KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                            "beim letzten Speichern nicht veranlagt");
+                    } catch (Exception ex) {
+                        LOG.error("error while storing veranlagungszettel", ex);
+                    }
                 }
-            } else {
-                try {
-                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
-                    kassenzeichenBean.setProperty(
-                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
-                        veranlagungszettel);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
-                    kassenzeichenBean.setProperty(
-                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
-                        "beim letzten Speichern nicht veranlagt");
-                    kassenzeichenBean.persist();
-                } catch (Exception ex) {
-                    LOG.error("error while storing veranlagungszettel", ex);
-                }
+                storeChanges(false);
             }
         }
     }
@@ -4372,22 +4374,25 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public boolean storeChanges(final boolean editModeAfterStoring,
             final String refreshingKassenzeichen) {
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        disableKassenzeichenCmds();
-                    }
-                });
+                @Override
+                public void run() {
+                    disableKassenzeichenCmds();
+                }
+            });
+        try {
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
                 new Timestamp(new java.util.Date().getTime()));
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
                 Main.THIS.getUserString());
-            setCidsBean(kassenzeichenBean.persist());
+        } catch (Exception ex) {
+            LOG.error("error while setting letzte aenderung", ex);
+        }
 
+        if (persistKassenzeichenBean()) {
             if (!editModeAfterStoring) {
                 CidsAppBackend.getInstance().releaseLock();
             }
@@ -4407,8 +4412,23 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 getKzPanel().gotoKassenzeichen(refreshingKassenzeichen);
             }
             return true;
-        } catch (final Exception e) {
+        } else {
             enableEditing(true);
+
+            return false;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean persistKassenzeichenBean() {
+        try {
+            setCidsBean(kassenzeichenBean.persist());
+            return true;
+        } catch (final Exception e) {
             LOG.error("error during persist", e);
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
