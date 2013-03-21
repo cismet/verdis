@@ -4330,6 +4330,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
                     kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
                     kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
+                    kassenzeichenBean.persist();
                 } catch (Exception ex) {
                     LOG.error("error while storing veranlagung", ex);
                 }
@@ -4343,6 +4344,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     kassenzeichenBean.setProperty(
                         KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
                         "beim letzten Speichern nicht veranlagt");
+                    kassenzeichenBean.persist();
                 } catch (Exception ex) {
                     LOG.error("error while storing veranlagungszettel", ex);
                 }
