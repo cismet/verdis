@@ -262,8 +262,7 @@ public class DokumentenPanel extends javax.swing.JPanel implements EditModeListe
                     urlBaseCB.setProperty("path", splitter.getPath());
 
                     urls.add(dmsUrlCB);
-
-                    this.repaint();
+                    addNewDocPanel(dmsUrlCB);
                 } catch (Exception e) {
                     log.fatal("Fehler beim Fuellen der CidsBeans", e);
                 }
