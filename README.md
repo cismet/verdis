@@ -23,4 +23,4 @@ Don't hesitate to contact us if you have any questions.
 License
 =======
 
-verdis is distributed under [LGPLv3](https://github.com/cismet/verdis/blob/dev/LICENSE)
+verdis is distributed under [GPLv3](https://github.com/cismet/verdis/blob/dev/LICENSE)
