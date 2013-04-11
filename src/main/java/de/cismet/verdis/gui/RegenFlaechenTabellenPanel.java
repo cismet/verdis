@@ -110,13 +110,40 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedIndex = componentAdapter.row;
+                    final int columnIndex = componentAdapter.column;
                     final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                    return getItemValidator(cidsBean).getState().isError();
+
+                    switch (columnIndex) {
+                        case 1: {
+                            // Flaechenbezeichnung
+                            return RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(cidsBean)
+                                        .getState()
+                                        .isError();
+                        }
+                        case 2: {
+                            return getItemValidator(cidsBean).getState().isError();
+                        }
+                        case 3: {
+                            // Flaechenart
+                            return RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(cidsBean).getState()
+                                        .isError();
+                        }
+                        case 6: {
+                            // Erfassungsdatum
+                            return RegenFlaechenDetailsPanel.getValidatorDatumErfassung(cidsBean).getState().isError();
+                        }
+                        default: {
+                            return false;
+                        }
+                    }
                 }
             };
 
-        final Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
+        final Highlighter errorHighlighter = new ColorHighlighter(
+                errorPredicate,
+                Color.RED.brighter().brighter().brighter(),
+                Color.WHITE);
 
         final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
@@ -136,20 +163,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
         final Highlighter changedHighlighter = new ColorHighlighter(changedPredicate, null, Color.RED);
 
-        final HighlightPredicate noGeometryPredicate = new HighlightPredicate() {
-
-                @Override
-                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
-                    final int displayedIndex = componentAdapter.row;
-                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
-                    final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                    return getGeometry(cidsBean) == null;
-                }
-            };
-
-        final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
-
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
+        jxtOverview.setHighlighters(changedHighlighter, errorHighlighter);
 
         jxtOverview.getColumnModel().getColumn(0).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
         jxtOverview.getColumnModel().getColumn(2).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
