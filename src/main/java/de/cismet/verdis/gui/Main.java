@@ -2473,60 +2473,60 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_menWindowsActionPerformed
+    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menWindowsActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_menWindowsActionPerformed
+    }//GEN-LAST:event_menWindowsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
+    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
-    }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
+    }//GEN-LAST:event_mniResetWindowLayoutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDokumenteActionPerformed
+    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDokumenteActionPerformed
         showOrHideView(vDokumente);
-    }                                                                                //GEN-LAST:event_mniDokumenteActionPerformed
+    }//GEN-LAST:event_mniDokumenteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKanalanschlussActionPerformed
+    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKanalanschlussActionPerformed
         showOrHideView(vKanaldaten);
-    }                                                                                     //GEN-LAST:event_mniKanalanschlussActionPerformed
+    }//GEN-LAST:event_mniKanalanschlussActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSummenActionPerformed
+    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSummenActionPerformed
         showOrHideView(vSummen);
-    }                                                                             //GEN-LAST:event_mniSummenActionPerformed
+    }//GEN-LAST:event_mniSummenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichenActionPerformed
+    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichenActionPerformed
         showOrHideView(vKassenzeichen);
-    }                                                                                    //GEN-LAST:event_mniKassenzeichenActionPerformed
+    }//GEN-LAST:event_mniKassenzeichenActionPerformed
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniLoadLayoutActionPerformed
+    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniLoadLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2562,14 +2562,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 LOG.error("error while loading layout", ex);
             }
         }
-    } //GEN-LAST:event_mniLoadLayoutActionPerformed
+    }//GEN-LAST:event_mniLoadLayoutActionPerformed
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSaveLayoutActionPerformed
+    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSaveLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2601,7 +2601,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 saveLayout(name + ".layout");
             }
         }
-    } //GEN-LAST:event_mniSaveLayoutActionPerformed
+    }//GEN-LAST:event_mniSaveLayoutActionPerformed
 
     /**
      * TODO Bundle Inserting Docking Window functionalty (Sebastian) 24.07.07.
@@ -2758,44 +2758,44 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuChangeUserActionPerformed
+    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuChangeUserActionPerformed
         formWindowOpened(null);
-    }                                                                                 //GEN-LAST:event_mnuChangeUserActionPerformed
+    }//GEN-LAST:event_mnuChangeUserActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
+    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
         cmdNewKassenzeichenActionPerformed(null);
-    }                                                                                       //GEN-LAST:event_mnuNewKassenzeichenActionPerformed
+    }//GEN-LAST:event_mnuNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
+    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditModeActionPerformed
         cmdEditModeActionPerformed(null);
-    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
+    }//GEN-LAST:event_mnuEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuExitActionPerformed
+    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
         dispose();
-    }                                                                           //GEN-LAST:event_mnuExitActionPerformed
+    }//GEN-LAST:event_mnuExitActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowOpened(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowOpened
-    }                                                                     //GEN-LAST:event_formWindowOpened
+    private void formWindowOpened(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * DOCUMENT ME!
@@ -2891,9 +2891,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
+    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
         regenFlaechenTabellenPanel.reEnumerateFlaechen();
-    }                                                                                         //GEN-LAST:event_cmdRefreshEnumerationActionPerformed
+    }//GEN-LAST:event_cmdRefreshEnumerationActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2909,7 +2909,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
+    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
             final FEPGeneratorDialog dialog = new FEPGeneratorDialog(kassenzeichenBean, this);
 
@@ -2921,46 +2921,46 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                 });
         }
-    } //GEN-LAST:event_cmdPdfActionPerformed
+    }//GEN-LAST:event_cmdPdfActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
+    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
         deleteKZ();
-    }                                                                                          //GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
+    }//GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteFlaecheActionPerformed
+    private void cmdPasteFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteFlaecheActionPerformed
         if (flaechenClipboard != null) {
             flaechenClipboard.storeToFile();
             flaechenClipboard.paste();
         }
-    }                                                                                   //GEN-LAST:event_cmdPasteFlaecheActionPerformed
+    }//GEN-LAST:event_cmdPasteFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCutFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCutFlaecheActionPerformed
+    private void cmdCutFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutFlaecheActionPerformed
         if (flaechenClipboard != null) {
             flaechenClipboard.cut();
         }
-    }                                                                                 //GEN-LAST:event_cmdCutFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCutFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
+    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdInfoActionPerformed
 //        String info="Verdis Plugin\n"
 //                + "cismet GmbH\n\n"
 //                + de.cismet.verdis.Version.getVersion()+"\n"
@@ -2986,52 +2986,52 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             about = d;
         }
         StaticSwingTools.showDialog(about);
-    } //GEN-LAST:event_cmdInfoActionPerformed
+    }//GEN-LAST:event_cmdInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuInfoActionPerformed
+    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoActionPerformed
         cmdInfoActionPerformed(null);
-    }                                                                           //GEN-LAST:event_mnuInfoActionPerformed
+    }//GEN-LAST:event_mnuInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyReleased(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyReleased
+    private void formKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         // TODO add your handling code here:
-    } //GEN-LAST:event_formKeyReleased
+    }//GEN-LAST:event_formKeyReleased
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyPressed
+    private void formKeyPressed(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
 
         if ((evt.getKeyCode() == KeyEvent.VK_F1) && evt.isControlDown()) {
         }
         // TODO add your handling code here:
-    } //GEN-LAST:event_formKeyPressed
+    }//GEN-LAST:event_formKeyPressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyTyped
-    }                                                              //GEN-LAST:event_formKeyTyped
+    private void formKeyTyped(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
+    }//GEN-LAST:event_formKeyTyped
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPutKassenzeichenToSearchTreeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
+    private void cmdPutKassenzeichenToSearchTreeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
         if ((kassenzeichenPanel.getShownKassenzeichen() != null)
                     && !kassenzeichenPanel.getShownKassenzeichen().trim().equals("")) {
             if (LOG.isDebugEnabled()) {
@@ -3064,22 +3064,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             + ") nicht vorhanden!!!");
             }
         }
-    }                                                                                                   //GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
+    }//GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWorkflowActionPerformed
-    }                                                                               //GEN-LAST:event_cmdWorkflowActionPerformed
+    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
+    }//GEN-LAST:event_cmdWorkflowActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         LOG.info("formWindowClosing");
         if (editmode && !kassenzeichenPanel.isEmpty()) {
             if (changesPending()) {
@@ -3093,7 +3093,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             @Override
                             protected Void doInBackground() throws Exception {
-                                storeChanges();
+                                prepareSaveKassenzeichen();
                                 return null;
                             }
                         }.execute();
@@ -3109,7 +3109,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }.execute();
         }
         closeAllConnections();
-    } //GEN-LAST:event_formWindowClosing
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
@@ -3126,15 +3126,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosed(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosed
-    }                                                                     //GEN-LAST:event_formWindowClosed
+    private void formWindowClosed(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
+    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -3147,7 +3147,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             @Override
                             protected Void doInBackground() throws Exception {
-                                storeChanges();
+                                prepareSaveKassenzeichen();
                                 return null;
                             }
 
@@ -3163,32 +3163,32 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 newKassenzeichen();
             }
         }
-    } //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
+    }//GEN-LAST:event_cmdNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
+    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOkActionPerformed
         if (changesPending()) {
             new SwingWorker<Void, Void>() {
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        storeChanges();
+                        prepareSaveKassenzeichen();
                         return null;
                     }
                 }.execute();
         }
-    } //GEN-LAST:event_cmdOkActionPerformed
+    }//GEN-LAST:event_cmdOkActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
         if (changesPending()) {
             final int answer = JOptionPane.showConfirmDialog(
                     this,
@@ -3216,14 +3216,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     kassenzeichenPanel.refresh();
                 }
             }.execute();
-    } //GEN-LAST:event_cmdCancelActionPerformed
+    }//GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
+    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
             new SwingWorker<Void, Void>() {
 
@@ -3239,41 +3239,41 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                 }.execute();
         }
-    } //GEN-LAST:event_cmdEditModeActionPerformed
+    }//GEN-LAST:event_cmdEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCopyFlaecheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCopyFlaecheActionPerformed
+    private void cmdCopyFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyFlaecheActionPerformed
         if (flaechenClipboard != null) {
             flaechenClipboard.storeToFile();
             flaechenClipboard.copy();
         }
-    }                                                                                  //GEN-LAST:event_cmdCopyFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCopyFlaecheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTestActionPerformed
-    }                                                                           //GEN-LAST:event_cmdTestActionPerformed
+    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestActionPerformed
+    }//GEN-LAST:event_cmdTestActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTest2ActionPerformed
-    }                                                                            //GEN-LAST:event_cmdTest2ActionPerformed
+    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
+    }//GEN-LAST:event_cmdTest2ActionPerformed
     /**
      * ToDo Threading and Progressbar.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
+    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
             final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(prefs.getLagisCrossoverPort(), this);
@@ -3289,14 +3289,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             LOG.error("Crossover: Fehler im LagIS Crossover", ex);
             // ToDo Meldung an Benutzer
         }
-    }                                                                                     //GEN-LAST:event_cmdLagisCrossoverActionPerformed
+    }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameKZActionPerformed
+    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRenameKZActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -3309,7 +3309,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             @Override
                             protected Void doInBackground() throws Exception {
-                                storeChanges();
+                                prepareSaveKassenzeichen();
                                 return null;
                             }
 
@@ -3326,23 +3326,23 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 renameKZ();
             }
         }
-    } //GEN-LAST:event_mnuRenameKZActionPerformed
+    }//GEN-LAST:event_mnuRenameKZActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKarteActionPerformed
+    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKarteActionPerformed
         showOrHideView(vKarte);
-    }                                                                            //GEN-LAST:event_mniKarteActionPerformed
+    }//GEN-LAST:event_mniKarteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniTabelleActionPerformed
+    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniTabelleActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vTabelleRegen);
@@ -3353,14 +3353,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             break;
         }
-    }                                                                              //GEN-LAST:event_mniTabelleActionPerformed
+    }//GEN-LAST:event_mniTabelleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDetailsActionPerformed
+    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDetailsActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vDetailsRegen);
@@ -3374,23 +3374,23 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             break;
         }
-    }                                                                              //GEN-LAST:event_mniDetailsActionPerformed
+    }//GEN-LAST:event_mniDetailsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
-    }                                                                              //GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnHistoryActionPerformed
+    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
         final HistoryPanel historyPan = new HistoryPanel();
         historyPan.setCidsBean(kassenzeichenBean);
 
@@ -3399,7 +3399,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         dial.setContentPane(historyPan);
         dial.setSize(800, 600);
         StaticSwingTools.showDialog(dial);
-    } //GEN-LAST:event_btnHistoryActionPerformed
+    }//GEN-LAST:event_btnHistoryActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3570,7 +3570,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
         if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             setKZGeomFromSole();
         } else {
@@ -3579,14 +3579,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 cidsBeanTable.addNewBean();
             }
         }
-    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
+    }//GEN-LAST:event_cmdAddActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
+    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveActionPerformed
         if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             removeKZGeometrie();
         } else {
@@ -3595,45 +3595,45 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 cidsBeanTable.removeSelectedBeans();
             }
         }
-    }                                                                             //GEN-LAST:event_cmdRemoveActionPerformed
+    }//GEN-LAST:event_cmdRemoveActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
         final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
         if (cidsBeanTable != null) {
             cidsBeanTable.restoreSelectedBeans();
         }
-    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
+    }//GEN-LAST:event_cmdUndoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniOptionsActionPerformed
+    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniOptionsActionPerformed
         final OptionsDialog od = new OptionsDialog(this, true);
         StaticSwingTools.showDialog(od);
-    }                                                                              //GEN-LAST:event_mniOptionsActionPerformed
+    }//GEN-LAST:event_mniOptionsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
+    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFortfuehrungActionPerformed
         StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
-    }                                                                                   //GEN-LAST:event_cmdFortfuehrungActionPerformed
+    }//GEN-LAST:event_cmdFortfuehrungActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
         final Integer kassenzeichennummer8;
         if (getCidsBean() != null) {
             kassenzeichennummer8 = (Integer)getCidsBean().getProperty(
@@ -3654,7 +3654,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         } catch (final ConnectionException ex) {
             LOG.error("error while executing next kassenzeichensearch", ex);
         }
-    } //GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    }//GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3693,6 +3693,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                     return;
                                 }
 
+                                disableKassenzeichenCmds();
                                 new SwingWorker<Void, Void>() {
 
                                         @Override
@@ -3702,14 +3703,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                                 kassenzeichenBean.setProperty(
                                                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
                                                     newKZInt);
-                                                if (!storeChanges(false, newKZ)) {
-                                                    if (LOG.isDebugEnabled()) {
-                                                        LOG.debug("storechanges error");
-                                                    }
-                                                }
                                             } catch (Exception ex) {
                                                 LOG.error("error while setting kassenzeichennummer", ex);
                                             }
+                                            persistAndReloadKassenzeichen();
                                             return null;
                                         }
                                     }.execute();
@@ -3895,7 +3892,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     CidsAppBackend.getInstance().setCidsBean(null);
 
                     kassenzeichenPanel.setKZSearchField("");
-                    Main.THIS.enableEditing(false);
+                    enableEditing(false);
                 } catch (final Exception ex) {
                     JOptionPane.showMessageDialog(this.getComponent(),
                         "Das Kassenzeichen konnte nicht gelöscht werden.",
@@ -3997,7 +3994,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             @Override
                             protected Void doInBackground() throws Exception {
-                                storeChanges();
+                                prepareSaveKassenzeichen();
                                 return null;
                             }
                         }.execute();
@@ -4212,7 +4209,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    public void storeChanges() {
+    public void prepareSaveKassenzeichen() {
         final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
         fillVeranlagungSummeMap(newVeranlagungSummeMap);
 
@@ -4238,119 +4235,161 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final int returnType = assessmentDialog.getReturnType();
 
         if (returnType != AssessmentDialog.RETURN_CANCEL) {
-            if (persistKassenzeichenBean()) {
-                if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
-                    try {
-                        final MetaObject veranlagungMo = CidsAppBackend.getInstance()
-                                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
-                                    .getEmptyInstance();
-                        final CidsBean veranlagungBean = veranlagungMo.getBean();
-                        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__DATUM,
-                            new java.sql.Date(assessmentDialog.getDatum().getTime()));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
-                            new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G_200,
-                            newVeranlagungSummeMap.get("null--200"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G_100,
-                            newVeranlagungSummeMap.get("null--100"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G305,
-                            newVeranlagungSummeMap.get("A1-305"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G306,
-                            newVeranlagungSummeMap.get("Z1-306"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G310,
-                            newVeranlagungSummeMap.get("A1V-310"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G311,
-                            newVeranlagungSummeMap.get("Z1V-311"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G315,
-                            newVeranlagungSummeMap.get("A2-315"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G320,
-                            newVeranlagungSummeMap.get("A2V-320"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G321,
-                            newVeranlagungSummeMap.get("A3-321"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G322,
-                            newVeranlagungSummeMap.get("A3V-322"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G325,
-                            newVeranlagungSummeMap.get("B1-325"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G330,
-                            newVeranlagungSummeMap.get("B1V-330"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G335,
-                            newVeranlagungSummeMap.get("B2-335"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G340,
-                            newVeranlagungSummeMap.get("B2V-340"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G345,
-                            newVeranlagungSummeMap.get("D1-345"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G350,
-                            newVeranlagungSummeMap.get("D2-350"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G361,
-                            newVeranlagungSummeMap.get("P1-361"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G362,
-                            newVeranlagungSummeMap.get("P2-362"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G710,
-                            newVeranlagungSummeMap.get("710-DF"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G715,
-                            newVeranlagungSummeMap.get("715-GDF"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G720,
-                            newVeranlagungSummeMap.get("720-VF"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G725,
-                            newVeranlagungSummeMap.get("725-VFÖ"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G730,
-                            newVeranlagungSummeMap.get("730-Va-über"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G740,
-                            newVeranlagungSummeMap.get("740-VFS"));
-                        veranlagungBean.setProperty(
-                            VeranlagungPropertyConstants.PROP__G999,
-                            newVeranlagungSummeMap.get("999-Rest"));
+            SwingUtilities.invokeLater(new Runnable() {
 
-                        veranlagungBean.persist();
-                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
-                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
-                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
-                    } catch (Exception ex) {
-                        LOG.error("error while storing veranlagung", ex);
+                    @Override
+                    public void run() {
+                        enableEditing(false);
+                        disableKassenzeichenCmds();
                     }
-                } else {
-                    try {
-                        final String veranlagungszettel = assessmentDialog.getZettelHtml();
-                        kassenzeichenBean.setProperty(
-                            KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
-                            veranlagungszettel);
-                        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
-                        kassenzeichenBean.setProperty(
-                            KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
-                            "beim letzten Speichern nicht veranlagt");
-                    } catch (Exception ex) {
-                        LOG.error("error while storing veranlagungszettel", ex);
-                    }
+                });
+
+            try {
+                setCidsBean(kassenzeichenBean.persist());
+            } catch (final Exception e) {
+                LOG.error("error during persist", e);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                JXErrorPane.showDialog(
+                                    Main.this,
+                                    new ErrorInfo(
+                                        "Fehler beim Schreiben",
+                                        "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
+                                        null,
+                                        "",
+                                        e,
+                                        null,
+                                        null));
+                            }
+                        });
+                } catch (final Exception ex) {
                 }
-                storeChanges(false);
+
+                SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            enableEditing(true);
+                        }
+                    });
+                return;
             }
+
+            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                try {
+                    final MetaObject veranlagungMo = CidsAppBackend.getInstance()
+                                .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
+                                .getEmptyInstance();
+                    final CidsBean veranlagungBean = veranlagungMo.getBean();
+                    veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__DATUM,
+                        new java.sql.Date(assessmentDialog.getDatum().getTime()));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+                        new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G_200,
+                        newVeranlagungSummeMap.get("null--200"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G_100,
+                        newVeranlagungSummeMap.get("null--100"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G305,
+                        newVeranlagungSummeMap.get("A1-305"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G306,
+                        newVeranlagungSummeMap.get("Z1-306"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G310,
+                        newVeranlagungSummeMap.get("A1V-310"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G311,
+                        newVeranlagungSummeMap.get("Z1V-311"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G315,
+                        newVeranlagungSummeMap.get("A2-315"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G320,
+                        newVeranlagungSummeMap.get("A2V-320"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G321,
+                        newVeranlagungSummeMap.get("A3-321"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G322,
+                        newVeranlagungSummeMap.get("A3V-322"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G325,
+                        newVeranlagungSummeMap.get("B1-325"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G330,
+                        newVeranlagungSummeMap.get("B1V-330"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G335,
+                        newVeranlagungSummeMap.get("B2-335"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G340,
+                        newVeranlagungSummeMap.get("B2V-340"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G345,
+                        newVeranlagungSummeMap.get("D1-345"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G350,
+                        newVeranlagungSummeMap.get("D2-350"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G361,
+                        newVeranlagungSummeMap.get("P1-361"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G362,
+                        newVeranlagungSummeMap.get("P2-362"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G710,
+                        newVeranlagungSummeMap.get("710-DF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G715,
+                        newVeranlagungSummeMap.get("715-GDF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G720,
+                        newVeranlagungSummeMap.get("720-VF"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G725,
+                        newVeranlagungSummeMap.get("725-VFÖ"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G730,
+                        newVeranlagungSummeMap.get("730-Va-über"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G740,
+                        newVeranlagungSummeMap.get("740-VFS"));
+                    veranlagungBean.setProperty(
+                        VeranlagungPropertyConstants.PROP__G999,
+                        newVeranlagungSummeMap.get("999-Rest"));
+
+                    veranlagungBean.persist();
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
+                } catch (Exception ex) {
+                    LOG.error("error while storing veranlagung", ex);
+                }
+            } else {
+                try {
+                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                        veranlagungszettel);
+                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                    kassenzeichenBean.setProperty(
+                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                        "beim letzten Speichern nicht veranlagt");
+                } catch (Exception ex) {
+                    LOG.error("error while storing veranlagungszettel", ex);
+                }
+            }
+
+            persistAndReloadKassenzeichen();
         }
     }
 
@@ -4367,20 +4406,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param   editModeAfterStoring     DOCUMENT ME!
-     * @param   refreshingKassenzeichen  DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
-    public boolean storeChanges(final boolean editModeAfterStoring,
-            final String refreshingKassenzeichen) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    disableKassenzeichenCmds();
-                }
-            });
+    public boolean persistAndReloadKassenzeichen() {
         try {
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
@@ -4392,41 +4420,27 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             LOG.error("error while setting letzte aenderung", ex);
         }
 
-        if (persistKassenzeichenBean()) {
-            if (!editModeAfterStoring) {
-                CidsAppBackend.getInstance().releaseLock();
-            }
+        try {
+            setCidsBean(kassenzeichenBean.persist());
+
+            CidsAppBackend.getInstance().releaseLock();
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        enableEditing(editModeAfterStoring);
+                        enableEditing(false);
                     }
                 });
 
             fixMapExtent = CidsAppBackend.getInstance().getMainMap().isFixedMapExtent();
             CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(true);
+            final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
             if (refreshingKassenzeichen == null) {
                 getKzPanel().refresh();
             } else {
                 getKzPanel().gotoKassenzeichen(refreshingKassenzeichen);
             }
-            return true;
-        } else {
-            enableEditing(true);
-
-            return false;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean persistKassenzeichenBean() {
-        try {
-            setCidsBean(kassenzeichenBean.persist());
             return true;
         } catch (final Exception e) {
             LOG.error("error during persist", e);
@@ -4449,6 +4463,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     });
             } catch (final Exception ex) {
             }
+
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        enableEditing(true);
+                    }
+                });
+
             return false;
         }
     }
@@ -4463,18 +4486,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  editModeAfterStoring  DOCUMENT ME!
-     */
-    public void storeChanges(final boolean editModeAfterStoring) {
-        storeChanges(editModeAfterStoring, null);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
-    public de.cismet.verdis.gui.KassenzeichenPanel getKzPanel() {
+    public KassenzeichenPanel getKzPanel() {
         return kassenzeichenPanel;
     }
 
