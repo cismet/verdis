@@ -29,14 +29,7 @@ import java.sql.Date;
 
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
-import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -45,9 +38,6 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
-import de.cismet.verdis.gui.AbstractCidsBeanTable;
-
-import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
 
 /**

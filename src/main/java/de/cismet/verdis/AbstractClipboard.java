@@ -99,7 +99,7 @@ public abstract class AbstractClipboard {
                 }
                 if (notPastableCounter > 0) {
                     LOG.info(notPastableCounter
-                                + " flaecheBean(s) not pasted because the flaecheinfoBean of this bean(s) was still assigned to a flaecheBean of the current kassenzeichen");
+                                + " cidsBean(s) not pasted because the cidsinfoBean of this bean(s) was still assigned to a cidsBean of the current kassenzeichen");
                 }
             } catch (Exception ex) {
                 LOG.error("error while pasting bean", ex);
@@ -109,7 +109,7 @@ public abstract class AbstractClipboard {
 
     public abstract CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception;
 
-    public abstract boolean isPastable(final CidsBean clipboardFlaecheBean);
+    public abstract boolean isPastable(final CidsBean clipboardBean);
 
     /**
      * DOCUMENT ME!
@@ -152,19 +152,19 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @param   flaecheBeans  DOCUMENT ME!
+     * @param   cidsBeans  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private boolean cutOrCopy(final Collection<CidsBean> flaecheBeans) {
-        if ((flaecheBeans != null) && !flaecheBeans.isEmpty()) {
+    private boolean cutOrCopy(final Collection<CidsBean> cidsBeans) {
+        if ((cidsBeans != null) && !cidsBeans.isEmpty()) {
             if (!checkNotPasted()) {
                 return false;
             }
             try {
                 clipboardBeans.clear();
-                for (final CidsBean flaecheBean : flaecheBeans) {
-                    this.clipboardBeans.add(CidsBeanSupport.deepcloneCidsBean(flaecheBean));
+                for (final CidsBean cidsBean : cidsBeans) {
+                    this.clipboardBeans.add(CidsBeanSupport.deepcloneCidsBean(cidsBean));
                 }
                 fireClipboardChanged();
                 return true;
