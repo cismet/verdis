@@ -12,6 +12,8 @@ import Sirius.navigator.connection.SessionManager;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import org.apache.log4j.Logger;
 
@@ -42,6 +44,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 
+import de.cismet.verdis.server.search.FortfuehrungItemSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 
 /**
@@ -828,8 +831,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         try {
             final int displayedIndex = jXTable1.getSelectedRow();
             final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
-            final CidsBean selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel())
-                        .getCidsBeanByIndex(modelIndex);
+            final CidsBean selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(
+                    modelIndex).getBean();
             selectedFortfuehrungBean.setProperty(
                 FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET,
                 cbxAbgearbeitet.isSelected());
@@ -853,7 +856,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      *
      * @param  kassenzeichennummern  DOCUMENT ME!
      */
-    private void setKassenzeichenNummern(final Set<Integer> kassenzeichennummern) {
+    private void setKassenzeichenNummern(final Collection<Integer> kassenzeichennummern) {
         final DefaultListModel kassenzeichenListModel = (DefaultListModel)lstKassenzeichen.getModel();
         kassenzeichenListModel.removeAllElements();
 
@@ -878,47 +881,59 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      * @param  e  DOCUMENT ME!
      */
     private void fortfuehrungsTableListSelectionChanged(final ListSelectionEvent e) {
+        if (e.getValueIsAdjusting()) {
+            return;
+        }
         final int selectedIndex = jXTable1.getSelectedRow();
-        final CidsBean selectedFortfuehrungBean;
+        final FortfuehrungItem selectedFortfuehrungItem;
         if (selectedIndex >= 0) {
             final int rowIndex = jXTable1.convertRowIndexToModel(selectedIndex);
-            selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getCidsBeanByIndex(rowIndex);
+            selectedFortfuehrungItem = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(rowIndex);
         } else {
-            selectedFortfuehrungBean = null;
+            selectedFortfuehrungItem = null;
         }
-        if (selectedFortfuehrungBean != null) {
-            new SwingWorker<Set<Integer>, Void>() {
+        if (selectedFortfuehrungItem != null) {
+            new SwingWorker<Collection<Integer>, Void>() {
+
+                    private CidsBean selectedFortfuehrungBean;
 
                     @Override
-                    protected Set<Integer> doInBackground() throws Exception {
+                    protected Collection<Integer> doInBackground() throws Exception {
                         lstKassenzeichen.setEnabled(false);
                         cbxAbgearbeitet.setEnabled(false);
                         jProgressBar1.setVisible(true);
+                        selectedFortfuehrungBean = selectedFortfuehrungItem.getBean();
                         final List<CidsBean> geomBeans = (List<CidsBean>)
                             selectedFortfuehrungBean.getBeanCollectionProperty(
                                 FortfuehrungPropertyConstants.PROP__GEOMETRIEN);
                         final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
-                        final Set<Integer> kassenzeichennummern = new HashSet<Integer>();
+                        final List<Geometry> geoms = new ArrayList<Geometry>(geomBeans.size());
                         for (final CidsBean geomBean : geomBeans) {
                             if (geomBean != null) {
                                 try {
                                     final Geometry geom = (Geometry)geomBean.getProperty(
                                             GeomPropertyConstants.PROP__GEO_FIELD);
-                                    geomSearch.setGeometry(geom.buffer(FLURSTUECKBUFFER_FOR_KASSENZEICHEN_GEOMSEARCH));
-                                    kassenzeichennummern.addAll((Collection<Integer>)SessionManager.getProxy()
-                                                .customServerSearch(SessionManager.getSession().getUser(), geomSearch));
+                                    geoms.add(geom.buffer(FLURSTUECKBUFFER_FOR_KASSENZEICHEN_GEOMSEARCH));
+//                                    geomSearch.setGeometry(geom.buffer(FLURSTUECKBUFFER_FOR_KASSENZEICHEN_GEOMSEARCH));
+//                                    kassenzeichennummern.addAll((Collection<Integer>)SessionManager.getProxy()
+//                                                .customServerSearch(SessionManager.getSession().getUser(), geomSearch));
                                 } catch (final Exception ex) {
                                     LOG.error("fehler beim suchen von kassenzeichen über eine geometrie", ex);
                                 }
                             }
                         }
-                        return kassenzeichennummern;
+                        final Geometry geomColl = new GeometryCollection(GeometryFactory.toGeometryArray(geoms),
+                                geoms.get(0).getFactory());
+                        geomSearch.setGeometry(geomColl.buffer(0));
+                        final Collection<Integer> result = (Collection<Integer>)SessionManager.getProxy()
+                                    .customServerSearch(SessionManager.getSession().getUser(), geomSearch);
+                        return result;
                     }
 
                     @Override
                     protected void done() {
                         try {
-                            final Set<Integer> kassenzeichennummern = get();
+                            final Collection<Integer> kassenzeichennummern = get();
                             setDetailEnabled(true);
                             setKassenzeichenNummern(kassenzeichennummern);
                             cbxAbgearbeitet.setSelected((Boolean)selectedFortfuehrungBean.getProperty(
@@ -980,34 +995,50 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      * DOCUMENT ME!
      */
     private void refreshFortfuehrungsList() {
-        new SwingWorker<List<CidsBean>, Void>() {
+        new SwingWorker<Collection<FortfuehrungItem>, Void>() {
 
                 @Override
-                protected List<CidsBean> doInBackground() throws Exception {
+                protected Collection<FortfuehrungItem> doInBackground() throws Exception {
                     btnRefreshAnlaesse.setEnabled(false);
                     jProgressBar1.setVisible(true);
                     jXTable1.setEnabled(false);
                     final CidsAppBackend be = CidsAppBackend.getInstance();
 
-                    return be.loadFortfuehrungBeansByDates(dpiFrom.getDate(), dpiTo.getDate());
+                    final FortfuehrungItemSearch itemSearch = new FortfuehrungItemSearch(dpiFrom.getDate(),
+                            dpiTo.getDate());
+                    final Collection<Object[]> rawItems = (Collection<Object[]>)SessionManager.getProxy()
+                                .customServerSearch(SessionManager.getSession().getUser(), itemSearch);
+                    final List<FortfuehrungItem> items = new ArrayList<FortfuehrungItem>(rawItems.size());
+                    for (final Object[] rawItem : rawItems) {
+                        items.add(new FortfuehrungItem(
+                                (Integer)rawItem[0],
+                                (String)rawItem[1],
+                                (Date)rawItem[2],
+                                (String)rawItem[3],
+                                (String)rawItem[4],
+                                (Boolean)rawItem[5]));
+                    }
+                    Collections.sort(items);
+                    return items;
                 }
 
                 @Override
                 protected void done() {
-                    List<CidsBean> cidsBeans = null;
+                    Collection<FortfuehrungItem> items = null;
                     try {
-                        cidsBeans = get();
+                        items = get();
 
                         jXTable1.getSelectionModel().clearSelection();
-                        ((CidsBeanTableModel)jXTable1.getModel()).setCidsBeans(cidsBeans);
+                        ((FortfuehrungenTableModel)jXTable1.getModel()).setItems(items.toArray(
+                                new FortfuehrungItem[0]));
                     } catch (Exception ex) {
-                        LOG.error("error while loading fortfuehrung beans", ex);
+                        LOG.error("error while loading fortfuehrung items", ex);
                     }
                     btnRefreshAnlaesse.setEnabled(true);
                     jXTable1.setEnabled(true);
                     jProgressBar1.setVisible(false);
 
-                    if ((cidsBeans == null) || cidsBeans.isEmpty()) {
+                    if ((items == null) || (items.isEmpty())) {
                         JOptionPane.showMessageDialog(
                             rootPane,
                             "<html>Es konnten keine Fortführungsfälle<br/>für den gewählten Zeitraum gefunden werden.",
@@ -1091,9 +1122,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         public Component highlight(final Component renderer, final ComponentAdapter adapter) {
             final int displayedIndex = adapter.row;
             final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
-            final CidsBean cidsBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getCidsBeanByIndex(modelIndex);
-            final boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
-                    FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET);
+            final FortfuehrungItem item = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(modelIndex);
+            final boolean istAbgearbeitet = item.isIst_abgearbeitet();
             renderer.setEnabled(!istAbgearbeitet);
             return renderer;
         }

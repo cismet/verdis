@@ -11,9 +11,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.Date;
 
-import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
+import javax.swing.table.AbstractTableModel;
 
 /**
  * DOCUMENT ME!
@@ -21,7 +19,7 @@ import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class FortfuehrungenTableModel extends CidsBeanTableModel {
+public class FortfuehrungenTableModel extends AbstractTableModel {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -40,26 +38,56 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             String.class
         };
 
+    //~ Instance fields --------------------------------------------------------
+
+    private FortfuehrungItem[] items = new FortfuehrungItem[0];
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FortfuehrungenTableModel object.
      */
     public FortfuehrungenTableModel() {
-        super(COLUMN_NAMES, COLUMN_CLASSES);
     }
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  items  DOCUMENT ME!
+     */
+    public void setItems(final FortfuehrungItem[] items) {
+        if (items != null) {
+            this.items = items;
+        } else {
+            this.items = new FortfuehrungItem[0];
+        }
+        fireTableDataChanged();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   rowIndex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public FortfuehrungItem getItem(final int rowIndex) {
+        return items[rowIndex];
+    }
+
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
-        final CidsBean fortfuehrungBean = getCidsBeanByIndex(rowIndex);
-        if (fortfuehrungBean == null) {
+        final FortfuehrungItem item = getItem(rowIndex);
+
+        if (item == null) {
             return null;
         }
+
         if (columnIndex == 0) {
             try {
-                final Date date = (Date)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__BEGINN);
+                final Date date = item.getBeginn();
                 if (date != null) {
                     return new SimpleDateFormat("dd.MM.yyyy").format(date);
                 } else {
@@ -71,17 +99,15 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             }
         } else if (columnIndex == 1) {
             try {
-                return (String)fortfuehrungBean.getProperty(FortfuehrungPropertyConstants.PROP__ANLASS__NAME);
+                return item.getAnlass();
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
             }
         } else if (columnIndex == 2) {
             try {
-                final String flurstueck_alt = (String)fortfuehrungBean.getProperty(
-                        FortfuehrungPropertyConstants.PROP__FLURSTUECK_ALT);
-                final String flurstueck_neu = (String)fortfuehrungBean.getProperty(
-                        FortfuehrungPropertyConstants.PROP__FLURSTUECK_NEU);
+                final String flurstueck_alt = item.getFlurstueck_alt();
+                final String flurstueck_neu = item.getFlurstueck_neu();
                 if (flurstueck_alt.equals(flurstueck_neu)) {
                     return flurstueck_alt;
                 } else {
@@ -93,5 +119,25 @@ public class FortfuehrungenTableModel extends CidsBeanTableModel {
             }
         }
         return null;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return COLUMN_NAMES.length;
+    }
+
+    @Override
+    public String getColumnName(final int columnIndex) {
+        return COLUMN_NAMES[columnIndex];
+    }
+
+    @Override
+    public Class<?> getColumnClass(final int columnIndex) {
+        return COLUMN_CLASSES[columnIndex];
+    }
+
+    @Override
+    public int getRowCount() {
+        return items.length;
     }
 }

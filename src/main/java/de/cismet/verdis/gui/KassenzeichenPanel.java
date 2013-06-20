@@ -599,16 +599,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hbBackActionPerformed
+    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hbBackActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_hbBackActionPerformed
+    }//GEN-LAST:event_hbBackActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
+    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
         mainApp.refreshLeftTitleBarColor();
 
         final boolean sperre = chkSperre.isSelected();
@@ -623,55 +623,55 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         } else {
             txtSperreBemerkung.setText(null);
         }
-    } //GEN-LAST:event_chkSperreActionPerformed
+    }//GEN-LAST:event_chkSperreActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchActionPerformed
+    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         gotoTxtKassenzeichen();
-    }                                                                             //GEN-LAST:event_txtSearchActionPerformed
+    }//GEN-LAST:event_txtSearchActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togInfoModeActionPerformed
+    private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togInfoModeActionPerformed
         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
         mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togInfoModeActionPerformed
+    }//GEN-LAST:event_togInfoModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togRegenModeActionPerformed
+    private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togRegenModeActionPerformed
         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
         mainApp.refreshLeftTitleBarColor();
-    }                                                                                //GEN-LAST:event_togRegenModeActionPerformed
+    }//GEN-LAST:event_togRegenModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togWDSRModeActionPerformed
+    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togWDSRModeActionPerformed
         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ESW);
         mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togWDSRModeActionPerformed
+    }//GEN-LAST:event_togWDSRModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchActionPerformed
+    private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         gotoTxtKassenzeichen();
-    }                                                                             //GEN-LAST:event_btnSearchActionPerformed
+    }//GEN-LAST:event_btnSearchActionPerformed
 
     @Override
     public void appModeChanged() {

@@ -373,38 +373,6 @@ public class CidsAppBackend implements CidsBeanStore {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   fromDate  DOCUMENT ME!
-     * @param   toDate    DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> loadFortfuehrungBeansByDates(final Date fromDate, final Date toDate) {
-        try {
-            final MetaClass mcFortfuehrung = ClassCacheMultiple.getMetaClass(DOMAIN, "fortfuehrung");
-            final String query = "SELECT "
-                        + "   " + mcFortfuehrung.getId() + ", "
-                        + "   id FROM fortfuehrung "
-                        + "WHERE "
-                        + "   fortfuehrung.beginn BETWEEN '" + fromDate + "' AND '" + toDate + "';";
-            final MetaObject[] mos = proxy.getMetaObjectByQuery(query, 0);
-            if ((mos == null) || (mos.length < 1)) {
-                return null;
-            } else {
-                final List<CidsBean> cbs = new ArrayList<CidsBean>();
-                for (final MetaObject mo : mos) {
-                    cbs.add(mo.getBean());
-                }
-                return cbs;
-            }
-        } catch (ConnectionException ex) {
-            log.error("error during retrieval of object", ex);
-            return null;
-        }
-    }
-
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;
