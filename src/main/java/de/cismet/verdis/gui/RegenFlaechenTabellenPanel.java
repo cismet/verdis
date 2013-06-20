@@ -110,33 +110,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedIndex = componentAdapter.row;
-                    final int columnIndex = componentAdapter.column;
                     final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-
-                    switch (columnIndex) {
-                        case 1: {
-                            // Flaechenbezeichnung
-                            return RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(cidsBean)
-                                        .getState()
-                                        .isError();
-                        }
-                        case 2: {
-                            return getItemValidator(cidsBean).getState().isError();
-                        }
-                        case 3: {
-                            // Flaechenart
-                            return RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(cidsBean).getState()
-                                        .isError();
-                        }
-                        case 6: {
-                            // Erfassungsdatum
-                            return RegenFlaechenDetailsPanel.getValidatorDatumErfassung(cidsBean).getState().isError();
-                        }
-                        default: {
-                            return false;
-                        }
-                    }
+                    return getItemValidator(cidsBean).getState().isError();
                 }
             };
 
