@@ -140,10 +140,12 @@ import de.cismet.validation.ValidatorState;
 
 import de.cismet.validation.validator.AggregatedValidator;
 
+import de.cismet.verdis.AbstractClipboard;
 import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.ClipboardListener;
+import de.cismet.verdis.FlaechenClipboard;
+import de.cismet.verdis.FrontenClipboard;
 
 import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
@@ -261,7 +263,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private String userString;
     private String kassenzeichenSuche = "kassenzeichenSuche";
     private String userGroup = "noGroup";
+    private EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards;
     private FlaechenClipboard flaechenClipboard;
+    private FrontenClipboard frontenClipboard;
     private AppPreferences prefs;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
@@ -307,8 +311,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdCancel;
-    private javax.swing.JButton cmdCopyFlaeche;
-    private javax.swing.JButton cmdCutFlaeche;
+    private javax.swing.JButton cmdCopy;
+    private javax.swing.JButton cmdCut;
     private javax.swing.JButton cmdDeleteKassenzeichen;
     private javax.swing.JButton cmdDownloads;
     private javax.swing.JButton cmdEditMode;
@@ -318,7 +322,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton cmdNewKassenzeichen;
     private javax.swing.JButton cmdNextKassenzeichenWithoutGeom;
     private javax.swing.JButton cmdOk;
-    private javax.swing.JButton cmdPasteFlaeche;
+    private javax.swing.JButton cmdPaste;
     private javax.swing.JButton cmdPdf;
     private javax.swing.JButton cmdPutKassenzeichenToSearchTree;
     private javax.swing.JButton cmdRefreshEnumeration;
@@ -974,6 +978,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final File dotverdisDir = new File(DIRECTORYPATH_VERDIS);
         dotverdisDir.mkdir();
 
+        clipboards = new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
+
         final ClipboardListener clipboardListener = new ClipboardListener() {
 
                 @Override
@@ -993,6 +999,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
         }
+
+        clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
 
         configurationManager.configure(this);
 
@@ -1411,6 +1419,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         currentMode = mode;
 
         refreshClipboardButtons();
+        refreshClipboardButtonsToolTipText();
         refreshItemButtons();
     }
 
@@ -1729,9 +1738,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdNewKassenzeichen = new javax.swing.JButton();
         cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
         jSeparator6 = new javax.swing.JSeparator();
-        cmdCutFlaeche = new javax.swing.JButton();
-        cmdCopyFlaeche = new javax.swing.JButton();
-        cmdPasteFlaeche = new javax.swing.JButton();
+        cmdCut = new javax.swing.JButton();
+        cmdCopy = new javax.swing.JButton();
+        cmdPaste = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
         cmdRefreshEnumeration = new javax.swing.JButton();
         jSeparator12 = new javax.swing.JToolBar.Separator();
@@ -1948,47 +1957,47 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator6);
 
-        cmdCutFlaeche.setIcon(new javax.swing.ImageIcon(
+        cmdCut.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
-        cmdCutFlaeche.setToolTipText("Fläche ausschneiden");
-        cmdCutFlaeche.setEnabled(false);
-        cmdCutFlaeche.setFocusPainted(false);
-        cmdCutFlaeche.addActionListener(new java.awt.event.ActionListener() {
+        cmdCut.setToolTipText("Fläche ausschneiden");
+        cmdCut.setEnabled(false);
+        cmdCut.setFocusPainted(false);
+        cmdCut.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCutFlaecheActionPerformed(evt);
+                    cmdCutActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdCutFlaeche);
+        tobVerdis.add(cmdCut);
 
-        cmdCopyFlaeche.setIcon(new javax.swing.ImageIcon(
+        cmdCopy.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
-        cmdCopyFlaeche.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
-        cmdCopyFlaeche.setEnabled(false);
-        cmdCopyFlaeche.setFocusPainted(false);
-        cmdCopyFlaeche.addActionListener(new java.awt.event.ActionListener() {
+        cmdCopy.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
+        cmdCopy.setEnabled(false);
+        cmdCopy.setFocusPainted(false);
+        cmdCopy.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCopyFlaecheActionPerformed(evt);
+                    cmdCopyActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdCopyFlaeche);
+        tobVerdis.add(cmdCopy);
 
-        cmdPasteFlaeche.setIcon(new javax.swing.ImageIcon(
+        cmdPaste.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
-        cmdPasteFlaeche.setToolTipText("Fläche einfügen");
-        cmdPasteFlaeche.setEnabled(false);
-        cmdPasteFlaeche.setFocusPainted(false);
-        cmdPasteFlaeche.addActionListener(new java.awt.event.ActionListener() {
+        cmdPaste.setToolTipText("Fläche einfügen");
+        cmdPaste.setEnabled(false);
+        cmdPaste.setFocusPainted(false);
+        cmdPaste.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdPasteFlaecheActionPerformed(evt);
+                    cmdPasteActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdPasteFlaeche);
+        tobVerdis.add(cmdPaste);
 
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator4.setMaximumSize(new java.awt.Dimension(2, 32767));
@@ -2937,23 +2946,25 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteFlaecheActionPerformed
-        if (flaechenClipboard != null) {
-            flaechenClipboard.storeToFile();
-            flaechenClipboard.paste();
+    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteActionPerformed
+        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
+        if (clipboard != null) {
+            clipboard.storeToFile();
+            clipboard.paste();
         }
-    }//GEN-LAST:event_cmdPasteFlaecheActionPerformed
+    }//GEN-LAST:event_cmdPasteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCutFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutFlaecheActionPerformed
-        if (flaechenClipboard != null) {
-            flaechenClipboard.cut();
+    private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutActionPerformed
+        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
+        if (clipboard != null) {
+            clipboard.cut();
         }
-    }//GEN-LAST:event_cmdCutFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCutActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3069,7 +3080,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param  evt  DCUMENT ME!
      */
     private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
     }//GEN-LAST:event_cmdWorkflowActionPerformed
@@ -3246,12 +3257,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCopyFlaecheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyFlaecheActionPerformed
-        if (flaechenClipboard != null) {
-            flaechenClipboard.storeToFile();
-            flaechenClipboard.copy();
+    private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyActionPerformed
+        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
+        if (clipboard != null) {
+            clipboard.storeToFile();
+            clipboard.copy();
         }
-    }//GEN-LAST:event_cmdCopyFlaecheActionPerformed
+    }//GEN-LAST:event_cmdCopyActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3631,7 +3643,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param  evt  DCUMENT ME!
      */
     private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
         final Integer kassenzeichennummer8;
@@ -4015,7 +4027,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             configurationManager.writeConfiguration();
             saveLayout(FILEPATH_PLUGINLAYOUT);
         }
-        flaechenClipboard.deleteStoreFile();
+        allClipboardsDeleteStoreFile();
     }
 
     @Override
@@ -4101,11 +4113,48 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void refreshClipboardButtons() {
+        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
         final boolean isEditable = CidsAppBackend.getInstance().isEditable();
-        final boolean isFlaechen = CidsAppBackend.getInstance().getMode() == CidsAppBackend.Mode.REGEN;
-        cmdPasteFlaeche.setEnabled(isEditable && isFlaechen && flaechenClipboard.isPastable());
-        cmdCopyFlaeche.setEnabled(isFlaechen && flaechenClipboard.isCopyable());
-        cmdCutFlaeche.setEnabled(isEditable && isFlaechen && flaechenClipboard.isCutable());
+        if ((clipboard == null)) {
+            cmdCopy.setEnabled(false);
+            cmdPaste.setEnabled(false);
+            cmdCut.setEnabled(false);
+        } else {
+            cmdCopy.setEnabled(clipboard.isCopyable());
+            cmdPaste.setEnabled(isEditable && clipboard.isPastable());
+            cmdCut.setEnabled(isEditable && clipboard.isCutable());
+        }
+    }
+
+    /**
+     * gets called on Mode changed to set the right tooltip for the clipboard buttons 
+     */
+    private void refreshClipboardButtonsToolTipText() {
+        switch (CidsAppBackend.getInstance().getMode()) {
+            case REGEN: {
+                cmdCopy.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
+                cmdPaste.setToolTipText("Fläche einfügen");
+                cmdCut.setToolTipText("Fläche ausschneiden");
+                break;
+            }
+            case ESW: {
+                cmdCopy.setToolTipText("Fronten kopieren");
+                cmdPaste.setToolTipText("Fronten einfügen");
+                cmdCut.setToolTipText("Fronten ausschneiden");
+                break;
+            }
+            case ALLGEMEIN: {
+                cmdCopy.setToolTipText("Kassenzeichengeometrie kopieren");
+                cmdPaste.setToolTipText("Kassenzeichengeometrie einfügen");
+                cmdCut.setToolTipText("Kassenzeichengeometrie ausschneiden");
+                break;
+            }
+            default: {
+                cmdCopy.setToolTipText("kopieren");
+                cmdPaste.setToolTipText("einfügen");
+                cmdCut.setToolTipText("ausschneiden");
+            }
+        }
     }
 
     /**
@@ -4620,7 +4669,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         configurationManager.writeConfiguration();
         saveLayout(FILEPATH_LAYOUT + "." + currentMode);
 
-        flaechenClipboard.deleteStoreFile();
+        allClipboardsDeleteStoreFile();
         System.exit(0);
     }
 
@@ -4887,6 +4936,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String wdKey = key + "-" + schluessel;
             final double summe = veranlagungSummeMap.get(wdKey);
             veranlagungSummeMap.put(wdKey, summe + laenge);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void allClipboardsDeleteStoreFile() {
+        for (final AbstractClipboard clipboard : clipboards.values()) {
+            clipboard.deleteStoreFile();
         }
     }
 
