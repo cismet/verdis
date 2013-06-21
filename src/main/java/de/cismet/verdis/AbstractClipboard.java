@@ -1,52 +1,63 @@
-/*
- * Copyright (C) 2013 cismet GmbH
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.verdis;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.gui.AbstractCidsBeanTable;
-import de.cismet.verdis.gui.Main;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 
+import de.cismet.cids.custom.util.CidsBeanSupport;
+
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.verdis.gui.AbstractCidsBeanTable;
+import de.cismet.verdis.gui.Main;
+
 /**
+ * DOCUMENT ME!
  *
- * @author gbaatz
+ * @author   Gilles Baatz
+ * @version  $Revision$, $Date$
  */
 public abstract class AbstractClipboard {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(AbstractClipboard.class);
+
+    //~ Instance fields --------------------------------------------------------
+
     private AbstractCidsBeanTable table;
     private Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
     private List<ClipboardListener> listeners = new ArrayList<ClipboardListener>();
     private boolean isCutted = false;
 
-    public AbstractClipboard(AbstractCidsBeanTable table) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AbstractClipboard object.
+     *
+     * @param  table  DOCUMENT ME!
+     */
+    public AbstractClipboard(final AbstractCidsBeanTable table) {
         this.table = table;
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
      *
-     * @param listener DOCUMENT ME!
+     * @param   listener  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     public boolean addListener(final ClipboardListener listener) {
         return listeners.add(listener);
@@ -55,9 +66,9 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @param listener DOCUMENT ME!
+     * @param   listener  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     public boolean removeListener(final ClipboardListener listener) {
         return listeners.remove(listener);
@@ -72,14 +83,27 @@ public abstract class AbstractClipboard {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Collection<CidsBean> getClipboardBeans() {
         return clipboardBeans;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public AbstractCidsBeanTable getTable() {
         return table;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void paste() {
         if (isPastable()) {
             try {
@@ -107,14 +131,30 @@ public abstract class AbstractClipboard {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   clipboardBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public abstract CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception;
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   clipboardBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public abstract boolean isPastable(final CidsBean clipboardBean);
 
     /**
      * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     public boolean isPastable() {
         return !clipboardBeans.isEmpty();
@@ -123,7 +163,7 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     public boolean isCopyable() {
         return !isSelectionEmpty();
@@ -132,7 +172,7 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     public boolean isCutable() {
         return !isSelectionEmpty();
@@ -141,13 +181,11 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     private boolean isSelectionEmpty() {
         return table.getSelectedBeans().isEmpty();
     }
-    
-    
 
     /**
      * DOCUMENT ME!
@@ -211,8 +249,7 @@ public abstract class AbstractClipboard {
     private Collection<CidsBean> getSelectedBeans() {
         return table.getSelectedBeans();
     }
-    
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -230,8 +267,7 @@ public abstract class AbstractClipboard {
         }
         return answer == JOptionPane.YES_OPTION;
     }
-    
-    
+
     /**
      * DOCUMENT ME!
      */

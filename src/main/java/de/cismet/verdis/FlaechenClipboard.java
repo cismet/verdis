@@ -38,6 +38,7 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
 
 /**
@@ -46,16 +47,23 @@ import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class FlaechenClipboard extends AbstractClipboard{
+public class FlaechenClipboard extends AbstractClipboard {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FlaechenClipboard.class);
 
-    public FlaechenClipboard(RegenFlaechenTabellenPanel table) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new FlaechenClipboard object.
+     *
+     * @param  table  DOCUMENT ME!
+     */
+    public FlaechenClipboard(final RegenFlaechenTabellenPanel table) {
         super(table);
-    }    
-    
+    }
+
     //~ Methods ----------------------------------------------------------------
 
     /**
