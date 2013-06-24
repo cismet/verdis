@@ -53,15 +53,16 @@ public class FrontenClipboard extends AbstractClipboard {
      */
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = getTable().getModel().deepcloneBean(clipboardBean);
-        final int id = getTable().getTableHelper().getNextNewBeanId();
+        final WDSRTabellenPanel table = (WDSRTabellenPanel)getComponent();
+        final CidsBean pasteBean = table.getModel().deepcloneBean(clipboardBean);
+        final int id = table.getTableHelper().getNextNewBeanId();
         pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
         // the values for PROP__SR_KLASSE_OR, PROP__WD_PRIO_OR and PROP__STRASSE were already set in
         // WDSRTableModel.deepclone()
 
-        final int newNummer = ((WDSRTabellenPanel)getTable()).getValidNummer();
+        final int newNummer = ((WDSRTabellenPanel)getComponent()).getValidNummer();
         pasteBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, newNummer);
 
         final Calendar cal = Calendar.getInstance();

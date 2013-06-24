@@ -17,8 +17,9 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.Main;
+
+import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
 
 /**
  * DOCUMENT ME!
@@ -34,7 +35,7 @@ public abstract class AbstractClipboard {
 
     //~ Instance fields --------------------------------------------------------
 
-    private AbstractCidsBeanTable table;
+    private AbstractCidsBeanComponent component;
     private Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
     private List<ClipboardListener> listeners = new ArrayList<ClipboardListener>();
     private boolean isCutted = false;
@@ -44,10 +45,10 @@ public abstract class AbstractClipboard {
     /**
      * Creates a new AbstractClipboard object.
      *
-     * @param  table  DOCUMENT ME!
+     * @param  component  DOCUMENT ME!
      */
-    public AbstractClipboard(final AbstractCidsBeanTable table) {
-        this.table = table;
+    public AbstractClipboard(final AbstractCidsBeanComponent component) {
+        this.component = component;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -97,8 +98,8 @@ public abstract class AbstractClipboard {
      *
      * @return  DOCUMENT ME!
      */
-    public AbstractCidsBeanTable getTable() {
-        return table;
+    public AbstractCidsBeanComponent getComponent() {
+        return component;
     }
 
     /**
@@ -112,7 +113,7 @@ public abstract class AbstractClipboard {
                 for (final CidsBean clipboardBean : clipboardBeans) {
                     if (isPastable(clipboardBean)) {
                         final CidsBean pasteBean = createPastedBean(clipboardBean);
-                        getTable().addBean(pasteBean);
+                        getComponent().addBean(pasteBean);
                     } else {
                         notPastableCounter++;
                     }
@@ -184,7 +185,7 @@ public abstract class AbstractClipboard {
      * @return  DOCUMENT ME!
      */
     private boolean isSelectionEmpty() {
-        return table.getSelectedBeans().isEmpty();
+        return component.getSelectedBeans().isEmpty();
     }
 
     /**
@@ -235,7 +236,7 @@ public abstract class AbstractClipboard {
             isCutted = cutOrCopy(selectedBeans);
             if (isCutted) {
                 for (final CidsBean selectedBean : selectedBeans) {
-                    table.removeBean(selectedBean);
+                    component.removeBean(selectedBean);
                 }
             }
         }
@@ -247,7 +248,7 @@ public abstract class AbstractClipboard {
      * @return  DOCUMENT ME!
      */
     private Collection<CidsBean> getSelectedBeans() {
-        return table.getSelectedBeans();
+        return component.getSelectedBeans();
     }
 
     /**

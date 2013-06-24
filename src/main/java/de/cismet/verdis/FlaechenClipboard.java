@@ -77,8 +77,9 @@ public class FlaechenClipboard extends AbstractClipboard {
      */
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = getTable().getModel().deepcloneBean(clipboardBean);
-        final int id = getTable().getTableHelper().getNextNewBeanId();
+        final RegenFlaechenTabellenPanel table = (RegenFlaechenTabellenPanel)getComponent();
+        final CidsBean pasteBean = table.getModel().deepcloneBean(clipboardBean);
+        final int id = table.getTableHelper().getNextNewBeanId();
         pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
@@ -100,7 +101,7 @@ public class FlaechenClipboard extends AbstractClipboard {
         pasteBean.setProperty(FlaechePropertyConstants.PROP__BEMERKUNG, null);
         pasteBean.setProperty(
             FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-            ((RegenFlaechenTabellenPanel)getTable()).getValidFlaechenname(
+            ((RegenFlaechenTabellenPanel)getComponent()).getValidFlaechenname(
                 (Integer)clipboardBean.getProperty(
                     FlaechePropertyConstants.PROP__FLAECHENINFO
                             + "."
@@ -129,7 +130,7 @@ public class FlaechenClipboard extends AbstractClipboard {
             return false;
         }
 
-        for (final CidsBean flaecheBean : getTable().getAllBeans()) {
+        for (final CidsBean flaecheBean : getComponent().getAllBeans()) {
             final int id = (Integer)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__ID);
             final int ownId = (Integer)clipboardFlaecheBean.getProperty(
