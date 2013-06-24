@@ -8,12 +8,15 @@
 package de.cismet.verdis.gui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
 
@@ -25,12 +28,17 @@ import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
  */
 public class KassenzeichenGeometrienList extends JList<CidsBean> implements AbstractCidsBeanComponent {
 
+    //~ Instance fields --------------------------------------------------------
+
+    CidsBean kassenzeichen;
+
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void addBean(final CidsBean cidsBean) {
-        final DefaultListModel<CidsBean> dfm = (DefaultListModel<CidsBean>)getModel();
-        dfm.addElement(cidsBean);
+        final Collection<CidsBean> geos = (Collection<CidsBean>)kassenzeichen.getProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+        geos.add(cidsBean);
     }
 
     @Override
@@ -48,19 +56,28 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Abst
 
     @Override
     public void removeBean(final CidsBean cidsBean) {
-        final DefaultListModel<CidsBean> dfm = (DefaultListModel<CidsBean>)getModel();
-        dfm.removeElement(cidsBean);
+        final Collection<CidsBean> geos = (Collection<CidsBean>)kassenzeichen.getProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+        geos.remove(cidsBean);
     }
 
     @Override
     public List<CidsBean> getAllBeans() {
         final List<CidsBean> cidsBeans = new ArrayList<CidsBean>();
-        final DefaultListModel<CidsBean> dfm = (DefaultListModel<CidsBean>)getModel();
 
-        for (int i = 0; i < dfm.size(); i++) {
-            cidsBeans.add(dfm.getElementAt(i));
+        for (int i = 0; i < getModel().getSize(); i++) {
+            cidsBeans.add(getModel().getElementAt(i));
         }
 
         return cidsBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kassenzeichen  DOCUMENT ME!
+     */
+    public void setKassenzeichen(final CidsBean kassenzeichen) {
+        this.kassenzeichen = kassenzeichen;
     }
 }

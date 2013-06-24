@@ -583,6 +583,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             return;
         }
         refreshLstAlkisLandparcels();
+        Main.getCurrentInstance().selectionChanged();
     }                                                                                                     //GEN-LAST:event_lstKassenzeichenGeometrienValueChanged
 
     /**
@@ -1025,6 +1026,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
             kassenzeichenGeometrieList.addObservableListListener(kassenzeichenGeometrieListListener);
         }
+        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).setKassenzeichen(kassenzeichenBean);
         bindingGroup.bind();
 
         refreshCmdShowAlkisRendererVisibility();
@@ -1218,6 +1220,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             }
 
             lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
+            Main.getCurrentInstance().selectionChanged();
         }
     }
 
