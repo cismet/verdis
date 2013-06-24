@@ -1002,6 +1002,20 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
 
+        frontenClipboard = new FrontenClipboard(wdsrFrontenTabellenPanel);
+        frontenClipboard.addListener(clipboardListener);
+
+        frontenClipboard.loadFromFile();
+
+        if (frontenClipboard.isPastable()) {
+            JOptionPane.showMessageDialog(this.getComponent(),
+                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        clipboards.put(CidsAppBackend.Mode.ESW, frontenClipboard);
+
         configurationManager.configure(this);
 
         // Piccolo Listener
@@ -4127,7 +4141,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     }
 
     /**
-     * gets called on Mode changed to set the right tooltip for the clipboard buttons 
+     * gets called on Mode changed to set the right tooltip for the clipboard buttons.
      */
     private void refreshClipboardButtonsToolTipText() {
         switch (CidsAppBackend.getInstance().getMode()) {
