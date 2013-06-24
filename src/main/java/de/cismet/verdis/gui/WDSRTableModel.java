@@ -23,8 +23,8 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.server.middleware.types.MetaObject;
 import de.cismet.cids.dynamics.CidsBean;
-
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
 import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
@@ -141,6 +141,21 @@ public class WDSRTableModel extends CidsBeanTableModel {
             cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
         // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
         // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
+
+        final CidsBean sr_klasse = (CidsBean)deepclone.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+        if (sr_klasse != null) {
+            sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
+
+        final CidsBean wd_prio = (CidsBean)deepclone.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
+        if (wd_prio != null) {
+            wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
+
+        final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontinfoPropertyConstants.PROP__STRASSE);
+        if (strasse != null) {
+            strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
         return deepclone;
     }
 }

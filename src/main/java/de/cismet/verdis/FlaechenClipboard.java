@@ -69,7 +69,7 @@ public class FlaechenClipboard extends AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @param   clipboardBean  DOCUMENT ME!
+     * @param   clipboardBean  is an instance of Flaeche
      *
      * @return  DOCUMENT ME!
      *
@@ -78,7 +78,6 @@ public class FlaechenClipboard extends AbstractClipboard {
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
         final CidsBean pasteBean = getTable().getModel().deepcloneBean(clipboardBean);
-
         final int id = getTable().getTableHelper().getNextNewBeanId();
         pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
