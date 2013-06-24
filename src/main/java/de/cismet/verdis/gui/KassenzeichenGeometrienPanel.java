@@ -185,7 +185,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        lstKassenzeichenGeometrien = new javax.swing.JList();
+        lstKassenzeichenGeometrien = new KassenzeichenGeometrienList();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstAlkisLandparcels = new javax.swing.JList();
         jPanel2 = new javax.swing.JPanel();
@@ -327,7 +327,6 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 "KassenzeichenGeometrienPanel.tglShowAlkisLandparcelGeoms.toolTipText"));           // NOI18N
         tglShowAlkisLandparcelGeoms.setBorderPainted(false);
         tglShowAlkisLandparcelGeoms.setContentAreaFilled(false);
-        tglShowAlkisLandparcelGeoms.setRolloverEnabled(false);
         tglShowAlkisLandparcelGeoms.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         tglShowAlkisLandparcelGeoms.addActionListener(new java.awt.event.ActionListener() {
@@ -399,7 +398,6 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 "KassenzeichenGeometrienPanel.tglShowKassenzeichenGeometrien.toolTipText"));        // NOI18N
         tglShowKassenzeichenGeometrien.setBorderPainted(false);
         tglShowKassenzeichenGeometrien.setContentAreaFilled(false);
-        tglShowKassenzeichenGeometrien.setRolloverEnabled(false);
         tglShowKassenzeichenGeometrien.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         tglShowKassenzeichenGeometrien.addActionListener(new java.awt.event.ActionListener() {
@@ -1374,6 +1372,15 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
     private void refreshCmdShowAlkisRendererForAllVisibility() {
         final int size = lstAlkisLandparcels.getModel().getSize();
         cmdShowAlkisRendererForAll.setEnabled(size > 0);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    KassenzeichenGeometrienList getKassenzeichenGeometrienList() {
+        return (KassenzeichenGeometrienList)lstKassenzeichenGeometrien;
     }
 
     //~ Inner Classes ----------------------------------------------------------
