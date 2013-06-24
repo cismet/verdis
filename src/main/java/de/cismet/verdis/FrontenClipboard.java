@@ -120,14 +120,14 @@ public class FrontenClipboard extends AbstractClipboard {
     }
 
     @Override
-    public boolean isPastable(final CidsBean clipboardFlaecheBean) {
-        if (clipboardFlaecheBean == null) {
+    public boolean isPastable(final CidsBean clipboardFrontBean) {
+        if (clipboardFrontBean == null) {
             return false;
         }
 
-        for (final CidsBean flaecheBean : getTable().getAllBeans()) {
-            final int id = (Integer)flaecheBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
-            final int ownId = (Integer)clipboardFlaecheBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
+        for (final CidsBean frontBean : getComponent().getAllBeans()) {
+            final int id = (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
+            final int ownId = (Integer)clipboardFrontBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
             if (id == ownId) {
                 return false;
             }
