@@ -38,7 +38,7 @@ import de.cismet.verdis.gui.AbstractCidsBeanTable;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public interface CidsBeanTable extends Validatable, AbstractCidsBeanComponent {
+public interface CidsBeanTable extends Validatable, CidsBeanComponent {
 
     //~ Methods ----------------------------------------------------------------
 

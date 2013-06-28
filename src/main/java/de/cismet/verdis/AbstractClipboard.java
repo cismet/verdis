@@ -19,7 +19,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.gui.Main;
 
-import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
+import de.cismet.verdis.interfaces.CidsBeanComponent;
 
 /**
  * DOCUMENT ME!
@@ -35,7 +35,7 @@ public abstract class AbstractClipboard {
 
     //~ Instance fields --------------------------------------------------------
 
-    private AbstractCidsBeanComponent component;
+    private CidsBeanComponent component;
     private Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
     private List<ClipboardListener> listeners = new ArrayList<ClipboardListener>();
     private boolean isCutted = false;
@@ -47,7 +47,7 @@ public abstract class AbstractClipboard {
      *
      * @param  component  DOCUMENT ME!
      */
-    public AbstractClipboard(final AbstractCidsBeanComponent component) {
+    public AbstractClipboard(final CidsBeanComponent component) {
         this.component = component;
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractClipboard {
      *
      * @return  DOCUMENT ME!
      */
-    public AbstractCidsBeanComponent getComponent() {
+    public CidsBeanComponent getComponent() {
         return component;
     }
 

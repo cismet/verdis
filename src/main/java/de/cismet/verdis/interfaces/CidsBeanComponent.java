@@ -17,7 +17,7 @@ import de.cismet.cids.dynamics.CidsBean;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  */
-public interface AbstractCidsBeanComponent {
+public interface CidsBeanComponent {
 
     //~ Methods ----------------------------------------------------------------
 
