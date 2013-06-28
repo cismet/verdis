@@ -18,7 +18,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
-import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
+import de.cismet.verdis.interfaces.CidsBeanComponent;
 
 /**
  * DOCUMENT ME!
@@ -26,19 +26,26 @@ import de.cismet.verdis.interfaces.AbstractCidsBeanComponent;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  */
-public class KassenzeichenGeometrienList extends JList<CidsBean> implements AbstractCidsBeanComponent {
+public class KassenzeichenGeometrienList extends JList<CidsBean> implements CidsBeanComponent {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            KassenzeichenGeometrienList.class);
 
     //~ Instance fields --------------------------------------------------------
 
-    CidsBean kassenzeichen;
+    private CidsBean kassenzeichen;
+    private KassenzeichenGeometrienPanel panel;
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void addBean(final CidsBean cidsBean) {
-        final Collection<CidsBean> geos = (Collection<CidsBean>)kassenzeichen.getProperty(
-                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
-        geos.add(cidsBean);
+//        final Collection<CidsBean> geos = (Collection<CidsBean>)kassenzeichen.getProperty(
+//                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+//        geos.add(cidsBean);
+        panel.addKassenzeichenGeometrieBean(cidsBean);
     }
 
     @Override
@@ -79,5 +86,23 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Abst
      */
     public void setKassenzeichen(final CidsBean kassenzeichen) {
         this.kassenzeichen = kassenzeichen;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean getKassenzeichen() {
+        return kassenzeichen;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  panel  DOCUMENT ME!
+     */
+    public void setPanel(final KassenzeichenGeometrienPanel panel) {
+        this.panel = panel;
     }
 }
