@@ -12,6 +12,7 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.gui.KassenzeichenGeometrienList;
 
@@ -22,6 +23,11 @@ import de.cismet.verdis.gui.KassenzeichenGeometrienList;
  * @version  $Revision$, $Date$
  */
 public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            KassenzeichenGeometrienClipboard.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -46,6 +52,12 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
         final int id = getNextNewBeanId();
         pasteBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
+
+        final int geoId = getNextNewBeanId();
+        final CidsBean geometrie = (CidsBean)pasteBean.getProperty(
+                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE);
+        geometrie.getMetaObject().setID(geoId);
+        geometrie.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, geoId);
 
         return pasteBean;
     }
