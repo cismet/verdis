@@ -240,6 +240,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 }
             });
         jScrollPane1.setViewportView(lstKassenzeichenGeometrien);
+        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).setPanel(this);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
