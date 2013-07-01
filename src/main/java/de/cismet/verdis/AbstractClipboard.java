@@ -110,15 +110,19 @@ public abstract class AbstractClipboard {
             try {
                 int notPastableCounter = 0;
                 final int numOfClipBoardItems = clipboardBeans.size();
+                final ArrayList<CidsBean> removedBeans = new ArrayList<CidsBean>();
+
                 for (final CidsBean clipboardBean : clipboardBeans) {
                     if (isPastable(clipboardBean)) {
                         final CidsBean pasteBean = createPastedBean(clipboardBean);
                         getComponent().addBean(pasteBean);
+                        removedBeans.add(clipboardBean);
                     } else {
                         notPastableCounter++;
                     }
                 }
-                clipboardBeans.clear();
+
+                clipboardBeans.removeAll(removedBeans);
                 if (notPastableCounter < numOfClipBoardItems) {
                     fireClipboardChanged();
                 }
