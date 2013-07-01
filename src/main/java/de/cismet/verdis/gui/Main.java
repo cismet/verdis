@@ -1276,7 +1276,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                                     transformedGeom,
                                                     bezeichnung,
                                                     false);
-                                            kassenzeichenGeometrienPanel.addKassenzeichenGeometrieBean(
+                                            kassenzeichenGeometrienList.addKassenzeichenGeometrieBean(
                                                 kassenzeichenGeometrieBean);
                                         } catch (Exception ex) {
                                             LOG.fatal("", ex);
