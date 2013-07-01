@@ -11,6 +11,7 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
@@ -57,7 +58,7 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
         final CidsBean geometrie = (CidsBean)pasteBean.getProperty(
                 KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE);
         geometrie.getMetaObject().setID(geoId);
-        geometrie.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, geoId);
+        geometrie.setProperty(GeomPropertyConstants.PROP__ID, geoId);
 
         return pasteBean;
     }
