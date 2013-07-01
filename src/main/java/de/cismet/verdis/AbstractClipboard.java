@@ -262,7 +262,7 @@ public abstract class AbstractClipboard {
      */
     private boolean checkNotPasted() {
         int answer = JOptionPane.YES_OPTION;
-        if (isCutted && (clipboardBeans != null)) {
+        if (isCutted && clipboardBeans != null && !clipboardBeans.isEmpty()) {
             answer = JOptionPane.showConfirmDialog(
                     Main.getCurrentInstance(),
                     "In der Verdis-Zwischenablage befinden sich noch Daten die\nausgeschnitten und noch nicht wieder eingef\u00FCgt wurden.\nMöchten Sie diese Daten jetzt verwerfen ?",
