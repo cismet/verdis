@@ -732,42 +732,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRemoveKassenzeichenGeometrienActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
-        final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
-        lstKassenzeichenGeometrien.clearSelection();
-        final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
-
-        int firstSelectedIndex = -1;
-        final Collection<CidsBean> beansToRemove = new ArrayList<CidsBean>();
-        for (int index = 0; index < selectedIndices.length; ++index) {
-            final int selectedIndex = selectedIndices[index];
-
-            if (firstSelectedIndex < 0) {
-                firstSelectedIndex = selectedIndex;
-            }
-
-            final Object listObject = lstKassenzeichenGeometrien.getModel().getElementAt(selectedIndex);
-            if (listObject instanceof CidsBean) {
-                final CidsBean kassenzeichenGeometrieBean = (CidsBean)listObject;
-                beansToRemove.add(kassenzeichenGeometrieBean);
-            }
-        }
-
-        for (final CidsBean beanToRemove : beansToRemove) {
-            final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
-            final CidsBean kassenzBean = getCidsBean();
-            if (kassenzBean != null) {
-                kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
-                        .remove(beanToRemove);
-                featureCollection.removeFeature(kassenzeichenGeometrieFeature);
-            }
-        }
-
-        final int listSize = lstKassenzeichenGeometrien.getModel().getSize();
-        if (firstSelectedIndex >= listSize) {
-            firstSelectedIndex = listSize - 1;
-        }
-        lstKassenzeichenGeometrien.setSelectedIndex(firstSelectedIndex);
-    } //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
+        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).removeSelectedBeans();
+    }                                                                                                    //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
 
     /**
      * DOCUMENT ME!

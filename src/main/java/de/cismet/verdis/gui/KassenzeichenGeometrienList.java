@@ -19,6 +19,7 @@ import javax.swing.JList;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollection;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
@@ -45,7 +46,6 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
     //~ Instance fields --------------------------------------------------------
 
-    // private CidsBean kassenzeichen;
     private KassenzeichenGeometrienPanel panel;
 
     //~ Methods ----------------------------------------------------------------
@@ -133,12 +133,54 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
         return cidsBeans;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void removeSelectedBeans() {
+        final int[] selectedIndices = this.getSelectedIndices();
+        this.clearSelection();
+        final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
+
+        int firstSelectedIndex = -1;
+        final Collection<CidsBean> beansToRemove = new ArrayList<CidsBean>();
+        for (int index = 0; index < selectedIndices.length; ++index) {
+            final int selectedIndex = selectedIndices[index];
+
+            if (firstSelectedIndex < 0) {
+                firstSelectedIndex = selectedIndex;
+            }
+
+            final Object listObject = this.getModel().getElementAt(selectedIndex);
+            if (listObject instanceof CidsBean) {
+                final CidsBean kassenzeichenGeometrieBean = (CidsBean)listObject;
+                beansToRemove.add(kassenzeichenGeometrieBean);
+            }
+        }
+
+        for (final CidsBean beanToRemove : beansToRemove) {
+            final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
+            final CidsBean kassenzBean = panel.getCidsBean();
+            if (kassenzBean != null) {
+                kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+                        .remove(beanToRemove);
+                featureCollection.removeFeature(kassenzeichenGeometrieFeature);
+            }
+        }
+
+        final int listSize = this.getModel().getSize();
+        if (firstSelectedIndex >= listSize) {
+            firstSelectedIndex = listSize - 1;
+        }
+        this.setSelectedIndex(firstSelectedIndex);
+    }
+
     @Override
-    public void removeBean(final CidsBean cidsBean) {
-        final Collection<CidsBean> geos = (Collection<CidsBean>)panel.getCidsBean()
-                    .getProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
-        geos.remove(cidsBean);
+    public void removeBean(final CidsBean beanToRemove) {
+        final CidsBean kassenzBean = panel.getCidsBean();
+        if (kassenzBean != null) {
+            kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+                    .remove(beanToRemove);
+        }
     }
 
     @Override
@@ -151,24 +193,6 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
         return cidsBeans;
     }
-
-//    /**
-//     * DOCUMENT ME!
-//     *
-//     * @param  kassenzeichen  DOCUMENT ME!
-//     */
-//    public void setKassenzeichen(final CidsBean kassenzeichen) {
-//        this.kassenzeichen = kassenzeichen;
-//    }
-//
-//    /**
-//     * DOCUMENT ME!
-//     *
-//     * @return  DOCUMENT ME!
-//     */
-//    public CidsBean getKassenzeichen() {
-//        return kassenzeichen;
-//    }
 
     /**
      * DOCUMENT ME!
