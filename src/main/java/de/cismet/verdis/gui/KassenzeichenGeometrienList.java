@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -178,8 +177,13 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
     public void removeBean(final CidsBean beanToRemove) {
         final CidsBean kassenzBean = panel.getCidsBean();
         if (kassenzBean != null) {
+            final FeatureCollection featureCollection = CidsAppBackend.getInstance()
+                        .getMainMap()
+                        .getFeatureCollection();
             kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
                     .remove(beanToRemove);
+            final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
+            featureCollection.removeFeature(kassenzeichenGeometrieFeature);
         }
     }
 
