@@ -149,6 +149,7 @@ import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
@@ -625,7 +626,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             // dialog for alkis_landparcel
             final DescriptionPane descriptionPane = new DescriptionPaneFS();
             ComponentRegistry.registerComponents(
-                null,
+                this,
                 null,
                 null,
                 null,
@@ -4829,17 +4830,20 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(
-                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
-                    FrontinfoPropertyConstants.PROP__LAGE_SR);
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
             final String key;
             final Integer schluessel;
             if (satzung_strassenreinigung == null) {
-                key = (String)front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                key = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
                                 + StrassenreinigungPropertyConstants.PROP__KEY);
-                schluessel = (Integer)front.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                schluessel = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
                                 + StrassenreinigungPropertyConstants.PROP__SCHLUESSEL);
             } else {
                 key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
@@ -4867,17 +4871,21 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         for (final CidsBean front : fronten) {
             final Integer laenge = (Integer)front.getProperty(
-                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                    FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
 
             final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
-                    FrontinfoPropertyConstants.PROP__LAGE_WD);
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
 
             final String key;
             final Integer schluessel;
             if (satzung_winterdienst == null) {
-                key = (String)front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                key = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
                                 + WinterdienstPropertyConstants.PROP__KEY);
-                schluessel = (Integer)front.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                schluessel = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
                                 + WinterdienstPropertyConstants.PROP__SCHLUESSEL);
             } else {
                 key = (String)satzung_winterdienst.getProperty("wd_prio.key");

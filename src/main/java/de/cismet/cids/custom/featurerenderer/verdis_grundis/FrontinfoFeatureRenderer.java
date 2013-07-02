@@ -31,6 +31,7 @@ import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
 
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 
 /**
@@ -51,8 +52,10 @@ public class FrontinfoFeatureRenderer extends CustomCidsFeatureRenderer {
 
     @Override
     public void assign() {
-        sr = cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR) != null;
-        wd = cidsBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR) != null;
+        sr = cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR) != null;
+        wd = cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR) != null;
     }
 
     @Override
