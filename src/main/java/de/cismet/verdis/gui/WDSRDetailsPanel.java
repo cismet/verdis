@@ -66,6 +66,7 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
@@ -374,7 +375,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.laenge_grafik}"),
                 txtLaengeGrafik,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                FrontPropertyConstants.PROP__LAENGE_GRAFIK);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -403,7 +404,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.laenge_korrektur}"),
                 txtLaengeKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -821,13 +822,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
-        CidsBean strasseBean = null;
+    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboStrasseActionPerformed
+        CidsBean strasseBean = null;        
         if (frontBean != null) {
-            strasseBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE);
+            strasseBean = (CidsBean)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__STRASSE);
         }
         if (strasseBean != null) {
-            final int strasseId = (Integer)strasseBean.getProperty(StrassePropertyConstants.PROP__ID);
+            final int strasseId = (Integer)strasseBean.getProperty(StrassePropertyConstants.PROP__ID);            
 
             final String tabSatzung = VerdisMetaClassConstants.MC_SATZUNG;
             final String tabWinterdienst = VerdisMetaClassConstants.MC_WINTERDIENST;
@@ -875,7 +877,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                             + "."
                             + fldSrKlasse
                             + ";",
-                    (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_SR)));
+                    (CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR)));
             CismetThreadPool.execute(new SatzungsComboModelWorker(
                     cboLageWD,
                     "SELECT "
@@ -913,27 +918,30 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                             + "."
                             + fldWdPrio
                             + ";",
-                    (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_WD)));
+                    (CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_WD)));
         }
-    } //GEN-LAST:event_cboStrasseActionPerformed
+    }//GEN-LAST:event_cboStrasseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
+    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageSRActionPerformed
         updateLageDependendCbos();
-    }                                                                             //GEN-LAST:event_cboLageSRActionPerformed
+    }//GEN-LAST:event_cboLageSRActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageWDActionPerformed
+    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageWDActionPerformed
         updateLageDependendCbos();
-    }                                                                             //GEN-LAST:event_cboLageWDActionPerformed
+    }//GEN-LAST:event_cboLageWDActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -952,8 +960,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Geometry getGeometry(final CidsBean frontBean) {
-        if ((frontBean != null) && (frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + "."
+        if ((frontBean != null) && (frontBean.getProperty(FrontPropertyConstants.PROP__GEOMETRIE) != null)) {
+            return (Geometry)frontBean.getProperty(FrontPropertyConstants.PROP__GEOMETRIE + "."
                             + GeomPropertyConstants.PROP__GEO_FIELD);
         } else {
             return null;
@@ -970,14 +978,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
         Main.transformToDefaultCrsNeeded(geom);
-        if (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) == null) {
+        if (cidsBean.getProperty(FrontPropertyConstants.PROP__GEOMETRIE) == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
                         .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
+            cidsBean.setProperty(FrontPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
         }
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE + "." + GeomPropertyConstants.PROP__GEO_FIELD,
+        cidsBean.setProperty(FrontPropertyConstants.PROP__GEOMETRIE + "." + GeomPropertyConstants.PROP__GEO_FIELD,
             geom);
     }
 
@@ -1000,12 +1008,16 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         bindingGroup.bind();
 
         try {
-            if ((cidsBean != null) && (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
+            if ((cidsBean != null) && (cidsBean.getProperty(FrontPropertyConstants.PROP__GEOMETRIE) != null)) {
                 bpanWdsrDetails.setBackgroundEnabled(true);
             } else {
                 bpanWdsrDetails.setBackgroundEnabled(false);
             }
-            if ((cidsBean == null) || (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
+            if ((cidsBean == null)
+                        || (cidsBean.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
                 cboLageSR.setSelectedItem(null);
                 cboLageWD.setSelectedItem(null);
             }
@@ -1022,7 +1034,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     private void updateLageDependendCbos() {
         if (getCidsBean() != null) {
-            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_WD);
+            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
             if (lageWDBean != null) {
                 String wdname = "kein Winterdienst";
                 if (lageWDBean.getProperty("wd_prio") != null) {
@@ -1033,7 +1046,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             cboWD.setVisible(lageWDBean == null);
             cboWDFromLage.setVisible(lageWDBean != null);
 
-            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
             if (lageSRBean != null) {
                 String srname = "keine Straßenreinigung";
                 if (lageSRBean.getProperty("sr_klasse") != null) {
@@ -1103,7 +1117,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorNummer(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__NUMMER) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__NUMMER) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1181,7 +1199,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorLaengeGrafik(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK) {
+        return new CidsBeanValidator(frontBean, FrontPropertyConstants.PROP__LAENGE_GRAFIK) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1191,7 +1209,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                            FrontPropertyConstants.PROP__LAENGE_GRAFIK);
                     final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
                     final Action action = new AbstractAction() {
 
@@ -1211,7 +1229,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                             try {
                                                 final int laenge_grafik = (int)Math.abs(geom.getLength());
                                                 cidsBean.setProperty(
-                                                    FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                                    FrontPropertyConstants.PROP__LAENGE_GRAFIK,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1249,7 +1267,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorLaengeKorrektur(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR) {
+        return new CidsBeanValidator(frontBean, FrontPropertyConstants.PROP__LAENGE_KORREKTUR) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1259,9 +1277,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                            FrontPropertyConstants.PROP__LAENGE_GRAFIK);
                     final Integer laenge_korrektur = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                            FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
                     final Action action = new AbstractAction() {
 
                             @Override
@@ -1279,9 +1297,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                         if (answer == JOptionPane.YES_OPTION) {
                                             try {
                                                 final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                                                        FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                                                        FrontPropertyConstants.PROP__LAENGE_GRAFIK);
                                                 cidsBean.setProperty(
-                                                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                                    FrontPropertyConstants.PROP__LAENGE_KORREKTUR,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1319,7 +1337,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumErfassung(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1342,7 +1364,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorVeranlagungSR(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1352,7 +1378,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(
@@ -1377,7 +1405,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorVeranlagungWD(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1387,7 +1419,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(

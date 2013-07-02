@@ -76,7 +76,7 @@
               <Property name="nullValue" type="java.lang.String" value=""/>
               <Property name="incompletePathValue" type="java.lang.String" value=""/>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                <Connection code="FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK" type="code"/>
+                <Connection code="FrontPropertyConstants.PROP__LAENGE_GRAFIK" type="code"/>
               </Property>
             </BindingProperty>
           </BindingProperties>
@@ -105,7 +105,7 @@
               <Property name="nullValue" type="java.lang.String" value=""/>
               <Property name="incompletePathValue" type="java.lang.String" value=""/>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                <Connection code="FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR" type="code"/>
+                <Connection code="FrontPropertyConstants.PROP__LAENGE_KORREKTUR" type="code"/>
               </Property>
             </BindingProperty>
           </BindingProperties>
