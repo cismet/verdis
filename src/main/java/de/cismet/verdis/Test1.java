@@ -77,7 +77,7 @@ public class Test1 {
 //            MetaObject mo = proxy.getMetaObject(6021737, 11, VerdisConstants.DOMAIN);
             System.out.println("dauer:" + (System.currentTimeMillis() - l));
             System.out.println("retrieved 6000467");
-            System.out.println(mo.getBean().toJSONString());
+            System.out.println(mo.getBean().toJSONString(true));
         } catch (Exception e) {
             e.printStackTrace();
         }
