@@ -40,7 +40,7 @@ import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FrontinfoFeatureRenderer extends CustomCidsFeatureRenderer {
+public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Instance fields --------------------------------------------------------
 

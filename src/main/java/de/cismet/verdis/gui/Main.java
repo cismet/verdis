@@ -625,8 +625,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             // dialog for alkis_landparcel
             final DescriptionPane descriptionPane = new DescriptionPaneFS();
-            ComponentRegistry.registerComponents(
-                this,
+            ComponentRegistry.registerComponents((JFrame)null,
                 null,
                 null,
                 null,
@@ -4871,15 +4870,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
+            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
 
-            final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
+            final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                            + "." + FrontinfoPropertyConstants.PROP__LAGE_WD);
 
             final String key;
             final Integer schluessel;

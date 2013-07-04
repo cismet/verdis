@@ -118,6 +118,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -332,6 +333,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         scpQuer = new javax.swing.JScrollPane();
         edtQuer = new javax.swing.JEditorPane();
         jSeparator3 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -498,7 +500,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         txtBemSR.setLineWrap(true);
         txtBemSR.setRows(2);
         txtBemSR.setMinimumSize(new java.awt.Dimension(240, 200));
-        txtBemSR.setPreferredSize(new java.awt.Dimension(240, 200));
+        txtBemSR.setPreferredSize(new java.awt.Dimension(21, 756));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -545,7 +547,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         txtBemWD.setLineWrap(true);
         txtBemWD.setRows(2);
         txtBemWD.setMinimumSize(new java.awt.Dimension(240, 200));
-        txtBemWD.setPreferredSize(new java.awt.Dimension(240, 200));
+        txtBemWD.setPreferredSize(new java.awt.Dimension(21, 756));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -864,6 +866,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanWdsrDetails.add(jSeparator3, gridBagConstraints);
 
+        jPanel1.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 0.01;
+        bpanWdsrDetails.add(jPanel1, gridBagConstraints);
+
         add(bpanWdsrDetails, java.awt.BorderLayout.CENTER);
 
         bindingGroup.bind();
@@ -874,7 +884,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboStrasseActionPerformed
+    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
         CidsBean strasseBean = null;
         if (frontBean != null) {
             strasseBean = (CidsBean)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
@@ -975,25 +985,25 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                 + "."
                                 + FrontinfoPropertyConstants.PROP__LAGE_WD)));
         }
-    }//GEN-LAST:event_cboStrasseActionPerformed
+    } //GEN-LAST:event_cboStrasseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageSRActionPerformed
+    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
         updateLageDependendCbos();
-    }//GEN-LAST:event_cboLageSRActionPerformed
+    }                                                                             //GEN-LAST:event_cboLageSRActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageWDActionPerformed
+    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageWDActionPerformed
         updateLageDependendCbos();
-    }//GEN-LAST:event_cboLageWDActionPerformed
+    }                                                                             //GEN-LAST:event_cboLageWDActionPerformed
 
     /**
      * DOCUMENT ME!

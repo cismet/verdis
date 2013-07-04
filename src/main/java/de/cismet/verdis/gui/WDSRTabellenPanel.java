@@ -72,6 +72,7 @@ import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
@@ -304,6 +305,10 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         final String wdQuery = "SELECT " + wdMC.getID() + ", " + wdMC.getPrimaryKey() + " FROM " + wdMC.getTableName()
                     + " WHERE schluessel = -200;";
 
+        final CidsBean frontBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
+                    .getEmptyInstance()
+                    .getBean();
         final CidsBean frontinfoBean = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO)
                     .getEmptyInstance()
@@ -316,26 +321,27 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         final CidsBean winterdienstBean = SessionManager.getProxy().getMetaObjectByQuery(wdQuery, 0)[0].getBean();
 
         final int newId = getNextNewBeanId();
-        frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__ID,
+        frontBean.setProperty(FrontinfoPropertyConstants.PROP__ID,
             newId);
-        frontinfoBean.getMetaObject().setID(newId);
+        frontBean.getMetaObject().setID(newId);
 
         // final CidsBean strasseBean = SessionManager.getProxy().getVerdisMetaObject(8, PROP__"strasse".getId(),
         // Main.DOMAIN).getBean();
 
         // cidsBean.setProperty(PROP__"strasse", strasseBean);
-        frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                     + FrontinfoPropertyConstants.PROP__GEOMETRIE,
             geomBean);
-        frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                     + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
             strassenreinigungBean);
-        frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                     + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
             winterdienstBean);
-        frontinfoBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
+        frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
             getValidNummer());
-        frontinfoBean.setProperty(
+        frontBean.setProperty(
             FrontPropertyConstants.PROP__ERFASSUNGSDATUM,
             new Date(Calendar.getInstance().getTime().getTime()));
 
@@ -354,14 +360,14 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                     final double abs_laenge = Math.abs(geom.getLength());
                     // round to second decimal place
                     final int laenge = (int)Math.round(abs_laenge * 100) / 100;
-                    frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                 + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
                         laenge);
-                    frontinfoBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                 + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
                         laenge);
-                    setGeometry(geom, frontinfoBean);
-                    frontinfoBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
+                    setGeometry(geom, frontBean);
+                    frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
                         getValidNummer());
 
                     // unzugeordnete Geometrie aus Karte entfernen
@@ -371,7 +377,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 }
             }
         }
-        return frontinfoBean;
+        return frontBean;
     }
 
     @Override
