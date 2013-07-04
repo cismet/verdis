@@ -2188,7 +2188,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         for (final CidsBean front : fronten) {
             final Feature add = new BeanUpdatingCidsFeature(
                     front,
-                    FrontPropertyConstants.PROP__GEOMETRIE
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__GEOMETRIE
                             + "."
                             + GeomPropertyConstants.PROP__GEO_FIELD);
             add.setEditable(editable);

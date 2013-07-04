@@ -81,15 +81,15 @@ public class WDSRTableModel extends CidsBeanTableModel {
         }
         if (column == 0) {
             try {
-                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__NUMMER);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1;
             }
         } else if (column == 1) {
             try {
-                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1f;
