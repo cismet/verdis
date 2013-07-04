@@ -27,6 +27,7 @@ import Sirius.server.middleware.types.MetaObject;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
 import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
@@ -82,14 +83,15 @@ public class WDSRTableModel extends CidsBeanTableModel {
         }
         if (column == 0) {
             try {
-                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__NUMMER);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1;
             }
         } else if (column == 1) {
             try {
-                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1f;
@@ -97,10 +99,13 @@ public class WDSRTableModel extends CidsBeanTableModel {
         } else if (column == 2) {
             try {
                 final CidsBean satzung_strassenreinigung = (CidsBean)frontBean.getProperty(
-                        FrontinfoPropertyConstants.PROP__LAGE_SR);
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR);
                 final String srKey;
                 if (satzung_strassenreinigung == null) {
-                    srKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                    srKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
                                     + StrassenreinigungPropertyConstants.PROP__KEY);
                 } else {
                     srKey = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
@@ -113,10 +118,13 @@ public class WDSRTableModel extends CidsBeanTableModel {
         } else {
             try {
                 final CidsBean satzung_winterdienst = (CidsBean)frontBean.getProperty(
-                        FrontinfoPropertyConstants.PROP__LAGE_WD);
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_WD);
                 final String wdKey;
                 if (satzung_winterdienst == null) {
-                    wdKey = (String)frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                    wdKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
                                     + WinterdienstPropertyConstants.PROP__KEY);
                 } else {
                     wdKey = (String)satzung_winterdienst.getProperty("wd_prio.key");
@@ -133,11 +141,21 @@ public class WDSRTableModel extends CidsBeanTableModel {
     public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
         final CidsBean deepclone = super.deepcloneBean(cidsBean);
         deepclone.setProperty(
-            FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
-            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
+            FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
         deepclone.setProperty(
-            FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
+            FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
         deepclone.setProperty(
             FrontinfoPropertyConstants.PROP__STRASSE,
             cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
