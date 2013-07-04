@@ -461,7 +461,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
-        binding.setConverter(new EmptyFloatToStringConverter());
+        binding.setConverter(new de.cismet.verdis.gui.EmptyFloatToStringConverter());
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -681,10 +681,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
         scpQuer.setOpaque(false);
 
+        edtQuer.setEditable(false);
         edtQuer.setContentType(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.edtQuer.contentType")); // NOI18N
-        edtQuer.setEditable(false);
         edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
@@ -801,14 +801,23 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
             bpanRegenFlDetails.setBackgroundEnabled(false);
         }
 
-        if (cidsBean != null) {
+        updateCrossReferences();
+
+        attachBeanValidators();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void updateCrossReferences() {
+        if (flaecheBean != null) {
             final Thread t = new Thread() {
 
                     @Override
                     public void run() {
                         // TeileigentumCrossReferences
                         final Collection crossReference = (Collection)CidsAppBackend.getInstance()
-                                    .getCrossReferencesFor(cidsBean.getMetaObject().getID());
+                                    .getFlaechenCrossReferencesFor(flaecheBean.getMetaObject().getID());
                         if (crossReference != null) {
                             String html = "<html><body><center>";
                             for (final Object o : crossReference) {
@@ -838,8 +847,6 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
             edtQuer.setVisible(false);
             scpQuer.setVisible(false);
         }
-
-        attachBeanValidators();
     }
 
     @Override

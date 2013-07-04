@@ -4830,7 +4830,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
+            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
                     FrontPropertyConstants.PROP__FRONTINFO
@@ -4871,7 +4872,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         for (final CidsBean front : fronten) {
             final Integer laenge = (Integer)front.getProperty(
-                    FrontPropertyConstants.PROP__LAENGE_KORREKTUR);
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
 
             final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
                     FrontPropertyConstants.PROP__FRONTINFO
