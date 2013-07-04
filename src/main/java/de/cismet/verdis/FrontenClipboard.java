@@ -7,6 +7,7 @@
 ****************************************************/
 package de.cismet.verdis;
 
+import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaObject;
 
 import java.sql.Date;
@@ -16,8 +17,11 @@ import java.util.Calendar;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.SatzungPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.gui.WDSRTabellenPanel;
 
@@ -45,7 +49,7 @@ public class FrontenClipboard extends AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @param   clipboardBean  is an instance of Frontinfo
+     * @param   clipboardBean  is an instance of Front
      *
      * @return  DOCUMENT ME!
      *
@@ -56,67 +60,33 @@ public class FrontenClipboard extends AbstractClipboard {
         final WDSRTabellenPanel table = (WDSRTabellenPanel)getComponent();
         final CidsBean pasteBean = table.getModel().deepcloneBean(clipboardBean);
         final int id = table.getTableHelper().getNextNewBeanId();
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
+        pasteBean.setProperty(FrontPropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
-        // the values for PROP__SR_KLASSE_OR, PROP__WD_PRIO_OR and PROP__STRASSE were already set in
-        // WDSRTableModel.deepclone()
-
         final int newNummer = ((WDSRTabellenPanel)getComponent()).getValidNummer();
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__NUMMER, newNummer);
+        pasteBean.setProperty(FrontPropertyConstants.PROP__NUMMER, newNummer);
+
+        pasteBean.setProperty(FrontPropertyConstants.PROP__BEARBEITET_DURCH, null);
+
+        if (clipboardBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO) != null) {
+            final int frontinfoId = (Integer)clipboardBean.getProperty(
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__ID);
+            final CidsBean frontinfoBean = SessionManager.getProxy()
+                        .getMetaObject(
+                                frontinfoId,
+                                CidsAppBackend.getInstance().getVerdisMetaClass(
+                                    VerdisMetaClassConstants.MC_FRONTINFO).getId(),
+                                VerdisConstants.DOMAIN)
+                        .getBean();
+            pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
+        }
 
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
-
-        createPastedBean_Satzung(FrontinfoPropertyConstants.PROP__LAGE_SR, clipboardBean, pasteBean);
-        createPastedBean_Satzung(FrontinfoPropertyConstants.PROP__LAGE_WD, clipboardBean, pasteBean);
-
-        pasteBean.setProperty(
-            FrontinfoPropertyConstants.PROP__LAGE_SR,
-            clipboardBean.getProperty(FrontinfoPropertyConstants.PROP__LAGE_SR));
-
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__SR_BEM, null);
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__WD_BEM, null);
-
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG, null);
-        pasteBean.setProperty(FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG, null);
+        pasteBean.setProperty(FrontPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
 
         return pasteBean;
-    }
-
-    /**
-     * PROP__LAGE_SR and PROP__LAGE_WD use the same Type, namely Satzung. Therefore their forceStatus() calls are the
-     * same. Those calls are needed to avoid duplicate database entries.
-     *
-     * @param   identifier     FrontinfoPropertyConstants.PROP__LAGE_SR or FrontinfoPropertyConstants.PROP__LAGE_WD
-     * @param   clipboardBean  DOCUMENT ME!
-     * @param   pasteBean      DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    private void createPastedBean_Satzung(final String identifier,
-            final CidsBean clipboardBean,
-            final CidsBean pasteBean) throws Exception {
-        pasteBean.setProperty(
-            identifier,
-            clipboardBean.getProperty(identifier));
-        final CidsBean satzung = (CidsBean)pasteBean.getProperty(identifier);
-        if (satzung != null) {
-            final CidsBean satzung__sr_klasse = (CidsBean)satzung.getProperty(SatzungPropertyConstants.PROP__SR_KLASSE);
-            if (satzung__sr_klasse != null) {
-                satzung__sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-            }
-            satzung.setProperty(SatzungPropertyConstants.PROP__SR_BEM, null);
-            final CidsBean satzung__wd_prio = (CidsBean)satzung.getProperty(SatzungPropertyConstants.PROP__WD_PRIO);
-            if (satzung__wd_prio != null) {
-                satzung__wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-            }
-            satzung.setProperty(SatzungPropertyConstants.PROP__WD_BEM, null);
-            final CidsBean satzung__strasse = (CidsBean)satzung.getProperty(SatzungPropertyConstants.PROP__STRASSE);
-            if (satzung__strasse != null) {
-                satzung__strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-            }
-        }
     }
 
     @Override
@@ -126,8 +96,10 @@ public class FrontenClipboard extends AbstractClipboard {
         }
 
         for (final CidsBean frontBean : getComponent().getAllBeans()) {
-            final int id = (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
-            final int ownId = (Integer)clipboardFrontBean.getProperty(FrontinfoPropertyConstants.PROP__ID);
+            final int id = (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__ID);
+            final int ownId = (Integer)clipboardFrontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__ID);
             if (id == ownId) {
                 return false;
             }
