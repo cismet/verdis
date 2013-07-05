@@ -43,6 +43,8 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
 
@@ -78,7 +80,7 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
+public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener, HyperlinkListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -247,6 +249,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     return this;
                 }
             });
+
+        edtQuer.addHyperlinkListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -842,6 +846,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         scpQuer.setOpaque(false);
 
         edtQuer.setEditable(false);
+        edtQuer.setContentType("text/html"); // NOI18N
         edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
@@ -1120,7 +1125,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     public void run() {
                         // TeileigentumCrossReferences
                         final Collection crossReference = (Collection)CidsAppBackend.getInstance()
-                                    .getFlaechenCrossReferencesFor(frontBean.getMetaObject().getID());
+                                    .getFrontenCrossReferencesFor(frontBean.getMetaObject().getID());
                         if (crossReference != null) {
                             String html = "<html><body><center>";
                             for (final Object o : crossReference) {
@@ -1575,6 +1580,25 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
+    }
+
+    @Override
+    public void hyperlinkUpdate(final HyperlinkEvent he) {
+        final Thread t = new Thread() {
+
+                @Override
+                public void run() {
+                    if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        try {
+                            Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(he.getDescription());
+                        } catch (Exception ex) {
+                            LOG.error("Fehler im Hyperlinken", ex);
+                        }
+                    }
+                }
+            };
+        t.setPriority(Thread.NORM_PRIORITY);
+        t.start();
     }
 
     //~ Inner Classes ----------------------------------------------------------

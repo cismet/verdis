@@ -160,29 +160,30 @@ public class WDSRTableModel extends CidsBeanTableModel {
             FrontPropertyConstants.PROP__FRONTINFO
                     + "."
                     + FrontinfoPropertyConstants.PROP__STRASSE,
-            cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE));
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__STRASSE));
         // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
         // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
 
         final CidsBean sr_klasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
         if (sr_klasse != null) {
             sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
         }
 
         final CidsBean wd_prio = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
         if (wd_prio != null) {
             wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
         }
 
         final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE);
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__STRASSE);
         if (strasse != null) {
             strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
         }
