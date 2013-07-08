@@ -438,6 +438,7 @@ public class CidsAppBackend implements CidsBeanStore {
                             frontenCrossReferences.put(fields[1], fields[3] + ":" + fields[4]);
                             // }
                         }
+                        Main.getCurrentInstance().getWdsrFrontenDetailsPanel().updateCrossReferences();
                     } catch (Exception ex) {
                         log.error("error while doing server search", ex);
                     }
@@ -480,6 +481,7 @@ public class CidsAppBackend implements CidsBeanStore {
                             flaechenCrossReferences.put(fields[1], fields[3] + ":" + fields[4]);
                             // }
                         }
+                        Main.getCurrentInstance().getRegenFlaechenDetailsPanel().updateCrossReferences();
                     } catch (Exception ex) {
                         log.error("error while doing server search", ex);
                     }
