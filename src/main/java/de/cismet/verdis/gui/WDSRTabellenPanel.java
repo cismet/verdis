@@ -249,6 +249,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
+                                Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
                             } catch (Exception ex) {
                                 LOG.error("error while attaching feature", ex);
                             }
