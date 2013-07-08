@@ -574,7 +574,9 @@
             <Component class="javax.swing.JEditorPane" name="edtQuer">
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
-                <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
+                <Property name="contentType" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.edtQuer.contentType" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                </Property>
                 <Property name="opaque" type="boolean" value="false"/>
               </Properties>
             </Component>

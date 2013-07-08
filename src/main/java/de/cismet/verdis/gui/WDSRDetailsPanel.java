@@ -36,10 +36,13 @@ import edu.umd.cs.piccolo.PCanvas;
 
 import org.jdesktop.beansbinding.Converter;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -846,7 +849,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         scpQuer.setOpaque(false);
 
         edtQuer.setEditable(false);
-        edtQuer.setContentType("text/html"); // NOI18N
+        edtQuer.setContentType(org.openide.util.NbBundle.getMessage(
+                WDSRDetailsPanel.class,
+                "WDSRDetailsPanel.edtQuer.contentType")); // NOI18N
         edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
@@ -1117,15 +1122,15 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     /**
      * DOCUMENT ME!
      */
-    private void updateCrossReferences() {
+    public synchronized void updateCrossReferences() {
         if (frontBean != null) {
-            final Thread t = new Thread() {
+            new SwingWorker<String, Void>() {
 
                     @Override
-                    public void run() {
-                        // TeileigentumCrossReferences
+                    protected String doInBackground() throws Exception {
                         final Collection crossReference = (Collection)CidsAppBackend.getInstance()
                                     .getFrontenCrossReferencesFor(frontBean.getMetaObject().getID());
+
                         if (crossReference != null) {
                             String html = "<html><body><center>";
                             for (final Object o : crossReference) {
@@ -1133,22 +1138,35 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                 html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
                             }
                             html += "</center></body></html>";
-                            final String finalHtml = html;
-                            lblQuerverweise.setVisible(true);
-                            edtQuer.setVisible(true);
-                            scpQuer.setVisible(true);
-                            edtQuer.setText(finalHtml);
-                            edtQuer.setCaretPosition(0);
-                        } else {
-                            edtQuer.setText("");
-                            lblQuerverweise.setVisible(false);
-                            edtQuer.setVisible(false);
-                            scpQuer.setVisible(false);
+                            return html;
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final String html = get();
+                            if (html != null) {
+                                lblQuerverweise.setVisible(true);
+                                edtQuer.setVisible(true);
+                                scpQuer.setVisible(true);
+                                edtQuer.setText(html);
+                                edtQuer.setCaretPosition(0);
+                            } else {
+                                edtQuer.setText("");
+                                lblQuerverweise.setVisible(false);
+                                edtQuer.setVisible(false);
+                                scpQuer.setVisible(false);
+                            }
+                        } catch (InterruptedException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } catch (ExecutionException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
-                };
-            t.setPriority(Thread.NORM_PRIORITY);
-            t.start();
+                }.execute();
         } else {
             edtQuer.setText("");
             lblQuerverweise.setVisible(false);
