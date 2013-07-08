@@ -1320,8 +1320,35 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
+    public RegenFlaechenDetailsPanel getRegenFlaechenDetailsPanel() {
+        return regenFlaechenDetailsPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public RegenFlaechenTabellenPanel getRegenFlaechenTabellenPanel() {
         return regenFlaechenTabellenPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public WDSRTabellenPanel getWdsrFrontenTabellenPanel() {
+        return wdsrFrontenTabellenPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public WDSRDetailsPanel getWdsrFrontenDetailsPanel() {
+        return wdsrFrontenDetailsPanel;
     }
 
     /**
