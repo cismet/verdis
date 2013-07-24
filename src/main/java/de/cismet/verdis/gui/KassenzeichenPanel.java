@@ -786,7 +786,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  historyEnabled  DOCUMENT ME!
      */
     public void gotoKassenzeichen(final String kz, final boolean historyEnabled) {
-        boolean refreshFlag = false;
         final String[] test = kz.split(":");
 
         final String kassenzeichenNummer;
@@ -799,11 +798,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             flaechenBez = "";
         }
 
-        if (kassenzeichenNummer.trim().equals(txtKassenzeichen.getText().trim())) {
-            refreshFlag = true;
-        }
-
-        if ((mainApp.changesPending() == false) || (refreshFlag == true)) {
+        if ((mainApp.changesPending() == false)) {
             mainApp.disableKassenzeichenCmds();
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);
