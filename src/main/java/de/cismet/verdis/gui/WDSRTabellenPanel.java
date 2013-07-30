@@ -384,12 +384,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     @Override
     public void removeBean(final CidsBean cidsBean) {
         if (cidsBean != null) {
-            final CidsBean geomBean = (CidsBean)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__GEOMETRIE);
             try {
-                if (geomBean != null) {
-                    geomBean.delete();
-                }
                 cidsBean.delete();
             } catch (final Exception ex) {
                 LOG.error("error while removing frontbean", ex);
