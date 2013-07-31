@@ -1213,7 +1213,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPoly1ActionPerformed
-        mappingComp.zoomToSelectedNode();
+        mappingComp.zoomToSelection();
     }                                                                                //GEN-LAST:event_cmdFullPoly1ActionPerformed
 
     /**
