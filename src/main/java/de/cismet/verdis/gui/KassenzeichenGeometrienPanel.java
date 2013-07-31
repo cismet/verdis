@@ -185,7 +185,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        lstKassenzeichenGeometrien = new javax.swing.JList();
+        lstKassenzeichenGeometrien = new KassenzeichenGeometrienList();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstAlkisLandparcels = new javax.swing.JList();
         jPanel2 = new javax.swing.JPanel();
@@ -240,6 +240,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 }
             });
         jScrollPane1.setViewportView(lstKassenzeichenGeometrien);
+        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).setPanel(this);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -327,7 +328,6 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 "KassenzeichenGeometrienPanel.tglShowAlkisLandparcelGeoms.toolTipText"));           // NOI18N
         tglShowAlkisLandparcelGeoms.setBorderPainted(false);
         tglShowAlkisLandparcelGeoms.setContentAreaFilled(false);
-        tglShowAlkisLandparcelGeoms.setRolloverEnabled(false);
         tglShowAlkisLandparcelGeoms.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         tglShowAlkisLandparcelGeoms.addActionListener(new java.awt.event.ActionListener() {
@@ -399,7 +399,6 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 "KassenzeichenGeometrienPanel.tglShowKassenzeichenGeometrien.toolTipText"));        // NOI18N
         tglShowKassenzeichenGeometrien.setBorderPainted(false);
         tglShowKassenzeichenGeometrien.setContentAreaFilled(false);
-        tglShowKassenzeichenGeometrien.setRolloverEnabled(false);
         tglShowKassenzeichenGeometrien.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
         tglShowKassenzeichenGeometrien.addActionListener(new java.awt.event.ActionListener() {
@@ -585,6 +584,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             return;
         }
         refreshLstAlkisLandparcels();
+        Main.getCurrentInstance().selectionChanged();
     }                                                                                                     //GEN-LAST:event_lstKassenzeichenGeometrienValueChanged
 
     /**
@@ -732,42 +732,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRemoveKassenzeichenGeometrienActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
-        final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
-        lstKassenzeichenGeometrien.clearSelection();
-        final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
-
-        int firstSelectedIndex = -1;
-        final Collection<CidsBean> beansToRemove = new ArrayList<CidsBean>();
-        for (int index = 0; index < selectedIndices.length; ++index) {
-            final int selectedIndex = selectedIndices[index];
-
-            if (firstSelectedIndex < 0) {
-                firstSelectedIndex = selectedIndex;
-            }
-
-            final Object listObject = lstKassenzeichenGeometrien.getModel().getElementAt(selectedIndex);
-            if (listObject instanceof CidsBean) {
-                final CidsBean kassenzeichenGeometrieBean = (CidsBean)listObject;
-                beansToRemove.add(kassenzeichenGeometrieBean);
-            }
-        }
-
-        for (final CidsBean beanToRemove : beansToRemove) {
-            final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
-            final CidsBean kassenzBean = getCidsBean();
-            if (kassenzBean != null) {
-                kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
-                        .remove(beanToRemove);
-                featureCollection.removeFeature(kassenzeichenGeometrieFeature);
-            }
-        }
-
-        final int listSize = lstKassenzeichenGeometrien.getModel().getSize();
-        if (firstSelectedIndex >= listSize) {
-            firstSelectedIndex = listSize - 1;
-        }
-        lstKassenzeichenGeometrien.setSelectedIndex(firstSelectedIndex);
-    } //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
+        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).removeSelectedBeans();
+    }                                                                                                    //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -892,7 +858,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                                     false);
                             kassenzeichenGeometrieBeansToAdd.add(kassenzeichenGeometrieBean);
                         }
-                        addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeansToAdd);
+                        ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).addKassenzeichenGeometrieBeans(
+                            kassenzeichenGeometrieBeansToAdd);
                     } catch (final Exception ex) {
                         LOG.error("error while creating kassenzeichenGeometrie beans", ex);
                     }
@@ -929,71 +896,6 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         kassenzeichenGeometrieBean.getMetaObject().setID(KassenzeichenGeometrienPanel.getNewKassenzeichenGeometrieId());
 
         return kassenzeichenGeometrieBean;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  kassenzeichenGeometrieBeanToAdd  DOCUMENT ME!
-     */
-    public void addKassenzeichenGeometrieBean(final CidsBean kassenzeichenGeometrieBeanToAdd) {
-        if (kassenzeichenGeometrieBeanToAdd != null) {
-            final Collection<CidsBean> kassenzeichenGeometrieBeanToAdds = new ArrayList<CidsBean>();
-            kassenzeichenGeometrieBeanToAdds.add(kassenzeichenGeometrieBeanToAdd);
-            addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeanToAdds);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  kassenzeichenGeometrieBeansToAdd  DOCUMENT ME!
-     */
-    public void addKassenzeichenGeometrieBeans(final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd) {
-        final CidsBean kassenzBean = getCidsBean();
-        if (kassenzBean != null) {
-            final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
-            final Collection<Feature> featuresToAdd = new ArrayList<Feature>();
-            final Collection<CidsBean> beansToAdd = new ArrayList<CidsBean>();
-
-            for (final CidsBean kassenzeichenGeometrieBeanToAdd : kassenzeichenGeometrieBeansToAdd) {
-                final Geometry kassenzeichenGeometrieGeomToAdd = (Geometry)kassenzeichenGeometrieBeanToAdd.getProperty(
-                        KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
-                                + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
-                final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
-                CidsFeature geomAlreadyInMapFeature = null;
-                for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
-                    final Geometry kassenzeichenGeometrieGeom = (Geometry)kassenzeichenGeometrieBean.getProperty(
-                            KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
-                                    + "."
-                                    + GeomPropertyConstants.PROP__GEO_FIELD);
-                    if (kassenzeichenGeometrieGeomToAdd.equals(kassenzeichenGeometrieGeom)) {
-                        geomAlreadyInMapFeature = new CidsFeature(
-                                kassenzeichenGeometrieBean.getMetaObject());
-                        break;
-                    }
-                }
-
-                if (geomAlreadyInMapFeature == null) {
-                    beansToAdd.add(kassenzeichenGeometrieBeanToAdd);
-
-                    final CidsFeature cidsFeatureToAdd = new CidsFeature(
-                            kassenzeichenGeometrieBeanToAdd.getMetaObject());
-                    cidsFeatureToAdd.setEditable(CidsAppBackend.getInstance().isEditable());
-                    featuresToAdd.add(cidsFeatureToAdd);
-                    featuresToSelect.add(cidsFeatureToAdd);
-                } else {
-                    featuresToSelect.add(geomAlreadyInMapFeature);
-                }
-            }
-
-            kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
-                    .addAll(beansToAdd);
-            Main.getMappingComponent().getFeatureCollection().addFeatures(featuresToAdd);
-            Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
-        }
     }
 
     /**
@@ -1220,6 +1122,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             }
 
             lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
+            Main.getCurrentInstance().selectionChanged();
         }
     }
 
@@ -1257,7 +1160,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                             geometry,
                             "freie Geometrie",
                             true);
-                    addKassenzeichenGeometrieBean(kassenzeichenGeometrieBean);
+                    ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).addKassenzeichenGeometrieBean(
+                        kassenzeichenGeometrieBean);
                     Main.getMappingComponent().getFeatureCollection().removeFeature(pFeatureToAttach.getFeature());
                 } catch (Exception ex) {
                     LOG.error("error while attaching feature", ex);
@@ -1374,6 +1278,15 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
     private void refreshCmdShowAlkisRendererForAllVisibility() {
         final int size = lstAlkisLandparcels.getModel().getSize();
         cmdShowAlkisRendererForAll.setEnabled(size > 0);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    KassenzeichenGeometrienList getKassenzeichenGeometrienList() {
+        return (KassenzeichenGeometrienList)lstKassenzeichenGeometrien;
     }
 
     //~ Inner Classes ----------------------------------------------------------

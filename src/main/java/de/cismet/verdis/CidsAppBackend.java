@@ -64,6 +64,7 @@ import de.cismet.verdis.data.AppPreferences;
 import de.cismet.verdis.gui.Main;
 
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
+import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
 
 import static de.cismet.verdis.commons.constants.VerdisConstants.DOMAIN;
 
@@ -120,7 +121,8 @@ public class CidsAppBackend implements CidsBeanStore {
 
     private CidsBean sperreBean = null;
 
-    private final MultiMap crossReferences = new MultiMap();
+    private final MultiMap flaechenCrossReferences = new MultiMap();
+    private final MultiMap frontenCrossReferences = new MultiMap();
     private final HashMap<Mode, FeatureAttacher> featureAttacherByMode = new HashMap<Mode, FeatureAttacher>(3);
     private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
     private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
@@ -397,10 +399,63 @@ public class CidsAppBackend implements CidsBeanStore {
      * @param  cidsBean  DOCUMENT ME!
      */
     private void updateCrossReferences(final CidsBean cidsBean) {
+        updateFlaechenCrossReferences(cidsBean);
+        updateFrontenCrossReferences(cidsBean);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    private void updateFrontenCrossReferences(final CidsBean cidsBean) {
         final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
                 KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
 
-        crossReferences.clear();
+        frontenCrossReferences.clear();
+
+        new SwingWorker<Collection, Void>() {
+
+                @Override
+                protected Collection doInBackground() throws Exception {
+                    final CidsServerSearch search = new FrontenCrossReferencesServerSearch(kassenzeichenNummer);
+                    try {
+                        return getProxy().customServerSearch(CidsAppBackend.getInstance().getSession().getUser(),
+                                search);
+                    } catch (ConnectionException ex) {
+                        log.error("error during retrieval of object", ex);
+                        return null;
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final Collection collection = get();
+                        for (final Object row : collection) {
+                            final Object[] fields = ((Collection)row).toArray();
+                            // synchronized (kassenzeichenChangedBlocker) {
+                            frontenCrossReferences.put(fields[1], fields[3] + ":" + fields[4]);
+                            // }
+                        }
+                        Main.getCurrentInstance().getWdsrFrontenDetailsPanel().updateCrossReferences();
+                    } catch (Exception ex) {
+                        log.error("error while doing server search", ex);
+                    }
+                }
+            }.execute();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    private void updateFlaechenCrossReferences(final CidsBean cidsBean) {
+        final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+
+        flaechenCrossReferences.clear();
 
         new SwingWorker<Collection, Void>() {
 
@@ -423,9 +478,10 @@ public class CidsAppBackend implements CidsBeanStore {
                         for (final Object row : collection) {
                             final Object[] fields = ((Collection)row).toArray();
                             // synchronized (kassenzeichenChangedBlocker) {
-                            crossReferences.put(fields[1], fields[3] + ":" + fields[4]);
+                            flaechenCrossReferences.put(fields[1], fields[3] + ":" + fields[4]);
                             // }
                         }
+                        Main.getCurrentInstance().getRegenFlaechenDetailsPanel().updateCrossReferences();
                     } catch (Exception ex) {
                         log.error("error while doing server search", ex);
                     }
@@ -440,8 +496,19 @@ public class CidsAppBackend implements CidsBeanStore {
      *
      * @return  DOCUMENT ME!
      */
-    public Collection<String> getCrossReferencesFor(final int kassenzeichenNummer) {
-        return (Collection<String>)crossReferences.get(kassenzeichenNummer);
+    public Collection<String> getFlaechenCrossReferencesFor(final int kassenzeichenNummer) {
+        return (Collection<String>)flaechenCrossReferences.get(kassenzeichenNummer);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenNummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<String> getFrontenCrossReferencesFor(final int kassenzeichenNummer) {
+        return (Collection<String>)frontenCrossReferences.get(kassenzeichenNummer);
     }
 
     /**
