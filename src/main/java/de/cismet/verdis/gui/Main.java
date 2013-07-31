@@ -4911,7 +4911,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             } else {
                 groesse = anteil.doubleValue();
             }
-            final double groesseGewichtet = Math.round((groesse * veranlagungsschluessel) * 1000) / 1000;
+            final double groesseGewichtet = groesse * veranlagungsschluessel;
 
 //            final double summe = schluesselSummeMap.get(bezeichner);
             final double summeveranlagt = veranlagungSummeMap.get(bezeichner);
