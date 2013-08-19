@@ -32,15 +32,19 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -461,7 +465,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                 de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
-        binding.setConverter(new EmptyFloatToStringConverter());
+        binding.setConverter(new de.cismet.verdis.gui.EmptyFloatToStringConverter());
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -681,10 +685,10 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
         scpQuer.setOpaque(false);
 
+        edtQuer.setEditable(false);
         edtQuer.setContentType(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.edtQuer.contentType")); // NOI18N
-        edtQuer.setEditable(false);
         edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
@@ -801,14 +805,23 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
             bpanRegenFlDetails.setBackgroundEnabled(false);
         }
 
-        if (cidsBean != null) {
-            final Thread t = new Thread() {
+        updateCrossReferences();
+
+        attachBeanValidators();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public synchronized void updateCrossReferences() {
+        if (flaecheBean != null) {
+            new SwingWorker<String, Void>() {
 
                     @Override
-                    public void run() {
-                        // TeileigentumCrossReferences
+                    protected String doInBackground() throws Exception {
                         final Collection crossReference = (Collection)CidsAppBackend.getInstance()
-                                    .getCrossReferencesFor(cidsBean.getMetaObject().getID());
+                                    .getFlaechenCrossReferencesFor(flaecheBean.getMetaObject().getID());
+
                         if (crossReference != null) {
                             String html = "<html><body><center>";
                             for (final Object o : crossReference) {
@@ -816,30 +829,41 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
                                 html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
                             }
                             html += "</center></body></html>";
-                            final String finalHtml = html;
-                            lblTeileigentumQuerverweise.setVisible(true);
-                            edtQuer.setVisible(true);
-                            scpQuer.setVisible(true);
-                            edtQuer.setText(finalHtml);
-                            edtQuer.setCaretPosition(0);
-                        } else {
-                            edtQuer.setText("");
-                            lblTeileigentumQuerverweise.setVisible(false);
-                            edtQuer.setVisible(false);
-                            scpQuer.setVisible(false);
+                            return html;
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final String html = get();
+                            if (html != null) {
+                                lblTeileigentumQuerverweise.setVisible(true);
+                                edtQuer.setVisible(true);
+                                scpQuer.setVisible(true);
+                                edtQuer.setText(html);
+                                edtQuer.setCaretPosition(0);
+                            } else {
+                                edtQuer.setText("");
+                                lblTeileigentumQuerverweise.setVisible(false);
+                                edtQuer.setVisible(false);
+                                scpQuer.setVisible(false);
+                            }
+                        } catch (InterruptedException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } catch (ExecutionException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
-                };
-            t.setPriority(Thread.NORM_PRIORITY);
-            t.start();
+                }.execute();
         } else {
             edtQuer.setText("");
             lblTeileigentumQuerverweise.setVisible(false);
             edtQuer.setVisible(false);
             scpQuer.setVisible(false);
         }
-
-        attachBeanValidators();
     }
 
     @Override

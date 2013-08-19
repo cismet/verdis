@@ -38,7 +38,7 @@ import de.cismet.verdis.gui.AbstractCidsBeanTable;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public interface CidsBeanTable extends Validatable {
+public interface CidsBeanTable extends Validatable, CidsBeanComponent {
 
     //~ Methods ----------------------------------------------------------------
 
@@ -60,16 +60,16 @@ public interface CidsBeanTable extends Validatable {
     /**
      * DOCUMENT ME!
      *
-     * @param  cidsBean  DOCUMENT ME!
+     * @param  selectedRowListener  cidsBean DOCUMENT ME!
      */
-    void addBean(final CidsBean cidsBean);
+    // void addBean(final CidsBean cidsBean);
 
     /**
      * DOCUMENT ME!
      *
-     * @param  cidsBean  DOCUMENT ME!
+     * @param  selectedRowListener  cidsBean DOCUMENT ME!
      */
-    void removeBean(final CidsBean cidsBean);
+    // void removeBean(final CidsBean cidsBean);
 
     /**
      * DOCUMENT ME!
@@ -90,14 +90,14 @@ public interface CidsBeanTable extends Validatable {
      *
      * @return  DOCUMENT ME!
      */
-    List<CidsBean> getAllBeans();
+    // List<CidsBean> getAllBeans();
 
     /**
      * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    List<CidsBean> getSelectedBeans();
+    // List<CidsBean> getSelectedBeans();
 
     /**
      * DOCUMENT ME!

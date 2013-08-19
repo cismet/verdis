@@ -116,7 +116,10 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 }
             };
 
-        final Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
+        final Highlighter errorHighlighter = new ColorHighlighter(
+                errorPredicate,
+                Color.RED.brighter().brighter().brighter(),
+                Color.WHITE);
 
         final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
@@ -236,6 +239,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
+                                Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
                             } catch (Exception ex) {
                                 LOG.error("error while attaching feature", ex);
                             }
