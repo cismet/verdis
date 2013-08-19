@@ -66,8 +66,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Element;
 
-import org.openide.util.Exceptions;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -102,6 +100,7 @@ import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
 import de.cismet.cismap.commons.MappingModelListener;
+import de.cismet.cismap.commons.ModeLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
@@ -1482,6 +1481,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         refreshClipboardButtons();
         refreshClipboardButtonsToolTipText();
         refreshItemButtons();
+        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
+                    .getModeLayer("verdisAppModeLayer");
+        if (ml != null) {
+            ml.setMode(mode.toString());
+        }
     }
 
     /**
