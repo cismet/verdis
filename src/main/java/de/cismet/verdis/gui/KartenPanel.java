@@ -403,8 +403,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             return;
         }
         if (source.equals(mappingComp.getInputListener(Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER))) {
-            if (AbstractCreateSearchGeometryListener.PROPERTY_FORGUI_MODE.equals(propName)
-                        || AbstractCreateSearchGeometryListener.PROPERTY_MODE.equals(propName)) {
+            if (AbstractCreateSearchGeometryListener.PROPERTY_MODE.equals(propName)) {
                 mniSearchEllipse1.setSelected(CreateGeometryListener.ELLIPSE.equals(newValue));
                 mniSearchPolygon1.setSelected(CreateGeometryListener.POLYGON.equals(newValue));
                 mniSearchRectangle1.setSelected(CreateGeometryListener.RECTANGLE.equals(newValue));
