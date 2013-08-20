@@ -1484,7 +1484,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
                     .getModeLayer("verdisAppModeLayer");
         if (ml != null) {
-            ml.setMode(mode.toString());
+            ml.forceMode(mode.toString());
         }
     }
 
