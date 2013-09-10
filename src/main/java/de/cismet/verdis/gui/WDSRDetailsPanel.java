@@ -59,6 +59,8 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.tools.CismetThreadPool;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorHelper;
 import de.cismet.validation.ValidatorState;
@@ -253,6 +255,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 }
             });
 
+        StaticSwingTools.decorateWithFixedAutoCompleteDecorator(cboStrasse);
+        final JTextField txt = (JTextField)cboStrasse.getEditor().getEditorComponent();
+        txt.setOpaque(false);
         edtQuer.addHyperlinkListener(this);
     }
 
