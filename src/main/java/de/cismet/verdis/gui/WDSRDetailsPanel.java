@@ -40,6 +40,7 @@ import org.openide.util.Exceptions;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -109,6 +110,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         };
 
     //~ Instance fields --------------------------------------------------------
+
+    private CidsBean lastStrasseBean = null;
 
     private CidsBean frontBean = null;
     private final Validator bindingValidator;
@@ -255,6 +258,16 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 }
             });
 
+        cboStrasse.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    final CidsBean strasseBean = (CidsBean)cboStrasse.getSelectedItem();
+                    if ((strasseBean != null) && (frontBean != null)) {
+                        lastStrasseBean = strasseBean;
+                    }
+                }
+            });
         StaticSwingTools.decorateWithFixedAutoCompleteDecorator(cboStrasse);
         final JTextField txt = (JTextField)cboStrasse.getEditor().getEditorComponent();
         txt.setOpaque(false);
@@ -1098,6 +1111,18 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         bindingGroup.bind();
 
         try {
+            if ((cidsBean != null)
+                        && (cidsBean.getMetaObject().getStatus() == MetaObject.NEW)
+                        && (cidsBean.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
+                cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__STRASSE,
+                    lastStrasseBean);
+            }
+
             if ((cidsBean != null)
                         && (cidsBean.getProperty(
                                 FrontPropertyConstants.PROP__FRONTINFO
