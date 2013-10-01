@@ -4324,8 +4324,23 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void prepareSaveKassenzeichen() {
+        Map<String, Double> changedVeranlagungSummeMap;
         final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
+        final Map<String, Double> oldVeranlagungSummeMap = veranlagungSummeMap;
         fillVeranlagungSummeMap(newVeranlagungSummeMap);
+
+        if (prefs.isVeranlagungOnlyForChangedValues()) {
+            changedVeranlagungSummeMap = new HashMap<String, Double>();
+            for (final String bezeichner : veranlagungsgrundlageBezeichners) {
+                if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
+                    changedVeranlagungSummeMap.put(bezeichner, newVeranlagungSummeMap.get(bezeichner));
+                } else {
+                    changedVeranlagungSummeMap.put(bezeichner, null);
+                }
+            }
+        } else {
+            changedVeranlagungSummeMap = newVeranlagungSummeMap;
+        }
 
         final Date datumJetzt = new Date();
         final Calendar cal = GregorianCalendar.getInstance();
@@ -4334,7 +4349,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cal.add(Calendar.MONTH, 1);
         final Date datumVeranlagung = cal.getTime();
 
-        final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
+        final AssessmentDialog assessmentDialog = new AssessmentDialog(
+                this,
+                prefs.isVeranlagungOnlyForChangedValues(),
+                true);
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
         final Collection<String> veranlagungBezeichners = new ArrayList<String>();
@@ -4342,7 +4360,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         veranlagungBezeichners.addAll(strassenreinigungBezeichners);
         veranlagungBezeichners.addAll(winterdienstBezeichners);
         assessmentDialog.setBezeichners(veranlagungBezeichners);
-        assessmentDialog.setOldSchluesselSummeMap(veranlagungSummeMap);
+        assessmentDialog.setOldSchluesselSummeMap(oldVeranlagungSummeMap);
         assessmentDialog.setNewSchluesselSummeMap(newVeranlagungSummeMap);
         StaticSwingTools.showDialog(assessmentDialog, true);
 
@@ -4407,79 +4425,79 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G_200,
-                        newVeranlagungSummeMap.get("null--200"));
+                        changedVeranlagungSummeMap.get("null--200"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G_100,
-                        newVeranlagungSummeMap.get("null--100"));
+                        changedVeranlagungSummeMap.get("null--100"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G305,
-                        newVeranlagungSummeMap.get("A1-305"));
+                        changedVeranlagungSummeMap.get("A1-305"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G306,
-                        newVeranlagungSummeMap.get("Z1-306"));
+                        changedVeranlagungSummeMap.get("Z1-306"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G310,
-                        newVeranlagungSummeMap.get("A1V-310"));
+                        changedVeranlagungSummeMap.get("A1V-310"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G311,
-                        newVeranlagungSummeMap.get("Z1V-311"));
+                        changedVeranlagungSummeMap.get("Z1V-311"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G315,
-                        newVeranlagungSummeMap.get("A2-315"));
+                        changedVeranlagungSummeMap.get("A2-315"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G320,
-                        newVeranlagungSummeMap.get("A2V-320"));
+                        changedVeranlagungSummeMap.get("A2V-320"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G321,
-                        newVeranlagungSummeMap.get("A3-321"));
+                        changedVeranlagungSummeMap.get("A3-321"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G322,
-                        newVeranlagungSummeMap.get("A3V-322"));
+                        changedVeranlagungSummeMap.get("A3V-322"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G325,
-                        newVeranlagungSummeMap.get("B1-325"));
+                        changedVeranlagungSummeMap.get("B1-325"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G330,
-                        newVeranlagungSummeMap.get("B1V-330"));
+                        changedVeranlagungSummeMap.get("B1V-330"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G335,
-                        newVeranlagungSummeMap.get("B2-335"));
+                        changedVeranlagungSummeMap.get("B2-335"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G340,
-                        newVeranlagungSummeMap.get("B2V-340"));
+                        changedVeranlagungSummeMap.get("B2V-340"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G345,
-                        newVeranlagungSummeMap.get("D1-345"));
+                        changedVeranlagungSummeMap.get("D1-345"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G350,
-                        newVeranlagungSummeMap.get("D2-350"));
+                        changedVeranlagungSummeMap.get("D2-350"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G361,
-                        newVeranlagungSummeMap.get("P1-361"));
+                        changedVeranlagungSummeMap.get("P1-361"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G362,
-                        newVeranlagungSummeMap.get("P2-362"));
+                        changedVeranlagungSummeMap.get("P2-362"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G710,
-                        newVeranlagungSummeMap.get("710-DF"));
+                        changedVeranlagungSummeMap.get("710-DF"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G715,
-                        newVeranlagungSummeMap.get("715-GDF"));
+                        changedVeranlagungSummeMap.get("715-GDF"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G720,
-                        newVeranlagungSummeMap.get("720-VF"));
+                        changedVeranlagungSummeMap.get("720-VF"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G725,
-                        newVeranlagungSummeMap.get("725-VFÖ"));
+                        changedVeranlagungSummeMap.get("725-VFÖ"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G730,
-                        newVeranlagungSummeMap.get("730-Va-über"));
+                        changedVeranlagungSummeMap.get("730-Va-über"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G740,
-                        newVeranlagungSummeMap.get("740-VFS"));
+                        changedVeranlagungSummeMap.get("740-VFS"));
                     veranlagungBean.setProperty(
                         VeranlagungPropertyConstants.PROP__G999,
-                        newVeranlagungSummeMap.get("999-Rest"));
+                        changedVeranlagungSummeMap.get("999-Rest"));
 
                     veranlagungBean.persist();
                     kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
