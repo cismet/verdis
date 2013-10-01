@@ -5015,7 +5015,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 strasseKey = "<keine>";
             }
 
-            final String srKey = strasseKey + " - " + key + "-" + schluessel;
+            final String srKey = key + "-" + schluessel + " - " + strasseKey;
             final double summe = (strasseSummeMap.containsKey(srKey)) ? strasseSummeMap.get(srKey) : 0.0d;
             strasseSummeMap.put(srKey, summe + laenge);
         }
