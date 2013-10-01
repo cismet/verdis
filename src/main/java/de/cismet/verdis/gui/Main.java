@@ -155,6 +155,7 @@ import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
 import de.cismet.verdis.commons.constants.VeranlagungPropertyConstants;
 import de.cismet.verdis.commons.constants.VeranlagungsgrundlagePropertyConstants;
@@ -227,16 +228,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     //~ Instance fields --------------------------------------------------------
 
-    private final Collection<String> veranlagungsgrundlageBezeichners = new ArrayList<String>();
+    private final Collection<String> veranlagungBezeichners = new ArrayList<String>();
     private final Collection<String> winterdienstBezeichners = new ArrayList<String>();
     private final Collection<String> strassenreinigungBezeichners = new ArrayList<String>();
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<String, CidsBean>();
-    private final Map<String, CidsBean> winterdienstMap = new HashMap<String, CidsBean>();
-    private final Map<String, CidsBean> strassenreinigungMap = new HashMap<String, CidsBean>();
-//    private final Map<String, Double> veranlagungSchluesselSummeMap = new HashMap<String, Double>();
     private final Map<String, Double> veranlagungSummeMap = new HashMap<String, Double>();
-//    private final Map<String, Integer> strassenreinigungSummeMap = new HashMap<String, Integer>();
-//    private final Map<String, Integer> winterdienstSummeMap = new HashMap<String, Integer>();
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -4325,7 +4321,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void prepareSaveKassenzeichen() {
         final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
-        fillVeranlagungSummeMap(newVeranlagungSummeMap);
+        fillVeranlagungMaps(newVeranlagungSummeMap);
 
         final Date datumJetzt = new Date();
         final Calendar cal = GregorianCalendar.getInstance();
@@ -4337,11 +4333,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
-        final Collection<String> veranlagungBezeichners = new ArrayList<String>();
-        veranlagungBezeichners.addAll(veranlagungsgrundlageBezeichners);
-        veranlagungBezeichners.addAll(strassenreinigungBezeichners);
-        veranlagungBezeichners.addAll(winterdienstBezeichners);
-        assessmentDialog.setBezeichners(veranlagungBezeichners);
+        final Collection<String> allBezeichners = new ArrayList<String>();
+        allBezeichners.addAll(veranlagungBezeichners);
+        allBezeichners.addAll(strassenreinigungBezeichners);
+        allBezeichners.addAll(winterdienstBezeichners);
+        assessmentDialog.setBezeichners(allBezeichners);
         assessmentDialog.setOldSchluesselSummeMap(veranlagungSummeMap);
         assessmentDialog.setNewSchluesselSummeMap(newVeranlagungSummeMap);
         StaticSwingTools.showDialog(assessmentDialog, true);
@@ -4789,10 +4785,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
 
-        veranlagungSummeMap.clear();
-
         if (cidsBean != null) {
-            fillVeranlagungSummeMap(veranlagungSummeMap);
+            fillVeranlagungMaps(veranlagungSummeMap);
         }
     }
 
@@ -4834,9 +4828,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
 
             veranlagungsgrundlageMap.put(mapKey, veranlagungsgrundlageBean);
-
-            if (!veranlagungsgrundlageBezeichners.contains(bezeichner)) {
-                veranlagungsgrundlageBezeichners.add(bezeichner);
+            if (!veranlagungBezeichners.contains(bezeichner)) {
+                veranlagungBezeichners.add(bezeichner);
             }
         }
         for (final MetaObject winterdienstMo : winterdienstMos) {
@@ -4844,8 +4837,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String key = (String)winterdienstBean.getProperty("key");
             final Integer schluessel = (Integer)winterdienstBean.getProperty("schluessel");
             final String bezeichner = key + "-" + Integer.toString(schluessel);
-            winterdienstMap.put(bezeichner, winterdienstBean);
-
             if (!winterdienstBezeichners.contains(bezeichner)) {
                 winterdienstBezeichners.add(bezeichner);
             }
@@ -4855,8 +4846,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String key = (String)strassenreinigungBean.getProperty("key");
             final Integer schluessel = (Integer)strassenreinigungBean.getProperty("schluessel");
             final String bezeichner = key + "-" + Integer.toString(schluessel);
-
-            strassenreinigungMap.put(key + "-" + schluessel, strassenreinigungBean);
             if (!strassenreinigungBezeichners.contains(bezeichner)) {
                 strassenreinigungBezeichners.add(bezeichner);
             }
@@ -4868,8 +4857,20 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  veranlagungSummeMap  DOCUMENT ME!
      */
-    private void fillVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap) {
-        fillVeranlagungSchluesselSummeMap(veranlagungSummeMap);
+    private void fillVeranlagungMaps(final Map<String, Double> veranlagungSummeMap) {
+        veranlagungSummeMap.clear();
+
+        for (final String bezeichner : veranlagungBezeichners) {
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+        for (final String bezeichner : winterdienstBezeichners) {
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+        for (final String bezeichner : strassenreinigungBezeichners) {
+            veranlagungSummeMap.put(bezeichner, 0d);
+        }
+
+        fillFlaechenVeranlagungSummeMap(veranlagungSummeMap);
         fillWinterdienstSummeMap(veranlagungSummeMap);
         fillStrassenreinigungSummeMap(veranlagungSummeMap);
     }
@@ -4879,14 +4880,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  veranlagungSummeMap  DOCUMENT ME!
      */
-    public void fillVeranlagungSchluesselSummeMap(final Map<String, Double> veranlagungSummeMap) {
+    public void fillFlaechenVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap) {
         final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
-
-        for (final String bezeichner : veranlagungsgrundlageBezeichners) {
-//            schluesselSummeMap.put(bezeichner, 0d);
-            veranlagungSummeMap.put(bezeichner, 0d);
-        }
 
         for (final CidsBean flaeche : flaechen) {
             final Float anteil = (Float)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
@@ -4917,10 +4913,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             final double groesseGewichtet = groesse * veranlagungsschluessel;
 
-//            final double summe = schluesselSummeMap.get(bezeichner);
-            final double summeveranlagt = veranlagungSummeMap.get(bezeichner);
+            final double summeveranlagt = (veranlagungSummeMap.containsKey(bezeichner))
+                ? veranlagungSummeMap.get(bezeichner) : 0.0d;
 
-//            schluesselSummeMap.put(bezeichner, summe + groesse);
             if (groesseGewichtet > 0) {
                 veranlagungSummeMap.put(bezeichner, summeveranlagt + groesseGewichtet);
             } else {
@@ -4932,15 +4927,108 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  veranlagungSummeMap  DOCUMENT ME!
+     * @param  flaechenAnschlussgradSummeMap  DOCUMENT ME!
      */
-    public void fillStrassenreinigungSummeMap(final Map<String, Double> veranlagungSummeMap) {
+    public void fillFlaechenAnschlussgradSummeMap(final Map<String, Double> flaechenAnschlussgradSummeMap) {
+        final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+
+        for (final CidsBean flaeche : flaechen) {
+            final Float anteil = (Float)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+            final Integer flaechenart = (Integer)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
+                            + FlaechenartPropertyConstants.PROP__ID);
+            final Integer anschlussgrad = (Integer)flaeche.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + "."
+                            + AnschlussgradPropertyConstants.PROP__ID);
+            final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
+            final String anschlussgradKey = (String)flaeche.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + "."
+                            + AnschlussgradPropertyConstants.PROP__GRAD_ABKUERZUNG);
+
+            final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
+            final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
+                    "veranlagungsschluessel");
+
+            final double groesse;
+            if (anteil == null) {
+                groesse = (Integer)flaeche.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+            } else {
+                groesse = anteil.doubleValue();
+            }
+            final double groesseGewichtet = groesse * veranlagungsschluessel;
+
+            final double summeAnschlussgrad = (flaechenAnschlussgradSummeMap.containsKey(anschlussgradKey))
+                ? flaechenAnschlussgradSummeMap.get(anschlussgradKey) : 0d;
+
+            if (groesseGewichtet > 0) {
+                flaechenAnschlussgradSummeMap.put(anschlussgradKey, summeAnschlussgrad + groesseGewichtet);
+            } else {
+                flaechenAnschlussgradSummeMap.put(anschlussgradKey, summeAnschlussgrad + groesse);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  strasseSummeMap  DOCUMENT ME!
+     */
+    public void fillStrasseSummeMap(final Map<String, Double> strasseSummeMap) {
         final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
-        for (final String bezeichner : strassenreinigungBezeichners) {
-            veranlagungSummeMap.put(bezeichner, 0d);
+        for (final CidsBean front : fronten) {
+            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+
+            final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final String key;
+            final Integer schluessel;
+            if (satzung_strassenreinigung == null) {
+                key = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                + StrassenreinigungPropertyConstants.PROP__KEY);
+                schluessel = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                + StrassenreinigungPropertyConstants.PROP__SCHLUESSEL);
+            } else {
+                key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
+                schluessel = (Integer)satzung_strassenreinigung.getProperty("sr_klasse.schluessel");
+            }
+            String strasseKey = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__STRASSE + "."
+                            + StrassePropertyConstants.PROP__NAME);
+            if (strasseKey == null) {
+                strasseKey = "<keine>";
+            }
+
+            final String srKey = strasseKey + " - " + key + "-" + schluessel;
+            final double summe = (strasseSummeMap.containsKey(srKey)) ? strasseSummeMap.get(srKey) : 0.0d;
+            strasseSummeMap.put(srKey, summe + laenge);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  srSummeMap  DOCUMENT ME!
+     */
+    public void fillStrassenreinigungSummeMap(final Map<String, Double> srSummeMap) {
+        final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
 
         for (final CidsBean front : fronten) {
             final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
@@ -4965,23 +5053,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
 
             final String srKey = key + "-" + schluessel;
-            final double summe = veranlagungSummeMap.get(srKey);
-            veranlagungSummeMap.put(srKey, summe + laenge);
+            final double summe = (srSummeMap.containsKey(srKey)) ? srSummeMap.get(srKey) : 0.0d;
+            srSummeMap.put(srKey, summe + laenge);
         }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  veranlagungSummeMap  DOCUMENT ME!
+     * @param  wdSummeMap  DOCUMENT ME!
      */
-    public void fillWinterdienstSummeMap(final Map<String, Double> veranlagungSummeMap) {
+    public void fillWinterdienstSummeMap(final Map<String, Double> wdSummeMap) {
         final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
-
-        for (final String bezeichner : winterdienstBezeichners) {
-            veranlagungSummeMap.put(bezeichner, 0d);
-        }
 
         for (final CidsBean front : fronten) {
             final Integer laenge = (Integer)front.getProperty(
@@ -5009,8 +5093,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
 
             final String wdKey = key + "-" + schluessel;
-            final double summe = veranlagungSummeMap.get(wdKey);
-            veranlagungSummeMap.put(wdKey, summe + laenge);
+            final double summe = (wdSummeMap.containsKey(wdKey)) ? wdSummeMap.get(wdKey) : 0.0d;
+            wdSummeMap.put(wdKey, summe + laenge);
         }
     }
 

@@ -28,9 +28,12 @@
  */
 package de.cismet.verdis.gui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -51,13 +54,12 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
     private CidsBean kassenzeichenBean;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JLabel lblStrasse;
+    private javax.swing.JPanel panStrasse;
     private javax.swing.JTable tblSR;
-    private javax.swing.JTable tblWD;
+    private javax.swing.JTable tblSumStrasse;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -67,8 +69,8 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
      */
     public WDSRSummenPanel() {
         initComponents();
-        tblSR.setModel(new DefaultTableModel());
-        tblWD.setModel(new DefaultTableModel());
+        tblSR.setDefaultRenderer(Object.class, new SummenTableCellRenderer());
+        tblSumStrasse.setDefaultRenderer(Object.class, new SummenTableCellRenderer());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -82,20 +84,24 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanel5 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         tblSR = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        tblWD = new javax.swing.JTable();
+        panStrasse = new javax.swing.JPanel();
+        lblStrasse = new javax.swing.JLabel();
+        tblSumStrasse = new javax.swing.JTable();
 
         setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jPanel5, gridBagConstraints);
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setLayout(new java.awt.GridBagLayout());
+        jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setText(org.openide.util.NbBundle.getMessage(WDSRSummenPanel.class, "WDSRSummenPanel.jLabel1.text")); // NOI18N
@@ -103,47 +109,63 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-        jPanel3.add(jLabel1, gridBagConstraints);
-
-        jPanel1.add(jPanel3, java.awt.BorderLayout.PAGE_START);
+        jPanel1.add(jLabel1, gridBagConstraints);
 
         tblSR.setBackground(javax.swing.UIManager.getDefaults().getColor("Label.background"));
-        jPanel1.add(tblSR, java.awt.BorderLayout.CENTER);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jPanel1, gridBagConstraints);
-
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel4.setLayout(new java.awt.GridBagLayout());
-
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(WDSRSummenPanel.class, "WDSRSummenPanel.jLabel2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-        jPanel4.add(jLabel2, gridBagConstraints);
-
-        jPanel2.add(jPanel4, java.awt.BorderLayout.PAGE_START);
-
-        tblWD.setBackground(javax.swing.UIManager.getDefaults().getColor("Label.background"));
-        jPanel2.add(tblWD, java.awt.BorderLayout.CENTER);
-
+        tblSR.setModel(new DefaultTableModel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        jPanel1.add(tblSR, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jPanel2, gridBagConstraints);
+        add(jPanel1, gridBagConstraints);
+
+        panStrasse.setLayout(new java.awt.GridBagLayout());
+
+        lblStrasse.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblStrasse.setText(org.openide.util.NbBundle.getMessage(
+                WDSRSummenPanel.class,
+                "WDSRSummenPanel.lblStrasse.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
+        panStrasse.add(lblStrasse, gridBagConstraints);
+
+        tblSumStrasse.setBackground(javax.swing.UIManager.getDefaults().getColor("Label.background"));
+        tblSumStrasse.setModel(new DefaultTableModel());
+        tblSumStrasse.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tblSumStrasse.setFocusable(false);
+        tblSumStrasse.setMinimumSize(new java.awt.Dimension(60, 25));
+        tblSumStrasse.setRowSelectionAllowed(false);
+        tblSumStrasse.setShowHorizontalLines(false);
+        tblSumStrasse.setShowVerticalLines(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        panStrasse.add(tblSumStrasse, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(panStrasse, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
@@ -154,42 +176,43 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         try {
-            final Map<String, Double> srHash = new HashMap<String, Double>();
-            final Map<String, Double> wdHash = new HashMap<String, Double>();
-
-            Main.getCurrentInstance().fillStrassenreinigungSummeMap(srHash);
-            Main.getCurrentInstance().fillWinterdienstSummeMap(wdHash);
-
             kassenzeichenBean = cidsBean;
             if (cidsBean != null) {
-                final Vector srData = new Vector();
-                for (final String key : srHash.keySet()) {
+                final Map<String, Double> srHash = new HashMap<String, Double>();
+                final Map<String, Double> strasseHash = new HashMap<String, Double>();
+
+                Main.getCurrentInstance().fillStrassenreinigungSummeMap(srHash);
+                Main.getCurrentInstance().fillStrasseSummeMap(strasseHash);
+
+                final List<String> srKeys = Arrays.asList(srHash.keySet().toArray(new String[0]));
+                final List<String> strasseKeys = Arrays.asList(strasseHash.keySet().toArray(new String[0]));
+
+                Collections.sort(srKeys);
+                final List<String[]> srData = new ArrayList<String[]>();
+                for (final String key : srKeys) {
                     final double value = srHash.get(key);
                     if (value > 0) {
-                        final Vector row = new Vector();
-                        row.add(key);
-                        row.add(value + " m");
-                        srData.add(row);
+                        srData.add(new String[] { key, value + " m" });
                     }
                 }
-                final Vector wdData = new Vector();
-                for (final String key : wdHash.keySet()) {
-                    final double value = wdHash.get(key);
+
+                Collections.sort(strasseKeys);
+                final List<String[]> strasseData = new ArrayList<String[]>();
+                for (final String key : strasseKeys) {
+                    final double value = strasseHash.get(key);
                     if (value > 0) {
-                        final Vector row = new Vector();
-                        row.add(key);
-                        row.add(value + " m");
-                        wdData.add(row);
+                        strasseData.add(new String[] { key, value + " m" });
                     }
                 }
 
-                final Vector header = new Vector();
+                final String[] header = { "A", "B" };
 
-                header.add("A");
-                header.add("B");
+                ((DefaultTableModel)tblSR.getModel()).setDataVector(srData.toArray(new String[0][]), header);
+                ((DefaultTableModel)tblSumStrasse.getModel()).setDataVector(strasseData.toArray(new String[0][]),
+                    header);
 
-                ((DefaultTableModel)tblSR.getModel()).setDataVector(srData, header);
-                ((DefaultTableModel)tblWD.getModel()).setDataVector(wdData, header);
+                tblSR.getColumnModel().getColumn(1).setPreferredWidth(0);
+                tblSumStrasse.getColumnModel().getColumn(1).setPreferredWidth(0);
             }
         } catch (Exception e) {
             log.error("error in setCidsBean", e);
