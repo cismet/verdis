@@ -4917,9 +4917,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 ? veranlagungSummeMap.get(bezeichner) : 0.0d;
 
             if (groesseGewichtet > 0) {
-                veranlagungSummeMap.put(bezeichner, summeveranlagt + groesseGewichtet);
+                veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesseGewichtet) * 1000) / 1000d);
             } else {
-                veranlagungSummeMap.put(bezeichner, summeveranlagt + groesse);
+                veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesse) * 1000) / 1000d);
             }
         }
     }
@@ -4971,9 +4971,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 ? flaechenAnschlussgradSummeMap.get(anschlussgradKey) : 0d;
 
             if (groesseGewichtet > 0) {
-                flaechenAnschlussgradSummeMap.put(anschlussgradKey, summeAnschlussgrad + groesseGewichtet);
+                flaechenAnschlussgradSummeMap.put(
+                    anschlussgradKey,
+                    Math.round((summeAnschlussgrad + groesseGewichtet) * 1000)
+                            / 1000d);
             } else {
-                flaechenAnschlussgradSummeMap.put(anschlussgradKey, summeAnschlussgrad + groesse);
+                flaechenAnschlussgradSummeMap.put(
+                    anschlussgradKey,
+                    Math.round((summeAnschlussgrad + groesse) * 1000)
+                            / 1000d);
             }
         }
     }
@@ -5017,7 +5023,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             final String srKey = key + "-" + schluessel + " - " + strasseKey;
             final double summe = (strasseSummeMap.containsKey(srKey)) ? strasseSummeMap.get(srKey) : 0.0d;
-            strasseSummeMap.put(srKey, summe + laenge);
+            strasseSummeMap.put(srKey, Math.round((summe + laenge) * 1000) / 1000d);
         }
     }
 
@@ -5054,7 +5060,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             final String srKey = key + "-" + schluessel;
             final double summe = (srSummeMap.containsKey(srKey)) ? srSummeMap.get(srKey) : 0.0d;
-            srSummeMap.put(srKey, summe + laenge);
+            srSummeMap.put(srKey, Math.round((summe + laenge) * 1000) / 1000d);
         }
     }
 
@@ -5094,7 +5100,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             final String wdKey = key + "-" + schluessel;
             final double summe = (wdSummeMap.containsKey(wdKey)) ? wdSummeMap.get(wdKey) : 0.0d;
-            wdSummeMap.put(wdKey, summe + laenge);
+            wdSummeMap.put(wdKey, Math.round((summe + laenge) * 1000) / 1000d);
         }
     }
 
