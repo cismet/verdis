@@ -124,7 +124,7 @@ public class BEDialog extends javax.swing.JDialog implements CidsBeanStore {
         aggVal.addListener(new ValidatorListener() {
 
                 @Override
-                public void stateChanged(final ValidatorState state) {
+                public void stateChanged(final Validator source, final ValidatorState state) {
                     btnGo.setEnabled(state.isValid());
                 }
             });

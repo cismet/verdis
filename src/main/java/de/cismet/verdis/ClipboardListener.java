@@ -29,7 +29,7 @@ package de.cismet.verdis;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public interface FlaechenClipboardListener {
+public interface ClipboardListener {
 
     //~ Methods ----------------------------------------------------------------
 

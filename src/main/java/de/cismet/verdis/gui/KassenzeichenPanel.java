@@ -12,18 +12,12 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.JXBusyLabel;
-
 import java.awt.Color;
-import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -35,8 +29,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
-
-import de.cismet.cismap.commons.features.Feature;
 
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
@@ -53,8 +45,9 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -794,7 +787,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  historyEnabled  DOCUMENT ME!
      */
     public void gotoKassenzeichen(final String kz, final boolean historyEnabled) {
-        boolean refreshFlag = false;
         final String[] test = kz.split(":");
 
         final String kassenzeichenNummer;
@@ -807,11 +799,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             flaechenBez = "";
         }
 
-        if (kassenzeichenNummer.trim().equals(txtKassenzeichen.getText().trim())) {
-            refreshFlag = true;
-        }
-
-        if ((mainApp.changesPending() == false) || (refreshFlag == true)) {
+        if ((mainApp.changesPending() == false)) {
             mainApp.disableKassenzeichenCmds();
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);
@@ -832,7 +820,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
                             if (cidsBean != null) {
                                 CidsAppBackend.getInstance().setCidsBean(cidsBean);
-                                selectFlaecheByBez(flaechenBez);
+                                selectCidsBeanByIdentifier(flaechenBez);
                                 flashSearchField(Color.GREEN);
                                 if (historyEnabled) {
                                     historyModel.addToHistory(kz);
@@ -865,13 +853,53 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     /**
      * DOCUMENT ME!
      *
+     * @param  identifier  DOCUMENT ME!
+     */
+    private void selectCidsBeanByIdentifier(final String identifier) {
+        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+        if (mode.equals(mode.REGEN)) {
+            selectFlaecheByBezeichner(identifier);
+        } else if (mode.equals(mode.ESW)) {
+            selectFrontByNummer(identifier);
+        } else if (mode.equals(mode.ALLGEMEIN)) {
+            // do nothing
+            return;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  bez  DOCUMENT ME!
      */
-    private void selectFlaecheByBez(final String bez) {
+    private void selectFlaecheByBezeichner(final String bez) {
         for (final CidsBean flaeche
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-            if (((String)flaeche.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
+            if (((String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
                 mainApp.getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
+                return;
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nummer  DOCUMENT ME!
+     */
+    private void selectFrontByNummer(final String nummer) {
+        final int nummerAsInt;
+        try {
+            nummerAsInt = Integer.parseInt(nummer);
+        } catch (NumberFormatException e) {
+            // the Nummer is an invalid identifier for a Front, so do nothing
+            return;
+        }
+
+        for (final CidsBean front
+                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)) {
+            if (((Integer)front.getProperty(FrontPropertyConstants.PROP__NUMMER)).equals(nummerAsInt)) {
+                mainApp.getWdsrFrontenTabellenPanel().selectCidsBean(front);
                 return;
             }
         }

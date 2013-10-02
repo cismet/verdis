@@ -22,7 +22,7 @@ import java.util.Collection;
 import javax.swing.SwingWorker;
 
 import de.cismet.cismap.commons.CrsTransformer;
-import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.SearchFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AbstractCreateSearchGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListenerInterface;
@@ -60,7 +60,7 @@ public class ServerSearchCreateSearchGeometryListener extends AbstractCreateSear
      * @param  serverSearch  DOCUMENT ME!
      */
     public ServerSearchCreateSearchGeometryListener(final MappingComponent mc, final GeomServerSearch serverSearch) {
-        super(mc);
+        super(mc, INPUT_LISTENER_NAME);
 
         setMode(CreateGeometryListenerInterface.POLYGON);
         setGeomServerSearch(serverSearch);
@@ -78,7 +78,7 @@ public class ServerSearchCreateSearchGeometryListener extends AbstractCreateSear
     }
 
     @Override
-    protected boolean performSearch(final PureNewFeature searchFeature) {
+    protected boolean performSearch(final SearchFeature searchFeature) {
         final String crs = geomServerSearch.getCrs();
         final Geometry geometry;
         if (crs != null) {
