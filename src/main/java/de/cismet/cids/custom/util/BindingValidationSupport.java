@@ -58,11 +58,11 @@ public class BindingValidationSupport {
         for (final Binding binding : bindingGroup.getBindings()) {
             final JComponent targetComponent = (JComponent)binding.getTargetObject();
             // nur jtextfields die keine strings representieren
+            final Validator validator = new BindingValidator(binding);
             if (targetComponent instanceof JTextField) {
-                final Validator validator = new BindingValidator(binding);
                 validator.attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(targetComponent));
-                validators.add(validator);
             }
+            validators.add(validator);
         }
         return validators;
     }

@@ -29,22 +29,16 @@ import java.sql.Date;
 
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
-import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
-import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
 
 /**
@@ -53,101 +47,47 @@ import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class FlaechenClipboard {
+public class FlaechenClipboard extends AbstractClipboard {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(FlaechenClipboard.class);
-    private static RegenFlaechenTabellenPanel flaechenTable = Main.getCurrentInstance().getRegenFlaechenTabellenPanel();
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Constructors -----------------------------------------------------------
 
-    private Collection<CidsBean> clipboardFlaecheBeans = new ArrayList<CidsBean>();
-    private List<FlaechenClipboardListener> listeners = new ArrayList<FlaechenClipboardListener>();
-    private boolean isCutted = false;
+    /**
+     * Creates a new FlaechenClipboard object.
+     *
+     * @param  table  DOCUMENT ME!
+     */
+    public FlaechenClipboard(final RegenFlaechenTabellenPanel table) {
+        super(table);
+    }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
      *
-     * @param   listener  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean addListener(final FlaechenClipboardListener listener) {
-        return listeners.add(listener);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   listener  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean removeListener(final FlaechenClipboardListener listener) {
-        return listeners.remove(listener);
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void fireClipboardChanged() {
-        for (final FlaechenClipboardListener listener : listeners) {
-            listener.clipboardChanged();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void paste() {
-        if (isPastable()) {
-            try {
-                int notPastableCounter = 0;
-                final int numOfClipBoardItems = clipboardFlaecheBeans.size();
-                for (final CidsBean clipboardFlaecheBean : clipboardFlaecheBeans) {
-                    if (isPastable(clipboardFlaecheBean)) {
-                        final CidsBean pasteBean = createPastedBean(clipboardFlaecheBean);
-                        flaechenTable.addBean(pasteBean);
-                    } else {
-                        notPastableCounter++;
-                    }
-                }
-                clipboardFlaecheBeans.clear();
-                if (notPastableCounter < numOfClipBoardItems) {
-                    fireClipboardChanged();
-                }
-                if (notPastableCounter > 0) {
-                    LOG.info(notPastableCounter
-                                + " flaecheBean(s) not pasted because the flaecheinfoBean of this bean(s) was still assigned to a flaecheBean of the current kassenzeichen");
-                }
-            } catch (Exception ex) {
-                LOG.error("error while pasting bean", ex);
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   clipboardBean  DOCUMENT ME!
+     * @param   clipboardBean  is an instance of Flaeche
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = flaechenTable.getModel().deepcloneBean(clipboardBean);
-
-        final int id = flaechenTable.getTableHelper().getNextNewBeanId();
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__ID, id);
+    @Override
+    public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
+        final RegenFlaechenTabellenPanel table = (RegenFlaechenTabellenPanel)getComponent();
+        final CidsBean pasteBean = table.getModel().deepcloneBean(clipboardBean);
+        final int id = table.getTableHelper().getNextNewBeanId();
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
 
-        if (clipboardBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO) != null) {
+        if (clipboardBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO) != null) {
             final int flaecheninfoId = (Integer)clipboardBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             final CidsBean flaecheninfoBean = SessionManager.getProxy()
                         .getMetaObject(
                                 flaecheninfoId,
@@ -155,20 +95,23 @@ public class FlaechenClipboard {
                                     VerdisMetaClassConstants.MC_FLAECHENINFO).getId(),
                                 VerdisConstants.DOMAIN)
                         .getBean();
-            pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
+            pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
         }
 
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__BEMERKUNG, null);
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__BEMERKUNG, null);
         pasteBean.setProperty(
-            RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-            flaechenTable.getValidFlaechenname(
+            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+            ((RegenFlaechenTabellenPanel)getComponent()).getValidFlaechenname(
                 (Integer)clipboardBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__FLAECHENART__ID)));
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + "."
+                            + FlaechenartPropertyConstants.PROP__ID)));
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
-        pasteBean.setProperty(RegenFlaechenPropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
 
         return pasteBean;
     }
@@ -180,182 +123,24 @@ public class FlaechenClipboard {
      *
      * @return  DOCUMENT ME!
      */
-    private boolean isPastable(final CidsBean clipboardFlaecheBean) {
+    @Override
+    public boolean isPastable(final CidsBean clipboardFlaecheBean) {
         if (clipboardFlaecheBean == null) {
             return false;
         }
 
-        for (final CidsBean flaecheBean : flaechenTable.getAllBeans()) {
-            final int id = (Integer)flaecheBean.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+        for (final CidsBean flaecheBean : getComponent().getAllBeans()) {
+            final int id = (Integer)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             final int ownId = (Integer)clipboardFlaecheBean.getProperty(
-                    RegenFlaechenPropertyConstants.PROP__FLAECHENINFO__ID);
+                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                            + "."
+                            + FlaecheninfoPropertyConstants.PROP__ID);
             if (id == ownId) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isPastable() {
-        return !clipboardFlaecheBeans.isEmpty();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isCopyable() {
-        return !isSelectionEmpty();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isCutable() {
-        return !isSelectionEmpty();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean isSelectionEmpty() {
-        return flaechenTable.getSelectedBeans().isEmpty();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   flaecheBeans  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean cutOrCopy(final Collection<CidsBean> flaecheBeans) {
-        if ((flaecheBeans != null) && !flaecheBeans.isEmpty()) {
-            if (!checkNotPasted()) {
-                return false;
-            }
-            try {
-                clipboardFlaecheBeans.clear();
-                for (final CidsBean flaecheBean : flaecheBeans) {
-                    this.clipboardFlaecheBeans.add(CidsBeanSupport.deepcloneCidsBean(flaecheBean));
-                }
-                fireClipboardChanged();
-                return true;
-            } catch (Exception ex) {
-                LOG.error("error while copying or cutting cidsbean", ex);
-                clipboardFlaecheBeans.clear();
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void copy() {
-        if (isCopyable()) {
-            final Collection<CidsBean> selectedBeans = getSelectedFlaechenBean();
-            cutOrCopy(selectedBeans);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void cut() {
-        if (isCutable()) {
-            final Collection<CidsBean> selectedBeans = getSelectedFlaechenBean();
-            isCutted = cutOrCopy(selectedBeans);
-            if (isCutted) {
-                for (final CidsBean selectedBean : selectedBeans) {
-                    flaechenTable.removeBean(selectedBean);
-                }
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private Collection<CidsBean> getSelectedFlaechenBean() {
-        return flaechenTable.getSelectedBeans();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean checkNotPasted() {
-        int answer = JOptionPane.YES_OPTION;
-        if (isCutted && (clipboardFlaecheBeans != null)) {
-            answer = JOptionPane.showConfirmDialog(
-                    Main.getCurrentInstance(),
-                    "In der Verdis-Zwischenablage befinden sich noch Daten die\nausgeschnitten und noch nicht wieder eingef\u00FCgt wurden.\nMöchten Sie diese Daten jetzt verwerfen ?",
-                    "Ausschneiden",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-        }
-        return answer == JOptionPane.YES_OPTION;
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void storeToFile() {
-//        CismetThreadPool.execute(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    final XStream x = new XStream(new Dom4JDriver());
-//                    final FileWriter f = new FileWriter(Main.verdisDirectory + Main.fs + "flaechenClipboardBackup.xml");
-//                    x.toXML(clipboardBeans, f);
-//                    f.close();
-//                } catch (Exception ex) {
-//                    LOG.error("Beim Sichern des Clipboards ist etwas schiefgegangen", ex);
-//                }
-//            }
-//        });
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void loadFromFile() {
-//        CismetThreadPool.execute(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    final XStream x = new XStream(new Dom4JDriver());
-//                    clipboardBeans = (List<CidsBean>) x.fromXML(new FileReader(Main.verdisDirectory + Main.fs + "flaechenClipboardBackup.xml"));
-//                    clipboardModus = Modus.COPY;
-//                } catch (Exception exception) {
-//                    LOG.error("Beim Laden des Flaechen-ClipboardBackups ist etwas schiefgegangen", exception);
-//                }
-//            }
-//        });
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void deleteStoreFile() {
     }
 }
