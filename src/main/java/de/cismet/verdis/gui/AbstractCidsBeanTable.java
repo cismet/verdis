@@ -41,6 +41,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
 import de.cismet.cismap.commons.features.FeatureCollectionListener;
+import de.cismet.cismap.commons.features.PureNewFeature;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
@@ -77,7 +78,6 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     private final JXTable jxTable = new JXTable();
     private final CidsAppBackend.Mode modus;
     private final CidsBeanTableModel model;
-
     private CidsBeanStore selectedRowListener = null;
     private int newBeanId = 0;
 
@@ -265,33 +265,91 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
         if (CidsAppBackend.getInstance().getMode().equals(modus)) {
             getJXTable().getSelectionModel().removeListSelectionListener(this);
-            getJXTable().getSelectionModel().clearSelection();
 
             final Collection<Feature> selectedFeatures = CidsAppBackend.getInstance()
                         .getMainMap()
                         .getFeatureCollection()
                         .getSelectedFeatures(); // fce.getEventFeatures();
-            final Collection<Feature> selectedFlaechenFeatures = new ArrayList<Feature>();
 
-            for (final Feature selectedFeature : selectedFeatures) {
-                if (selectedFeature instanceof CidsFeature) {
-                    final int index = model.getIndexByCidsBean(((CidsFeature)selectedFeature).getMetaObject()
-                                    .getBean());
-                    final int viewIndex = getJXTable().convertRowIndexToView(index);
-                    getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
-                    selectedFlaechenFeatures.add(selectedFeature);
+            final Collection<Feature> selectedFeaturesWithoutPostgis = new ArrayList<Feature>();
+            for (final Feature feature : selectedFeatures) {
+                if ((feature instanceof CidsFeature) || (feature instanceof PureNewFeature)) {
+                    selectedFeaturesWithoutPostgis.add(feature);
                 }
             }
 
-            if (selectedFlaechenFeatures.size() == 1) {
-                final CidsFeature feature = (CidsFeature)selectedFlaechenFeatures.toArray()[0];
-                setDetailBean(feature.getMetaObject().getBean());
+            // do not change selection, if only one CidsBean is selected in the table, which has no feature
+            // and also if no feature or one feature, without a CidsBean, is selected in the map
+            if ((getJXTable().getSelectedRowCount() == 1)
+                        && (selectedFeaturesWithoutPostgis.isEmpty()
+                            || isSelectedFeatureNotBound(selectedFeaturesWithoutPostgis))) {
+                final int viewIndex = getJXTable().getSelectedRow();
+                final int modelIndex = getJXTable().convertRowIndexToModel(viewIndex);
+                final CidsBean cidsBean = model.getCidsBeanByIndex(modelIndex);
+                if (getGeometry(cidsBean) != null) {
+                    featureSelectionChanged_helper(selectedFeaturesWithoutPostgis);
+                } else {
+                    // do nothing, to keep the selection
+                }
             } else {
-                setDetailBean(null);
+                featureSelectionChanged_helper(selectedFeaturesWithoutPostgis);
             }
 
             getJXTable().getSelectionModel().addListSelectionListener(this);
             Main.getCurrentInstance().selectionChanged();
+        }
+    }
+
+    /**
+     * return true if only one feature is selected in the map, and if that feature is not bound to a CidsBean otherwise
+     * return false.
+     *
+     * @param   features  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isSelectedFeatureNotBound(final Collection<Feature> features) {
+        // check if only one feature
+        if (features.size() != 1) {
+            return false;
+        }
+
+        final Feature feature = (Feature)features.toArray()[0];
+
+        if (feature instanceof PureNewFeature) {
+            return true;
+        } else if ((feature instanceof CidsFeature) && (((CidsFeature)feature).getMetaObject().getBean() == null)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  selectedFeatures  DOCUMENT ME!
+     */
+    private void featureSelectionChanged_helper(final Collection<Feature> selectedFeatures) {
+        getJXTable().clearSelection();
+
+        for (final Feature selectedFeature : selectedFeatures) {
+            if (selectedFeature instanceof CidsFeature) {
+                final int index = model.getIndexByCidsBean(((CidsFeature)selectedFeature).getMetaObject().getBean());
+                final int viewIndex = getJXTable().convertRowIndexToView(index);
+                getJXTable().getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
+            }
+        }
+
+        if (selectedFeatures.size() == 1) {
+            final Feature selectedFeature = (Feature)selectedFeatures.toArray()[0];
+            if (selectedFeature instanceof CidsFeature) {
+                setDetailBean(((CidsFeature)selectedFeature).getMetaObject().getBean());
+            } else {
+                setDetailBean(null);
+            }
+        } else {
+            setDetailBean(null);
         }
     }
 

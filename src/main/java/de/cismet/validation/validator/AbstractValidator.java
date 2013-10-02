@@ -88,7 +88,7 @@ public abstract class AbstractValidator implements Validator {
             LOG.debug("fire state changed");
         }
         for (final ValidatorListener listener : this.listeners) {
-            listener.stateChanged(state);
+            listener.stateChanged(this, state);
         }
     }
 

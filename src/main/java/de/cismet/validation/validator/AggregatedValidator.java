@@ -87,7 +87,7 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
     }
 
     @Override
-    public void stateChanged(final ValidatorState state) {
+    public void stateChanged(final Validator source, final ValidatorState state) {
         validate();
     }
 

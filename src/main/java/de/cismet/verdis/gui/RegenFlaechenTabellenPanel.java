@@ -116,7 +116,10 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 }
             };
 
-        final Highlighter errorHighlighter = new ColorHighlighter(errorPredicate, Color.RED, Color.WHITE);
+        final Highlighter errorHighlighter = new ColorHighlighter(
+                errorPredicate,
+                Color.RED.brighter().brighter().brighter(),
+                Color.WHITE);
 
         final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
@@ -236,6 +239,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
+                                Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
                             } catch (Exception ex) {
                                 LOG.error("error while attaching feature", ex);
                             }
@@ -384,9 +388,6 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             flaechenartBean);
         flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG, getValidFlaechenname(art));
         final Calendar cal = Calendar.getInstance();
-        flaecheBean.setProperty(
-            FlaechePropertyConstants.PROP__DATUM_ERFASSUNG,
-            new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         flaecheBean.setProperty(
             FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG,

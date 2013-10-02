@@ -44,7 +44,6 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore {
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private String desc;
     private String gotoUrl;
-    private java.applet.AppletContext appletContext = null;
     private boolean deletable = false;
     private CidsBean dmsUrl;
 
@@ -70,11 +69,9 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore {
      * Setzt den Appletkontext.<br>
      * Wird dann benoetigt falls DocPanel in einem Applett benutzt wird
      *
-     * @param  appletContext  Appletkontext
+     * @return  DOCUMENT ME!
      */
-    public void setAplettContext(final java.applet.AppletContext appletContext) {
-        this.appletContext = appletContext;
-    }
+
     /**
      * Liefert das dargestellte Symbol zurueck.
      *
@@ -253,12 +250,7 @@ public class DocPanel extends javax.swing.JPanel implements CidsBeanStore {
         }
 
         try {
-            if (appletContext == null) {
-                de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
-            } else {
-                final java.net.URL u = new java.net.URL(gotoUrl);
-                appletContext.showDocument(u, "cismetDocPanelFrame");
-            }
+            de.cismet.tools.BrowserLauncher.openURL(gotoUrl);
         } catch (Exception e) {
             log.warn("Fehler beim Oeffnen von:" + gotoUrl + "\nNeuer Versuch", e);
             // Nochmal zur Sicherheit mit dem BrowserLauncher probieren

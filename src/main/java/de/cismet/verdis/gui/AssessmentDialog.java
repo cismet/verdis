@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+import javax.swing.WindowConstants;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.CidsAppBackend;
@@ -108,7 +110,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
         defaultBindableDateChooser1 = new de.cismet.cids.editors.DefaultBindableDateChooser();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(AssessmentDialog.class, "AssessmentDialog.title")); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
@@ -225,10 +227,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
         final javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
-                0,
-                21,
-                Short.MAX_VALUE));
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 4, Short.MAX_VALUE));
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(
                 0,
@@ -426,8 +425,8 @@ public class AssessmentDialog extends javax.swing.JDialog {
                     .append("         </thead>")
                     .append("         <tbody>");
             for (final String bezeichner : bezeichners) {
-                final double oldSumme = oldSchluesselSummeMap.get(bezeichner);
-                final double newSumme = newSchluesselSummeMap.get(bezeichner);
+                final double oldSumme = Math.round(oldSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
+                final double newSumme = Math.round(newSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
                 if ((oldSumme > 0) || (newSumme > 0)) {
                     teilZettelSB.append("            <tr>")
                             .append("               <td align=\"left\">")
