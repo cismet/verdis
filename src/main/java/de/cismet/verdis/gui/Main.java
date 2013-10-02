@@ -1086,7 +1086,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         aggValidator.addListener(new ValidatorListener() {
 
                 @Override
-                public void stateChanged(final ValidatorState state) {
+                public void stateChanged(final Validator source, final ValidatorState state) {
                     enableSave(!state.isError());
                 }
             });
@@ -4355,6 +4355,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 });
 
             try {
+                for (final CidsBean flaecheBean
+                            : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                    if ((flaecheBean != null)
+                                && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
+                                    || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
+                        flaecheBean.setProperty(
+                            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+                            new java.sql.Date(Calendar.getInstance().getTime().getTime()));
+                    }
+                }
+
                 setCidsBean(kassenzeichenBean.persist());
             } catch (final Exception e) {
                 LOG.error("error during persist", e);
@@ -4520,6 +4531,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public boolean persistAndReloadKassenzeichen() {
         try {
+            LOG.fatal(kassenzeichenBean.getMOString());
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
                 new Timestamp(new java.util.Date().getTime()));

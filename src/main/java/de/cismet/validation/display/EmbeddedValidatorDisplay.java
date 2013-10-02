@@ -105,13 +105,13 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
     @Override
     public void addValidator(final Validator validator) {
         this.aggValidator.add(validator);
-        stateChanged(validator.getState());
+        stateChanged(validator, validator.getState());
     }
 
     @Override
     public void removeValidator(final Validator validator) {
         this.aggValidator.remove(validator);
-        stateChanged(validator.getState());
+        stateChanged(validator, validator.getState());
     }
 
     @Override
@@ -120,7 +120,7 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
     }
 
     @Override
-    public final void stateChanged(final ValidatorState state) {
+    public final void stateChanged(final Validator source, final ValidatorState state) {
         refresh();
     }
 

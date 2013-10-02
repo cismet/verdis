@@ -164,8 +164,8 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
                                 + AnschlussgradPropertyConstants.PROP__GRAD_ABKUERZUNG);
             }
             case 6: {
-                // Erfassungsdatum
-                return DATE_FORMAT.format(cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_ERFASSUNG));
+                // Änderungsdatum
+                return DATE_FORMAT.format(cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG));
             }
             default: {
                 return null;

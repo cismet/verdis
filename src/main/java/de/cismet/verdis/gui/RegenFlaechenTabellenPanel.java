@@ -388,9 +388,6 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             flaechenartBean);
         flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG, getValidFlaechenname(art));
         final Calendar cal = Calendar.getInstance();
-        flaecheBean.setProperty(
-            FlaechePropertyConstants.PROP__DATUM_ERFASSUNG,
-            new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         flaecheBean.setProperty(
             FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG,

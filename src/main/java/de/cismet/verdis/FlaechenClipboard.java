@@ -109,7 +109,6 @@ public class FlaechenClipboard extends AbstractClipboard {
                             + "."
                             + FlaechenartPropertyConstants.PROP__ID)));
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_ERFASSUNG, new Date(cal.getTime().getTime()));
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
         pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));

@@ -54,9 +54,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import de.cismet.cids.custom.util.BindingValidationSupport;
-import de.cismet.cids.custom.util.CidsBeanSupport;
-
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
@@ -72,7 +69,6 @@ import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
@@ -98,7 +94,6 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTable jxtOverview;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -156,8 +151,6 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
         jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
-
-        BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -181,8 +174,6 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
-
         jScrollPane1 = new javax.swing.JScrollPane();
         jxtOverview = getJXTable();
 
@@ -191,30 +182,9 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         jxtOverview.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        final org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create(
-                "${cidsBean}");
-        final org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings
-                    .createJTableBinding(
-                        org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                        this,
-                        eLProperty,
-                        jxtOverview);
-        bindingGroup.addBinding(jTableBinding);
-        jTableBinding.bind();
-        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${selectedRow}"),
-                jxtOverview,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedElement"));
-        bindingGroup.addBinding(binding);
-
         jScrollPane1.setViewportView(jxtOverview);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
 
     /**

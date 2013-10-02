@@ -501,6 +501,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_klasse_or}"),
                 cboSR,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -605,6 +606,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_prio_or}"),
                 cboWD,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -768,6 +770,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_wd}"),
                 cboLageWD,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageWD.addActionListener(new java.awt.event.ActionListener() {
@@ -794,6 +797,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_sr}"),
                 cboLageSR,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageSR.addActionListener(new java.awt.event.ActionListener() {
