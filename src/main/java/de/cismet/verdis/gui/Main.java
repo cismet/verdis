@@ -1044,7 +1044,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 .addListener(
                     kartenPanel,
                     "selectionChanged",
-                    PSelectionEventHandler.SELECTION_CHANGED_NOTIFICATION,
+                    SelectionListener.SELECTION_CHANGED_NOTIFICATION,
+                    getMappingComponent().getInputListener(MappingComponent.SELECT));
+        PNotificationCenter.defaultCenter()
+                .addListener(
+                    kartenPanel,
+                    "doubleClickPerformed",
+                    SelectionListener.DOUBLECLICK_POINT_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.SELECT));
         PNotificationCenter.defaultCenter()
                 .addListener(
@@ -1457,6 +1463,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void appModeChanged() {
         // TODO : alter Kram abspeichern
@@ -1735,6 +1744,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  b  DOCUMENT ME!
+     */
     @Override
     public void setEnabled(final boolean b) {
         kassenzeichenPanel.setEnabled(b);
@@ -4032,24 +4046,46 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         SPLASH = null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  b  DOCUMENT ME!
+     */
     @Override
     public void setVisible(final boolean b) {
         if (!plugin) {
             super.setVisible(b);
         }
     }
-
-    // Methoden f\u00FCr die Plugin Schnittstelle
+    /**
+     * Methoden f\u00FCr die Plugin Schnittstelle.
+     *
+     * @param   str  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public PluginUI getUI(final String str) {
         return this;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   str  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public PluginMethod getMethod(final String str) {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  param  DOCUMENT ME!
+     */
     @Override
     public void setActive(final boolean param) {
         if (LOG.isDebugEnabled()) {
@@ -4091,6 +4127,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         allClipboardsDeleteStoreFile();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public java.util.Iterator getUIs() {
         final LinkedList ll = new LinkedList();
@@ -4098,62 +4139,115 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         return ll.iterator();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public PluginProperties getProperties() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public java.util.Iterator getMethods() {
         final LinkedList ll = new LinkedList();
         return ll.iterator();
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void shown() {
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void resized() {
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void moved() {
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void hidden() {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public java.util.Collection getMenus() {
         return menues;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public String getId() {
         return "verdis";
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public JComponent getComponent() {
         return panMain;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public java.util.Collection getButtons() {
         return Arrays.asList(this.tobVerdis.getComponents());
             // return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void floatingStopped() {
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void floatingStarted() {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public boolean changesPending() {
         if ((kassenzeichenBean == null) || !editmode) {
@@ -4280,6 +4374,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     .isEmpty());
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  b  DOCUMENT ME!
+     */
     @Override
     public void enableEditing(final boolean b) {
         CidsAppBackend.getInstance().setEditable(b);
@@ -4641,6 +4740,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         return userString;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
     @Override
     public void configure(final Element parent) {
         try {
@@ -4654,6 +4758,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Element getConfiguration() {
         try {
@@ -4666,6 +4775,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
     @Override
     public void masterConfigure(final Element parent) {
     }
@@ -4718,6 +4832,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         return banner;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void dispose() {
         try {
@@ -4773,6 +4890,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         Main.loggedIn = loggedIn;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;
@@ -4793,6 +4915,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         return aggVal;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
@@ -5164,6 +5291,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  collection  DOCUMENT ME!
+         */
         @Override
         protected void nodeSelectionChanged(final Collection collection) {
             final Thread t = new Thread() {
@@ -5230,6 +5362,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   name      DOCUMENT ME!
+         * @param   password  DOCUMENT ME!
+         * @param   server    DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         *
+         * @throws  Exception  DOCUMENT ME!
+         */
         @Override
         public boolean authenticate(final String name, final char[] password, final String server) throws Exception {
             System.setProperty("sun.rmi.transport.connectionTimeout", "15");
