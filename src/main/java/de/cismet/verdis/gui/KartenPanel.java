@@ -1286,6 +1286,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdMoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMoveHandleActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SELECT);
         mappingComp.setHandleInteractionMode(MappingComponent.MOVE_HANDLE);
     }                                                                                 //GEN-LAST:event_cmdMoveHandleActionPerformed
 
@@ -1295,6 +1296,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdAddHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddHandleActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SELECT);
         mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
     }                                                                                //GEN-LAST:event_cmdAddHandleActionPerformed
 
@@ -1304,6 +1306,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRemoveHandleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveHandleActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SELECT);
         mappingComp.setHandleInteractionMode(MappingComponent.REMOVE_HANDLE);
     }                                                                                   //GEN-LAST:event_cmdRemoveHandleActionPerformed
 
@@ -1313,6 +1316,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRotatePolygonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRotatePolygonActionPerformed
+        mappingComp.setInteractionMode(MappingComponent.SELECT);
         mappingComp.setHandleInteractionMode(MappingComponent.ROTATE_POLYGON);
     }                                                                                    //GEN-LAST:event_cmdRotatePolygonActionPerformed
 
