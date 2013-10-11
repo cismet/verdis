@@ -177,7 +177,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
                 for (final String key : veranlagungKeys) {
                     final double value = veranlagungHash.get(key);
                     if (value > 0) {
-                        veranlagungData.add(new String[] { key, value + " m²" });
+                        veranlagungData.add(new String[] { key, (int) value + " m²" });
                     }
                 }
 
