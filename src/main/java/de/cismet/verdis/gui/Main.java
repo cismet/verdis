@@ -4422,11 +4422,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         Map<String, Double> changedVeranlagungSummeMap;
         final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
         final Map<String, Double> oldVeranlagungSummeMap = veranlagungSummeMap;
-        fillVeranlagungSummeMap(newVeranlagungSummeMap);
+        fillVeranlagungMaps(newVeranlagungSummeMap);
 
         if (prefs.isVeranlagungOnlyForChangedValues()) {
             changedVeranlagungSummeMap = new HashMap<String, Double>();
-            for (final String bezeichner : veranlagungsgrundlageBezeichners) {
+            for (final String bezeichner : veranlagungBezeichners) {
                 if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
                     changedVeranlagungSummeMap.put(bezeichner, newVeranlagungSummeMap.get(bezeichner));
                 } else {
@@ -4450,11 +4450,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 true);
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
-        final Collection<String> veranlagungBezeichners = new ArrayList<String>();
-        veranlagungBezeichners.addAll(veranlagungsgrundlageBezeichners);
-        veranlagungBezeichners.addAll(strassenreinigungBezeichners);
-        veranlagungBezeichners.addAll(winterdienstBezeichners);
-        assessmentDialog.setBezeichners(veranlagungBezeichners);
+        final Collection<String> allBezeichners = new ArrayList<String>();
+        allBezeichners.addAll(veranlagungBezeichners);
+        allBezeichners.addAll(strassenreinigungBezeichners);
+        allBezeichners.addAll(winterdienstBezeichners);
+        assessmentDialog.setBezeichners(allBezeichners);
         assessmentDialog.setOldSchluesselSummeMap(oldVeranlagungSummeMap);
         assessmentDialog.setNewSchluesselSummeMap(newVeranlagungSummeMap);
         StaticSwingTools.showDialog(assessmentDialog, true);
