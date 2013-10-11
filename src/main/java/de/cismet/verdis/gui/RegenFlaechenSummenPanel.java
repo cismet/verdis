@@ -12,22 +12,14 @@
  */
 package de.cismet.verdis.gui;
 
-import com.ibm.icu.text.UTF16;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
-import javax.swing.DefaultRowSorter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -194,7 +186,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
                 for (final String key : anschlussgradKeys) {
                     final double value = anschlussgradHash.get(key);
                     if (value > 0) {
-                        anschlussgradData.add(new String[] { key, value + " m²" });
+                        anschlussgradData.add(new String[] { key, (int)value + " m²" });
                     }
                 }
 

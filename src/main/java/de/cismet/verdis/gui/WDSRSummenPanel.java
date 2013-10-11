@@ -180,7 +180,7 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
                     if (value > 0) {
                         final String[] keyArr = key.split(" - ");
 
-                        strasseData.add(new String[] { keyArr[0], keyArr[1], value + " m" });
+                        strasseData.add(new String[] { keyArr[0], keyArr[1], (int)value + " m" });
                     }
                 }
 
