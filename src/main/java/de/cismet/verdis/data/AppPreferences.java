@@ -57,6 +57,7 @@ public class AppPreferences {
     private int verdisCrossoverPort;
     private int lagisCrossoverPort;
     private double flurstueckBuffer = -0.5;
+    private boolean veranlagungOnlyForChangedValues = false;
 
     private String appbackenddomain = null;
     private String appbackendconnectionclass = null;
@@ -227,6 +228,15 @@ public class AppPreferences {
                     if (((Element)o).getAttribute("rw").getBooleanValue()) {
                         rwGroups.add(e.getText().toLowerCase());
                     }
+                }
+            }
+
+            try {
+                veranlagungOnlyForChangedValues = Boolean.parseBoolean(root.getChild("general").getAttribute(
+                            "veranlassungOnlyForChangedValues").getValue());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.fatal("Fehler beim parsen von veranlassungOnlyForChangedValues --> benutze default false", e);
                 }
             }
 
@@ -638,5 +648,23 @@ public class AppPreferences {
      */
     public String getAppbackendDomain() {
         return appbackenddomain;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isVeranlagungOnlyForChangedValues() {
+        return veranlagungOnlyForChangedValues;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
+     */
+    public void setVeranlagungOnlyForChangedValues(final boolean veranlagungOnlyForChangedValues) {
+        this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;
     }
 }

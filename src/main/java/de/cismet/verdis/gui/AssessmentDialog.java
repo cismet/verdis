@@ -55,6 +55,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
     private Collection<String> bezeichners;
     private Date datum = null;
     private Date veranlagungsdatum = null;
+    private boolean veranlagungOnlyForChangedValues;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdCancel;
@@ -77,12 +78,17 @@ public class AssessmentDialog extends javax.swing.JDialog {
     /**
      * Creates new form AssessmentDialog.
      *
-     * @param  parent  DOCUMENT ME!
-     * @param  modal   DOCUMENT ME!
+     * @param  parent                           DOCUMENT ME!
+     * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
+     * @param  modal                            DOCUMENT ME!
      */
-    public AssessmentDialog(final java.awt.Frame parent, final boolean modal) {
+    public AssessmentDialog(final java.awt.Frame parent,
+            final boolean veranlagungOnlyForChangedValues,
+            final boolean modal) {
         super(parent, modal);
         initComponents();
+
+        this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -425,9 +431,20 @@ public class AssessmentDialog extends javax.swing.JDialog {
                     .append("         </thead>")
                     .append("         <tbody>");
             for (final String bezeichner : bezeichners) {
-                final double oldSumme = Math.round(oldSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
-                final double newSumme = Math.round(newSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
-                if ((oldSumme > 0) || (newSumme > 0)) {
+                final double oldSumme;
+                final double newSumme;
+                if (oldSchluesselSummeMap.get(bezeichner) != null) {
+                    oldSumme = Math.round(oldSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
+                } else {
+                    oldSumme = 0.0d;
+                }
+                if (newSchluesselSummeMap.get(bezeichner) != null) {
+                    newSumme = Math.round(newSchluesselSummeMap.get(bezeichner) * 1000) / 1000;
+                } else {
+                    newSumme = 0.0d;
+                }
+                if (((oldSumme > 0.0d) || (newSumme > 0.0d))
+                            && (!veranlagungOnlyForChangedValues || ((oldSumme - newSumme) != 0.0d))) {
                     teilZettelSB.append("            <tr>")
                             .append("               <td align=\"left\">")
                             .append(bezeichner)
@@ -576,7 +593,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
 
                 @Override
                 public void run() {
-                    final AssessmentDialog dialog = new AssessmentDialog(new javax.swing.JFrame(), true);
+                    final AssessmentDialog dialog = new AssessmentDialog(new javax.swing.JFrame(), false, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                             @Override
