@@ -1276,7 +1276,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSnapActionPerformed
         mappingComp.setSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
-        mappingComp.setVisualizeSnappingRectEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
     }                                                                           //GEN-LAST:event_cmdSnapActionPerformed
 
