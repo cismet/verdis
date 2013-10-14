@@ -1381,8 +1381,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSplitPolyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSplitPolyActionPerformed
-        mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
         cmdMoveHandleActionPerformed(null);
+        mappingComp.setInteractionMode(MappingComponent.SPLIT_POLYGON);
     }                                                                                //GEN-LAST:event_cmdSplitPolyActionPerformed
 
     /**

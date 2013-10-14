@@ -5076,16 +5076,25 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
 
             final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
-            final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
-                    "veranlagungsschluessel");
+            float veranlagungsschluessel;
+            try {
+                veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
+                        "veranlagungsschluessel");
+            } catch (final Exception e) {
+                veranlagungsschluessel = 0;
+            }
             final String bezeichner = (String)veranlagungsgrundlageBean.getProperty("bezeichner");
 
-            final double groesse;
+            double groesse;
             if (anteil == null) {
-                groesse = (Integer)flaeche.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
-                                + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                try {
+                    groesse = (Integer)flaeche.getProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                } catch (final Exception e) {
+                    groesse = 0;
+                }
             } else {
                 groesse = anteil.doubleValue();
             }
@@ -5172,8 +5181,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            int laenge;
+            try {
+                laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            } catch (final Exception e) {
+                laenge = 0;
+            }
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
                     FrontPropertyConstants.PROP__FRONTINFO
@@ -5215,8 +5229,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            int laenge;
+            try {
+                laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            } catch (final Exception e) {
+                laenge = 0;
+            }
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
                     FrontPropertyConstants.PROP__FRONTINFO
@@ -5252,10 +5271,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
         for (final CidsBean front : fronten) {
-            final Integer laenge = (Integer)front.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            int laenge;
+            try {
+                laenge = (Integer)front.getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            } catch (final Exception e) {
+                laenge = 0;
+            }
 
             final CidsBean satzung_winterdienst = (CidsBean)front.getProperty(
                     FrontPropertyConstants.PROP__FRONTINFO
