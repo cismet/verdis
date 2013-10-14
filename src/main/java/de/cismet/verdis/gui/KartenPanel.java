@@ -2368,7 +2368,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     public void doubleClickPerformed(final PNotification notfication) {
         final Object o = notfication.getObject();
-        if (o instanceof SelectionListener) {
+        if ((o instanceof SelectionListener)
+                    && !mappingComp.getHandleInteractionMode().equals(MappingComponent.ADD_HANDLE)) {
             final SelectionListener selectionListener = (SelectionListener)o;
             final Geometry searchGeom = selectionListener.getDoubleclickPoint();
 
@@ -2429,33 +2430,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  notfication  DOCUMENT ME!
      */
     public void selectionChanged(final PNotification notfication) {
-        final Object o = notfication.getObject();
-        // ADD Handle requires a double click, which triggers this selection too
-        // => ignore the postgis feature selection when in add handle interaction mode
-        if ((mappingComp.getHandleInteractionMode() == null)
-                    ? (MappingComponent.ADD_HANDLE != null)
-                    : (!mappingComp.getHandleInteractionMode().equals(MappingComponent.ADD_HANDLE))) {
-            if ((o instanceof SelectionListener) || (o instanceof FeatureMoveListener)
-                        || (o instanceof SplitPolygonListener)) {
-                PFeature pf = null;
-                if (o instanceof SelectionListener) {
-                    pf = ((SelectionListener)o).getSelectedPFeature();
-                    if ((((SelectionListener)o).getClickCount() > 1) && (pf.getFeature() instanceof PostgisFeature)) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("SelectionchangedListener: clickCOunt:" + ((SelectionListener)o).getClickCount());
-                        }
-                        final PostgisFeature postgisFeature = ((PostgisFeature)pf.getFeature());
-                        try {
-                            if ((pf.getVisible() == true) && (pf.getParent().getVisible() == true)
-                                        && postgisFeature.getFeatureType().equalsIgnoreCase("KASSENZEICHEN")) {
-                            }
-                        } catch (Exception e) {
-                            LOG.info("Fehler beim gotoKassenzeichen", e);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**

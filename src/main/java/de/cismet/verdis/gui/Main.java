@@ -111,6 +111,8 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.rasterservice.MapService;
+import de.cismet.cismap.commons.retrieval.RetrievalEvent;
+import de.cismet.cismap.commons.retrieval.RetrievalListener;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
 import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
@@ -1102,7 +1104,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         aggValidator.add(regenFlaechenDetailsPanel.getValidator());
         aggValidator.add(wdsrFrontenDetailsPanel.getValidator());
 
-        setPostgisFlaechenSnappable(true);
+        setPostgisFeaturesSelectable(false);
 
         initGeomServerSearches();
 
@@ -1413,9 +1415,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  snappable  DOCUMENT ME!
+     * @param  selectable  DOCUMENT ME!
      */
-    private void setPostgisFlaechenSnappable(final boolean snappable) {
+    private void setPostgisFeaturesSelectable(final boolean selectable) {
         // falls neue dazu kommen
         mappingModel.addMappingModelListener(new MappingModelListener() {
 
@@ -1425,8 +1427,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                 @Override
                 public void mapServiceAdded(final MapService mapService) {
-                    if (checkForFlaechenFeatureService(mapService)) {
-                        setFeaturesSnappable(mapService, snappable);
+                    if (mapService instanceof ModeLayer) {
+                        setFeaturesSelectable((ModeLayer)mapService, selectable);
                     }
                 }
 
@@ -1435,10 +1437,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
             });
 
-        // für schon vorhandene
-        final AbstractFeatureService featureService = getFleachenFeatureService();
-        if (featureService != null) {
-            setFeaturesSnappable(featureService, snappable);
+        for (final MapService mapService : mappingModel.getMapServices().values()) {
+            if (mapService instanceof ModeLayer) {
+                setFeaturesSelectable((ModeLayer)mapService, selectable);
+            }
         }
     }
 
@@ -1446,20 +1448,39 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      *
      * @param  mapService  DOCUMENT ME!
-     * @param  snappable   DOCUMENT ME!
+     * @param  selectable  DOCUMENT ME!
      */
-    private static void setFeaturesSnappable(final MapService mapService, final boolean snappable) {
+    private static void setFeaturesSelectable(final ModeLayer mapService, final boolean selectable) {
         if (mapService != null) {
-            final PNode pNode = mapService.getPNode();
-            if (pNode != null) {
-                for (int index = 0; index < pNode.getChildrenCount(); index++) {
-                    final PNode child = pNode.getChild(index);
-                    if ((child != null) && (child instanceof PFeature)) {
-                        final PFeature pFeature = (PFeature)child;
-                        pFeature.setSnappable(snappable);
+            mapService.addRetrievalListener(new RetrievalListener() {
+
+                    @Override
+                    public void retrievalStarted(final RetrievalEvent e) {
                     }
-                }
-            }
+
+                    @Override
+                    public void retrievalProgress(final RetrievalEvent e) {
+                    }
+
+                    @Override
+                    public void retrievalComplete(final RetrievalEvent e) {
+                        if (mapService.getCurrentLayer() instanceof SimplePostgisFeatureService) {
+                            if (e.getRetrievedObject() != null) {
+                                for (final PostgisFeature feature : (Collection<PostgisFeature>)e.getRetrievedObject()) {
+                                    feature.setCanBeSelected(selectable);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void retrievalAborted(final RetrievalEvent e) {
+                    }
+
+                    @Override
+                    public void retrievalError(final RetrievalEvent e) {
+                    }
+                });
         }
     }
 
