@@ -217,10 +217,10 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtSperreBemerkung">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection component="Form" name="background" type="property"/>
             </Property>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
             </Property>
@@ -235,6 +235,7 @@
                 <Connection code="KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE" type="code"/>
               </Property>
             </BindingProperty>
+            <BindingProperty name="toolTipText" source="Form" sourcePath="${cidsBean.bemerkung_sperre}" target="txtSperreBemerkung" targetPath="toolTipText" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

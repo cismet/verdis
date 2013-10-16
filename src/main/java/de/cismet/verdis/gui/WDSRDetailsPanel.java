@@ -36,13 +36,19 @@ import edu.umd.cs.piccolo.PCanvas;
 
 import org.jdesktop.beansbinding.Converter;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
 
@@ -53,6 +59,8 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.tools.CismetThreadPool;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.validation.Validator;
 import de.cismet.validation.ValidatorHelper;
@@ -66,7 +74,9 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
@@ -76,7 +86,7 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
+public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener, HyperlinkListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -101,6 +111,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
 
     //~ Instance fields --------------------------------------------------------
 
+    private CidsBean lastStrasseBean = null;
+
     private CidsBean frontBean = null;
     private final Validator bindingValidator;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -112,11 +124,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private javax.swing.JComboBox cboStrasse;
     private javax.swing.JComboBox cboWD;
     private javax.swing.JComboBox cboWDFromLage;
+    private javax.swing.JEditorPane edtQuer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JLabel labLageSR;
     private javax.swing.JLabel labLageWD;
     private javax.swing.JLabel lblBemSR;
@@ -127,9 +142,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private javax.swing.JLabel lblLaengeKorr;
     private javax.swing.JLabel lblLastEditorDescr;
     private javax.swing.JLabel lblNummer;
+    private javax.swing.JLabel lblQuerverweise;
     private javax.swing.JLabel lblVeranlagungWD;
     private javax.swing.JScrollPane scpBemSR;
     private javax.swing.JScrollPane scpBemWD;
+    private javax.swing.JScrollPane scpQuer;
     private javax.swing.JTextField txtBearbeitetDurch;
     private javax.swing.JTextArea txtBemSR;
     private javax.swing.JTextArea txtBemWD;
@@ -240,6 +257,21 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     return this;
                 }
             });
+
+        cboStrasse.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    final CidsBean strasseBean = (CidsBean)cboStrasse.getSelectedItem();
+                    if ((strasseBean != null) && (frontBean != null)) {
+                        lastStrasseBean = strasseBean;
+                    }
+                }
+            });
+        StaticSwingTools.decorateWithFixedAutoCompleteDecorator(cboStrasse);
+        final JTextField txt = (JTextField)cboStrasse.getEditor().getEditorComponent();
+        txt.setOpaque(false);
+        edtQuer.addHyperlinkListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -322,6 +354,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         jLabel5 = new javax.swing.JLabel();
         cboWDFromLage = new javax.swing.JComboBox();
         cboSRFromLage = new javax.swing.JComboBox();
+        lblQuerverweise = new javax.swing.JLabel();
+        scpQuer = new javax.swing.JScrollPane();
+        edtQuer = new javax.swing.JEditorPane();
+        jSeparator3 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -344,7 +381,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.nummer}"),
                 txtNummer,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__NUMMER);
+                FrontPropertyConstants.PROP__NUMMER);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -370,10 +407,12 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.laenge_grafik}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.laenge_grafik}"),
                 txtLaengeGrafik,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -399,10 +438,12 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.laenge_korrektur}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.laenge_korrektur}"),
                 txtLaengeKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -428,7 +469,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.strasse}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.strasse}"),
                 cboStrasse,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         binding.setSourceNullValue(null);
@@ -457,9 +498,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sr_klasse_or}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_klasse_or}"),
                 cboSR,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -483,11 +525,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         txtBemSR.setColumns(20);
         txtBemSR.setLineWrap(true);
         txtBemSR.setRows(2);
+        txtBemSR.setMinimumSize(new java.awt.Dimension(240, 200));
+        txtBemSR.setPreferredSize(new java.awt.Dimension(21, 756));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sr_bem}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_bem}"),
                 txtBemSR,
                 org.jdesktop.beansbinding.BeanProperty.create("text"));
         binding.setSourceNullValue("");
@@ -502,7 +546,6 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanWdsrDetails.add(scpBemSR, gridBagConstraints);
 
@@ -529,11 +572,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         txtBemWD.setColumns(20);
         txtBemWD.setLineWrap(true);
         txtBemWD.setRows(2);
+        txtBemWD.setMinimumSize(new java.awt.Dimension(240, 200));
+        txtBemWD.setPreferredSize(new java.awt.Dimension(21, 756));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.wd_bem}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_bem}"),
                 txtBemWD,
                 org.jdesktop.beansbinding.BeanProperty.create("text"));
         binding.setSourceNullValue("");
@@ -548,7 +593,6 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.5;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanWdsrDetails.add(scpBemWD, gridBagConstraints);
 
@@ -559,9 +603,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.wd_prio_or}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_prio_or}"),
                 cboWD,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -597,7 +642,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bearbeitet_durch}"),
                 txtBearbeitetDurch,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                FrontPropertyConstants.PROP__BEARBEITET_DURCH);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -616,7 +662,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.erfassungsdatum}"),
                 txtErfassungsdatum,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM);
+                FrontPropertyConstants.PROP__ERFASSUNGSDATUM);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         binding.setConverter(new SqlDateToStringConverter());
@@ -643,7 +689,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sr_veranlagung}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_veranlagung}"),
                 txtVeranlagungSR,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
                 FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
@@ -672,7 +718,7 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.wd_veranlagung}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_veranlagung}"),
                 txtVeranlagungWD,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
                 FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
@@ -721,9 +767,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.lage_wd}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_wd}"),
                 cboLageWD,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageWD.addActionListener(new java.awt.event.ActionListener() {
@@ -747,9 +794,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.lage_sr}"),
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_sr}"),
                 cboLageSR,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageSR.addActionListener(new java.awt.event.ActionListener() {
@@ -810,6 +858,54 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         bpanWdsrDetails.add(cboSRFromLage, gridBagConstraints);
         cboSRFromLage.setVisible(false);
 
+        lblQuerverweise.setText(org.openide.util.NbBundle.getMessage(
+                WDSRDetailsPanel.class,
+                "WDSRDetailsPanel.lblQuerverweise.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
+        bpanWdsrDetails.add(lblQuerverweise, gridBagConstraints);
+
+        scpQuer.setOpaque(false);
+
+        edtQuer.setEditable(false);
+        edtQuer.setContentType(org.openide.util.NbBundle.getMessage(
+                WDSRDetailsPanel.class,
+                "WDSRDetailsPanel.edtQuer.contentType")); // NOI18N
+        edtQuer.setOpaque(false);
+        scpQuer.setViewportView(edtQuer);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
+        bpanWdsrDetails.add(scpQuer, gridBagConstraints);
+
+        jSeparator3.setMinimumSize(new java.awt.Dimension(0, 10));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanWdsrDetails.add(jSeparator3, gridBagConstraints);
+
+        jPanel1.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 0.01;
+        bpanWdsrDetails.add(jPanel1, gridBagConstraints);
+
         add(bpanWdsrDetails, java.awt.BorderLayout.CENTER);
 
         bindingGroup.bind();
@@ -823,7 +919,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
     private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
         CidsBean strasseBean = null;
         if (frontBean != null) {
-            strasseBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE);
+            strasseBean = (CidsBean)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__STRASSE);
         }
         if (strasseBean != null) {
             final int strasseId = (Integer)strasseBean.getProperty(StrassePropertyConstants.PROP__ID);
@@ -874,7 +971,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                             + "."
                             + fldSrKlasse
                             + ";",
-                    (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_SR)));
+                    (CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR)));
             CismetThreadPool.execute(new SatzungsComboModelWorker(
                     cboLageWD,
                     "SELECT "
@@ -912,7 +1012,10 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                             + "."
                             + fldWdPrio
                             + ";",
-                    (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_WD)));
+                    (CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_WD)));
         }
     } //GEN-LAST:event_cboStrasseActionPerformed
 
@@ -951,8 +1054,14 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Geometry getGeometry(final CidsBean frontBean) {
-        if ((frontBean != null) && (frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD);
+        if ((frontBean != null)
+                    && (frontBean.getProperty(
+                            FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
+            return (Geometry)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__GEOMETRIE + "."
+                            + GeomPropertyConstants.PROP__GEO_FIELD);
         } else {
             return null;
         }
@@ -968,14 +1077,22 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
         Main.transformToDefaultCrsNeeded(geom);
-        if (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) == null) {
+        if (
+            cidsBean.getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__GEOMETRIE)
+                    == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
                         .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
+            cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                        + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+                emptyGeoBean);
         }
-        cidsBean.setProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE__GEO_FIELD,
+        cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__GEOMETRIE
+                    + "." + GeomPropertyConstants.PROP__GEO_FIELD,
             geom);
     }
 
@@ -998,12 +1115,32 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
         bindingGroup.bind();
 
         try {
-            if ((cidsBean != null) && (cidsBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
+            if ((cidsBean != null)
+                        && (cidsBean.getMetaObject().getStatus() == MetaObject.NEW)
+                        && (cidsBean.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
+                cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__STRASSE,
+                    lastStrasseBean);
+            }
+
+            if ((cidsBean != null)
+                        && (cidsBean.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
                 bpanWdsrDetails.setBackgroundEnabled(true);
             } else {
                 bpanWdsrDetails.setBackgroundEnabled(false);
             }
-            if (cidsBean == null) {
+            if ((cidsBean == null)
+                        || (cidsBean.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__STRASSE) == null)) {
                 cboLageSR.setSelectedItem(null);
                 cboLageWD.setSelectedItem(null);
             }
@@ -1012,7 +1149,64 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             bpanWdsrDetails.setBackgroundEnabled(false);
         }
         updateLageDependendCbos();
+        updateCrossReferences();
         attachBeanValidators();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public synchronized void updateCrossReferences() {
+        if (frontBean != null) {
+            new SwingWorker<String, Void>() {
+
+                    @Override
+                    protected String doInBackground() throws Exception {
+                        final Collection crossReference = (Collection)CidsAppBackend.getInstance()
+                                    .getFrontenCrossReferencesFor(frontBean.getMetaObject().getID());
+
+                        if (crossReference != null) {
+                            String html = "<html><body><center>";
+                            for (final Object o : crossReference) {
+                                final String link = o.toString();
+                                html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
+                            }
+                            html += "</center></body></html>";
+                            return html;
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final String html = get();
+                            if (html != null) {
+                                lblQuerverweise.setVisible(true);
+                                edtQuer.setVisible(true);
+                                scpQuer.setVisible(true);
+                                edtQuer.setText(html);
+                                edtQuer.setCaretPosition(0);
+                            } else {
+                                edtQuer.setText("");
+                                lblQuerverweise.setVisible(false);
+                                edtQuer.setVisible(false);
+                                scpQuer.setVisible(false);
+                            }
+                        } catch (InterruptedException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } catch (ExecutionException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
+                }.execute();
+        } else {
+            edtQuer.setText("");
+            lblQuerverweise.setVisible(false);
+            edtQuer.setVisible(false);
+            scpQuer.setVisible(false);
+        }
     }
 
     /**
@@ -1020,7 +1214,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      */
     private void updateLageDependendCbos() {
         if (getCidsBean() != null) {
-            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_WD);
+            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
             if (lageWDBean != null) {
                 String wdname = "kein Winterdienst";
                 if (lageWDBean.getProperty("wd_prio") != null) {
@@ -1031,7 +1226,8 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
             cboWD.setVisible(lageWDBean == null);
             cboWDFromLage.setVisible(lageWDBean != null);
 
-            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
             if (lageSRBean != null) {
                 String srname = "keine Straßenreinigung";
                 if (lageSRBean.getProperty("sr_klasse") != null) {
@@ -1101,7 +1297,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorNummer(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__NUMMER) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__NUMMER) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1179,7 +1377,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorLaengeGrafik(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1189,7 +1391,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
                     final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
                     final Action action = new AbstractAction() {
 
@@ -1209,7 +1413,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                             try {
                                                 final int laenge_grafik = (int)Math.abs(geom.getLength());
                                                 cidsBean.setProperty(
-                                                    FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                                    FrontPropertyConstants.PROP__FRONTINFO
+                                                            + "."
+                                                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1247,7 +1453,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorLaengeKorrektur(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1257,9 +1467,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
                     final Integer laenge_korrektur = (Integer)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
                     final Action action = new AbstractAction() {
 
                             @Override
@@ -1277,9 +1491,13 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                                         if (answer == JOptionPane.YES_OPTION) {
                                             try {
                                                 final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                                                        FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                                                        FrontPropertyConstants.PROP__FRONTINFO
+                                                                + "."
+                                                                + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
                                                 cidsBean.setProperty(
-                                                    FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                                    FrontPropertyConstants.PROP__FRONTINFO
+                                                            + "."
+                                                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1317,7 +1535,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumErfassung(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__ERFASSUNGSDATUM) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__ERFASSUNGSDATUM) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1340,7 +1560,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorVeranlagungSR(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1350,7 +1574,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(
@@ -1375,7 +1601,11 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorVeranlagungWD(final CidsBean frontBean) {
-        return new CidsBeanValidator(frontBean, FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG) {
+        return new CidsBeanValidator(
+                frontBean,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1385,7 +1615,9 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(
@@ -1400,6 +1632,25 @@ public class WDSRDetailsPanel extends javax.swing.JPanel implements CidsBeanStor
                     return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
+    }
+
+    @Override
+    public void hyperlinkUpdate(final HyperlinkEvent he) {
+        final Thread t = new Thread() {
+
+                @Override
+                public void run() {
+                    if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        try {
+                            Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(he.getDescription());
+                        } catch (Exception ex) {
+                            LOG.error("Fehler im Hyperlinken", ex);
+                        }
+                    }
+                }
+            };
+        t.setPriority(Thread.NORM_PRIORITY);
+        t.start();
     }
 
     //~ Inner Classes ----------------------------------------------------------

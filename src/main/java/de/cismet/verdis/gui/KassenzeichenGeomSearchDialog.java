@@ -18,6 +18,8 @@ import java.util.Collection;
 
 import javax.swing.DefaultListModel;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
@@ -65,7 +67,6 @@ public class KassenzeichenGeomSearchDialog extends javax.swing.JDialog implement
     public static KassenzeichenGeomSearchDialog getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new KassenzeichenGeomSearchDialog(Main.getCurrentInstance(), false);
-            INSTANCE.setLocationRelativeTo(Main.getCurrentInstance());
         }
         return INSTANCE;
     }
@@ -82,7 +83,7 @@ public class KassenzeichenGeomSearchDialog extends javax.swing.JDialog implement
 
             jProgressBar1.setVisible(true);
             jButton1.setVisible(false);
-            setVisible(true);
+            StaticSwingTools.showDialog(this);
         } else if (evt.getPropertyName().equals(ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE)) {
             model.removeAllElements();
 

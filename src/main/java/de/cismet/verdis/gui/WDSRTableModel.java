@@ -23,11 +23,14 @@
  */
 package de.cismet.verdis.gui;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
+import Sirius.server.middleware.types.MetaObject;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -45,7 +48,6 @@ public class WDSRTableModel extends CidsBeanTableModel {
             "Straßenreinigung",
             "Winterdienst"
         };
-
     private static final Class[] COLUMN_CLASSES = {
             Integer.class,
             Float.class,
@@ -81,30 +83,53 @@ public class WDSRTableModel extends CidsBeanTableModel {
         }
         if (column == 0) {
             try {
-                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__NUMMER);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1;
             }
         } else if (column == 1) {
             try {
-                return (Integer)frontBean.getProperty(FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1f;
             }
         } else if (column == 2) {
             try {
-                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR__KEY);
-                return (o == null) ? "" : o.toString();
+                final CidsBean satzung_strassenreinigung = (CidsBean)frontBean.getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                final String srKey;
+                if (satzung_strassenreinigung == null) {
+                    srKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                                    + StrassenreinigungPropertyConstants.PROP__KEY);
+                } else {
+                    srKey = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
+                }
+                return (srKey == null) ? "" : srKey;
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
             }
         } else {
             try {
-                final Object o = frontBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR__KEY);
-                return (o == null) ? "" : o.toString();
+                final CidsBean satzung_winterdienst = (CidsBean)frontBean.getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_WD);
+                final String wdKey;
+                if (satzung_winterdienst == null) {
+                    wdKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
+                                    + WinterdienstPropertyConstants.PROP__KEY);
+                } else {
+                    wdKey = (String)satzung_winterdienst.getProperty("wd_prio.key");
+                }
+                return (wdKey == null) ? "" : wdKey;
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return "";
@@ -116,16 +141,52 @@ public class WDSRTableModel extends CidsBeanTableModel {
     public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
         final CidsBean deepclone = super.deepcloneBean(cidsBean);
         deepclone.setProperty(
-            FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
-            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
+            FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
         deepclone.setProperty(
-            FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
+            FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
         deepclone.setProperty(
-            FrontinfoPropertyConstants.PROP__STRASSE,
-            cidsBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
+            FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__STRASSE,
+            cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__STRASSE));
         // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
         // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
+
+        final CidsBean sr_klasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+        if (sr_klasse != null) {
+            sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
+
+        final CidsBean wd_prio = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
+        if (wd_prio != null) {
+            wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
+
+        final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__STRASSE);
+        if (strasse != null) {
+            strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
+        }
         return deepclone;
     }
 }
