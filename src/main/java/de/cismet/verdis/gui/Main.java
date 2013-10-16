@@ -770,8 +770,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             @Override
                             public void actionPerformed(final ActionEvent e) {
-                                formView.setLocationRelativeTo(Main.this);
-                                formView.setVisible(true);
+                                StaticSwingTools.showDialog(formView);
                             }
                         });
 
@@ -3355,9 +3354,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             dialog.setIconImage(new javax.swing.ImageIcon(
                     getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png")).getImage());
             dialog.setTitle("Flurstück in LagIS öffnen.");
-            dialog.setLocationRelativeTo(this);
             lcp.startSearch();
-            dialog.setVisible(true);
+            StaticSwingTools.showDialog(dialog);
         } catch (Exception ex) {
             LOG.error("Crossover: Fehler im LagIS Crossover", ex);
             // ToDo Meldung an Benutzer
@@ -4330,7 +4328,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cal.add(Calendar.MONTH, 1);
         final Date datumVeranlagung = cal.getTime();
 
-        final AssessmentDialog assessmentDialog = new AssessmentDialog(this, true);
+        final AssessmentDialog assessmentDialog = new AssessmentDialog();
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
         final Collection<String> allBezeichners = new ArrayList<String>();
