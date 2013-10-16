@@ -23,11 +23,7 @@
  */
 package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
-import Sirius.server.middleware.types.MetaObject;
-
 import java.awt.Paint;
-
-import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
@@ -69,22 +65,7 @@ public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
         } catch (Exception e) {
             LOG.error("error during getting the flaechenart", e);
         }
-        boolean markedForDeletion = false;
-        try {
-            final CidsBean geomBean = (CidsBean)cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE);
-            markedForDeletion = geomBean.getMetaObject().getStatus() == MetaObject.TO_DELETE;
-        } catch (Exception e) {
-            LOG.error("error during markedForDeletionCheck", e);
-        }
-        int alpha = 0;
-        if (markedForDeletion) {
-            alpha = 100;
-        } else {
-            alpha = 255;
-        }
+        final int alpha = 255;
         switch (art) {
             case Main.PROPVAL_ART_DACH: {
                 return new java.awt.Color(162, 76, 41, alpha);

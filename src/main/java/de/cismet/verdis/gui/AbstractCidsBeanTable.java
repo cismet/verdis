@@ -68,6 +68,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(AbstractCidsBeanTable.class);
+    private static int NEW_BEAN_ID = 0;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -79,7 +80,6 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     private final CidsAppBackend.Mode modus;
     private final CidsBeanTableModel model;
     private CidsBeanStore selectedRowListener = null;
-    private int newBeanId = 0;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -110,8 +110,8 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
      *
      * @return  DOCUMENT ME!
      */
-    public int getNextNewBeanId() {
-        return --newBeanId;
+    public static int getNextNewBeanId() {
+        return --NEW_BEAN_ID;
     }
 
     @Override

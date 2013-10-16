@@ -2480,6 +2480,12 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     } catch (Exception ex) {
                         LOG.error("error while removing geometry", ex);
                     }
+
+                    try {
+                        CidsAppBackend.getInstance().setLastSplitFlaecheId(cb.getMetaObject().getId());
+                    } catch (final Exception ex) {
+                        LOG.error("error while saving last FlaecheQuerverweise", ex);
+                    }
                 }
                 final Feature[] f_arr = pf.split();
                 if (f_arr != null) {

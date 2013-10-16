@@ -4504,7 +4504,90 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                 }
 
+                final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
+                            .getFlaecheToKassenzeichenQuerverweisMap();
+
+                // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
+                // soll einen Querverweis im Kassenzeichen y anlegen
+                final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
+                for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
+                    final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
+                            unsavedFlaecheBean);
+                    bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
+                }
+
                 setCidsBean(kassenzeichenBean.persist());
+
+                // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
+                // doppelt geladen und  gespeichert werden
+                final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
+                for (final Integer zielKassenzeichennummer : flaecheToKassenzeichenQuerverweisMap.values()) {
+                    if (!kassenzeichenNummerToKassenzeichenMap.containsKey(zielKassenzeichennummer)) {
+                        final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
+                                    .loadKassenzeichenByNummer(zielKassenzeichennummer);
+                        kassenzeichenNummerToKassenzeichenMap.put(
+                            zielKassenzeichennummer,
+                            querverweisZielKassenzeichen);
+                    }
+                }
+
+                final Collection<CidsBean> savedFlaechen = (Collection<CidsBean>)
+                    kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                for (final CidsBean savedFlaeche : savedFlaechen) {
+                    final String flaechenBezeichnung = (String)savedFlaeche.getProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+
+                    // in der Map schauen ob für die abgespeicherte Flaechen ein Querverweis erzeugt werden soll
+                    if (bezeichnungToKassenzeichennummerMap.containsKey(flaechenBezeichnung)) {
+                        final int zielKassenzeichennummer = bezeichnungToKassenzeichennummerMap.get(
+                                flaechenBezeichnung);
+
+                        // in welches Kassenzeichen soll der Querverweis erzeugt werden
+                        final CidsBean querverweisKassenzeichenBean = kassenzeichenNummerToKassenzeichenMap.get(
+                                zielKassenzeichennummer);
+                        if (querverweisKassenzeichenBean != null) {
+                            final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
+                                querverweisKassenzeichenBean.getBeanCollectionProperty(
+                                    KassenzeichenPropertyConstants.PROP__FLAECHEN);
+
+                            // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
+                            final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
+                            final CidsBean querverweisFlaecheBean = RegenFlaechenTabellenPanel.createNewFlaecheBean(
+                                    flaechenartBean,
+                                    flaechenOfQuerverweisKassenzeichen,
+                                    null);
+
+                            // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
+                            querverweisFlaecheBean.setProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO,
+                                savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
+
+                            flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
+                        } else {
+                            LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                        }
+                    }
+                }
+
+                // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
+                for (final CidsBean querverweisKassenzeichenBean : kassenzeichenNummerToKassenzeichenMap.values()) {
+                    try {
+                        querverweisKassenzeichenBean.persist();
+                    } finally {
+                        CidsAppBackend.getInstance().releaseLock();
+                        // TODO unlock
+                    }
+                }
+
+                // querverweise wurden angelegt, map muss leer gemacht werden
+                // damit beim nächsten Speichern nicht nochmal die selben
+                // Querverweise angelegt werden
+                flaecheToKassenzeichenQuerverweisMap.clear();
             } catch (final Exception e) {
                 LOG.error("error during persist", e);
                 try {
@@ -4669,7 +4752,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public boolean persistAndReloadKassenzeichen() {
         try {
-            LOG.fatal(kassenzeichenBean.getMOString());
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
                 new Timestamp(new java.util.Date().getTime()));

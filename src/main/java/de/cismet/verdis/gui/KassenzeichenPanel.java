@@ -799,7 +799,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             flaechenBez = "";
         }
 
-        if ((mainApp.changesPending() == false)) {
+        if (!Main.getCurrentInstance().isInEditMode()) {
             mainApp.disableKassenzeichenCmds();
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);

@@ -29,6 +29,7 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
+import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
@@ -119,7 +120,7 @@ public class CidsAppBackend implements CidsBeanStore {
 
     //~ Instance fields --------------------------------------------------------
 
-    private CidsBean sperreBean = null;
+    private Map<Integer, CidsBean> sperreBeanMap = new HashMap<Integer, CidsBean>();
 
     private final MultiMap flaechenCrossReferences = new MultiMap();
     private final MultiMap frontenCrossReferences = new MultiMap();
@@ -134,6 +135,8 @@ public class CidsAppBackend implements CidsBeanStore {
     private Frame frameToDisplayDialogs = null;
     private MappingComponent mainMap = null;
     private Mode mode = null;
+    private int lastSplitFlaecheId = -1;
+    private Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -477,9 +480,13 @@ public class CidsAppBackend implements CidsBeanStore {
                         final Collection collection = get();
                         for (final Object row : collection) {
                             final Object[] fields = ((Collection)row).toArray();
-                            // synchronized (kassenzeichenChangedBlocker) {
-                            flaechenCrossReferences.put(fields[1], fields[3] + ":" + fields[4]);
-                            // }
+                            final FlaecheCrossreference flaechenCrossReference = new FlaecheCrossreference((Integer)
+                                    fields[0],
+                                    (Integer)fields[1],
+                                    (String)fields[2],
+                                    (Integer)fields[3],
+                                    (String)fields[4]);
+                            flaechenCrossReferences.put((Integer)fields[1], flaechenCrossReference);
                         }
                         Main.getCurrentInstance().getRegenFlaechenDetailsPanel().updateCrossReferences();
                     } catch (Exception ex) {
@@ -492,12 +499,12 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenNummer  DOCUMENT ME!
+     * @param   flaechenId  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public Collection<String> getFlaechenCrossReferencesFor(final int kassenzeichenNummer) {
-        return (Collection<String>)flaechenCrossReferences.get(kassenzeichenNummer);
+    public Collection<FlaecheCrossreference> getFlaechenCrossReferencesFor(final int flaechenId) {
+        return (Collection<FlaecheCrossreference>)flaechenCrossReferences.get((Integer)flaechenId);
     }
 
     /**
@@ -711,22 +718,87 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
+     * @param   stringArray  DOCUMENT ME!
+     * @param   delimiter    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static String implode(final Object[] stringArray, final String delimiter) {
+        if (stringArray.length == 0) {
+            return "";
+        } else {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(stringArray[0]);
+            for (int index = 1; index < stringArray.length; index++) {
+                sb.append(delimiter);
+                sb.append(stringArray[index]);
+            }
+            return sb.toString();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   kassenzeichenBean  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean acquireLock(final CidsBean kassenzeichenBean) {
         try {
-            if ((kassenzeichenBean != null) && (sperreBean == null)) {
+            if (kassenzeichenBean != null) {
+                // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
+                // doppelt geladen und  gespeichert werden
+                final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
+                for (final Collection<FlaecheCrossreference> flaechenCrossReferenceList
+                            : (Collection<Collection<FlaecheCrossreference>>)flaechenCrossReferences.values()) {
+                    for (final FlaecheCrossreference flaechenCrossReference
+                                : (Collection<FlaecheCrossreference>)flaechenCrossReferenceList) {
+                        final Integer kassenzeichennummer = flaechenCrossReference.getFlaecheToKassenzeichen();
+                        if (!kassenzeichenNummerToKassenzeichenMap.containsKey(kassenzeichennummer)) {
+                            try {
+                                final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
+                                            .loadKassenzeichenByNummer(kassenzeichennummer);
+                                kassenzeichenNummerToKassenzeichenMap.put(
+                                    kassenzeichennummer,
+                                    querverweisZielKassenzeichen);
+                            } catch (final Exception ex) {
+                                JOptionPane.showMessageDialog(
+                                    Main.getCurrentInstance(),
+                                    "Es ist ein Querverweis auf das Kassenzeichen "
+                                            + kassenzeichennummer
+                                            + " vorhanden, dessen Sperren nicht überprüft werden konnte.",
+                                    "Kein Editieren möglich",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                                log.error("error while loading toLockKassenzeichen:" + kassenzeichennummer, ex);
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                // gesperrt werden sollen das eigentliche Kassenzeichen UND alle
+                // Kassenzeichen mit einem Querverweis zu diesem.
+                final Collection<CidsBean> kassenzeichenListToLock = new ArrayList<CidsBean>();
+                kassenzeichenListToLock.add(kassenzeichenBean);
+                kassenzeichenListToLock.addAll(kassenzeichenNummerToKassenzeichenMap.values());
+
+                final Collection<Integer> kassenzeichenIds = new ArrayList<Integer>();
+                for (final CidsBean kassenzeichenToLock : kassenzeichenListToLock) {
+                    kassenzeichenIds.add((Integer)kassenzeichenToLock.getProperty(
+                            KassenzeichenPropertyConstants.PROP__ID));
+                }
+
+                final String idInString = implode(kassenzeichenIds.toArray(new Integer[0]), ", ");
                 final MetaObject[] oldSperren = getMetaObject("SELECT " + getVerdisMetaClass("sperre").getId()
-                                + ", id FROM sperre WHERE fk_kassenzeichen = '"
-                                + kassenzeichenBean.getProperty("id") + "'",
+                                + ", id FROM sperre WHERE fk_kassenzeichen IN (" + idInString + ")",
                         DOMAIN);
 
                 if ((oldSperren != null) && (oldSperren.length > 0)) {
                     final CidsBean oldSperreBean = oldSperren[0].getBean();
                     final String benutzerkonto = (String)oldSperreBean.getProperty("benutzerkonto");
-                    log.info("Sperre für Kassenzeichen " + kassenzeichenBean.getProperty("id")
+                    log.info("Sperre für Kassenzeichen "
+                                + kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__ID)
                                 + " bereitsvorhanden von Benutzer " + benutzerkonto);
                     JOptionPane.showMessageDialog(
                         Main.getCurrentInstance(),
@@ -737,19 +809,25 @@ public class CidsAppBackend implements CidsBeanStore {
                         JOptionPane.INFORMATION_MESSAGE);
                     return false;
                 } else {
-                    final CidsBean newSperre = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "sperre");
-                    newSperre.setProperty("fk_kassenzeichen", kassenzeichenBean);
-                    newSperre.setProperty("benutzerkonto", getAccountName());
-                    newSperre.setProperty("zeitstempel_timestamp", new Timestamp(new Date().getTime()));
-                    sperreBean = newSperre.persist();
-                    if (log.isDebugEnabled()) {
-                        log.debug("Sperre konnte erfolgreich angelegt werden");
+                    for (final CidsBean oneOfAllKz : kassenzeichenListToLock) {
+                        if (oneOfAllKz != null) {
+                            final Integer kassenzeichennummer = (Integer)oneOfAllKz.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                            final CidsBean newSperre = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "sperre");
+                            newSperre.setProperty("fk_kassenzeichen", oneOfAllKz);
+                            newSperre.setProperty("benutzerkonto", getAccountName());
+                            newSperre.setProperty("zeitstempel_timestamp", new Timestamp(new Date().getTime()));
+                            sperreBeanMap.put(kassenzeichennummer, newSperre.persist());
+                            if (log.isDebugEnabled()) {
+                                log.debug("Sperre konnte erfolgreich angelegt werden");
+                            }
+                        }
                     }
                     return true;
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Kassenzeichen ist null oder Sperre bereits vorhanden.");
+                    log.debug("Kassenzeichen ist null");
                 }
                 return false;
             }
@@ -765,23 +843,26 @@ public class CidsAppBackend implements CidsBeanStore {
      * @return  DOCUMENT ME!
      */
     public boolean releaseLock() {
-        try {
-            if (sperreBean != null) {
-                sperreBean.delete();
-                sperreBean.persist();
-                sperreBean = null;
-                if (log.isDebugEnabled()) {
-                    log.debug("Sperre konnte erfolgreich gelöst werden");
+        if (!sperreBeanMap.isEmpty()) {
+            boolean allOK = true;
+            for (final CidsBean sperreBean : sperreBeanMap.values()) {
+                try {
+                    sperreBean.delete();
+                    sperreBean.persist();
+                    if (log.isDebugEnabled()) {
+                        log.debug("Sperre konnte erfolgreich gelöst werden");
+                    }
+                } catch (Exception ex) {
+                    log.error("Fehler beim lösen der Sperre", ex);
+                    allOK = false;
                 }
-                return true;
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Sperre ist null");
-                }
-                return false;
             }
-        } catch (Exception ex) {
-            log.error("Fehler beim lösen der Sperre", ex);
+            sperreBeanMap.clear();
+            return allOK;
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Sperre ist null");
+            }
             return false;
         }
     }
@@ -907,5 +988,32 @@ public class CidsAppBackend implements CidsBeanStore {
             log.error(ex, ex);
         }
         return new MetaObject[0];
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getLastSplitFlaecheId() {
+        return lastSplitFlaecheId;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  lastSplitFlaecheId  DOCUMENT ME!
+     */
+    public void setLastSplitFlaecheId(final int lastSplitFlaecheId) {
+        this.lastSplitFlaecheId = lastSplitFlaecheId;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<CidsBean, Integer> getFlaecheToKassenzeichenQuerverweisMap() {
+        return flaecheToKassenzeichenQuerverweisMap;
     }
 }

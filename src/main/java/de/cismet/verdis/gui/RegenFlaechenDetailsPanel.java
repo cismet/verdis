@@ -37,9 +37,6 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
-import java.sql.Date;
-
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -64,11 +61,11 @@ import de.cismet.validation.*;
 
 import de.cismet.validation.display.EmbeddedValidatorDisplay;
 
-import de.cismet.validation.validator.BindingValidator;
 import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+import de.cismet.verdis.FlaecheCrossreference;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
@@ -825,13 +822,14 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
                     @Override
                     protected String doInBackground() throws Exception {
-                        final Collection crossReference = (Collection)CidsAppBackend.getInstance()
+                        final Collection<FlaecheCrossreference> crossReference = CidsAppBackend.getInstance()
                                     .getFlaechenCrossReferencesFor(flaecheBean.getMetaObject().getID());
 
                         if (crossReference != null) {
                             String html = "<html><body><center>";
-                            for (final Object o : crossReference) {
-                                final String link = o.toString();
+                            for (final FlaecheCrossreference crossreference : crossReference) {
+                                final String link = crossreference.getFlaecheToKassenzeichen() + ":"
+                                            + crossreference.getFlaecheToBezeichnung();
                                 html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
                             }
                             html += "</center></body></html>";
