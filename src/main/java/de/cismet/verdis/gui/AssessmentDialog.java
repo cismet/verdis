@@ -19,9 +19,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
@@ -78,14 +81,10 @@ public class AssessmentDialog extends javax.swing.JDialog {
     /**
      * Creates new form AssessmentDialog.
      *
-     * @param  parent                           DOCUMENT ME!
      * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
-     * @param  modal                            DOCUMENT ME!
      */
-    public AssessmentDialog(final java.awt.Frame parent,
-            final boolean veranlagungOnlyForChangedValues,
-            final boolean modal) {
-        super(parent, modal);
+    public AssessmentDialog(final boolean veranlagungOnlyForChangedValues) {
+        super(Main.getCurrentInstance(), true);
         initComponents();
 
         this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;
@@ -498,48 +497,48 @@ public class AssessmentDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
         returnType = RETURN_CANCEL;
         dispose();
-    }                                                                             //GEN-LAST:event_cmdCancelActionPerformed
+    }//GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWithoutAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithoutAssessementActionPerformed
+    private void cmdWithoutAssessementActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWithoutAssessementActionPerformed
         returnType = RETURN_WITHOUT_ASSESSEMENT;
         dispose();
-    }                                                                                         //GEN-LAST:event_cmdWithoutAssessementActionPerformed
+    }//GEN-LAST:event_cmdWithoutAssessementActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWithAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithAssessementActionPerformed
+    private void cmdWithAssessementActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWithAssessementActionPerformed
         returnType = RETURN_WITH_ASSESSEMENT;
         dispose();
-    }                                                                                      //GEN-LAST:event_cmdWithAssessementActionPerformed
+    }//GEN-LAST:event_cmdWithAssessementActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void defaultBindableDateChooser1PropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_defaultBindableDateChooser1PropertyChange
-    }                                                                                                  //GEN-LAST:event_defaultBindableDateChooser1PropertyChange
+    private void defaultBindableDateChooser1PropertyChange(final java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_defaultBindableDateChooser1PropertyChange
+    }//GEN-LAST:event_defaultBindableDateChooser1PropertyChange
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void defaultBindableDateChooser1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_defaultBindableDateChooser1ActionPerformed
+    private void defaultBindableDateChooser1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultBindableDateChooser1ActionPerformed
         veranlagungsdatum = defaultBindableDateChooser1.getDate();
         refreshZettel();
-    }                                                                                               //GEN-LAST:event_defaultBindableDateChooser1ActionPerformed
+    }//GEN-LAST:event_defaultBindableDateChooser1ActionPerformed
 
     @Override
     public void setVisible(final boolean b) {
@@ -553,56 +552,5 @@ public class AssessmentDialog extends javax.swing.JDialog {
     private void refreshZettel() {
         lblVeranlagungszettel.setText(createZettelHtml(CidsAppBackend.getInstance().getCidsBean()));
         jScrollPane2.revalidate();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  args  the command line arguments
-     */
-    public static void main(final String[] args) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (final javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AssessmentDialog.class.getName())
-                    .log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AssessmentDialog.class.getName())
-                    .log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AssessmentDialog.class.getName())
-                    .log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AssessmentDialog.class.getName())
-                    .log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    final AssessmentDialog dialog = new AssessmentDialog(new javax.swing.JFrame(), false, true);
-                    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                            @Override
-                            public void windowClosing(final java.awt.event.WindowEvent e) {
-                                System.exit(0);
-                            }
-                        });
-                    dialog.setVisible(true);
-                }
-            });
     }
 }
