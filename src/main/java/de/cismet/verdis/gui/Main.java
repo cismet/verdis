@@ -1488,31 +1488,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     @Override
     public void appModeChanged() {
-//        if (currentMode != null) {
-//            saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
-//            saveConfig(FILEPATH_MAP + "." + currentMode.name());
-//        }
-//
-//        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-//        if (mode.equals(mode.ALLGEMEIN)) {
-//            setupLayoutInfo();
-//        } else if (mode.equals(mode.ESW)) {
-//            setupLayoutWDSR();
-//        } else if (mode.equals(mode.REGEN)) {
-//            setupLayoutRegen();
-//        }
-//        currentMode = mode;
-//        setupMap(currentMode);
-//
-//        refreshClipboardButtons();
-//        refreshClipboardButtonsToolTipText();
-//        refreshItemButtons();
-//        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
-//                    .getModeLayer("verdisAppModeLayer");
-//        if (ml != null) {
-//            ml.forceMode(currentMode.toString());
-//        }
-
         new SwingWorker<Void, Void>() {
 
                 @Override
