@@ -39,10 +39,8 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
-import edu.umd.cs.piccolox.event.PSelectionEventHandler;
 
 import net.infonode.docking.*;
 import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
@@ -219,9 +217,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 + ((DIRECTORYEXTENSION != null) ? DIRECTORYEXTENSION : "");
     private static final String FILE_LAYOUT = "verdis.layout";
     private static final String FILE_SCREEN = "verdis.screen";
+    private static final String FILE_MAP = "verdis.map";
     private static final String FILE_PLUGINLAYOUT = "plugin.layout";
     private static final String DIRECTORYPATH_VERDIS = DIRECTORYPATH_HOME + FILESEPARATOR + DIRECTORY_VERDISHOME;
     private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
+    private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
     private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
     private static Main THIS;
@@ -590,7 +590,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             // ClearLookManager.setMode(ClearLookMode.ON);
             // PlasticLookAndFeel.setMyCurrentTheme(new DesertBlue());
             try {
-                // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()) ;
+                // UIManager.setLookAndFeel(UIManager.getSysaptemLookAndFeelClassName()) ;
                 javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
                 // javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
                 // javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.PlasticXPLookAndFeel());
@@ -1488,28 +1488,89 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     @Override
     public void appModeChanged() {
-        // TODO : alter Kram abspeichern
-        if (currentMode != null) {
-            saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
-        }
+        new SwingWorker<Void, Void>() {
 
-        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(mode.ALLGEMEIN)) {
-            setupLayoutInfo();
-        } else if (mode.equals(mode.ESW)) {
-            setupLayoutWDSR();
-        } else if (mode.equals(mode.REGEN)) {
-            setupLayoutRegen();
-        }
-        currentMode = mode;
+                @Override
+                protected Void doInBackground() throws Exception {
+                    EventQueue.invokeLater(new Runnable() {
 
-        refreshClipboardButtons();
-        refreshClipboardButtonsToolTipText();
-        refreshItemButtons();
-        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
-                    .getModeLayer("verdisAppModeLayer");
-        if (ml != null) {
-            ml.forceMode(mode.toString());
+                            @Override
+                            public void run() {
+                                setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                            }
+                        });
+
+                    if (currentMode != null) {
+                        saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
+                        saveConfig(FILEPATH_MAP + "." + currentMode.name());
+                    }
+
+                    final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+                    if (mode.equals(mode.ALLGEMEIN)) {
+                        EventQueue.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    setupLayoutInfo();
+                                }
+                            });
+                    } else if (mode.equals(mode.ESW)) {
+                        EventQueue.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    setupLayoutWDSR();
+                                }
+                            });
+                    } else if (mode.equals(mode.REGEN)) {
+                        EventQueue.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    setupLayoutRegen();
+                                }
+                            });
+                    }
+                    currentMode = mode;
+                    setupMap(currentMode);
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        refreshClipboardButtons();
+                        refreshClipboardButtonsToolTipText();
+                        refreshItemButtons();
+                        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
+                                    .getModeLayer("verdisAppModeLayer");
+                        if (ml != null) {
+                            ml.forceMode(currentMode.toString());
+                        }
+                        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            }.execute();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  appMode  DOCUMENT ME!
+     */
+    public void setupMap(final CidsAppBackend.Mode appMode) {
+        final String fileName = FILEPATH_MAP + "." + appMode.name();
+        try {
+            mappingModel.removeAllLayers();
+            getMappingComponent().getRasterServiceLayer().removeAllChildren();
+            configurationManager.configure(getMappingComponent(), fileName);
+            configurationManager.configure(mappingModel, fileName);
+        } catch (Exception e) {
+            LOG.info("Problem beim Lesen des MapFiles " + fileName);
         }
     }
 
@@ -2625,6 +2686,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichenActionPerformed
         showOrHideView(vKassenzeichen);
     }                                                                                    //GEN-LAST:event_mniKassenzeichenActionPerformed
+
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
@@ -2740,6 +2802,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  file  DOCUMENT ME!
+     */
+    public void saveConfig(final String file) {
+        configurationManager.writeConfiguration(file);
+    }
 
     /**
      * DOCUMENT ME!
@@ -3375,6 +3446,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTest2ActionPerformed
     }                                                                            //GEN-LAST:event_cmdTest2ActionPerformed
+
     /**
      * ToDo Threading and Progressbar.
      *
@@ -4076,6 +4148,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             super.setVisible(b);
         }
     }
+
     /**
      * Methoden f\u00FCr die Plugin Schnittstelle.
      *
@@ -4974,7 +5047,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // Inserting Docking Window functionalty (Sebastian) 24.07.07
         configurationManager.writeConfiguration();
         saveLayout(FILEPATH_LAYOUT + "." + currentMode);
-
+        saveConfig(FILEPATH_MAP + "." + currentMode);
         allClipboardsDeleteStoreFile();
         System.exit(0);
     }
