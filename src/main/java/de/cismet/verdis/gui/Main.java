@@ -1484,15 +1484,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         }
 
-        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(mode.ALLGEMEIN)) {
-            setupLayoutInfo();
-        } else if (mode.equals(mode.ESW)) {
-            setupLayoutWDSR();
-        } else if (mode.equals(mode.REGEN)) {
-            setupLayoutRegen();
-        }
-        currentMode = mode;
+                @Override
+                protected Void doInBackground() throws Exception {
+                    EventQueue.invokeLater(new Runnable() {
 
         setupMap(currentMode);
         refreshClipboardButtons();
@@ -2761,6 +2755,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      *
      * @param file DOCUMENT ME!
+     */
+    public void saveConfig(final String file) {
+        configurationManager.writeConfiguration(file);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  file  DOCUMENT ME!
      */
     public void saveLayout(final String file) {
         if (LOG.isDebugEnabled()) {
