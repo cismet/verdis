@@ -497,48 +497,48 @@ public class AssessmentDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
         returnType = RETURN_CANCEL;
         dispose();
-    }//GEN-LAST:event_cmdCancelActionPerformed
+    }                                                                             //GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWithoutAssessementActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWithoutAssessementActionPerformed
+    private void cmdWithoutAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithoutAssessementActionPerformed
         returnType = RETURN_WITHOUT_ASSESSEMENT;
         dispose();
-    }//GEN-LAST:event_cmdWithoutAssessementActionPerformed
+    }                                                                                         //GEN-LAST:event_cmdWithoutAssessementActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdWithAssessementActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWithAssessementActionPerformed
+    private void cmdWithAssessementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWithAssessementActionPerformed
         returnType = RETURN_WITH_ASSESSEMENT;
         dispose();
-    }//GEN-LAST:event_cmdWithAssessementActionPerformed
+    }                                                                                      //GEN-LAST:event_cmdWithAssessementActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void defaultBindableDateChooser1PropertyChange(final java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_defaultBindableDateChooser1PropertyChange
-    }//GEN-LAST:event_defaultBindableDateChooser1PropertyChange
+    private void defaultBindableDateChooser1PropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_defaultBindableDateChooser1PropertyChange
+    }                                                                                                  //GEN-LAST:event_defaultBindableDateChooser1PropertyChange
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void defaultBindableDateChooser1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultBindableDateChooser1ActionPerformed
+    private void defaultBindableDateChooser1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_defaultBindableDateChooser1ActionPerformed
         veranlagungsdatum = defaultBindableDateChooser1.getDate();
         refreshZettel();
-    }//GEN-LAST:event_defaultBindableDateChooser1ActionPerformed
+    }                                                                                               //GEN-LAST:event_defaultBindableDateChooser1ActionPerformed
 
     @Override
     public void setVisible(final boolean b) {
