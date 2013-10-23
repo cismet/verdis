@@ -3425,10 +3425,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             }
                         }.execute();
                 } else if (answer == JOptionPane.NO_OPTION) {
+                    enableEditing(false);
                     kassenzeichenPanel.refresh();
                     renameKZ();
                 }
             } else {
+                enableEditing(false);
                 renameKZ();
             }
         }
