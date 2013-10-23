@@ -1504,69 +1504,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             ml.forceMode(mode.toString());
         }
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
-//        new SwingWorker<Void, Void>() {
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                EventQueue.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        setCursor(new Cursor(Cursor.WAIT_CURSOR));
-//                    }
-//                });
-//
-//                if (currentMode != null) {
-//                    saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
-//                    saveConfig(FILEPATH_MAP + "." + currentMode.name());
-//                }
-//
-//                final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-//                if (mode.equals(mode.ALLGEMEIN)) {
-//                    EventQueue.invokeLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setupLayoutInfo();
-//                        }
-//                    });
-//                } else if (mode.equals(mode.ESW)) {
-//                    EventQueue.invokeLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setupLayoutWDSR();
-//                        }
-//                    });
-//                } else if (mode.equals(mode.REGEN)) {
-//                    EventQueue.invokeLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setupLayoutRegen();
-//                        }
-//                    });
-//                }
-//                currentMode = mode;
-//
-//                return null;
-//            }
-//
-//            @Override
-//            protected void done() {
-//                try {
-//                    setupMap(currentMode);
-//                    refreshClipboardButtons();
-//                    refreshClipboardButtonsToolTipText();
-//                    refreshItemButtons();
-//                    final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
-//                            .getModeLayer("verdisAppModeLayer");
-//                    if (ml != null) {
-//                        ml.forceMode(currentMode.toString());
-//                    }
-//                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//                } catch (Exception e) {
-//                    LOG.error("Exception in Background Thread", e);
-//                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//                }
-//            }
-//        }.execute();
     }
 
     /**
