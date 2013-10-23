@@ -13,19 +13,12 @@ package de.cismet.cids.custom.reports.verdis;
 
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.swing.JFrame;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
@@ -34,11 +27,11 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
-public class FEBReportTester {
+public class EBReportTester {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger LOG = Logger.getLogger(FEBReportTester.class);
+    private static final Logger LOG = Logger.getLogger(EBReportTester.class);
 
     //~ Methods ----------------------------------------------------------------
 
@@ -56,8 +49,8 @@ public class FEBReportTester {
                 "SteinbacherD102",
                 "kif",
                 "kassenzeichen",
-//                74211);
-                41);
+                126638);
+//                41);
         final CidsBean[] beans = new CidsBean[1];
         beans[0] = kassenzeiechenBean;
         if (LOG.isDebugEnabled()) {
@@ -65,7 +58,10 @@ public class FEBReportTester {
         }
 //        final CidsBean[] reportBeans = new CidsBean[beans.length];
 
-        final FEPGeneratorDialog dialog = new FEPGeneratorDialog(kassenzeiechenBean, new JFrame());
+        final EBGeneratorDialog dialog = new EBGeneratorDialog(
+                kassenzeiechenBean,
+                new JFrame(),
+                EBGeneratorDialog.Mode.FRONTEN);
         dialog.show();
         System.out.println("alles fertich.ok");
     }

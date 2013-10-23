@@ -88,7 +88,7 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
-import de.cismet.cids.custom.reports.verdis.FEPGeneratorDialog;
+import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -3015,7 +3015,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
-            final FEPGeneratorDialog dialog = new FEPGeneratorDialog(kassenzeichenBean, this);
+            final EBGeneratorDialog.Mode ebMode;
+            if (CidsAppBackend.Mode.ESW.equals(CidsAppBackend.getInstance().getMode())) {
+                ebMode = EBGeneratorDialog.Mode.FRONTEN;
+            } else {
+                ebMode = EBGeneratorDialog.Mode.FLAECHEN;
+            }
+            final EBGeneratorDialog dialog = new EBGeneratorDialog(kassenzeichenBean, this, ebMode);
 
             SwingUtilities.invokeLater(new Runnable() {
 

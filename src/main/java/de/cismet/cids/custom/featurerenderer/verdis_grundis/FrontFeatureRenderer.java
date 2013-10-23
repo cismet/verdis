@@ -27,12 +27,15 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -45,29 +48,37 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
     //~ Instance fields --------------------------------------------------------
 
     OldFixedWidthStroke stroke = new OldFixedWidthStroke();
-    boolean wd = false;
     boolean sr = false;
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void assign() {
-        sr = cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR) != null;
-        wd = cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR) != null;
+        final CidsBean satzung_strassenreinigung = (CidsBean)cidsBean.getProperty(
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__LAGE_SR);
+        final String key;
+        if (satzung_strassenreinigung == null) {
+            key = (String)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
+                            + StrassenreinigungPropertyConstants.PROP__KEY);
+        } else {
+            key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
+        }
+
+        sr = key != null;
     }
 
     @Override
     public Paint getLinePaint() {
-        if (sr && wd) {
+        if (cidsBean != null) {
+            assign();
+        }
+        if (sr) {
             return Color.ORANGE;
-        } else if (sr) {
-            return Color.BLUE;
-        } else if (wd) {
-            return Color.YELLOW;
         } else {
-            return Color.RED;
+            return Color.GREEN.darker();
         }
     }
 
