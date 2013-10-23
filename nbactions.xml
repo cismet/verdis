@@ -12,7 +12,7 @@
         <properties>
             <jalopy.skip>true</jalopy.skip>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-splash:verdis_splash.png -Xms256m -Xmx512m -classpath ${de.cismet.cids.classpath} de.cismet.verdis.gui.Main</exec.args>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8898 -Xms256m -Xmx512m -classpath ${de.cismet.cids.classpath} de.cismet.verdis.gui.Main</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
@@ -22,7 +22,7 @@
             <goal>process-classes</goal>
             <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
         </goals>
-         <activatedProfiles>
+        <activatedProfiles>
             <activatedProfile>cismet-dev-exec</activatedProfile>
         </activatedProfiles>
         <properties>
@@ -48,18 +48,15 @@
             <profiler.action>profile</profiler.action>
             <exec.executable>${profiler.java}</exec.executable>
         </properties>
-    </action>
+    </action>    
     <action>
-        <actionName>CUSTOM-public-deploy-flexo</actionName>
-        <displayName>public-deploy-flexo</displayName>
+        <actionName>build</actionName>
         <goals>
-            <goal>clean</goal>
-            <goal>deploy</goal>
+            <goal>install</goal>
         </goals>
-        <activatedProfiles>
-            <activatedProfile>deploy</activatedProfile>
-            <activatedProfile>deploy-public</activatedProfile>
-        </activatedProfiles>
+        <properties>
+            <maven.test.skip>true</maven.test.skip>
+            <jalopy.skip>true</jalopy.skip>
+        </properties>
     </action>
-
 </actions>
