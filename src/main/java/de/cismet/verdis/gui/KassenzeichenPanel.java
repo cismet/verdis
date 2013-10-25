@@ -76,7 +76,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private final Validator bindingValidator;
     private final AggregatedValidator aggVal = new AggregatedValidator();
     private Integer nextKassenzeichen = null;
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
     private javax.swing.JButton btnSearch;
@@ -641,9 +640,24 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  evt  DOCUMENT ME!
      */
     private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togInfoModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togInfoModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togInfoModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -651,9 +665,24 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  evt  DOCUMENT ME!
      */
     private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togRegenModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                                //GEN-LAST:event_togRegenModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togRegenModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -661,9 +690,24 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  evt  DOCUMENT ME!
      */
     private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togWDSRModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ESW);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togWDSRModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ESW);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togWDSRModeActionPerformed
 
     /**
      * DOCUMENT ME!

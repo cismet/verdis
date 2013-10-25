@@ -62,7 +62,9 @@ import org.jdesktop.swingx.auth.DefaultUserNameStore;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -95,10 +97,12 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 
+import de.cismet.cismap.commons.CidsLayerFactory;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
 import de.cismet.cismap.commons.MappingModelListener;
 import de.cismet.cismap.commons.ModeLayer;
+import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
@@ -108,6 +112,8 @@ import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
+import de.cismet.cismap.commons.raster.wms.WMSServiceLayer;
 import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
@@ -1488,73 +1494,33 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     @Override
     public void appModeChanged() {
-        new SwingWorker<Void, Void>() {
+        setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-                @Override
-                protected Void doInBackground() throws Exception {
-                    EventQueue.invokeLater(new Runnable() {
+        if (currentMode != null) {
+            saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
+            saveConfig(FILEPATH_MAP + "." + currentMode.name());
+        }
 
-                            @Override
-                            public void run() {
-                                setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                            }
-                        });
+        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+        if (mode.equals(mode.ALLGEMEIN)) {
+            setupLayoutInfo();
+        } else if (mode.equals(mode.ESW)) {
+            setupLayoutWDSR();
+        } else if (mode.equals(mode.REGEN)) {
+            setupLayoutRegen();
+        }
+        currentMode = mode;
 
-                    if (currentMode != null) {
-                        saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
-                        saveConfig(FILEPATH_MAP + "." + currentMode.name());
-                    }
-
-                    final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-                    if (mode.equals(mode.ALLGEMEIN)) {
-                        EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    setupLayoutInfo();
-                                }
-                            });
-                    } else if (mode.equals(mode.ESW)) {
-                        EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    setupLayoutWDSR();
-                                }
-                            });
-                    } else if (mode.equals(mode.REGEN)) {
-                        EventQueue.invokeLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    setupLayoutRegen();
-                                }
-                            });
-                    }
-                    currentMode = mode;
-
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        setupMap(currentMode);
-                        refreshClipboardButtons();
-                        refreshClipboardButtonsToolTipText();
-                        refreshItemButtons();
-                        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
-                                    .getModeLayer("verdisAppModeLayer");
-                        if (ml != null) {
-                            ml.forceMode(currentMode.toString());
-                        }
-                        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                    } catch (Exception e) {
-                        LOG.error("Exception in Background Thread", e);
-                        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                    }
-                }
-            }.execute();
+        setupMap(currentMode);
+        refreshClipboardButtons();
+        refreshClipboardButtonsToolTipText();
+        refreshItemButtons();
+        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
+                    .getModeLayer("verdisAppModeLayer");
+        if (ml != null) {
+            ml.forceMode(mode.toString());
+        }
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     /**
@@ -1564,12 +1530,53 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void setupMap(final CidsAppBackend.Mode appMode) {
         final String fileName = FILEPATH_MAP + "." + appMode.name();
+        final TreeMap ms = mappingModel.getMapServices();
         try {
             if (new File(fileName).exists()) {
-                mappingModel.removeAllLayers();
-                getMappingComponent().getRasterServiceLayer().removeAllChildren();
-                configurationManager.configure(getMappingComponent(), fileName);
-                configurationManager.configure(mappingModel, fileName);
+//                configurationManager.configure(mappingModel, fileName);
+                final SAXBuilder builder = new SAXBuilder(false);
+                final Document doc = builder.build(new File(fileName));
+
+                final Element rootObject = doc.getRootElement();
+                final Element conf = rootObject.getChild("cismapActiveLayerConfiguration"); // NOI18N
+                final Element layerElement = conf.getChild("Layers");
+                final Element[] orderedLayers = CidsLayerFactory.orderLayers(layerElement);
+                int counter = 0;
+                for (final Element element : orderedLayers) {
+                    boolean visible = true;
+                    boolean enabled = true;
+                    double translucency = 1.0d;
+
+                    try {
+                        visible = element.getAttribute("visible").getBooleanValue();
+                    } catch (Exception skip) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Setting default value for visible", skip);
+                        }
+                    }
+                    try {
+                        enabled = element.getAttribute("enabled").getBooleanValue();
+                    } catch (Exception skip) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Setting default value for enabled", skip);
+                        }
+                    }
+                    try {
+                        translucency = element.getAttribute("translucency").getDoubleValue();
+                    } catch (Exception skip) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Setting default value for translucency", skip);
+                        }
+                    }
+
+                    ((MapService)ms.get(counter)).getPNode().setVisible(visible);
+                    final ActiveLayerEvent ale = new ActiveLayerEvent();
+                    ale.setLayer(ms.get(counter));
+                    CismapBroker.getInstance().fireLayerVisibilityChanged(ale);
+                    ((ServiceLayer)ms.get(counter)).setEnabled(enabled);
+                    ((ServiceLayer)ms.get(counter)).setTranslucency((float)translucency);
+                    counter++;
+                }
             }
         } catch (Exception e) {
             LOG.error("Problem beim Lesen des MapFiles " + fileName);
