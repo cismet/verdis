@@ -1510,7 +1510,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             setupLayoutRegen();
         }
         currentMode = mode;
-
         refreshClipboardButtons();
         refreshClipboardButtonsToolTipText();
         refreshItemButtons();
@@ -1520,6 +1519,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             ml.forceMode(mode.toString());
         }
         setupMap(currentMode);
+
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
@@ -1568,8 +1568,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             LOG.debug("Setting default value for translucency", skip);
                         }
                     }
-
-                    ((MapService)ms.get(counter)).getPNode().setVisible(visible);
+                    if (ms.get(counter) instanceof ModeLayer) {
+                        ((ModeLayer)ms.get(counter)).setVisible(visible);
+                        ((ModeLayer)ms.get(counter)).getPNode().setTransparency((float)translucency);
+                    } else {
+                        ((MapService)ms.get(counter)).getPNode().setVisible(visible);
+                    }
                     final ActiveLayerEvent ale = new ActiveLayerEvent();
                     ale.setLayer(ms.get(counter));
                     CismapBroker.getInstance().fireLayerVisibilityChanged(ale);
@@ -3150,7 +3154,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param  evt  DCUMENT ME!
      */
     private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
 //        String info="Verdis Plugin\n"
@@ -3807,7 +3811,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param  evt  DCUMENT ME!
      */
     private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniOptionsActionPerformed
         final OptionsDialog od = new OptionsDialog(this, true);
@@ -3817,7 +3821,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param  evt  DOCMENT ME!
      */
     private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
         StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
