@@ -1511,7 +1511,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
         currentMode = mode;
 
-        setupMap(currentMode);
         refreshClipboardButtons();
         refreshClipboardButtonsToolTipText();
         refreshItemButtons();
@@ -1520,6 +1519,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         if (ml != null) {
             ml.forceMode(mode.toString());
         }
+        setupMap(currentMode);
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
