@@ -184,17 +184,18 @@ public class FlaechenReportBean extends EBReportBean {
                     "",
                     "",
                     null,
-                    new CustomFixedWidthStroke(1f));
+                    new CustomFixedWidthStroke(2f));
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
             final Color c2;
             c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
             dsf.setFillingPaint(c2);
-            dsf.setLinePaint(Color.RED);
+            dsf.setLinePaint(Color.decode("#1a008b"));
             dsf.setPrimaryAnnotation(flaechenbez);
-            dsf.setPrimaryAnnotationPaint(Color.RED);
+            dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
+
             dsf.setAutoScale(true);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
             map.getFeatureCollection().addFeature(dsf);
         }
     }

@@ -97,6 +97,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup btnGroupOrientation;
     private javax.swing.JButton btnPrint;
     private javax.swing.JComboBox cbScale;
+    private javax.swing.JCheckBox chkFillAbflusswirksamkeit;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFiller2;
     private javax.swing.JLabel lblFiller3;
@@ -130,9 +131,9 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
         this.mode = mode;
 
         if (Mode.FRONTEN.equals(mode)) {
-            title = "Frontenbogen - Report Paramater";
+            title = "Frontenbogen - Report Parameter";
         } else {
-            title = "Flächenerfassungsbogen - Report Paramater";
+            title = "Flächenerfassungsbogen - Report Parameter";
         }
 
         initComponents();
@@ -178,6 +179,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
         pnlButtons = new javax.swing.JPanel();
         btnPrint = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        chkFillAbflusswirksamkeit = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(title);
@@ -341,7 +343,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
         getContentPane().add(lblScale, gridBagConstraints);
 
-        cbScale.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "optimal angepasst", "1:500", "1:1000" }));
+        cbScale.setModel(new javax.swing.DefaultComboBoxModel(
+                new String[] { "optimal angepasst", "1:200", "1:300", "1:400", "1:500", "1:750", "1:1000" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -387,10 +390,22 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         getContentPane().add(pnlButtons, gridBagConstraints);
-    } // </editor-fold>//GEN-END:initComponents
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            chkFillAbflusswirksamkeit,
+            org.openide.util.NbBundle.getMessage(
+                EBGeneratorDialog.class,
+                "EBGeneratorDialog.chkFillAbflusswirksamkeit.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
+        getContentPane().add(chkFillAbflusswirksamkeit, gridBagConstraints);
+    }                                                                 // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -428,7 +443,6 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
         final String scale = (String)cbScale.getSelectedItem();
         if (scale.matches("1:[0-9]+")) {
             // format of string eg 1:500
-            LOG.fatal("Scale 1:500");
             final String[] splittedScale = scale.split(":");
             return Double.parseDouble(splittedScale[1]);
         } else {
