@@ -234,10 +234,14 @@
     <Component class="javax.swing.JComboBox" name="cbScale">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
+          <StringArray count="7">
             <StringItem index="0" value="optimal angepasst"/>
-            <StringItem index="1" value="1:500"/>
-            <StringItem index="2" value="1:1000"/>
+            <StringItem index="1" value="1:200"/>
+            <StringItem index="2" value="1:300"/>
+            <StringItem index="3" value="1:400"/>
+            <StringItem index="4" value="1:500"/>
+            <StringItem index="5" value="1:750"/>
+            <StringItem index="6" value="1:1000"/>
           </StringArray>
         </Property>
       </Properties>
@@ -250,7 +254,7 @@
     <Container class="javax.swing.JPanel" name="pnlButtons">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-          <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="13" weightX="0.0" weightY="0.0"/>
+          <GridBagConstraints gridX="1" gridY="5" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="13" weightX="0.0" weightY="0.0"/>
         </Constraint>
       </Constraints>
 
@@ -288,5 +292,17 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JCheckBox" name="chkFillAbflusswirksamkeit">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cismet/cids/custom/reports/verdis/Bundle.properties" key="EBGeneratorDialog.chkFillAbflusswirksamkeit.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+          <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="10" insetsBottom="10" insetsRight="10" anchor="10" weightX="0.0" weightY="0.0"/>
+        </Constraint>
+      </Constraints>
+    </Component>
   </SubComponents>
 </Form>

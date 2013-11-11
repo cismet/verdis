@@ -70,13 +70,15 @@ public class FlaechenReportBean extends EBReportBean {
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
+     * @param  fillAbfluss       DOCUMENT ME!
      */
     public FlaechenReportBean(final CidsBean kassenzeichen,
             final String hinweise,
             final int mapHeight,
             final int mapWidth,
-            final Double scaleDenominator) {
-        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator);
+            final Double scaleDenominator,
+            final boolean fillAbfluss) {
+        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, fillAbfluss);
         loadMap();
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -184,7 +186,7 @@ public class FlaechenReportBean extends EBReportBean {
                     "",
                     "",
                     null,
-                    new CustomFixedWidthStroke(1f));
+                    new CustomFixedWidthStroke(2f));
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
             final Color c2;
@@ -192,9 +194,10 @@ public class FlaechenReportBean extends EBReportBean {
             dsf.setFillingPaint(c2);
             dsf.setLinePaint(Color.RED);
             dsf.setPrimaryAnnotation(flaechenbez);
-            dsf.setPrimaryAnnotationPaint(Color.RED);
+            dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
+
             dsf.setAutoScale(true);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
             map.getFeatureCollection().addFeature(dsf);
         }
     }

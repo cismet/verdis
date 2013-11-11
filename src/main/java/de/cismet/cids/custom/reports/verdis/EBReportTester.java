@@ -49,7 +49,8 @@ public class EBReportTester {
                 "SteinbacherD102",
                 "kif",
                 "kassenzeichen",
-                126638);
+//                126638);
+                5930);
 //                41);
         final CidsBean[] beans = new CidsBean[1];
         beans[0] = kassenzeiechenBean;
@@ -61,7 +62,7 @@ public class EBReportTester {
         final EBGeneratorDialog dialog = new EBGeneratorDialog(
                 kassenzeiechenBean,
                 new JFrame(),
-                EBGeneratorDialog.Mode.FRONTEN);
+                EBGeneratorDialog.Mode.FLAECHEN);
         dialog.show();
         System.out.println("alles fertich.ok");
     }

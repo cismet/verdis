@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
 	<subDataset name="dataset1"/>
+	<parameter name="fillKanal" class="java.lang.Boolean" isForPrompting="false"/>
 	<field name="flaechenbezeichnung" class="java.lang.String"/>
 	<field name="flaecheninfo.groesse_korrektur" class="java.lang.Integer"/>
+	<field name="flaecheninfo.anschlussgrad.id" class="java.lang.Integer"/>
 	<columnHeader>
 		<band height="62">
 			<staticText>
@@ -201,6 +203,20 @@ einleitung in Gewässser]]></text>
 				<textElement/>
 				<text><![CDATA[qm]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="126" y="2" width="10" height="10" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[($P{fillKanal}.booleanValue() && $F{flaecheninfo.anschlussgrad.id}.intValue() == 1 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 4 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 5) ? "x" : " "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="161" y="2" width="10" height="10" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[($P{fillKanal}.booleanValue() && $F{flaecheninfo.anschlussgrad.id}.intValue() == 2 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 3) ? "x" : " "]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
