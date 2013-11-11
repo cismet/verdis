@@ -60,6 +60,7 @@ public abstract class EBReportBean {
     private int mapWidth;
     private int mapHeight;
     private Double scaleDenominator;
+    private boolean fillAbflusswirksamkeit = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -70,20 +71,41 @@ public abstract class EBReportBean {
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
+     * @param  fillAbfluss       DOCUMENT ME!
      */
     public EBReportBean(final CidsBean kassenzeichen,
             final int mapHeight,
             final int mapWidth,
-            final Double scaleDenominator) {
+            final Double scaleDenominator,
+            final boolean fillAbfluss) {
         this.kassenzeichen = kassenzeichen;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
         this.scaleDenominator = scaleDenominator;
         kznr = "" + (Integer)this.kassenzeichen.getProperty(
                         KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+        this.fillAbflusswirksamkeit = fillAbfluss;
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isFillAbflusswirksamkeit() {
+        return fillAbflusswirksamkeit;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fillAbflusswirksamkeit  DOCUMENT ME!
+     */
+    public void setFillAbflusswirksamkeit(final boolean fillAbflusswirksamkeit) {
+        this.fillAbflusswirksamkeit = fillAbflusswirksamkeit;
+    }
 
     /**
      * DOCUMENT ME!
@@ -178,7 +200,9 @@ public abstract class EBReportBean {
      */
     protected void loadMap() {
         final SimpleWMS s = new SimpleWMS(new SimpleWmsGetMapUrl(
-                    "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
+
+                    // "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
+                    "http://S102X284:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default"));
         final MappingComponent map = new MappingComponent(false);
 
         final ActiveLayerModel mappingModel = new ActiveLayerModel();

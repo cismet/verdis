@@ -65,7 +65,7 @@ public class FrontenReportBean extends EBReportBean {
             final int mapHeight,
             final int mapWidth,
             final Double scaleDenominator) {
-        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator);
+        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, false);
 
         loadMap();
     }

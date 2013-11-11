@@ -528,7 +528,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                                 hints,
                                 mapHeight,
                                 mapWidth,
-                                getSelectedScaleDenominator());
+                                getSelectedScaleDenominator(),
+                                chkFillAbflusswirksamkeit.isSelected());
                     }
                     final Collection<EBReportBean> reportBeans = new LinkedList<EBReportBean>();
                     reportBeans.add(reportBean);
@@ -547,6 +548,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                         LOG.debug("ready to procced");
                     }
                     final HashMap parameters = new HashMap();
+                    parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
 
                     final ArrayList<String> reports = new ArrayList<String>();
 

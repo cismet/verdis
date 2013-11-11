@@ -70,13 +70,15 @@ public class FlaechenReportBean extends EBReportBean {
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
+     * @param  fillAbfluss       DOCUMENT ME!
      */
     public FlaechenReportBean(final CidsBean kassenzeichen,
             final String hinweise,
             final int mapHeight,
             final int mapWidth,
-            final Double scaleDenominator) {
-        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator);
+            final Double scaleDenominator,
+            final boolean fillAbfluss) {
+        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, fillAbfluss);
         loadMap();
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -190,7 +192,7 @@ public class FlaechenReportBean extends EBReportBean {
             final Color c2;
             c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
             dsf.setFillingPaint(c2);
-            dsf.setLinePaint(Color.decode("#1a008b"));
+            dsf.setLinePaint(Color.RED);
             dsf.setPrimaryAnnotation(flaechenbez);
             dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
 
