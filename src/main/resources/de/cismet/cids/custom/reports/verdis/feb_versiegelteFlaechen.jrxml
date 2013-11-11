@@ -5,27 +5,6 @@
 	<field name="flaechenbezeichnung" class="java.lang.String"/>
 	<field name="flaecheninfo.groesse_korrektur" class="java.lang.Integer"/>
 	<field name="flaecheninfo.anschlussgrad.id" class="java.lang.Integer"/>
-	<variable name="kanal_ja" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($P{fillKanal}.booleanValue()&&($V{angeschlossen}.booleanValue()||$V{einleitung_verrohrt}.booleanValue()||$V{versickerung_not}.booleanValue()))]]></variableExpression>
-	</variable>
-	<variable name="kanal_nein" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($P{fillKanal}.booleanValue()&&($V{einleitung_offen}.booleanValue()||$V{versickernd}.booleanValue()))]]></variableExpression>
-	</variable>
-	<variable name="angeschlossen" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($F{flaecheninfo.anschlussgrad.id}.equals(new Integer(1)))]]></variableExpression>
-	</variable>
-	<variable name="versickernd" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($F{flaecheninfo.anschlussgrad.id}.equals(new Integer(2)))]]></variableExpression>
-	</variable>
-	<variable name="einleitung_verrohrt" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($F{flaecheninfo.anschlussgrad.id}.equals(new Integer(5)))]]></variableExpression>
-	</variable>
-	<variable name="versickerung_not" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($F{flaecheninfo.anschlussgrad.id}.equals(new Integer(4)))]]></variableExpression>
-	</variable>
-	<variable name="einleitung_offen" class="java.lang.Boolean">
-		<variableExpression><![CDATA[new Boolean($F{flaecheninfo.anschlussgrad.id}.equals(new Integer(3)))]]></variableExpression>
-	</variable>
 	<columnHeader>
 		<band height="62">
 			<staticText>
@@ -229,24 +208,14 @@ einleitung in Gewässser]]></text>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$V{kanal_ja}.booleanValue() ? "x" : " "]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[($P{fillKanal}.booleanValue() && $F{flaecheninfo.anschlussgrad.id}.intValue() == 1 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 4 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 5) ? "x" : " "]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="161" y="2" width="10" height="10" forecolor="#666666"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$V{kanal_nein}.booleanValue() ? "x" : " "]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Column">
-				<reportElement x="267" y="2" width="100" height="15"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.Boolean"><![CDATA[$V{kanal_ja}]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Column">
-				<reportElement x="402" y="2" width="100" height="15"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.Boolean"><![CDATA[$V{kanal_nein}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[($P{fillKanal}.booleanValue() && $F{flaecheninfo.anschlussgrad.id}.intValue() == 2 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 3) ? "x" : " "]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
