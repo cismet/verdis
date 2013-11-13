@@ -15,6 +15,9 @@ import Sirius.navigator.exception.ConnectionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PBounds;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
@@ -22,11 +25,16 @@ import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.ImageIcon;
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
 
@@ -35,6 +43,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
+import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
@@ -193,12 +202,46 @@ public class FlaechenReportBean extends EBReportBean {
             c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
             dsf.setFillingPaint(c2);
             dsf.setLinePaint(Color.RED);
+            map.getFeatureCollection().addFeature(dsf);
+        }
+        for (final CidsBean b : flaechen) {
+            try {
+                fr.setMetaObject(b.getMetaObject());
+            } catch (ConnectionException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
+            final Geometry xg = g.getInteriorPoint();
+
+            final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+            final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
+                    null,
+                    "",
+                    "",
+                    null,
+                    new CustomFixedWidthStroke(2f));
+            dsf.setGeometry(xg);
             dsf.setPrimaryAnnotation(flaechenbez);
             dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
-
+            final BufferedImage bi = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+//            final Graphics2D graphics = (Graphics2D)bi.getGraphics();
+//            graphics.setColor(Color.orange);
+//            graphics.fillOval(0, 0, 10, 10);
+            final FeatureAnnotationSymbol symb = new FeatureAnnotationSymbol(bi);
+            symb.setSweetSpotX(0.5);
+            symb.setSweetSpotY(0.5);
+            dsf.setIconImage(new ImageIcon(bi));
             dsf.setAutoScale(true);
             dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
+            dsf.setFeatureAnnotationSymbol(symb);
             map.getFeatureCollection().addFeature(dsf);
+
+            final PNode annotationNode = map.getPFeatureHM().get(dsf).getPrimaryAnnotationNode();
+            final PBounds bounds = annotationNode.getBounds();
+            bounds.x = -20;
+            bounds.y = -20;
+            annotationNode.setBounds(bounds);
         }
     }
 
