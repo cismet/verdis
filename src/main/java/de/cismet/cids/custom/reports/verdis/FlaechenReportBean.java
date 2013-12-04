@@ -105,6 +105,7 @@ public class FlaechenReportBean extends EBReportBean {
         }
         Collections.sort(dachflaechen, new DachflaechenComparator());
         Collections.sort(versiegelteflaechen, new VersiegelteFlaechenComparator());
+        this.hinweise = hinweise;
     }
 
     //~ Methods ----------------------------------------------------------------
