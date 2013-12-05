@@ -133,25 +133,25 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     final int displayedColumnIndex = componentAdapter.column;
                     final int modelColumnIndex = jxtOverview.convertColumnIndexToModel(displayedColumnIndex);
 
-                    final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelRowIndex);
+                    final CidsBean flaecheBean = getModel().getCidsBeanByIndex(modelRowIndex);
                     final Validator validator;
 
                     if (modelColumnIndex == 1) {
-                        validator = RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(cidsBean);
+                        validator = RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(flaecheBean);
                     } else if (modelColumnIndex == 3) {
                         final AggregatedValidator aggVal = new AggregatedValidator();
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(cidsBean));
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(cidsBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(flaecheBean));
                         validator = aggVal;
                     } else if (modelColumnIndex == 6) {
                         final AggregatedValidator aggVal = new AggregatedValidator();
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(cidsBean));
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(cidsBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
                         validator = aggVal;
                     } else {
                         final AggregatedValidator aggVal = new AggregatedValidator();
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(cidsBean));
-                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(cidsBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
                         validator = aggVal;
                     }
 
