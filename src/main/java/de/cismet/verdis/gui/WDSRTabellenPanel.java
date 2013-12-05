@@ -186,7 +186,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 Color.ORANGE,
                 Color.BLACK);
 
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter, warningHighlighter);
+        jxtOverview.setHighlighters(changedHighlighter, warningHighlighter, noGeometryHighlighter, errorHighlighter);
     }
 
     //~ Methods ----------------------------------------------------------------

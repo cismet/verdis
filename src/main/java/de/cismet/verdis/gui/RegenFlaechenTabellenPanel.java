@@ -195,7 +195,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter, warningHighlighter);
+        jxtOverview.setHighlighters(changedHighlighter, warningHighlighter, noGeometryHighlighter, errorHighlighter);
 
         jxtOverview.getColumnModel().getColumn(0).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
         jxtOverview.getColumnModel().getColumn(2).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
