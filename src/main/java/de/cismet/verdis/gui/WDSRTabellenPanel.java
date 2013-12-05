@@ -150,7 +150,43 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
 
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
+        final HighlightPredicate warningPredicate = new HighlightPredicate() {
+
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedRowIndex = componentAdapter.row;
+                    final int modelRowIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedRowIndex);
+                    final int displayedColumnIndex = componentAdapter.column;
+                    final int modelColumnIndex = jxtOverview.convertColumnIndexToModel(displayedColumnIndex);
+
+                    final CidsBean frontBean = getModel().getCidsBeanByIndex(modelRowIndex);
+                    final Validator validator;
+
+                    if (modelColumnIndex == 0) {
+                        validator = WDSRDetailsPanel.getValidatorNummer(frontBean);
+                    } else if (modelColumnIndex == 1) {
+                        final AggregatedValidator aggVal = new AggregatedValidator();
+                        aggVal.add(WDSRDetailsPanel.getValidatorLaengeGrafik(frontBean));
+                        aggVal.add(WDSRDetailsPanel.getValidatorLaengeKorrektur(frontBean));
+                        validator = aggVal;
+                    } else {
+                        final AggregatedValidator aggVal = new AggregatedValidator();
+                        aggVal.add(WDSRDetailsPanel.getValidatorDatumErfassung(frontBean));
+                        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungWD(frontBean));
+                        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungSR(frontBean));
+                        validator = aggVal;
+                    }
+
+                    return validator.getState().isWarning();
+                }
+            };
+
+        final Highlighter warningHighlighter = new ColorHighlighter(
+                warningPredicate,
+                Color.ORANGE,
+                Color.BLACK);
+
+        jxtOverview.setHighlighters(changedHighlighter, warningHighlighter, noGeometryHighlighter, errorHighlighter);
     }
 
     //~ Methods ----------------------------------------------------------------

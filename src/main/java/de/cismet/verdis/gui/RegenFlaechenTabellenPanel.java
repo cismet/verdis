@@ -124,6 +124,46 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 Color.RED.brighter().brighter().brighter(),
                 Color.WHITE);
 
+        final HighlightPredicate warningPredicate = new HighlightPredicate() {
+
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    final int displayedRowIndex = componentAdapter.row;
+                    final int modelRowIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedRowIndex);
+                    final int displayedColumnIndex = componentAdapter.column;
+                    final int modelColumnIndex = jxtOverview.convertColumnIndexToModel(displayedColumnIndex);
+
+                    final CidsBean flaecheBean = getModel().getCidsBeanByIndex(modelRowIndex);
+                    final Validator validator;
+
+                    if (modelColumnIndex == 1) {
+                        validator = RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(flaecheBean);
+                    } else if (modelColumnIndex == 3) {
+                        final AggregatedValidator aggVal = new AggregatedValidator();
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(flaecheBean));
+                        validator = aggVal;
+                    } else if (modelColumnIndex == 6) {
+                        final AggregatedValidator aggVal = new AggregatedValidator();
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
+                        validator = aggVal;
+                    } else {
+                        final AggregatedValidator aggVal = new AggregatedValidator();
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
+                        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
+                        validator = aggVal;
+                    }
+
+                    return validator.getState().isWarning();
+                }
+            };
+
+        final Highlighter warningHighlighter = new ColorHighlighter(
+                warningPredicate,
+                Color.ORANGE,
+                Color.BLACK);
+
         final HighlightPredicate changedPredicate = new HighlightPredicate() {
 
                 @Override
@@ -155,7 +195,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
         final Highlighter noGeometryHighlighter = new ColorHighlighter(noGeometryPredicate, Color.lightGray, null);
 
-        jxtOverview.setHighlighters(changedHighlighter, noGeometryHighlighter, errorHighlighter);
+        jxtOverview.setHighlighters(changedHighlighter, warningHighlighter, noGeometryHighlighter, errorHighlighter);
 
         jxtOverview.getColumnModel().getColumn(0).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
         jxtOverview.getColumnModel().getColumn(2).setCellRenderer(jxtOverview.getDefaultRenderer(Icon.class));
