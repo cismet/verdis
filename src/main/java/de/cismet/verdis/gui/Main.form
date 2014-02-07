@@ -703,6 +703,21 @@
             <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="if (StaticDebuggingTools.checkHomeForFile(&quot;cismetVerdisTest&quot;)) {                     // NOI18N&#xa;    cmdFortfuehrung.setVisible(true);&#xa;} else {&#xa;    cmdFortfuehrung.setVisible(false);&#xa;}"/>
           </AuxValues>
         </Component>
+        <Component class="javax.swing.JButton" name="cmdLagisCrossover1">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/BPlan.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Kassenzeichensuche &#xfc;ber Buchungsblatt"/>
+            <Property name="focusPainted" type="boolean" value="false"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdLagisCrossover1ActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="panMain">

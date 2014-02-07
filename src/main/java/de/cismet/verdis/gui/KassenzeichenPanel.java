@@ -847,6 +847,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             mainApp.disableKassenzeichenCmds();
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);
+            KassenzeichenGeomSearchDialog.getInstance().setEnabled(false);
+            GrundbuchblattSucheDialog.getInstance().setEnabled(false);
             setKZSearchField(kz);
 
             new SwingWorker<CidsBean, Void>() {
@@ -879,6 +881,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                         }
                         txtSearch.setEnabled(true);
                         btnSearch.setEnabled(true);
+                        KassenzeichenGeomSearchDialog.getInstance().setEnabled(true);
+                        GrundbuchblattSucheDialog.getInstance().setEnabled(true);
                         mainApp.refreshLeftTitleBarColor();
                         mainApp.refreshKassenzeichenButtons();
                         mainApp.refreshClipboardButtons();

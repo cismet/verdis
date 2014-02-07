@@ -113,7 +113,6 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
-import de.cismet.cismap.commons.raster.wms.WMSServiceLayer;
 import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
@@ -326,6 +325,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton cmdFortfuehrung;
     private javax.swing.JButton cmdInfo;
     private javax.swing.JButton cmdLagisCrossover;
+    private javax.swing.JButton cmdLagisCrossover1;
     private javax.swing.JButton cmdNewKassenzeichen;
     private javax.swing.JButton cmdNextKassenzeichenWithoutGeom;
     private javax.swing.JButton cmdOk;
@@ -1166,6 +1166,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isRendererVisible() {
+        return alkisRendererDialog.isVisible();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  metaObject  DOCUMENT ME!
      */
     public void showRenderer(final MetaObject metaObject) {
@@ -1927,6 +1936,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         btnHistory = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
+        cmdLagisCrossover1 = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2351,6 +2361,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
         tobVerdis.add(cmdFortfuehrung);
 
+        cmdLagisCrossover1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
+        cmdLagisCrossover1.setToolTipText("Kassenzeichensuche über Buchungsblatt");
+        cmdLagisCrossover1.setFocusPainted(false);
+        cmdLagisCrossover1.setFocusable(false);
+        cmdLagisCrossover1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdLagisCrossover1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdLagisCrossover1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdLagisCrossover1ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdLagisCrossover1);
+
         getContentPane().add(tobVerdis, java.awt.BorderLayout.NORTH);
 
         panMain.setLayout(new java.awt.BorderLayout());
@@ -2642,8 +2668,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         setJMenuBar(jMenuBar1);
 
-        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 1024) / 2, (screenSize.height - 868) / 2, 1024, 868);
+        setSize(new java.awt.Dimension(1024, 868));
+        setLocationRelativeTo(null);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -3854,6 +3880,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             LOG.error("error while executing next kassenzeichensearch", ex);
         }
     } //GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
+        StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
+    }                                                                                      //GEN-LAST:event_cmdLagisCrossover1ActionPerformed
 
     /**
      * DOCUMENT ME!
