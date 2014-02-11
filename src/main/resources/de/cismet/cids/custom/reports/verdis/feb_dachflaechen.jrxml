@@ -136,9 +136,12 @@ einleitung in Gewässser]]></text>
 	</columnHeader>
 	<detail>
 		<band height="20">
-			<line>
-				<reportElement x="199" y="0" width="1" height="20"/>
-			</line>
+			<rectangle>
+				<reportElement x="161" y="2" width="10" height="10" forecolor="#808080"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="126" y="2" width="10" height="10" forecolor="#808080"/>
+			</rectangle>
 			<line>
 				<reportElement x="118" y="0" width="1" height="20"/>
 			</line>
@@ -151,14 +154,14 @@ einleitung in Gewässser]]></text>
 			<line>
 				<reportElement x="489" y="0" width="1" height="20"/>
 			</line>
-			<rectangle>
-				<reportElement x="126" y="2" width="10" height="10" forecolor="#808080"/>
-			</rectangle>
 			<staticText>
 				<reportElement x="136" y="0" width="14" height="17"/>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[ja]]></text>
 			</staticText>
+			<line>
+				<reportElement x="199" y="0" width="1" height="20"/>
+			</line>
 			<line>
 				<reportElement x="255" y="0" width="1" height="20"/>
 			</line>
@@ -173,9 +176,6 @@ einleitung in Gewässser]]></text>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[nein]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="161" y="2" width="10" height="10" forecolor="#808080"/>
-			</rectangle>
 			<rectangle>
 				<reportElement x="222" y="2" width="10" height="10" forecolor="#808080"/>
 			</rectangle>
@@ -204,14 +204,14 @@ einleitung in Gewässser]]></text>
 				<text><![CDATA[qm]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="126" y="2" width="10" height="10" forecolor="#666666"/>
+				<reportElement x="126" y="0" width="10" height="12" forecolor="#666666" backcolor="#3C3C3C"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[($P{fillKanal}.booleanValue() && $F{flaecheninfo.anschlussgrad.id}.intValue() == 1 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 4 || $F{flaecheninfo.anschlussgrad.id}.intValue() == 5) ? "x" : " "]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="161" y="2" width="10" height="10" forecolor="#666666"/>
+				<reportElement x="161" y="0" width="10" height="12" forecolor="#666666"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
