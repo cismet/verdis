@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRenderer;
 
@@ -224,6 +225,7 @@ public class FlaechenReportBean extends EBReportBean {
                     new CustomFixedWidthStroke(2f));
             dsf.setGeometry(xg);
             dsf.setPrimaryAnnotation(flaechenbez);
+            dsf.setPrimaryAnnotationJustification(JLabel.RIGHT_ALIGNMENT);
             dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
             final BufferedImage bi = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 //            final Graphics2D graphics = (Graphics2D)bi.getGraphics();
