@@ -20,15 +20,14 @@ import net.sf.jasperreports.engine.util.JRLoader;
 
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.JXErrorPane;
-import org.jdesktop.swingx.error.ErrorInfo;
-
 import org.openide.util.NbBundle;
 
 import java.awt.Frame;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import java.util.ArrayList;
@@ -36,19 +35,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.utils.jasperreports.ReportHelper;
-import de.cismet.cids.utils.jasperreports.ReportSwingWorkerDialog;
 
-import de.cismet.tools.gui.StaticSwingTools;
-import de.cismet.tools.gui.downloadmanager.ByteArrayDownload;
+import de.cismet.cismap.commons.gui.printing.BackgroundTaskDownload;
+
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
@@ -90,7 +83,6 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
     private CidsBean kassenzeichen;
     private Frame parent;
     private String title = "";
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.ButtonGroup btnGroupFormat;
@@ -460,160 +452,132 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
             LOG.debug("starting report generation for feb report");
         }
 
-        final SwingWorker<Boolean, Object> worker = new SwingWorker<Boolean, Object>() {
-
-                private final ReportSwingWorkerDialog dialog = new ReportSwingWorkerDialog((Frame)parent, true);
-                private boolean forceQuit = false;
+        final BackgroundTaskDownload.DownloadTask swingWorkerBackgroundTask =
+            new BackgroundTaskDownload.DownloadTask() {
 
                 @Override
-                protected Boolean doInBackground() throws Exception {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                StaticSwingTools.showDialog(dialog);
-                            }
-                        });
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("generating report beans");
-                    }
-                    String repMap = "";
-                    String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
-                    String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
-                    if (btnGroupFormat.getSelection().getActionCommand().equals(rbA4.getActionCommand())) {
-                        repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
-                        mapHeightPropkey += A4_FORMAT;
-                        mapWidthPropkey += A4_FORMAT;
-                    } else {
-                        repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
-                        mapHeightPropkey += A3_FORMAT;
-                        mapWidthPropkey += A3_FORMAT;
-                    }
-
-                    if (btnGroupOrientation.getSelection().getActionCommand().equals(
-                                    rbLandscapeMode.getActionCommand())) {
-                        repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
-                        mapHeightPropkey += LANDSCAPE_ORIENTATION;
-                        mapWidthPropkey += LANDSCAPE_ORIENTATION;
-                    } else {
-                        repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
-                        mapHeightPropkey += PORTRAIT_ORIENTATION;
-                        mapWidthPropkey += PORTRAIT_ORIENTATION;
-                    }
-                    if (Mode.FRONTEN.equals(mode)) {
-                        repMap = repMap.replace("<mode>", "fronten");
-                    } else {
-                        repMap = repMap.replace("<mode>", "feb");
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Report File for Map: " + repMap);
-                    }
-                    final int mapWidth = Integer.parseInt(NbBundle.getMessage(
-                                EBGeneratorDialog.class,
-                                mapWidthPropkey));
-                    final int mapHeight = Integer.parseInt(NbBundle.getMessage(
-                                EBGeneratorDialog.class,
-                                mapHeightPropkey));
-
-                    final EBReportBean reportBean;
-                    if (Mode.FRONTEN.equals(mode)) {
-                        reportBean = new FrontenReportBean(
-                                kassenzeichen,
-                                mapHeight,
-                                mapWidth,
-                                getSelectedScaleDenominator());
-                    } else {
-                        reportBean = new FlaechenReportBean(
-                                kassenzeichen,
-                                hints,
-                                mapHeight,
-                                mapWidth,
-                                getSelectedScaleDenominator(),
-                                chkFillAbflusswirksamkeit.isSelected());
-                    }
-                    final Collection<EBReportBean> reportBeans = new LinkedList<EBReportBean>();
-                    reportBeans.add(reportBean);
-                    boolean ready;
-
-                    do {
-                        ready = true;
-                        for (final EBReportBean rb : reportBeans) {
-                            if (!rb.isReadyToProceed() || forceQuit) {
-                                ready = false;
-                                break;
-                            }
-                        }
-                    } while (!ready);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("ready to procced");
-                    }
-                    final HashMap parameters = new HashMap();
-                    parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
-
-                    final ArrayList<String> reports = new ArrayList<String>();
-
-                    reports.add(repMap);
-                    if (Mode.FLAECHEN.equals(mode)) {
-                        reports.add("/de/cismet/cids/custom/reports/verdis/feb_flaechen.jasper");
-                    }
-
-                    final List<InputStream> ins = new ArrayList<InputStream>();
-                    for (final String report : reports) {
-                        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(EBGeneratorDialog.class
-                                        .getResourceAsStream(report));
-
-                        final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                        // print aus report und daten erzeugen
-                        final JasperPrint jasperPrint = JasperFillManager.fillReport(
-                                jasperReport,
-                                parameters,
-                                dataSource);
-                        jasperPrint.setOrientation(jasperReport.getOrientation());
-
-                        final ByteArrayOutputStream outTmp = new ByteArrayOutputStream();
-                        JasperExportManager.exportReportToPdfStream(jasperPrint, outTmp);
-                        ins.add(new ByteArrayInputStream(outTmp.toByteArray()));
-                        outTmp.close();
-                    }
-                    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    ReportHelper.concatPDFs(ins, out, false);
-                    // zusammengefügten pdfStream in Datei schreiben
-
-                    if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
-                        final String jobname = DownloadManagerDialog.getJobname();
-
-                        DownloadManager.instance()
-                                .add(new ByteArrayDownload(out.toByteArray(), "", jobname, "feb_report", ".pdf"));
-                    }
-
-                    return true;
-                }
-
-                @Override
-                protected void done() {
-                    boolean error = false;
+                public void download(final File fileToSaveTo) throws Exception {
+                    FileOutputStream out = null;
                     try {
-                        error = !get();
-                    } catch (InterruptedException ex) {
-                        // unterbrochen, nichts tun
-                    } catch (ExecutionException ex) {
-                        error = true;
-                        LOG.error("error while generating report", ex);
-                    }
-                    dialog.setVisible(false);
-                    if (error) {
-                        final ErrorInfo ei = new ErrorInfo(
-                                "Error",                           // NOI18N
-                                "Error during report generation.", // NOI18N
-                                null,
-                                null,
-                                null,
-                                Level.ALL,
-                                null);
-                        JXErrorPane.showDialog(parent, ei);
+                        final boolean forceQuit = false;
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("generating report beans");
+                        }
+                        String repMap = "";
+                        String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
+                        String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
+                        if (btnGroupFormat.getSelection().getActionCommand().equals(rbA4.getActionCommand())) {
+                            repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
+                            mapHeightPropkey += A4_FORMAT;
+                            mapWidthPropkey += A4_FORMAT;
+                        } else {
+                            repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
+                            mapHeightPropkey += A3_FORMAT;
+                            mapWidthPropkey += A3_FORMAT;
+                        }
+
+                        if (btnGroupOrientation.getSelection().getActionCommand().equals(
+                                        rbLandscapeMode.getActionCommand())) {
+                            repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
+                            mapHeightPropkey += LANDSCAPE_ORIENTATION;
+                            mapWidthPropkey += LANDSCAPE_ORIENTATION;
+                        } else {
+                            repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
+                            mapHeightPropkey += PORTRAIT_ORIENTATION;
+                            mapWidthPropkey += PORTRAIT_ORIENTATION;
+                        }
+                        if (Mode.FRONTEN.equals(mode)) {
+                            repMap = repMap.replace("<mode>", "fronten");
+                        } else {
+                            repMap = repMap.replace("<mode>", "feb");
+                        }
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Report File for Map: " + repMap);
+                        }
+                        final int mapWidth = Integer.parseInt(NbBundle.getMessage(
+                                    EBGeneratorDialog.class,
+                                    mapWidthPropkey));
+                        final int mapHeight = Integer.parseInt(NbBundle.getMessage(
+                                    EBGeneratorDialog.class,
+                                    mapHeightPropkey));
+
+                        final EBReportBean reportBean;
+                        if (Mode.FRONTEN.equals(mode)) {
+                            reportBean = new FrontenReportBean(
+                                    kassenzeichen,
+                                    mapHeight,
+                                    mapWidth,
+                                    getSelectedScaleDenominator());
+                        } else {
+                            reportBean = new FlaechenReportBean(
+                                    kassenzeichen,
+                                    hints,
+                                    mapHeight,
+                                    mapWidth,
+                                    getSelectedScaleDenominator(),
+                                    chkFillAbflusswirksamkeit.isSelected());
+                        }
+                        final Collection<EBReportBean> reportBeans = new LinkedList<EBReportBean>();
+                        reportBeans.add(reportBean);
+                        boolean ready;
+
+                        do {
+                            ready = true;
+                            for (final EBReportBean rb : reportBeans) {
+                                if (!rb.isReadyToProceed() || forceQuit) {
+                                    ready = false;
+                                    break;
+                                }
+                            }
+                        } while (!ready);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("ready to procced");
+                        }
+                        final HashMap parameters = new HashMap();
+                        parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
+
+                        final ArrayList<String> reports = new ArrayList<String>();
+
+                        reports.add(repMap);
+                        if (Mode.FLAECHEN.equals(mode)) {
+                            reports.add("/de/cismet/cids/custom/reports/verdis/feb_flaechen.jasper");
+                        }
+
+                        final List<InputStream> ins = new ArrayList<InputStream>();
+                        for (final String report : reports) {
+                            final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(EBGeneratorDialog.class
+                                            .getResourceAsStream(report));
+
+                            final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
+                            // print aus report und daten erzeugen
+                            final JasperPrint jasperPrint = JasperFillManager.fillReport(
+                                    jasperReport,
+                                    parameters,
+                                    dataSource);
+                            jasperPrint.setOrientation(jasperReport.getOrientation());
+
+                            final ByteArrayOutputStream outTmp = new ByteArrayOutputStream();
+                            JasperExportManager.exportReportToPdfStream(jasperPrint, outTmp);
+                            ins.add(new ByteArrayInputStream(outTmp.toByteArray()));
+                            outTmp.close();
+                        }
+                        final ByteArrayOutputStream byteArrayReportsStream = new ByteArrayOutputStream();
+                        ReportHelper.concatPDFs(ins, byteArrayReportsStream, false);
+                        out = new FileOutputStream(fileToSaveTo);
+                        out.write(byteArrayReportsStream.toByteArray());
+                    } finally {
+                        if (out != null) {
+                            out.close();
+                        }
                     }
                 }
             };
-        worker.execute();
+
+        if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
+            final String jobname = DownloadManagerDialog.getJobname();
+
+            DownloadManager.instance()
+                    .add(new BackgroundTaskDownload(swingWorkerBackgroundTask, "", jobname, "feb_report", ".pdf"));
+        }
     }
 }
