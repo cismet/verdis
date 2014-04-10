@@ -541,6 +541,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                         reports.add(repMap);
                         if (Mode.FLAECHEN.equals(mode)) {
                             reports.add("/de/cismet/cids/custom/reports/verdis/feb_flaechen.jasper");
+                        } else if (Mode.FRONTEN.equals(mode)) {
+                            reports.add("/de/cismet/cids/custom/reports/verdis/fronten.jasper");
                         }
 
                         final List<InputStream> ins = new ArrayList<InputStream>();

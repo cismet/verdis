@@ -24,6 +24,9 @@ import java.awt.Color;
 import java.awt.Font;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.cismet.cids.custom.featurerenderer.verdis_grundis.FrontFeatureRenderer;
@@ -51,6 +54,10 @@ public class FrontenReportBean extends EBReportBean {
     private static final Logger LOG = Logger.getLogger(FrontenReportBean.class);
     private static final int FRONT_TRANSPARENCY = 200;
 
+    //~ Instance fields --------------------------------------------------------
+
+    private List<CidsBean> fronten = new LinkedList<CidsBean>();
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -66,7 +73,9 @@ public class FrontenReportBean extends EBReportBean {
             final int mapWidth,
             final Double scaleDenominator) {
         super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, false);
-
+        this.fronten = (List<CidsBean>)kassenzeichen.getProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
+        Collections.sort(this.fronten, new FrontenComparator());
         loadMap();
     }
 
@@ -120,6 +129,52 @@ public class FrontenReportBean extends EBReportBean {
             dsf.setAutoScale(true);
             dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
             map.getFeatureCollection().addFeature(dsf);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getFronten() {
+        return fronten;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fronten  DOCUMENT ME!
+     */
+    public void setFronten(final List<CidsBean> fronten) {
+        this.fronten = fronten;
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class FrontenComparator implements Comparator<CidsBean> {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new FrontenComparator object.
+         */
+        public FrontenComparator() {
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public int compare(final CidsBean o1, final CidsBean o2) {
+            final Integer frontNr1 = (Integer)o1.getProperty(FrontPropertyConstants.PROP__NUMMER);
+            final Integer frontNr2 = (Integer)o2.getProperty(FrontPropertyConstants.PROP__NUMMER);
+
+            return frontNr1.compareTo(frontNr2);
         }
     }
 }
