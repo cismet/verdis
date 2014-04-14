@@ -214,37 +214,39 @@ public class FlaechenReportBean extends EBReportBean {
             }
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
-            final Geometry xg = g.getInteriorPoint();
+            if (g != null) {
+                final Geometry xg = g.getInteriorPoint();
 
-            final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
-                    null,
-                    "",
-                    "",
-                    null,
-                    new CustomFixedWidthStroke(2f));
-            dsf.setGeometry(xg);
-            dsf.setPrimaryAnnotation(flaechenbez);
-            dsf.setPrimaryAnnotationJustification(JLabel.RIGHT_ALIGNMENT);
-            dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
-            final BufferedImage bi = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-//            final Graphics2D graphics = (Graphics2D)bi.getGraphics();
-//            graphics.setColor(Color.orange);
-//            graphics.fillOval(0, 0, 10, 10);
-            final FeatureAnnotationSymbol symb = new FeatureAnnotationSymbol(bi);
-            symb.setSweetSpotX(0.5);
-            symb.setSweetSpotY(0.5);
-            dsf.setIconImage(new ImageIcon(bi));
-            dsf.setAutoScale(true);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
-            dsf.setFeatureAnnotationSymbol(symb);
-            map.getFeatureCollection().addFeature(dsf);
+                final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
+                        null,
+                        "",
+                        "",
+                        null,
+                        new CustomFixedWidthStroke(2f));
+                dsf.setGeometry(xg);
+                dsf.setPrimaryAnnotation(flaechenbez);
+                dsf.setPrimaryAnnotationJustification(JLabel.RIGHT_ALIGNMENT);
+                dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
+                final BufferedImage bi = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+                // final Graphics2D graphics = (Graphics2D)bi.getGraphics();
+                // graphics.setColor(Color.orange);
+                // graphics.fillOval(0, 0, 10, 10);
+                final FeatureAnnotationSymbol symb = new FeatureAnnotationSymbol(bi);
+                symb.setSweetSpotX(0.5);
+                symb.setSweetSpotY(0.5);
+                dsf.setIconImage(new ImageIcon(bi));
+                dsf.setAutoScale(true);
+                dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
+                dsf.setFeatureAnnotationSymbol(symb);
+                map.getFeatureCollection().addFeature(dsf);
 
-            final PNode annotationNode = map.getPFeatureHM().get(dsf).getPrimaryAnnotationNode();
-            final PBounds bounds = annotationNode.getBounds();
-            bounds.x = -20;
-            bounds.y = -20;
-            annotationNode.setBounds(bounds);
+                final PNode annotationNode = map.getPFeatureHM().get(dsf).getPrimaryAnnotationNode();
+                final PBounds bounds = annotationNode.getBounds();
+                bounds.x = -20;
+                bounds.y = -20;
+                annotationNode.setBounds(bounds);
+            }
         }
     }
 

@@ -109,26 +109,28 @@ public class FrontenReportBean extends EBReportBean {
             fr.assign();
             final Geometry g = (Geometry)b.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
-            final Integer frontNummer = (Integer)b.getProperty(FrontPropertyConstants.PROP__NUMMER);
-            final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
-                    null,
-                    "",
-                    "",
-                    null,
-                    fr.getLineStyle());
-            dsf.setGeometry(g);
-            final Color c = (Color)fr.getLinePaint();
-            final Color c2;
-            c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FRONT_TRANSPARENCY);
-            dsf.setLinePaint(c2);
-            final OldFixedWidthStroke ls2 = new OldFixedWidthStroke();
-            ls2.setMultiplyer(25);
-            dsf.setLineSytle(ls2);
-            dsf.setPrimaryAnnotation(Integer.toString(frontNummer));
-            dsf.setPrimaryAnnotationPaint(Color.RED);
-            dsf.setAutoScale(true);
-            dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
-            map.getFeatureCollection().addFeature(dsf);
+            if (g != null) {
+                final Integer frontNummer = (Integer)b.getProperty(FrontPropertyConstants.PROP__NUMMER);
+                final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
+                        null,
+                        "",
+                        "",
+                        null,
+                        fr.getLineStyle());
+                dsf.setGeometry(g);
+                final Color c = (Color)fr.getLinePaint();
+                final Color c2;
+                c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FRONT_TRANSPARENCY);
+                dsf.setLinePaint(c2);
+                final OldFixedWidthStroke ls2 = new OldFixedWidthStroke();
+                ls2.setMultiplyer(25);
+                dsf.setLineSytle(ls2);
+                dsf.setPrimaryAnnotation(Integer.toString(frontNummer));
+                dsf.setPrimaryAnnotationPaint(Color.RED);
+                dsf.setAutoScale(true);
+                dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
+                map.getFeatureCollection().addFeature(dsf);
+                }
         }
     }
 
