@@ -20,23 +20,21 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKTReader;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.SwingWorker;
-
-import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.CrsTransformer;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
+import de.cismet.verdis.server.search.BuchungsblattLanparcelsGeomServerSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 
 /**
@@ -51,7 +49,6 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
 
     private static final Logger LOG = Logger.getLogger(KassenzeichenGrundbuchblattSearchDialog.class);
 
-    private static final float FLURSTUECKBUFFER_FOR_KASSENZEICHEN_GEOMSEARCH = -0.1f;
     private static KassenzeichenGrundbuchblattSearchDialog INSTANCE;
 
     //~ Instance fields --------------------------------------------------------
@@ -213,36 +210,30 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
      */
     public void setGrundbuchblatt(final MetaObject grundbuchblatt) {
         this.grundbuchblatt = grundbuchblatt;
-        jLabel2.setText((String)grundbuchblatt.getBean().getProperty("buchungsblattcode"));
+        final String bbcode = (String)grundbuchblatt.getBean().getProperty("buchungsblattcode");
+        jLabel2.setText(bbcode);
         kassenzeichenGeomSearchPanel1.searchStarted();
         new SwingWorker<Collection<Integer>, Void>() {
 
                 @Override
                 protected Collection<Integer> doInBackground() throws Exception {
-                    final CidsBean bean = grundbuchblatt.getBean();
-//                    }
+                    final Collection<String> bbUnionGeomSearchResult = (Collection<String>)SessionManager
+                                .getProxy()
+                                .customServerSearch(SessionManager.getSession().getUser(),
+                                        new BuchungsblattLanparcelsGeomServerSearch(
+                                            StringUtils.rightPad(bbcode, 14, ' ')));
+                    if (bbUnionGeomSearchResult.isEmpty()) {
+                        return null;
+                    }
+
+                    final Geometry bbUnionGeom = new WKTReader().read((String)bbUnionGeomSearchResult.toArray()[0]);
+                    bbUnionGeom.setSRID((Integer)bbUnionGeomSearchResult.toArray()[1]);
+                    final String currentCrs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
+                    final Geometry transformedGeom = CrsTransformer.transformToGivenCrs(bbUnionGeom, currentCrs);
+                    transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
 
                     final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
                     geomSearch.setAllgemeinFilter(true);
-                    final Collection<CidsBean> geomBeans = bean.getBeanCollectionProperty("landparcels");
-                    final List<Geometry> geoms = new ArrayList<Geometry>(geomBeans.size());
-                    for (final CidsBean geomBean : geomBeans) {
-                        if (geomBean != null) {
-                            try {
-                                final Geometry geom = (Geometry)geomBean.getProperty("geometrie.geo_field");
-                                geoms.add(geom.buffer(FLURSTUECKBUFFER_FOR_KASSENZEICHEN_GEOMSEARCH));
-                            } catch (final Exception ex) {
-                                LOG.error("fehler beim suchen von kassenzeichen über eine geometrie", ex);
-                            }
-                        }
-                    }
-                    final Geometry geomColl = new GeometryCollection(GeometryFactory.toGeometryArray(geoms),
-                            geoms.get(0).getFactory());
-                    final String currentCrs = CrsTransformer.createCrsFromSrid(CrsTransformer.getCurrentSrid());
-                    final Geometry transformedGeom = CrsTransformer.transformToGivenCrs((Geometry)geomColl.buffer(0)
-                                    .clone(),
-                            currentCrs);
-                    transformedGeom.setSRID(CrsTransformer.getCurrentSrid());
                     geomSearch.setGeometry(transformedGeom);
 
                     final Collection<Integer> result = (Collection<Integer>)SessionManager.getProxy()

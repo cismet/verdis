@@ -130,7 +130,7 @@ public class FrontenReportBean extends EBReportBean {
                 dsf.setAutoScale(true);
                 dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
                 map.getFeatureCollection().addFeature(dsf);
-                }
+            }
         }
     }
 
