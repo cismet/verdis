@@ -40,8 +40,11 @@ import edu.umd.cs.piccolox.event.PNotification;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -58,8 +61,13 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -77,6 +85,8 @@ import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
@@ -733,6 +743,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
      */
     private void cmdRemoveKassenzeichenGeometrienActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
         ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).removeSelectedBeans();
+        refreshAutoCreateGeometriesButton();
     }                                                                                                    //GEN-LAST:event_cmdRemoveKassenzeichenGeometrienActionPerformed
 
     /**
@@ -804,10 +815,38 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
      * @param  evt  DOCUMENT ME!
      */
     private void cmdAutoCreateGeometriesActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAutoCreateGeometriesActionPerformed
+        final JDialog dialog = new JDialog((JFrame)null, "Bitte warten...", true) {
+
+                @Override
+                public void dispose() {
+                    super.dispose();
+                }
+            };
+
+        final JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        bar.setString(" Kassenzeichen-Geometrien werden erstellt. ");
+        bar.setStringPainted(true);
+//        bar.setMinimumSize(new Dimension(200, 50));
+//        bar.setPreferredSize(bar.getMinimumSize());
+        dialog.add(BorderLayout.CENTER, bar);
+        // dlg.add(BorderLayout.NORTH, new JLabel("Progress..."));
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.pack();
+
         new SwingWorker<Collection<CidsBean>, Object>() {
 
                 @Override
                 protected Collection<CidsBean> doInBackground() throws Exception {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                StaticSwingTools.showDialog(dialog);
+                            }
+                        });
+
                     Geometry unionGeom = null;
                     final CidsBean kassenzBean = getCidsBean();
                     if (kassenzBean != null) {
@@ -862,6 +901,9 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                             kassenzeichenGeometrieBeansToAdd);
                     } catch (final Exception ex) {
                         LOG.error("error while creating kassenzeichenGeometrie beans", ex);
+                    } finally {
+                        dialog.dispose();
+                        refreshAutoCreateGeometriesButton();
                     }
                 }
             }.execute();
@@ -943,8 +985,16 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         setEnabled(isEditable);
         cmdRemoveKassenzeichenGeometrien.setEnabled(isEditable
                     && (lstKassenzeichenGeometrien.getSelectedIndices().length > 0));
+        refreshAutoCreateGeometriesButton();
+    }
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void refreshAutoCreateGeometriesButton() {
+        final boolean isEditable = CidsAppBackend.getInstance().isEditable();
         boolean hasFlaecheGeoms = false;
+        boolean hasAllgGeoms = false;
         final CidsBean kassenzBean = getCidsBean();
         if (kassenzBean != null) {
             for (final CidsBean flaecheBean
@@ -960,11 +1010,13 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                     break;
                 }
             }
+            hasAllgGeoms =
+                !((Collection<CidsBean>)kassenzBean.getBeanCollectionProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)).isEmpty();
         }
 
-        cmdAutoCreateGeometries.setEnabled(isEditable && hasFlaecheGeoms);
+        cmdAutoCreateGeometries.setEnabled(isEditable && hasFlaecheGeoms && !hasAllgGeoms);
     }
-
     /**
      * DOCUMENT ME!
      *
