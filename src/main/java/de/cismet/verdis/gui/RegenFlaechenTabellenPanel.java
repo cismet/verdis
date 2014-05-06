@@ -189,7 +189,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     final int displayedIndex = componentAdapter.row;
                     final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                    return getGeometry(cidsBean) == null;
+                    return (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                    != (Integer)cidsBean.getProperty(
+                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                        + "."
+                                        + FlaechenartPropertyConstants.PROP__ID)) && (getGeometry(cidsBean) == null);
                 }
             };
 
@@ -253,7 +259,14 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             if ((pf.getFeature() instanceof PureNewFeature) && (pf.getFeature().getGeometry() instanceof Polygon)) {
                 final List<CidsBean> selectedBeans = getSelectedBeans();
                 final CidsBean selectedBean = (!selectedBeans.isEmpty()) ? selectedBeans.get(0) : null;
-                if (selectedBean != null) {
+                if ((selectedBean != null)
+                            && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                != selectedBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                    + "."
+                                    + FlaechenartPropertyConstants.PROP__ID))) {
                     final boolean hasGeometrie = getGeometry(selectedBean) != null;
                     final boolean isMarkedForDeletion = selectedBean.getMetaObject().getStatus()
                                 == MetaObject.TO_DELETE;
@@ -459,7 +472,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         if (dialog.getReturnStatus() == NewFlaecheDialog.RET_OK) {
             final CidsBean flaechenartBean = dialog.getSelectedArt();
             Geometry geom = null;
-            if (dialog.isSoleNewChecked()) {
+            if ((Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                            != (Integer)flaechenartBean.getProperty(FlaechenartPropertyConstants.PROP__ID))
+                        && dialog.isSoleNewChecked()) {
                 if (sole != null) {
                     geom = sole.getFeature().getGeometry();
                     // unzugeordnete Geometrie aus Karte entfernen
@@ -524,7 +539,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             if (bezeichnung == null) {
                 break;
             }
-            if ((a == Main.PROPVAL_ART_DACH) || (a == Main.PROPVAL_ART_GRUENDACH)) {
+            if (a == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
+                return "A";
+            } else if ((a == Main.PROPVAL_ART_DACH) || (a == Main.PROPVAL_ART_GRUENDACH)) {
                 // In Bezeichnung m\u00FCsste eigentlich ne Zahl stehen. Einfach ignorieren falls nicht.
                 try {
                     final int num = new Integer(bezeichnung).intValue();
@@ -556,7 +573,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         // log.debug(highestNumber+"");
 
         // n\u00E4chste freie Zahl f\u00FCr Dachfl\u00E4chen
-        final int newHighestNumber = highestNumber + 1;
+        final int newHighestNumber = highestNumber
+                    + 1;
 
         // n\u00E4chste freie Bezeichnung f\u00FCr versiegelte Fl\u00E4chen
         final String newHighestBezeichner = nextFlBez(highestBezeichner);
@@ -564,7 +582,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         switch (art) {
             case Main.PROPVAL_ART_DACH:
             case Main.PROPVAL_ART_GRUENDACH: {
-                return newHighestNumber + "";
+                return newHighestNumber
+                            + "";
             }
             case Main.PROPVAL_ART_VERSIEGELTEFLAECHE:
             case Main.PROPVAL_ART_OEKOPFLASTER:
@@ -604,7 +623,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             final String end = new String(charArr);
 
             if (carry) {
-                return "A" + end;
+                return "A"
+                            + end;
             } else {
                 return end;
             }

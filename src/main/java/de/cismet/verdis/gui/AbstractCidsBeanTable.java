@@ -118,8 +118,10 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     public void addNewBean() {
         try {
             final CidsBean newBean = createNewBean();
-            addBean(newBean);
-            Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
+            if (newBean != null) {
+                addBean(newBean);
+                Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
+            }
         } catch (final Exception ex) {
             LOG.error("error while creating new bean", ex);
         }

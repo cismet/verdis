@@ -211,6 +211,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static final int PROPVAL_ART_OEKOPFLASTER = 4;
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE = 5;
     public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
+    public static final int PROPVAL_ART_VORLAEUFIGEVERANLASSUNG = 7;
     public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
     public static final String ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER = "ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER";
     public static final String KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER =
@@ -4471,10 +4472,27 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             switch (CidsAppBackend.getInstance().getMode()) {
                 case REGEN: {
+                    boolean canAdd = true;
+                    if (kassenzeichenBean != null) {
+                        final Collection<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
+                                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                        if ((flaechen.size() == 1)
+                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                        == (Integer)flaechen.iterator().next().getProperty(
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                            + "."
+                                            + FlaechenartPropertyConstants.PROP__ID))) {
+                            canAdd = false;
+                        }
+                    }
+                    cmdAdd.setEnabled(canAdd);
                     selectedBeans = regenFlaechenTabellenPanel.getSelectedBeans();
                 }
                 break;
                 case ESW: {
+                    cmdAdd.setEnabled(true);
                     selectedBeans = wdsrFrontenTabellenPanel.getSelectedBeans();
                 }
                 break;
@@ -4494,7 +4512,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             final boolean hasItemsInSelection = (selectedBeans != null) && !selectedBeans.isEmpty();
 
-            cmdAdd.setEnabled(true);
             cmdRemove.setEnabled(hasItemsInSelection);
             cmdUndo.setEnabled(hasItemsInSelection);
         } else {

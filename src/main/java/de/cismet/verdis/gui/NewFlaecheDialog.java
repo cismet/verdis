@@ -7,9 +7,12 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import Sirius.server.middleware.types.MetaClass;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
@@ -19,6 +22,11 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 
 import de.cismet.verdis.CidsAppBackend;
 
+import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
+import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
@@ -73,8 +81,9 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
 
         initComponents();
 
-        ((DefaultBindableReferenceCombo)cboArt).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_FLAECHENART));
+        final MetaClass faMc = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART);
+
+        ((DefaultBindableReferenceCombo)cboArt).setMetaClass(faMc);
         cboArt.addPropertyChangeListener(new PropertyChangeListener() {
 
                 @Override
@@ -101,7 +110,7 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        cboArt = new DefaultBindableReferenceCombo();
+        cboArt = createComboArt();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox2 = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
@@ -266,6 +275,85 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
         pack();
     } // </editor-fold>//GEN-END:initComponents
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static DefaultBindableReferenceCombo createComboArt() {
+        final DefaultBindableReferenceCombo combo = new DefaultBindableReferenceCombo();
+        combo.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (evt.getPropertyName().equals("model") && (evt.getNewValue() instanceof DefaultComboBoxModel)) {
+                        final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
+                        if ((kassenzeichenBean != null)
+                                    && !kassenzeichenBean.getBeanCollectionProperty(
+                                        KassenzeichenPropertyConstants.PROP__FLAECHEN).isEmpty()) {
+                            final DefaultComboBoxModel aModel = (DefaultComboBoxModel)evt.getNewValue();
+                            Object vvobject = null;
+                            for (int index = 0; (index < aModel.getSize()) && (vvobject == null); index++) {
+                                final Object object = aModel.getElementAt(index);
+                                if ((object instanceof CidsBean)
+                                            && ((Integer)((CidsBean)object).getProperty(
+                                                    FlaechenartPropertyConstants.PROP__ID)
+                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
+                                    vvobject = object;
+                                }
+                            }
+                            aModel.removeElement(vvobject);
+                        }
+                    }
+                }
+            });
+        return combo;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static DefaultBindableReferenceCombo createComboArtForEdit() {
+        final DefaultBindableReferenceCombo combo = new DefaultBindableReferenceCombo();
+        combo.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (evt.getPropertyName().equals("model") && (evt.getNewValue() instanceof DefaultComboBoxModel)) {
+                        final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
+                        if ((kassenzeichenBean != null)
+                                    && ((kassenzeichenBean.getBeanCollectionProperty(
+                                                KassenzeichenPropertyConstants.PROP__FLAECHEN).size() > 1)
+                                        || ((kassenzeichenBean.getBeanCollectionProperty(
+                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).size() == 1)
+                                            && (kassenzeichenBean.getBeanCollectionProperty(
+                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).iterator().next()
+                                                .getProperty(
+                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                                    + "."
+                                                    + GeomPropertyConstants.PROP__GEO_FIELD) != null)))) {
+                            final DefaultComboBoxModel aModel = (DefaultComboBoxModel)evt.getNewValue();
+                            Object vvobject = null;
+                            for (int index = 0; (index < aModel.getSize()) && (vvobject == null); index++) {
+                                final Object object = aModel.getElementAt(index);
+                                if ((object instanceof CidsBean)
+                                            && ((Integer)((CidsBean)object).getProperty(
+                                                    FlaechenartPropertyConstants.PROP__ID)
+                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
+                                    vvobject = object;
+                                }
+                            }
+                            aModel.removeElement(vvobject);
+                        }
+                    }
+                }
+            });
+        return combo;
+    }
     /**
      * DOCUMENT ME!
      *
