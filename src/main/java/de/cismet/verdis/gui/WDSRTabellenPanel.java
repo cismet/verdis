@@ -111,7 +111,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedIndex = componentAdapter.row;
-                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                     return getItemValidator(cidsBean).getState().isError();
                 }
@@ -124,7 +124,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedIndex = componentAdapter.row;
-                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                     if (cidsBean != null) {
                         return CidsAppBackend.getInstance().isEditable()
@@ -142,7 +142,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedIndex = componentAdapter.row;
-                    final int modelIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedIndex);
+                    final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                     return getGeometry(cidsBean) == null;
                 }
@@ -155,7 +155,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final int displayedRowIndex = componentAdapter.row;
-                    final int modelRowIndex = jxtOverview.getFilters().convertRowIndexToModel(displayedRowIndex);
+                    final int modelRowIndex = jxtOverview.convertRowIndexToModel(displayedRowIndex);
                     final int displayedColumnIndex = componentAdapter.column;
                     final int modelColumnIndex = jxtOverview.convertColumnIndexToModel(displayedColumnIndex);
 

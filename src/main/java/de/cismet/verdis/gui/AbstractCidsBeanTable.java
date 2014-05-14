@@ -475,7 +475,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         }
 
         for (int i = 0; i < rows.length; ++i) {
-            cidsBeans.add(model.getCidsBeanByIndex(getJXTable().getFilters().convertRowIndexToModel(rows[i])));
+            cidsBeans.add(model.getCidsBeanByIndex(getJXTable().convertRowIndexToModel(rows[i])));
         }
 
         return cidsBeans;

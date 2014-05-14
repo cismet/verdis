@@ -830,7 +830,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
     private void cbxAbgearbeitetActionPerformed(final java.awt.event.ActionEvent evt) {
         try {
             final int displayedIndex = jXTable1.getSelectedRow();
-            final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
+            final int modelIndex = jXTable1.convertRowIndexToModel(displayedIndex);
             final CidsBean selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(
                     modelIndex).getBean();
             selectedFortfuehrungBean.setProperty(
@@ -1121,7 +1121,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         @Override
         public Component highlight(final Component renderer, final ComponentAdapter adapter) {
             final int displayedIndex = adapter.row;
-            final int modelIndex = jXTable1.getFilters().convertRowIndexToModel(displayedIndex);
+            final int modelIndex = jXTable1.convertRowIndexToModel(displayedIndex);
             final FortfuehrungItem item = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(modelIndex);
             final boolean istAbgearbeitet = item.isIst_abgearbeitet();
             renderer.setEnabled(!istAbgearbeitet);
