@@ -464,7 +464,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         allgInfosPanel = new AllgemeineInfosPanel();
 
-        regenFlaechenDetailsPanel = new RegenFlaechenDetailsPanel();
+        regenFlaechenDetailsPanel = RegenFlaechenDetailsPanel.getInstance();
         regenFlaechenTabellenPanel = new RegenFlaechenTabellenPanel();
 
         kartenPanel = new KartenPanel();

@@ -107,6 +107,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         super(CidsAppBackend.Mode.REGEN, new RegenFlaechenTableModel());
 
         initComponents();
+        jxtOverview.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         jxtOverview.setModel(getModel());
         final HighlightPredicate errorPredicate = new HighlightPredicate() {
@@ -190,13 +191,18 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     final int displayedIndex = componentAdapter.row;
                     final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
-                    return (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                    != (Integer)cidsBean.getProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
-                                        + "."
-                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                        + "."
-                                        + FlaechenartPropertyConstants.PROP__ID)) && (getGeometry(cidsBean) == null);
+                    return ((cidsBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART) != null)
+                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                        != (Integer)cidsBean.getProperty(
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                            + "."
+                                            + FlaechenartPropertyConstants.PROP__ID)))
+                                && (getGeometry(cidsBean) == null);
                 }
             };
 
@@ -314,13 +320,13 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @Override
     public Validator getItemValidator(final CidsBean flaecheBean) {
         final AggregatedValidator aggVal = new AggregatedValidator();
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorFlaechenBezeichnung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorGroesseGrafik(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorGroesseKorrektur(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorAnteil(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumErfassung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumVeranlagung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorFebId(flaecheBean));
         return aggVal;
     }
 
@@ -410,7 +416,12 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     .getBean();
 
         final int newId = getNextNewBeanId();
-        final String bezeichnung = getValidFlaechenname(flaechenartBean.getMetaObject().getId(), otherFlaechenBeans);
+        final String bezeichnung;
+        if (flaechenartBean != null) {
+            bezeichnung = getValidFlaechenname(flaechenartBean.getMetaObject().getId(), otherFlaechenBeans);
+        } else {
+            bezeichnung = null;
+        }
 
         flaecheBean.setProperty(FlaechePropertyConstants.PROP__ID, newId);
         flaecheBean.getMetaObject().setID(newId);

@@ -36,7 +36,6 @@ import javax.swing.event.ListSelectionListener;
 import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
@@ -79,7 +78,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     private final JXTable jxTable = new JXTable();
     private final CidsAppBackend.Mode modus;
     private final CidsBeanTableModel model;
-    private CidsBeanStore selectedRowListener = null;
+    private AbstractDetailsPanel selectedRowListener = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -343,16 +342,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             }
         }
 
-        if (selectedFeatures.size() == 1) {
-            final Feature selectedFeature = (Feature)selectedFeatures.toArray()[0];
-            if (selectedFeature instanceof CidsFeature) {
-                setDetailBean(((CidsFeature)selectedFeature).getMetaObject().getBean());
-            } else {
-                setDetailBean(null);
-            }
-        } else {
-            setDetailBean(null);
-        }
+        setDetailBeans(getSelectedBeans());
     }
 
     @Override
@@ -390,7 +380,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
      * @return  DOCUMENT ME!
      */
     @Override
-    public CidsBeanStore getSelectedRowListener() {
+    public AbstractDetailsPanel getSelectedRowListener() {
         return selectedRowListener;
     }
 
@@ -400,7 +390,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
      * @param  selectedRowListener  DOCUMENT ME!
      */
     @Override
-    public void setSelectedRowListener(final CidsBeanStore selectedRowListener) {
+    public void setSelectedRowListener(final AbstractDetailsPanel selectedRowListener) {
         this.selectedRowListener = selectedRowListener;
     }
 
@@ -412,6 +402,17 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     private void setDetailBean(final CidsBean cb) {
         if (selectedRowListener != null) {
             selectedRowListener.setCidsBean(cb);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cbs  DOCUMENT ME!
+     */
+    private void setDetailBeans(final Collection<CidsBean> cbs) {
+        if (selectedRowListener != null) {
+            selectedRowListener.setCidsBeans(cbs);
         }
     }
 
@@ -434,12 +435,11 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             CidsAppBackend.getInstance().getMainMap().getFeatureCollection().select(selectedFeatures);
             CidsAppBackend.getInstance().getMainMap().getFeatureCollection().addFeatureCollectionListener(this);
 
-            // DetailPanel --> nur setzen wenn # selektierte zeilen==1
-            if (getJXTable().getSelectedRowCount() == 1) {
-                setDetailBean(model.getCidsBeanByIndex(modelSelection[0]));
-            } else {
-                setDetailBean(null);
-            }
+//            if (getJXTable().getSelectedRowCount() == 1) {
+            setDetailBeans(model.getCidsBeansByIndices(modelSelection));
+//            } else {
+//                setDetailBean(null);
+//            }
 
             Main.getCurrentInstance().selectionChanged();
         }
