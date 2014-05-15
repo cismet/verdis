@@ -297,27 +297,25 @@ public abstract class EBReportBean {
 
         loadFeaturesInMap(map);
 
+        final double oldScale = map.getScaleDenominator();
+        final BoundingBox bbox = map.getBoundingBoxFromScale(oldScale);
+        final double realWorldWidthInMeter = bbox.getWidth();
+
         map.zoomToFeatureCollection();
+        final double newScale;
 
         if (scaleDenominator != null) {
-            final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
-            final double realWorldWidthInMeter = bbox.getWidth();
-
-            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
-                    getMapScaleDenom(scaleDenominator, map.getScaleDenominator(), realWorldWidthInMeter)));
+            newScale = scaleDenominator;
         } else {
-            final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
-            final double realWorldWidthInMeter = bbox.getWidth();
-            double roundScale = getReportScaleDenom(realWorldWidthInMeter);
-            roundScale = Math.round((roundScale / 100) + 0.5d) * 100;
-            map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
-                    getMapScaleDenom(roundScale, map.getScaleDenominator(), realWorldWidthInMeter)));
+            final double roundScale = getReportScaleDenom(map.getBoundingBoxFromScale(map.getScaleDenominator())
+                            .getWidth());
+            newScale = Math.round((roundScale / 100) + 0.5d) * 100;
         }
+        map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
+                getMapScaleDenom(newScale, oldScale, realWorldWidthInMeter)));
 
         // lets calculate the correct scale for the printed report
-        final BoundingBox bbox = map.getBoundingBoxFromScale(map.getScaleDenominator());
-        final double realWorldWidthInMeter = bbox.getWidth();
-        final double so = getReportScaleDenom(realWorldWidthInMeter);
+        final double so = getReportScaleDenom(map.getBoundingBoxFromScale(map.getScaleDenominator()).getWidth());
         scale = "1:" + NumberFormat.getIntegerInstance().format(so);
 
         map.setInteractionMode(MappingComponent.SELECT);
