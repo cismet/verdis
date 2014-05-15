@@ -536,8 +536,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             for (final Feature feature : fce.getEventFeatures()) {
                                 if (feature instanceof PostgisFeature) {
                                     final PostgisFeature postgisFeature = (PostgisFeature)feature;
-                                    LOG.fatal(postgisFeature.getFeatureType());
-                                    LOG.fatal(postgisFeature.getObjectName());
                                     if (postgisFeature.getFeatureType().equals("Versiegelte Flächen")) {
                                         // fce.get
                                     }
@@ -5174,6 +5172,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         aggVal.add(kassenzeichenPanel.getValidator());
         aggVal.add(regenFlaechenTabellenPanel.getValidator());
         aggVal.add(wdsrFrontenTabellenPanel.getValidator());
+        aggVal.validate();
         return aggVal;
     }
 
@@ -5189,6 +5188,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         if (cidsBean != null) {
             fillVeranlagungMaps(veranlagungSummeMap);
         }
+
+        aggValidator.validate();
     }
 
     /**

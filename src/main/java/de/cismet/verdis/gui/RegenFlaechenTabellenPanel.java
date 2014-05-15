@@ -144,16 +144,19 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                         final AggregatedValidator aggVal = new AggregatedValidator();
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(flaecheBean));
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(flaecheBean));
+                        aggVal.validate();
                         validator = aggVal;
                     } else if (modelColumnIndex == 6) {
                         final AggregatedValidator aggVal = new AggregatedValidator();
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
+                        aggVal.validate();
                         validator = aggVal;
                     } else {
                         final AggregatedValidator aggVal = new AggregatedValidator();
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
                         aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
+                        aggVal.validate();
                         validator = aggVal;
                     }
 
@@ -327,6 +330,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumErfassung(flaecheBean));
         aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumVeranlagung(flaecheBean));
         aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorFebId(flaecheBean));
+        aggVal.validate();
         return aggVal;
     }
 

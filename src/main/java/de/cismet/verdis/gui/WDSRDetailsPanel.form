@@ -137,6 +137,7 @@
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.strasse}" target="cboStrasse" targetPath="selectedItem" updateStrategy="0" immediately="false">
               <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.strasse"/>
             </BindingProperty>
           </BindingProperties>
           <Events>
@@ -161,7 +162,11 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.sr_klasse_or}" target="cboSR" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.sr_klasse_or}" target="cboSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
+              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="sr_klasse_or"/>
+            </BindingProperty>
           </BindingProperties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
@@ -213,6 +218,7 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
+                  <Property name="name" type="java.lang.String" value="frontinfo.sr_bem"/>
                 </BindingProperty>
               </BindingProperties>
             </Component>
@@ -271,6 +277,7 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
+                  <Property name="name" type="java.lang.String" value="frontinfo.wd_bem"/>
                 </BindingProperty>
               </BindingProperties>
             </Component>
@@ -286,7 +293,11 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.wd_prio_or}" target="cboWD" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.wd_prio_or}" target="cboWD" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
+              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.wd_prio_or"/>
+            </BindingProperty>
           </BindingProperties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
@@ -459,7 +470,11 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_wd}" target="cboLageWD" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_wd}" target="cboLageWD" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
+              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.lage_wd"/>
+            </BindingProperty>
           </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboLageWDActionPerformed"/>
@@ -477,7 +492,11 @@
             </Property>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_sr}" target="cboLageSR" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_sr}" target="cboLageSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
+              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.lage_sr"/>
+            </BindingProperty>
           </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboLageSRActionPerformed"/>

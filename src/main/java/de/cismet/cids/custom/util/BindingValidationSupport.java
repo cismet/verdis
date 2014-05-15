@@ -64,6 +64,7 @@ public class BindingValidationSupport {
             }
             validators.add(validator);
         }
+        validators.validate();
         return validators;
     }
 }

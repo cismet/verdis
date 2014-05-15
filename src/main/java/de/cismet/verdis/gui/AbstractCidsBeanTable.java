@@ -131,6 +131,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
         for (final CidsBean cidsBean : getSelectedBeans()) {
             removeBean(cidsBean);
             aggVal.remove(beanToValidatorMap.get(cidsBean));
+            aggVal.validate();
             beanToValidatorMap.remove(cidsBean);
         }
     }
@@ -204,6 +205,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             final Validator validator = getItemValidator(cidsBean);
             beanToValidatorMap.put(cidsBean, validator);
             aggVal.add(validator);
+            aggVal.validate();
 
             final CidsFeature cidsFeature = createCidsFeature(cidsBean);
 
@@ -459,6 +461,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
                 backupBean(tableBean);
             }
         }
+        aggVal.validate();
     }
 
     @Override

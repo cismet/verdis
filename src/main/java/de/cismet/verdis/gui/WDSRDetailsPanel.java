@@ -478,7 +478,8 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.strasse}"),
                 cboStrasse,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
+                "frontinfo.strasse");
         binding.setSourceNullValue(null);
         binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
@@ -507,7 +508,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_klasse_or}"),
                 cboSR,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
+                "sr_klasse_or");
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -539,7 +543,8 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_bem}"),
                 txtBemSR,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                "frontinfo.sr_bem");
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -586,7 +591,8 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_bem}"),
                 txtBemWD,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                "frontinfo.wd_bem");
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -611,7 +617,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_prio_or}"),
                 cboWD,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
+                "frontinfo.wd_prio_or");
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -774,7 +783,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_wd}"),
                 cboLageWD,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
+                "frontinfo.lage_wd");
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageWD.addActionListener(new java.awt.event.ActionListener() {
@@ -800,7 +812,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_sr}"),
                 cboLageSR,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
+                "frontinfo.lage_sr");
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         cboLageSR.addActionListener(new java.awt.event.ActionListener() {
