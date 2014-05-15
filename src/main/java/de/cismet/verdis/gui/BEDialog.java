@@ -128,6 +128,7 @@ public class BEDialog extends javax.swing.JDialog implements CidsBeanStore {
                     btnGo.setEnabled(state.isValid());
                 }
             });
+        aggVal.validate();
     }
 
     /**
