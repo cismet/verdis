@@ -295,6 +295,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
+                                Main.getMappingComponent().getFeatureCollection().removeFeature(cidsFeature);
                                 Main.getMappingComponent().getFeatureCollection().addFeature(cidsFeature);
                                 Main.getMappingComponent().getFeatureCollection().select(cidsFeature);
                             } catch (Exception ex) {
