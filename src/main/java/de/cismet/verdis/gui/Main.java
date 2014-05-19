@@ -39,6 +39,7 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 
@@ -102,6 +103,7 @@ import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
 import de.cismet.cismap.commons.MappingModelListener;
 import de.cismet.cismap.commons.ModeLayer;
+import de.cismet.cismap.commons.PNodeProvider;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
@@ -1580,15 +1582,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                     if (ms.get(counter) instanceof ModeLayer) {
                         ((ModeLayer)ms.get(counter)).setVisible(visible);
-                        ((ModeLayer)ms.get(counter)).getPNode().setTransparency((float)translucency);
-                    } else {
-                        ((MapService)ms.get(counter)).getPNode().setVisible(visible);
                     }
+                    if (ms.get(counter) instanceof PNodeProvider) {
+                        ((PNodeProvider)ms.get(counter)).getPNode().setTransparency((float)translucency);
+                        ((PNodeProvider)ms.get(counter)).getPNode().setVisible(visible);
+                    }
+
                     final ActiveLayerEvent ale = new ActiveLayerEvent();
                     ale.setLayer(ms.get(counter));
                     CismapBroker.getInstance().fireLayerVisibilityChanged(ale);
+
                     ((ServiceLayer)ms.get(counter)).setEnabled(enabled);
                     ((ServiceLayer)ms.get(counter)).setTranslucency((float)translucency);
+
                     counter++;
                 }
             }
