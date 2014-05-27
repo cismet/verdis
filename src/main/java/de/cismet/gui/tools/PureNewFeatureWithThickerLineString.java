@@ -31,7 +31,8 @@ import java.awt.geom.Point2D;
 
 import de.cismet.cismap.commons.WorldToScreenTransform;
 import de.cismet.cismap.commons.features.PureNewFeature;
-import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
+import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 /**
  * DOCUMENT ME!
@@ -86,8 +87,9 @@ public class PureNewFeatureWithThickerLineString extends PureNewFeature {
 
     @Override
     public Stroke getLineStyle() {
-        final OldFixedWidthStroke s = new OldFixedWidthStroke();
-        s.setMultiplyer(5);
+        final CustomFixedWidthStroke s = new CustomFixedWidthStroke(
+                5,
+                CismapBroker.getInstance().getMappingComponent());
         return s;
     }
 }

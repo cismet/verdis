@@ -197,7 +197,7 @@ public class FlaechenReportBean extends EBReportBean {
                     "",
                     "",
                     null,
-                    new CustomFixedWidthStroke(2f));
+                    new CustomFixedWidthStroke(2f, map));
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
             final Color c2;
@@ -223,7 +223,7 @@ public class FlaechenReportBean extends EBReportBean {
                         "",
                         "",
                         null,
-                        new CustomFixedWidthStroke(2f));
+                        new CustomFixedWidthStroke(2f, map));
                 dsf.setGeometry(xg);
                 dsf.setPrimaryAnnotation(flaechenbez);
                 dsf.setPrimaryAnnotationJustification(JLabel.RIGHT_ALIGNMENT);

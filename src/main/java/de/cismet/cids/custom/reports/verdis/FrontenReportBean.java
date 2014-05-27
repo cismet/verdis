@@ -35,7 +35,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.gui.MappingComponent;
-import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
+import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
@@ -122,8 +122,7 @@ public class FrontenReportBean extends EBReportBean {
                 final Color c2;
                 c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FRONT_TRANSPARENCY);
                 dsf.setLinePaint(c2);
-                final OldFixedWidthStroke ls2 = new OldFixedWidthStroke();
-                ls2.setMultiplyer(25);
+                final CustomFixedWidthStroke ls2 = new CustomFixedWidthStroke(25, map);
                 dsf.setLineSytle(ls2);
                 dsf.setPrimaryAnnotation(Integer.toString(frontNummer));
                 dsf.setPrimaryAnnotationPaint(Color.RED);

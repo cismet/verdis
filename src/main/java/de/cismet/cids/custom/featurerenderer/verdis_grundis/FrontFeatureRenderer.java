@@ -31,7 +31,8 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
-import de.cismet.cismap.commons.gui.piccolo.OldFixedWidthStroke;
+import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
@@ -47,7 +48,7 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Instance fields --------------------------------------------------------
 
-    OldFixedWidthStroke stroke = new OldFixedWidthStroke();
+    CustomFixedWidthStroke stroke = new CustomFixedWidthStroke(10f, CismapBroker.getInstance().getMappingComponent());
     boolean sr = false;
 
     //~ Methods ----------------------------------------------------------------
@@ -84,7 +85,6 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
 
     @Override
     public Stroke getLineStyle() {
-        stroke.setMultiplyer(10);
         return stroke;
     }
 }
