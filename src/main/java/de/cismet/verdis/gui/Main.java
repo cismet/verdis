@@ -180,6 +180,9 @@ import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 
+import static de.cismet.verdis.CidsAppBackend.Mode.ESW;
+import static de.cismet.verdis.CidsAppBackend.Mode.REGEN;
+
 /**
  * DOCUMENT ME!
  *
@@ -1521,6 +1524,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         refreshClipboardButtons();
         refreshClipboardButtonsToolTipText();
         refreshItemButtons();
+        refreshKassenzeichenButtons();
         final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
                     .getModeLayer("verdisAppModeLayer");
         if (ml != null) {
@@ -4532,9 +4536,17 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdEditMode.setEnabled(!b && !readonly && (kassenzeichenBean != null));
 
         cmdRefreshEnumeration.setEnabled(b);
-        cmdPdf.setEnabled((kassenzeichenBean != null)
-                    && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
-                    .isEmpty());
+        if (REGEN.equals(CidsAppBackend.getInstance().getMode())) {
+            cmdPdf.setEnabled((kassenzeichenBean != null)
+                        && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
+                        .isEmpty());
+        } else if (ESW.equals(CidsAppBackend.getInstance().getMode())) {
+            cmdPdf.setEnabled((kassenzeichenBean != null)
+                        && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)
+                        .isEmpty());
+        } else {
+            cmdPdf.setEnabled(false);
+        }
     }
 
     /**
