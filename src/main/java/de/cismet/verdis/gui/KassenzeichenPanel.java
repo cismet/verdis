@@ -165,6 +165,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
+        aggVal.validate();
 
         Main.getCurrentInstance().refreshTitle();
     }

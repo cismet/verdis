@@ -40,6 +40,7 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.Collection;
@@ -48,20 +49,23 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
+
+import de.cismet.cids.utils.multibean.EmbeddedMultiBeanDisplay;
+import de.cismet.cids.utils.multibean.MultiBeanHelper;
 
 import de.cismet.validation.*;
 
@@ -70,7 +74,6 @@ import de.cismet.validation.display.EmbeddedValidatorDisplay;
 import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.EditModeListener;
 import de.cismet.verdis.FlaecheCrossreference;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
@@ -87,15 +90,13 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements CidsBeanStore,
-    EditModeListener,
-    HyperlinkListener,
-    Validatable {
+public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             RegenFlaechenDetailsPanel.class);
+    private static RegenFlaechenDetailsPanel INSTANCE;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -103,6 +104,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
 
     private CidsBean flaecheBean;
     private final Validator bindingValidator;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanRegenFlDetails;
     private javax.swing.JComboBox cboAnschlussgrad;
@@ -144,11 +146,9 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
     /**
      * Creates new form RegenFlaechenDetailsPanel.
      */
-    public RegenFlaechenDetailsPanel() {
+    private RegenFlaechenDetailsPanel() {
         UIManager.put("ComboBox.disabledForeground", Color.black);
         initComponents();
-
-        bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
 
         ((DefaultBindableReferenceCombo)cboBeschreibung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisMetaClassConstants.MC_FLAECHENBESCHREIBUNG));
@@ -171,9 +171,86 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         } catch (ConnectionException ex) {
             LOG.error(ex, ex);
         }
+
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtBezeichnung,
+            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtGroesseGrafik,
+            FlaechePropertyConstants.PROP__FLAECHENINFO
+                    + "."
+                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtGroesseKorrektur,
+            FlaechePropertyConstants.PROP__FLAECHENINFO
+                    + "."
+                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            cboFlaechenart,
+            FlaechePropertyConstants.PROP__FLAECHENINFO
+                    + "."
+                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            cboAnschlussgrad,
+            FlaechePropertyConstants.PROP__FLAECHENINFO
+                    + "."
+                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            cboBeschreibung,
+            FlaechePropertyConstants.PROP__FLAECHENINFO
+                    + "."
+                    + FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtAnteil,
+            FlaechePropertyConstants.PROP__ANTEIL,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtAenderungsdatum,
+            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtVeranlagungsdatum,
+            FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtBemerkung,
+            FlaechePropertyConstants.PROP__BEMERKUNG,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            chkSperre,
+            FlaechePropertyConstants.PROP__SPERRE,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtSperreBemerkung,
+            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
+            getMultiBeanHelper());
+        EmbeddedMultiBeanDisplay.registerComponentForProperty(
+            txtFEB_ID,
+            FlaechePropertyConstants.PROP__FEB_ID,
+            getMultiBeanHelper());
+
+        bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static RegenFlaechenDetailsPanel getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new RegenFlaechenDetailsPanel();
+        }
+        return INSTANCE;
+    }
 
     @Override
     public Validator getValidator() {
@@ -300,7 +377,7 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         txtAnteil = new javax.swing.JTextField();
         txtAenderungsdatum = new javax.swing.JTextField();
         txtVeranlagungsdatum = new javax.swing.JTextField();
-        cboFlaechenart = NewFlaecheDialog.createComboArtForEdit();
+        cboFlaechenart = createComboArtForEdit();
         cboAnschlussgrad = new DefaultBindableReferenceCombo();
         scpBemerkung = new javax.swing.JScrollPane();
         txtBemerkung = new javax.swing.JTextArea();
@@ -816,8 +893,8 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
         flaecheBean = cidsBean;
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         bindingGroup.unbind();
-        bindingGroup.bind();
         ((DefaultBindableReferenceCombo)cboFlaechenart).reload(true);
+        bindingGroup.bind();
 
         try {
             if ((cidsBean != null)
@@ -998,118 +1075,120 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorFlaechenBezeichnung(final CidsBean flaecheBean) {
-        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG) {
-
-                @Override
-                protected void init() {
-                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                }
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
+        return new CidsBeanValidator(
+                flaecheBean,
+                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
-
-                    final String bezeichnung = (String)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-                    final int art =
-                        (cidsBean.getProperty(
+                    } else {
+                        final String bezeichnung = (String)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                        final int art =
+                            (flaecheBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                            + "."
+                                            + FlaechenartPropertyConstants.PROP__ID)
+                                        == null)
+                            ? 0
+                            : (Integer)flaecheBean.getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
                                         + FlaecheninfoPropertyConstants.PROP__FLAECHENART
                                         + "."
-                                        + FlaechenartPropertyConstants.PROP__ID)
-                                    == null)
-                        ? 0
-                        : (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                    + "."
-                                    + FlaechenartPropertyConstants.PROP__ID);
-                    final Action action = new AbstractAction() {
+                                        + FlaechenartPropertyConstants.PROP__ID);
+                        final Action action = new AbstractAction() {
 
-                            @Override
-                            public void actionPerformed(final ActionEvent e) {
-                                final int answer = JOptionPane.showConfirmDialog(
-                                        Main.getCurrentInstance(),
-                                        "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
-                                        "Bezeichnung automatisch setzen",
-                                        JOptionPane.YES_NO_OPTION);
-                                if (answer == JOptionPane.YES_OPTION) {
-                                    final CidsBean cidsBean = getCidsBean();
-                                    int art;
-                                    try {
-                                        art = (Integer)cidsBean.getProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                        + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                                        + "."
-                                                        + FlaechenartPropertyConstants.PROP__ID);
-                                    } catch (final NumberFormatException ex) {
-                                        art = 0;
-                                    }
-                                    final String newValue = Main.getCurrentInstance()
-                                                .getRegenFlaechenTabellenPanel()
-                                                .getValidFlaechenname(art);
-                                    try {
-                                        cidsBean.setProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-                                            newValue);
-                                    } catch (Exception ex) {
-                                        if (LOG.isDebugEnabled()) {
-                                            LOG.debug("error while setting flaechenbezeichnung", ex);
+                                @Override
+                                public void actionPerformed(final ActionEvent e) {
+                                    final int answer = JOptionPane.showConfirmDialog(
+                                            Main.getCurrentInstance(),
+                                            "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
+                                            "Bezeichnung automatisch setzen",
+                                            JOptionPane.YES_NO_OPTION);
+                                    if (answer == JOptionPane.YES_OPTION) {
+                                        int art;
+                                        try {
+                                            art = (Integer)flaecheBean.getProperty(
+                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                            + "."
+                                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                            + "."
+                                                            + FlaechenartPropertyConstants.PROP__ID);
+                                        } catch (final NumberFormatException ex) {
+                                            art = 0;
+                                        }
+                                        final String newValue = Main.getCurrentInstance()
+                                                    .getRegenFlaechenTabellenPanel()
+                                                    .getValidFlaechenname(art);
+                                        try {
+                                            flaecheBean.setProperty(
+                                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                                newValue);
+                                        } catch (Exception ex) {
+                                            if (LOG.isDebugEnabled()) {
+                                                LOG.debug("error while setting flaechenbezeichnung", ex);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        };
+                            };
 
-                    boolean numerisch = false;
-                    Integer tester = null;
-                    try {
-                        tester = Integer.parseInt(bezeichnung);
-                        numerisch = true;
-                    } catch (final Exception ex) {
-                        numerisch = false;
-                    }
-
-                    if (art == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
-                        if (!"A".equals(bezeichnung)) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Fl\u00E4chenbezeichnung muss \"A\" sein.",
-                                    action);
+                        boolean numerisch = false;
+                        Integer tester = null;
+                        try {
+                            tester = Integer.parseInt(bezeichnung);
+                            numerisch = true;
+                        } catch (final Exception ex) {
+                            numerisch = false;
                         }
-                    } else if ((art == Main.PROPVAL_ART_DACH) || (art == Main.PROPVAL_ART_GRUENDACH)) {
-                        if (!numerisch) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Fl\u00E4chenbezeichnung muss eine Zahl sein.",
-                                    action);
+
+                        if (art == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
+                            if (!"A".equals(bezeichnung)) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.ERROR,
+                                        "Fl\u00E4chenbezeichnung muss \"A\" sein.",
+                                        action);
+                            }
+                        } else if ((art == Main.PROPVAL_ART_DACH) || (art == Main.PROPVAL_ART_GRUENDACH)) {
+                            if (!numerisch) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.ERROR,
+                                        "Fl\u00E4chenbezeichnung muss eine Zahl sein.",
+                                        action);
+                            } else {
+                                if ((tester.intValue() > 1000) || (tester.intValue() < 0)) {
+                                    return new ValidatorStateImpl(
+                                            ValidatorState.Type.ERROR,
+                                            "Fl\u00E4chenbezeichnung muss zwischen 0 und 1000 liegen.",
+                                            action);
+                                }
+                            }
                         } else {
-                            if ((tester.intValue() > 1000) || (tester.intValue() < 0)) {
-                                return new ValidatorStateImpl(
-                                        ValidatorState.Type.ERROR,
-                                        "Fl\u00E4chenbezeichnung muss zwischen 0 und 1000 liegen.",
-                                        action);
+                            if (bezeichnung != null) {
+                                final int len = bezeichnung.length();
+                                if (numerisch || ((len > 3) || ((len == 3) && (bezeichnung.compareTo("BBB") > 0)))) {
+                                    return new ValidatorStateImpl(
+                                            ValidatorState.Type.ERROR,
+                                            "Fl\u00E4chenbezeichnung muss zwischen A und BBB liegen.",
+                                            action);
+                                }
                             }
                         }
-                    } else {
-                        if (bezeichnung != null) {
-                            final int len = bezeichnung.length();
-                            if (numerisch || ((len > 3) || ((len == 3) && (bezeichnung.compareTo("BBB") > 0)))) {
-                                return new ValidatorStateImpl(
-                                        ValidatorState.Type.ERROR,
-                                        "Fl\u00E4chenbezeichnung muss zwischen A und BBB liegen.",
-                                        action);
-                            }
-                        }
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1122,109 +1201,105 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorGroesseGrafik(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(
                 flaecheBean,
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
-                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK) {
-
-                @Override
-                protected void init() {
-                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                }
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || (mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
+                    } else {
+                        final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                        final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
+                        final Action action = new AbstractAction() {
 
-                    final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                    final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
-                    final Action action = new AbstractAction() {
-
-                            @Override
-                            public void actionPerformed(final ActionEvent event) {
-                                final CidsBean cidsBean = getCidsBean();
-
-                                if (Main.getCurrentInstance().isInEditMode()) {
-                                    if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                                == (Integer)flaecheBean.getProperty(
-                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                                    + "."
-                                                    + FlaechenartPropertyConstants.PROP__ID)) {
-                                        try {
-                                            cidsBean.setProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                @Override
+                                public void actionPerformed(final ActionEvent event) {
+                                    if (Main.getCurrentInstance().isInEditMode()) {
+                                        if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                                    == (Integer)flaecheBean.getProperty(
+                                                        FlaechePropertyConstants.PROP__FLAECHENINFO
                                                         + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                                null);
-                                        } catch (final Exception ex) {
-                                            if (LOG.isDebugEnabled()) {
-                                                LOG.debug("error while setting groesse_aus_grafik", ex);
-                                            }
-                                        }
-                                    } else if (geom != null) {
-                                        final int answer = JOptionPane.showConfirmDialog(
-                                                Main.getCurrentInstance(),
-                                                "Soll die Gr\u00F6\u00DFe aus der Grafik \u00FCbernommen werden?",
-                                                "Gr\u00F6\u00DFe automatisch setzen",
-                                                JOptionPane.YES_NO_OPTION);
-                                        if (answer == JOptionPane.YES_OPTION) {
+                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID)) {
                                             try {
-                                                final Integer gr_grafik = new Integer((int)(geom.getArea()));
-                                                cidsBean.setProperty(
+                                                flaecheBean.setProperty(
                                                     FlaechePropertyConstants.PROP__FLAECHENINFO
                                                             + "."
                                                             + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                                    gr_grafik);
+                                                    null);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
                                                     LOG.debug("error while setting groesse_aus_grafik", ex);
                                                 }
                                             }
+                                        } else if (geom != null) {
+                                            final int answer = JOptionPane.showConfirmDialog(
+                                                    Main.getCurrentInstance(),
+                                                    "Soll die Gr\u00F6\u00DFe aus der Grafik \u00FCbernommen werden?",
+                                                    "Gr\u00F6\u00DFe automatisch setzen",
+                                                    JOptionPane.YES_NO_OPTION);
+                                            if (answer == JOptionPane.YES_OPTION) {
+                                                try {
+                                                    final Integer gr_grafik = new Integer((int)(geom.getArea()));
+                                                    flaecheBean.setProperty(
+                                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                                + "."
+                                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                                        gr_grafik);
+                                                } catch (final Exception ex) {
+                                                    if (LOG.isDebugEnabled()) {
+                                                        LOG.debug("error while setting groesse_aus_grafik", ex);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        };
+                            };
 
-                    if (gr_grafik == null) {
-                        if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                    != (Integer)flaecheBean.getProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        final Integer artId = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
                                         + FlaecheninfoPropertyConstants.PROP__FLAECHENART
                                         + "."
-                                        + FlaechenartPropertyConstants.PROP__ID)) {
-                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
-                        } else {
-                            return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                                        + FlaechenartPropertyConstants.PROP__ID);
+                        if (artId == null) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.WARNING,
+                                    "kann nicht validiert werden, Flächenart ist nicht gesetzt.");
+                        } else if (gr_grafik == null) {
+                            if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG != artId) {
+                                return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
+                            } else {
+                                return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                            }
+                        } else if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG == artId) {
+                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert muss leer sein", action);
+                        } else if ((geom != null) && !gr_grafik.equals(new Integer((int)(geom.getArea())))) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.WARNING,
+                                    "Fl\u00E4che der Geometrie stimmt nicht \u00FCberein ("
+                                            + ((int)(geom.getArea()))
+                                            + ")",
+                                    action);
                         }
-                    } else if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                == (Integer)flaecheBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                    + "."
-                                    + FlaechenartPropertyConstants.PROP__ID)) {
-                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert muss leer sein", action);
-                    } else if ((geom != null) && !gr_grafik.equals(new Integer((int)(geom.getArea())))) {
-                        return new ValidatorStateImpl(
-                                ValidatorState.Type.WARNING,
-                                "Fl\u00E4che der Geometrie stimmt nicht \u00FCberein ("
-                                        + ((int)(geom.getArea()))
-                                        + ")",
-                                action);
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1237,83 +1312,84 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorGroesseKorrektur(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(
                 flaecheBean,
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
-                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR) {
-
-                @Override
-                protected void init() {
-                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                }
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
+                    } else {
+                        final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                        final Integer gr_korrektur = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
 
-                    final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                    final Integer gr_korrektur = (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                        final Action action = new AbstractAction() {
 
-                    final Action action = new AbstractAction() {
+                                @Override
+                                public void actionPerformed(final ActionEvent event) {
+                                    final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
 
-                            @Override
-                            public void actionPerformed(final ActionEvent event) {
-                                final CidsBean cidsBean = getCidsBean();
-                                final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
-
-                                if (Main.getCurrentInstance().isInEditMode()) {
-                                    if (geom != null) {
-                                        final int answer = JOptionPane.showConfirmDialog(
-                                                Main.getCurrentInstance(),
-                                                "Soll die Gr\u00F6\u00DFe aus dem Feld \"Gr\u00F6\u00DFe (Grafik)\" \u00FCbernommen werden?",
-                                                "Gr\u00F6\u00DFe automatisch setzen",
-                                                JOptionPane.YES_NO_OPTION);
-                                        if (answer == JOptionPane.YES_OPTION) {
-                                            try {
-                                                final Integer gr_grafik = (Integer)cidsBean.getProperty(
+                                    if (Main.getCurrentInstance().isInEditMode()) {
+                                        if (geom != null) {
+                                            final int answer = JOptionPane.showConfirmDialog(
+                                                    Main.getCurrentInstance(),
+                                                    "Soll die Gr\u00F6\u00DFe aus dem Feld \"Gr\u00F6\u00DFe (Grafik)\" \u00FCbernommen werden?",
+                                                    "Gr\u00F6\u00DFe automatisch setzen",
+                                                    JOptionPane.YES_NO_OPTION);
+                                            if (answer == JOptionPane.YES_OPTION) {
+                                                try {
+                                                    final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                                    + "."
+                                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                                                    flaecheBean.setProperty(
                                                         FlaechePropertyConstants.PROP__FLAECHENINFO
                                                                 + "."
-                                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                                                cidsBean.setProperty(
-                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                            + "."
-                                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
-                                                    gr_grafik);
-                                            } catch (final Exception ex) {
-                                                if (LOG.isDebugEnabled()) {
-                                                    LOG.debug("error while setting groesse_korrektur", ex);
+                                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                                                        gr_grafik);
+                                                } catch (final Exception ex) {
+                                                    if (LOG.isDebugEnabled()) {
+                                                        LOG.debug("error while setting groesse_korrektur", ex);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            };
+                        if (gr_grafik == null) {
+                            return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Wert ist leer");
+                        } else if (gr_korrektur != null) {
+                            final int diff = gr_korrektur.intValue() - gr_grafik.intValue();
+                            if (Math.abs(diff) > 20) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.WARNING,
+                                        "Differenz zwischen Korrekturwert und Gr\u00F6\u00DFe > 20m.",
+                                        action);
                             }
-                        };
-                    if (gr_grafik == null) {
-                        return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Wert ist leer");
-                    } else if (gr_korrektur != null) {
-                        final int diff = gr_korrektur.intValue() - gr_grafik.intValue();
-                        if (Math.abs(diff) > 20) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.WARNING,
-                                    "Differenz zwischen Korrekturwert und Gr\u00F6\u00DFe > 20m.",
-                                    action);
                         }
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1326,37 +1402,41 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorAnteil(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__ANTEIL) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
+                    } else {
+                        final Float anteil = (Float)flaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+                        final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                        final Integer gr_korrektur = (Integer)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
 
-                    final Float anteil = (Float)cidsBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
-                    final Integer gr_grafik = (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                    final Integer gr_korrektur = (Integer)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
-
-                    if (anteil != null) {
-                        if ((gr_korrektur != null) && (anteil.intValue() > gr_korrektur.intValue())) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
-                        } else if ((gr_grafik != null) && (anteil.intValue() > gr_grafik.intValue())) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
+                        if (anteil != null) {
+                            if ((gr_korrektur != null) && (anteil.intValue() > gr_korrektur.intValue())) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.ERROR,
+                                        "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
+                            } else if ((gr_grafik != null) && (anteil.intValue() > gr_grafik.intValue())) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.ERROR,
+                                        "Anteil ist h\u00F6her als Gr\u00F6\u00DFe.");
+                            }
                         }
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1369,17 +1449,21 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumErfassung(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__DATUM_AENDERUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
+                    } else {
+                        // jedes gültige Datum ist valide
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-
-                    // jedes gültige Datum ist valide
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1392,29 +1476,33 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorDatumVeranlagung(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
+                    } else {
+                        final String veranlagungsdatum = (String)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG);
 
-                    final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG);
-
-                    if (veranlagungsdatum != null) {
-                        final boolean matches = Pattern.matches(
-                                "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
-                                veranlagungsdatum);
-                        if (!matches) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
+                        if (veranlagungsdatum != null) {
+                            final boolean matches = Pattern.matches(
+                                    "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
+                                    veranlagungsdatum);
+                            if (!matches) {
+                                return new ValidatorStateImpl(
+                                        ValidatorState.Type.ERROR,
+                                        "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
+                            }
                         }
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1427,35 +1515,39 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     public static Validator getValidatorFebId(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__FEB_ID) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
+                    } else {
+                        final String febId = (String)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FEB_ID);
+                        if ((febId == null) || febId.trim().isEmpty()) {
+                            return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                        }
+                        Integer febIdInt = null;
+                        try {
+                            febIdInt = Integer.parseInt(febId);
+                        } catch (final Exception ex) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("error while parsing febId to integer", ex);
+                            }
+                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "FEB muss eine Zahl sein.");
+                        }
 
-                    final String febId = (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FEB_ID);
-                    if ((febId == null) || febId.trim().isEmpty()) {
+                        if ((febIdInt.intValue() < 20000001) || (febIdInt.intValue() > 20200000)) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.ERROR,
+                                    "FEB muss zwischen 20.000.000 und 20.200.000 liegen.");
+                        }
                         return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }
-                    Integer febIdInt = null;
-                    try {
-                        febIdInt = Integer.parseInt(febId);
-                    } catch (final Exception ex) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("error while parsing febId to integer", ex);
-                        }
-                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "FEB muss eine Zahl sein.");
-                    }
-
-                    if ((febIdInt.intValue() < 20000001) || (febIdInt.intValue() > 20200000)) {
-                        return new ValidatorStateImpl(
-                                ValidatorState.Type.ERROR,
-                                "FEB muss zwischen 20.000.000 und 20.200.000 liegen.");
-                    }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
@@ -1468,74 +1560,157 @@ public class RegenFlaechenDetailsPanel extends javax.swing.JPanel implements Cid
      * @return  DOCUMENT ME!
      */
     private Validator getValidatorFlaechenart(final CidsBean flaecheBean) {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
         return new CidsBeanValidator(
                 flaecheBean,
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
-                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART) {
-
-                @Override
-                protected void init() {
-                    addTriggerProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
-                }
+                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                        + "."
+                        + GeomPropertyConstants.PROP__GEO_FIELD) {
 
                 @Override
                 public ValidatorState performValidation() {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                ((DefaultBindableReferenceCombo)cboFlaechenart).reload(true);
-                            }
-                        });
-
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
+                    final boolean doNotValidate = (flaecheBean == null)
+                                || ((getTriggerdByProperty() != null)
+                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
+                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
+                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
-                    }
-
-                    final CidsBean flaechenart = (CidsBean)cidsBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-
-                    if ((flaechenart != null)
-                                && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                    == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))) {
-                        try {
-                            cidsBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
-                                anschlussgradBean);
-                            cidsBean.setProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-                                Main.getCurrentInstance().getRegenFlaechenTabellenPanel().getValidFlaechenname(
-                                    (Integer)flaechenart.getProperty("id")));
-                            cidsBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                null);
-                        } catch (final Exception ex) {
-                            LOG.error(ex, ex);
-                        }
-                        cboAnschlussgrad.setEnabled(false);
-                        txtGroesseGrafik.setEnabled(false);
                     } else {
-                        cboAnschlussgrad.setEnabled(true);
-                        txtGroesseGrafik.setEnabled(true);
-                    }
-                    Main.getCurrentInstance().refreshItemButtons();
+                        SwingUtilities.invokeLater(new Runnable() {
 
-                    final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(cidsBean);
-                    if ((flaechenart != null)
-                                && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                    == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))
-                                && (geom != null)) {
-                        return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Geometrie darf nicht gesetzt sein.");
-                    }
+                                @Override
+                                public void run() {
+                                    ((DefaultBindableReferenceCombo)cboFlaechenart).reload(true);
+                                }
+                            });
 
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                        final CidsBean flaechenart = (CidsBean)flaecheBean.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
+
+                        if ((flaechenart != null)
+                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                        == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))) {
+                            try {
+                                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+                                    anschlussgradBean);
+                                flaecheBean.setProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                    Main.getCurrentInstance().getRegenFlaechenTabellenPanel().getValidFlaechenname(
+                                        (Integer)flaechenart.getProperty("id")));
+                                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                    null);
+                            } catch (final Exception ex) {
+                                LOG.error(ex, ex);
+                            }
+                            cboAnschlussgrad.setEnabled(false);
+                            txtGroesseGrafik.setEditable(false);
+                        } else {
+                            cboAnschlussgrad.setEnabled(txtBezeichnung.isEditable());
+                            txtGroesseGrafik.setEditable(txtBezeichnung.isEditable());
+                        }
+                        Main.getCurrentInstance().refreshItemButtons();
+
+                        final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
+                        if ((flaechenart != null)
+                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                        == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))
+                                    && (geom != null)) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.ERROR,
+                                    "Geometrie darf nicht gesetzt sein.");
+                        }
+
+                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
+                    }
                 }
             };
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo createComboArtForEdit() {
+        final DefaultBindableReferenceCombo combo = new DefaultBindableReferenceCombo() {
+
+                @Override
+                public void setModel(final ComboBoxModel aModel) {
+                    bindingGroup.unbind();
+                    super.setModel(aModel);
+                    bindingGroup.bind();
+                }
+            };
+
+        combo.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (evt.getPropertyName().equals("model") && (evt.getNewValue() instanceof DefaultComboBoxModel)) {
+                        final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
+                        if ((kassenzeichenBean != null)
+                                    && ((kassenzeichenBean.getBeanCollectionProperty(
+                                                KassenzeichenPropertyConstants.PROP__FLAECHEN).size() > 1)
+                                        || ((kassenzeichenBean.getBeanCollectionProperty(
+                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).size() == 1)
+                                            && (kassenzeichenBean.getBeanCollectionProperty(
+                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).iterator().next()
+                                                .getProperty(
+                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                                    + "."
+                                                    + GeomPropertyConstants.PROP__GEO_FIELD) != null)))) {
+                            final DefaultComboBoxModel aModel = (DefaultComboBoxModel)evt.getNewValue();
+                            Object vvobject = null;
+                            for (int index = 0; (index < aModel.getSize()) && (vvobject == null); index++) {
+                                final Object object = aModel.getElementAt(index);
+                                if ((object instanceof CidsBean)
+                                            && ((Integer)((CidsBean)object).getProperty(
+                                                    FlaechenartPropertyConstants.PROP__ID)
+                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
+                                    vvobject = object;
+                                }
+                            }
+                            aModel.removeElement(vvobject);
+                        }
+                    }
+                }
+            });
+        return combo;
+    }
+
+    @Override
+    public CidsBean createDummyBean() {
+        final CidsBean dummyBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean flaecheninfoBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean geomBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getEmptyInstance()
+                    .getBean();
+        try {
+            dummyBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
+            dummyBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                geomBean);
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+        return dummyBean;
     }
 }

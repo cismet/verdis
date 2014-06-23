@@ -137,13 +137,14 @@
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.strasse}" target="cboStrasse" targetPath="selectedItem" updateStrategy="0" immediately="false">
               <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.strasse"/>
             </BindingProperty>
           </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboStrasseActionPerformed"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo(true)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -162,7 +163,9 @@
           </Properties>
           <BindingProperties>
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.sr_klasse_or}" target="cboSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="sr_klasse_or"/>
             </BindingProperty>
           </BindingProperties>
           <AuxValues>
@@ -215,6 +218,7 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
+                  <Property name="name" type="java.lang.String" value="frontinfo.sr_bem"/>
                 </BindingProperty>
               </BindingProperties>
             </Component>
@@ -273,6 +277,7 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
+                  <Property name="name" type="java.lang.String" value="frontinfo.wd_bem"/>
                 </BindingProperty>
               </BindingProperties>
             </Component>
@@ -289,7 +294,9 @@
           </Properties>
           <BindingProperties>
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.wd_prio_or}" target="cboWD" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.wd_prio_or"/>
             </BindingProperty>
           </BindingProperties>
           <AuxValues>
@@ -464,7 +471,9 @@
           </Properties>
           <BindingProperties>
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_wd}" target="cboLageWD" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.lage_wd"/>
             </BindingProperty>
           </BindingProperties>
           <Events>
@@ -484,7 +493,9 @@
           </Properties>
           <BindingProperties>
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_sr}" target="cboLageSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="java.lang.Object" value="null"/>
               <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
+              <Property name="name" type="java.lang.String" value="frontinfo.lage_sr"/>
             </BindingProperty>
           </BindingProperties>
           <Events>
@@ -517,38 +528,6 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
               <GridBagConstraints gridX="0" gridY="5" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="7" insetsBottom="2" insetsRight="2" anchor="17" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="cboWDFromLage">
-          <Properties>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.cboWDFromLage.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="cboWDFromLage.setVisible(false);"/>
-          </AuxValues>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="13" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="2" insetsBottom="2" insetsRight="2" anchor="18" weightX="0.0" weightY="0.0"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="cboSRFromLage">
-          <Properties>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.cboSRFromLage.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="cboSRFromLage.setVisible(false);"/>
-          </AuxValues>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-              <GridBagConstraints gridX="1" gridY="8" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="2" insetsBottom="2" insetsRight="2" anchor="18" weightX="0.0" weightY="0.0"/>
             </Constraint>
           </Constraints>
         </Component>

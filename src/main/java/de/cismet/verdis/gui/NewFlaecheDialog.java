@@ -313,50 +313,6 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     */
-    public static DefaultBindableReferenceCombo createComboArtForEdit() {
-        final DefaultBindableReferenceCombo combo = new DefaultBindableReferenceCombo();
-        combo.addPropertyChangeListener(new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    if (evt.getPropertyName().equals("model") && (evt.getNewValue() instanceof DefaultComboBoxModel)) {
-                        final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
-                        if ((kassenzeichenBean != null)
-                                    && ((kassenzeichenBean.getBeanCollectionProperty(
-                                                KassenzeichenPropertyConstants.PROP__FLAECHEN).size() > 1)
-                                        || ((kassenzeichenBean.getBeanCollectionProperty(
-                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).size() == 1)
-                                            && (kassenzeichenBean.getBeanCollectionProperty(
-                                                    KassenzeichenPropertyConstants.PROP__FLAECHEN).iterator().next()
-                                                .getProperty(
-                                                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
-                                                    + "."
-                                                    + GeomPropertyConstants.PROP__GEO_FIELD) != null)))) {
-                            final DefaultComboBoxModel aModel = (DefaultComboBoxModel)evt.getNewValue();
-                            Object vvobject = null;
-                            for (int index = 0; (index < aModel.getSize()) && (vvobject == null); index++) {
-                                final Object object = aModel.getElementAt(index);
-                                if ((object instanceof CidsBean)
-                                            && ((Integer)((CidsBean)object).getProperty(
-                                                    FlaechenartPropertyConstants.PROP__ID)
-                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
-                                    vvobject = object;
-                                }
-                            }
-                            aModel.removeElement(vvobject);
-                        }
-                    }
-                }
-            });
-        return combo;
-    }
-    /**
-     * DOCUMENT ME!
-     *
      * @param  evt  DOCUMENT ME!
      */
     private void cmdOKActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOKActionPerformed

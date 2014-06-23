@@ -23,6 +23,8 @@
  */
 package de.cismet.verdis.gui;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -105,6 +107,21 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
             return 0;
         }
         return cidsBeans.size();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   modelIndices  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<CidsBean> getCidsBeansByIndices(final int[] modelIndices) {
+        final Collection<CidsBean> cidsBeans = new ArrayList<CidsBean>();
+        for (int i = 0; i < modelIndices.length; i++) {
+            cidsBeans.add(getCidsBeanByIndex(modelIndices[i]));
+        }
+        return cidsBeans;
     }
 
     /**

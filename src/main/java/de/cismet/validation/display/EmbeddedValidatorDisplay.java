@@ -80,7 +80,9 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
                     }
                 }
             });
-        component.setLayout(new BorderLayout());
+        if (!(component.getLayout() instanceof BorderLayout)) {
+            component.setLayout(new BorderLayout());
+        }
         component.add(this, BorderLayout.EAST);
 
         this.aggValidator.addListener(this);
@@ -105,12 +107,14 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
     @Override
     public void addValidator(final Validator validator) {
         this.aggValidator.add(validator);
+        aggValidator.validate();
         stateChanged(validator, validator.getState());
     }
 
     @Override
     public void removeValidator(final Validator validator) {
         this.aggValidator.remove(validator);
+        aggValidator.validate();
         stateChanged(validator, validator.getState());
     }
 

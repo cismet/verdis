@@ -26,11 +26,11 @@ package de.cismet.verdis.interfaces;
 import java.util.List;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.validation.Validatable;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
+import de.cismet.verdis.gui.AbstractDetailsPanel;
 
 /**
  * DOCUMENT ME!
@@ -76,14 +76,14 @@ public interface CidsBeanTable extends Validatable, CidsBeanComponent {
      *
      * @param  selectedRowListener  DOCUMENT ME!
      */
-    void setSelectedRowListener(final CidsBeanStore selectedRowListener);
+    void setSelectedRowListener(final AbstractDetailsPanel selectedRowListener);
 
     /**
      * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    CidsBeanStore getSelectedRowListener();
+    AbstractDetailsPanel getSelectedRowListener();
 
     /**
      * DOCUMENT ME!

@@ -53,6 +53,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -105,6 +106,8 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         super(CidsAppBackend.Mode.ESW, new WDSRTableModel());
 
         initComponents();
+        jxtOverview.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
         jxtOverview.setModel(getModel());
         final HighlightPredicate errorPredicate = new HighlightPredicate() {
 
@@ -168,12 +171,14 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                         final AggregatedValidator aggVal = new AggregatedValidator();
                         aggVal.add(WDSRDetailsPanel.getValidatorLaengeGrafik(frontBean));
                         aggVal.add(WDSRDetailsPanel.getValidatorLaengeKorrektur(frontBean));
+                        aggVal.validate();
                         validator = aggVal;
                     } else {
                         final AggregatedValidator aggVal = new AggregatedValidator();
                         aggVal.add(WDSRDetailsPanel.getValidatorDatumErfassung(frontBean));
                         aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungWD(frontBean));
                         aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungSR(frontBean));
+                        aggVal.validate();
                         validator = aggVal;
                     }
 
@@ -200,6 +205,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         aggVal.add(WDSRDetailsPanel.getValidatorDatumErfassung(frontBean));
         aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungWD(frontBean));
         aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungSR(frontBean));
+        aggVal.validate();
         return aggVal;
     }
 
