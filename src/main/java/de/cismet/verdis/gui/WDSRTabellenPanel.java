@@ -359,6 +359,11 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
             FrontPropertyConstants.PROP__ERFASSUNGSDATUM,
             new Date(Calendar.getInstance().getTime().getTime()));
 
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
+                    + "."
+                    + FrontinfoPropertyConstants.PROP__STRASSE,
+            Main.getCurrentInstance().getWdsrFrontenDetailsPanel().getLastStrasseBean());
+
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if ((sole != null) && (sole.getFeature().getGeometry() instanceof LineString)) {
             final int answer = JOptionPane.showConfirmDialog(

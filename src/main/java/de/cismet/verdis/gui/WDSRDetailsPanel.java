@@ -40,6 +40,7 @@ import org.openide.util.Exceptions;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -95,6 +96,8 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
     private CidsBean frontBean = null;
     private final Validator bindingValidator;
+    private CidsBean lastStrasseBean = null;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanWdsrDetails;
     private javax.swing.JComboBox cboLageSR;
@@ -192,6 +195,17 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                         setText(((bem == null) ? strasse : bem) + " (" + key + ")");
                     }
                     return this;
+                }
+            });
+
+        cboStrasse.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    final CidsBean strasseBean = (CidsBean)cboStrasse.getSelectedItem();
+                    if ((strasseBean != null) && (frontBean != null)) {
+                        lastStrasseBean = strasseBean;
+                    }
                 }
             });
 
@@ -1103,6 +1117,15 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     @Override
     public CidsBean getCidsBean() {
         return frontBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean getLastStrasseBean() {
+        return lastStrasseBean;
     }
 
     @Override
