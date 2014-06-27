@@ -12,6 +12,7 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.DefaultNavigatorExceptionHandler;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -30,6 +31,7 @@ import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
+import Sirius.navigator.ui.status.StatusChangeListener;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -344,8 +346,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
     private javax.swing.JButton cmdWorkflow;
+    private de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel exceptionNotificationStatusPanel;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
@@ -358,6 +362,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenu menEdit;
     private javax.swing.JMenu menExtras;
     private javax.swing.JMenu menFile;
@@ -638,6 +643,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
 
             initComponents();
+            DefaultNavigatorExceptionHandler.getInstance().addListener(exceptionNotificationStatusPanel);
 
             // dialog for alkis_landparcel
             final DescriptionPane descriptionPane = new DescriptionPaneFS();
@@ -1915,6 +1921,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void initComponents() {
         cmdTest = new javax.swing.JButton();
         cmdTest2 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jToolBar1 = new javax.swing.JToolBar();
+        exceptionNotificationStatusPanel =
+            new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
         tobVerdis = new javax.swing.JToolBar();
         cmdPutKassenzeichenToSearchTree = new javax.swing.JButton();
         jSeparator5 = new javax.swing.JSeparator();
@@ -2034,6 +2044,18 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     formKeyTyped(evt);
                 }
             });
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jToolBar1.setRollover(true);
+        jToolBar1.setMinimumSize(new java.awt.Dimension(34, 34));
+        jToolBar1.setPreferredSize(new java.awt.Dimension(34, 34));
+
+        exceptionNotificationStatusPanel.setMinimumSize(new java.awt.Dimension(34, 34));
+        exceptionNotificationStatusPanel.setPreferredSize(new java.awt.Dimension(34, 34));
+        jToolBar1.add(exceptionNotificationStatusPanel);
+
+        jPanel1.add(jToolBar1, java.awt.BorderLayout.EAST);
 
         tobVerdis.setRollover(true);
         tobVerdis.setAlignmentY(0.48387095F);
@@ -2386,7 +2408,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             });
         tobVerdis.add(cmdLagisCrossover1);
 
-        getContentPane().add(tobVerdis, java.awt.BorderLayout.NORTH);
+        jPanel1.add(tobVerdis, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
         panMain.setLayout(new java.awt.BorderLayout());
         getContentPane().add(panMain, java.awt.BorderLayout.CENTER);
@@ -4153,13 +4177,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  args  the command line arguments
      */
     public static void main(final String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
-                @Override
-                public void uncaughtException(final Thread t, final Throwable e) {
-                    LOG.error("Uncaught Exception in " + t, e);
-                }
-            });
+        Thread.setDefaultUncaughtExceptionHandler(DefaultNavigatorExceptionHandler.getInstance());
 
 //        EventQueue.invokeLater(new Runnable() {
 //
