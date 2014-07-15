@@ -189,8 +189,8 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
                 ((DefaultTableModel)tblSumStrasse.getModel()).setDataVector(strasseData.toArray(new String[0][]),
                     header);
 
-                tblSumStrasse.getColumnModel().getColumn(0).setPreferredWidth(0);
-                tblSumStrasse.getColumnModel().getColumn(2).setPreferredWidth(0);
+                tblSumStrasse.getColumnModel().getColumn(0).setMaxWidth(65);
+                tblSumStrasse.getColumnModel().getColumn(2).setMaxWidth(55);
             }
         } catch (Exception e) {
             log.error("error in setCidsBean", e);
