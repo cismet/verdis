@@ -9,6 +9,7 @@ package de.cismet.verdis.gui;
 
 import java.util.Collection;
 
+import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkListener;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -38,6 +39,7 @@ public abstract class AbstractDetailsPanel extends javax.swing.JPanel implements
     //~ Instance fields --------------------------------------------------------
 
     private final MultiBeanHelper multiBeanHelper = new MultiBeanHelper();
+    private SwingWorker previousSwingworker = null;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -54,11 +56,36 @@ public abstract class AbstractDetailsPanel extends javax.swing.JPanel implements
      * @param  cidsBeans  DOCUMENT ME!
      */
     public void setCidsBeans(final Collection<CidsBean> cidsBeans) {
-        final CidsBean dummyBean = createDummyBean();
-        multiBeanHelper.setDummyBean(dummyBean);
-        multiBeanHelper.setBeans(cidsBeans);
+        if ((previousSwingworker != null) && !previousSwingworker.isDone()) {
+            previousSwingworker.cancel(true);
+        }
+        previousSwingworker = new SwingWorker<CidsBean, Void>() {
 
-        setCidsBean(dummyBean);
+                @Override
+                protected CidsBean doInBackground() throws Exception {
+                    final CidsBean dummyBean = createDummyBean();
+                    multiBeanHelper.setDummyBean(dummyBean);
+                    multiBeanHelper.setBeans(cidsBeans);
+                    return dummyBean;
+                }
+
+                @Override
+                protected void done() {
+                    CidsBean dummyBean = null;
+                    try {
+                        dummyBean = get();
+                        setCidsBean(dummyBean);
+                    } catch (InterruptedException ex) {
+                        setCidsBean(null);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("canceled");
+                        }
+                    } catch (final Exception ex) {
+                        LOG.warn(ex, ex);
+                    }
+                }
+            };
+        previousSwingworker.execute();
     }
 
     /**
