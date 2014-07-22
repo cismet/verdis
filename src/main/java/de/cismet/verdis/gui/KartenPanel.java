@@ -66,6 +66,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.gui.MappingComponent;
+import de.cismet.cismap.commons.gui.piccolo.AngleMeasurementDialog;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.actions.CustomAction;
@@ -281,6 +282,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdAdd;
     private javax.swing.JToggleButton cmdAddHandle;
+    private javax.swing.JButton cmdAngleMeasurement;
     private javax.swing.JToggleButton cmdAttachPolyToAlphadata;
     private javax.swing.JButton cmdBack;
     private javax.swing.JToggleButton cmdCreateLandparcelGeom;
@@ -467,6 +469,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdWmsBackground = new javax.swing.JToggleButton();
         cmdForeground = new javax.swing.JButton();
         cmdSnap = new javax.swing.JToggleButton();
+        cmdAngleMeasurement = new javax.swing.JButton();
         sep2 = new javax.swing.JSeparator();
         cmdZoom = new javax.swing.JToggleButton();
         cmdPan = new javax.swing.JToggleButton();
@@ -764,6 +767,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdSnap);
+
+        cmdAngleMeasurement.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/piccolo/Angle-Thingy-icon.png")));
+        cmdAngleMeasurement.setBorderPainted(false);
+        cmdAngleMeasurement.setFocusable(false);
+        cmdAngleMeasurement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdAngleMeasurement.setMaximumSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setMinimumSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setPreferredSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdAngleMeasurement.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAngleMeasurementActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdAngleMeasurement);
 
         sep2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         sep2.setMaximumSize(new java.awt.Dimension(2, 32767));
@@ -1568,6 +1589,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void togFixMapExtentActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togFixMapExtentActionPerformed
         mappingComp.setFixedMapExtent(togFixMapExtent.isSelected());
     }                                                                                   //GEN-LAST:event_togFixMapExtentActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAngleMeasurementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAngleMeasurementActionPerformed
+        StaticSwingTools.showDialog(AngleMeasurementDialog.getInstance());
+    }                                                                                       //GEN-LAST:event_cmdAngleMeasurementActionPerformed
 
     /**
      * DOCUMENT ME!

@@ -23,6 +23,8 @@
  */
 package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
+import Sirius.server.middleware.types.MetaObject;
+
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
@@ -86,5 +88,14 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
     @Override
     public Stroke getLineStyle() {
         return stroke;
+    }
+
+    @Override
+    public String getAlternativeName() {
+        if (MetaObject.NEW == cidsBean.getMetaObject().getStatus()) {
+            return "neue Straßenfront";
+        } else {
+            return "Straßenfront " + cidsBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
+        }
     }
 }
