@@ -153,9 +153,7 @@ public class ExtractSegmentFromFeatureAction extends AbstractAction implements C
         final PureNewFeatureWithThickerLineString feat = new PureNewFeatureWithThickerLineString(nearestSegment);
         if (feature instanceof InheritsLayerProperties) {
             final String name = "aus \""
-                        + ((de.cismet.cismap.commons.features.WFSFeature)feature).getLayerProperties()
-                        .getFeatureService()
-                        .getName() + "\"";
+                        + ((InheritsLayerProperties)feature).getLayerProperties().getFeatureService().getName() + "\"";
             feat.setName(name);
         }
 
