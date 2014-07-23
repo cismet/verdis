@@ -75,14 +75,11 @@ public abstract class AbstractDetailsPanel extends javax.swing.JPanel implements
                     try {
                         dummyBean = get();
                         setCidsBean(dummyBean);
-                    } catch (InterruptedException ex) {
+                    } catch (Exception ex) {
                         setCidsBean(null);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("canceled");
-                        }
-                    } catch (final Exception ex) {
                         LOG.warn(ex, ex);
                     }
+                    setEnabled(isEnabled());
                 }
             };
         previousSwingworker.execute();
