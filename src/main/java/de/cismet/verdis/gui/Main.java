@@ -94,6 +94,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
+import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -216,13 +217,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static double INITIAL_WMS_BB_Y1 = 5668858.33;
     public static double INITIAL_WMS_BB_X2 = 2593744.91;
     public static double INITIAL_WMS_BB_Y2 = 5688416.22;
-    public static final int PROPVAL_ART_DACH = 1;
-    public static final int PROPVAL_ART_GRUENDACH = 2;
-    public static final int PROPVAL_ART_VERSIEGELTEFLAECHE = 3;
-    public static final int PROPVAL_ART_OEKOPFLASTER = 4;
-    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE = 5;
-    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
-    public static final int PROPVAL_ART_VORLAEUFIGEVERANLASSUNG = 7;
     public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
     public static final String ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER = "ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER";
     public static final String KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER =
@@ -257,6 +251,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private Icon icoKassenzeichen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
+    private Icon icoKassenzeichenList = new javax.swing.ImageIcon(getClass().getResource(
+                "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
     private Icon icoSummen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/sum.png"));
     private Icon icoKanal = new javax.swing.ImageIcon(getClass().getResource(
@@ -286,6 +282,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private AppPreferences prefs;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
+    private View vKassenzeichenList;
     private View vKanaldaten;
     private View vSummen;
     private View vDokumente;
@@ -306,6 +303,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private final RegenFlaechenSummenPanel regenSumPanel;
     private final DokumentenPanel dokPanel;
     private final KassenzeichenPanel kassenzeichenPanel;
+    private final KassenzeichenListPanel kassenzeichenListPanel;
     private final KanaldatenPanel kanaldatenPanel;
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel;
     private final AllgemeineInfosPanel allgInfosPanel;
@@ -378,6 +376,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JMenuItem mniKanalanschluss;
     private javax.swing.JMenuItem mniKarte;
     private javax.swing.JMenuItem mniKassenzeichen;
+    private javax.swing.JMenuItem mniKassenzeichen1;
     private javax.swing.JMenuItem mniLoadLayout;
     private javax.swing.JMenuItem mniOptions;
     private javax.swing.JMenuItem mniResetWindowLayout;
@@ -472,7 +471,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         kassenzeichenPanel = new KassenzeichenPanel();
 
-        kanaldatenPanel = new de.cismet.verdis.gui.KanaldatenPanel();
+        kassenzeichenListPanel = KassenzeichenListPanel.getInstance();
+
+        kanaldatenPanel = new KanaldatenPanel();
 
         kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
 
@@ -498,6 +499,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(wdsrFrontenTabellenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(wdsrSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
@@ -510,6 +512,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         CidsAppBackend.getInstance().addCidsBeanStore(regenSumPanel);
 
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenPanel);
+        CidsAppBackend.getInstance().addEditModeListener(kassenzeichenListPanel);
         CidsAppBackend.getInstance().addEditModeListener(wdsrFrontenDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenGeometrienPanel);
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
@@ -823,6 +826,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             viewMap.addView("Kassenzeichen", vKassenzeichen);
             vKassenzeichen.getCustomTitleBarComponents().addAll(kassenzeichenPanel.getCustomButtons());
 
+            vKassenzeichenList = new View(
+                    "Kassenzeichen-Liste",
+                    Static2DTools.borderIcon(icoKassenzeichenList, 0, 3, 0, 1),
+                    kassenzeichenListPanel);
+            viewMap.addView("Kassenzeichen-Liste", vKassenzeichenList);
+
             vSummen = new View("Summen", Static2DTools.borderIcon(icoSummen, 0, 3, 0, 1), regenSumPanel);
             viewMap.addView("Summen", vSummen);
 
@@ -1006,6 +1015,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                 @Override
                 public void clipboardChanged() {
+                    kassenzeichenListPanel.clipboardChanged();
                     refreshClipboardButtons();
                 }
             };
@@ -1219,7 +1229,25 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .putCursor(KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
-        kassenzeichenSearchGeometryListener.addPropertyChangeListener(KassenzeichenGeomSearchDialog.getInstance());
+        kassenzeichenSearchGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (evt.getPropertyName().equals(ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED)) {
+                        KassenzeichenListPanel.getInstance().searchStarted();
+                    } else if (evt.getPropertyName().equals(
+                                    ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE)) {
+                        final Collection<Integer> kassenzeichenNummern = (Collection<Integer>)evt.getNewValue();
+                        KassenzeichenListPanel.getInstance().searchFinished(kassenzeichenNummern);
+                    } else if (evt.getPropertyName().equals(
+                                    ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED)) {
+                        final Exception ex = (Exception)evt.getNewValue();
+                        LOG.error("error while searching kassenzeichen", ex);
+                        final String exMessage = ex.getMessage();
+                        KassenzeichenListPanel.getInstance().searchFailed(exMessage);
+                    }
+                }
+            });
 
         final ServerSearchCreateSearchGeometryListener alkisLandparcelSearchGeometryListener =
             new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
@@ -1670,12 +1698,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             0.4353147f,
                             new SplitWindow(
                                 true,
-                                0.24596775f,
-                                vKassenzeichen,
+                                0.4f,
+                                new SplitWindow(true, 0.62f,
+                                    vKassenzeichen,
+                                    vKassenzeichenList),
                                 new SplitWindow(
                                     true,
-                                    0.67061925f,
-                                    new SplitWindow(true, 0.29148936f,
+                                    0.6f,
+                                    new SplitWindow(true, 0.3f,
                                         vSummen,
                                         vKanaldaten),
                                     vDokumente)),
@@ -1690,42 +1720,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                 vDetailsRegen)));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-//                    rootWindow.getWindowBar(Direction.RIGHT).addTab(vHistory);
                 }
             });
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void setupOldLayoutRegen() {
-//        EventQueue.invokeLater(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                rootWindow.setWindow(
-//                        new SplitWindow(
-//                        false,
-//                        0.4353147f,
-//                        new SplitWindow(
-//                        true,
-//                        0.24596775f,
-//                        vKassenzeichen,
-//                        new SplitWindow(
-//                        true,
-//                        0.67061925f,
-//                        new SplitWindow(true, 0.29148936f,
-//                        vSummen,
-//                        vKanaldaten),
-//                        vDokumente))
-//                        ));
-//                // log.debug("layout: "+flPanel.getCustomButtons());
-//
-//                rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
-//                rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-////                    rootWindow.getWindowBar(Direction.RIGHT).addTab(vHistory);
-//            }
-//        });
     }
 
     /**
@@ -1742,9 +1738,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             0.4353147f,
                             new SplitWindow(
                                 true,
-                                0.24596775f,
-                                vKassenzeichen,
-                                new SplitWindow(true, 0.30118892f,
+                                0.4f,
+                                new SplitWindow(true, 0.62f,
+                                    vKassenzeichen,
+                                    vKassenzeichenList),
+                                new SplitWindow(true, 0.6f,
                                     vZusammenfassungWDSR,
                                     vDokumente)),
                             new SplitWindow(
@@ -1757,11 +1755,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                     }),
                                 vDetailsWDSR)));
 
-                    // log.debug("layout: "+flPanel.getCustomButtons());
-                    // vFlaechen.getCustomTabComponents().addAll(flPanel.getCustomButtons());
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-//                    rootWindow.getWindowBar(Direction.RIGHT).addTab(vHistory);
                 }
             });
     }
@@ -1780,9 +1775,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             0.4353147f,
                             new SplitWindow(
                                 true,
-                                0.24596775f,
-                                vKassenzeichen,
-                                new SplitWindow(true, 0.51783353f,
+                                0.4f,
+                                new SplitWindow(true, 0.62f,
+                                    vKassenzeichen,
+                                    vKassenzeichenList),
+                                new SplitWindow(true, 0.6f,
                                     vInfoAllgemein,
                                     vDokumente)),
                             new SplitWindow(true, 0.66f,
@@ -1791,7 +1788,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-//                    rootWindow.getWindowBar(Direction.RIGHT).addTab(vHistory);
                 }
             });
     }
@@ -1978,6 +1974,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         jMenuItem1 = new javax.swing.JMenuItem();
         menWindows = new javax.swing.JMenu();
         mniKassenzeichen = new javax.swing.JMenuItem();
+        mniKassenzeichen1 = new javax.swing.JMenuItem();
         mniSummen = new javax.swing.JMenuItem();
         mniKanalanschluss = new javax.swing.JMenuItem();
         mniDokumente = new javax.swing.JMenuItem();
@@ -2569,8 +2566,24 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             });
         menWindows.add(mniKassenzeichen);
 
-        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+        mniKassenzeichen1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
                 java.awt.event.KeyEvent.VK_2,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniKassenzeichen1.setMnemonic('L');
+        mniKassenzeichen1.setText("Kassenzeichen-Liste");
+        mniKassenzeichen1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniKassenzeichen1ActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniKassenzeichen1);
+
+        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_3,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniSummen.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
@@ -2586,7 +2599,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menWindows.add(mniSummen);
 
         mniKanalanschluss.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_3,
+                java.awt.event.KeyEvent.VK_4,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKanalanschluss.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
@@ -2602,7 +2615,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menWindows.add(mniKanalanschluss);
 
         mniDokumente.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_4,
+                java.awt.event.KeyEvent.VK_5,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniDokumente.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/docs.png"))); // NOI18N
@@ -3507,9 +3520,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     @Override
                     protected Void doInBackground() throws Exception {
                         if (!editmode
-                                    && CidsAppBackend.getInstance().acquireLock(
-                                        kassenzeichenPanel.getCidsBean(),
-                                        true)) {
+                                    && CidsAppBackend.getInstance().acquireLocks()) {
                             LockingDialog.getInstance().dispose();
                             enableEditing(true);
                         } else if (!changesPending()) {
@@ -3950,6 +3961,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
         StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
     }                                                                                      //GEN-LAST:event_cmdLagisCrossover1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichen1ActionPerformed
+        showOrHideView(vKassenzeichenList);
+    }                                                                                     //GEN-LAST:event_mniKassenzeichen1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -4532,7 +4552,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         final Collection<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
                                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
                         if ((flaechen.size() == 1)
-                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                    && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         == (Integer)flaechen.iterator().next().getProperty(
                                             FlaechePropertyConstants.PROP__FLAECHENINFO
                                             + "."
@@ -5036,6 +5056,15 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public KassenzeichenPanel getKzPanel() {
         return kassenzeichenPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public KassenzeichenListPanel getKzListPanel() {
+        return kassenzeichenListPanel;
     }
 
     /**

@@ -23,21 +23,12 @@
  */
 package de.cismet.verdis;
 
-import Sirius.navigator.connection.SessionManager;
-
-import java.sql.Date;
-
-import java.text.SimpleDateFormat;
-
-import java.util.Calendar;
+import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
 
@@ -78,41 +69,15 @@ public class FlaechenClipboard extends AbstractClipboard {
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
         final RegenFlaechenTabellenPanel table = (RegenFlaechenTabellenPanel)getComponent();
-        final CidsBean pasteBean = table.getModel().deepcloneBean(clipboardBean);
+
+        final CidsBean pasteBean = VerdisUtils.createPastedFlaecheBean(
+                clipboardBean,
+                table.getAllBeans(),
+                true);
+
         final int id = table.getTableHelper().getNextNewBeanId();
         pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
-
-        if (clipboardBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO) != null) {
-            final int flaecheninfoId = (Integer)clipboardBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__ID);
-            final CidsBean flaecheninfoBean = SessionManager.getProxy()
-                        .getMetaObject(
-                                flaecheninfoId,
-                                CidsAppBackend.getInstance().getVerdisMetaClass(
-                                    VerdisMetaClassConstants.MC_FLAECHENINFO).getId(),
-                                VerdisConstants.DOMAIN)
-                        .getBean();
-            pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
-        }
-
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__BEMERKUNG, null);
-        pasteBean.setProperty(
-            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-            ((RegenFlaechenTabellenPanel)getComponent()).getValidFlaechenname(
-                (Integer)clipboardBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                            + "."
-                            + FlaechenartPropertyConstants.PROP__ID)));
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, 1);
-        final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
-
         return pasteBean;
     }
 

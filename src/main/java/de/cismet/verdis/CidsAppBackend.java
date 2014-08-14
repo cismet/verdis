@@ -135,7 +135,7 @@ public class CidsAppBackend implements CidsBeanStore {
 
     private AlreadyLockedObjectsPanel lockPanel;
 
-    private MultiMap csLocksBeanMap = new MultiMap();
+    private Collection<CidsBean> csLocks = new ArrayList();
 
     private final MultiMap flaechenidToCrossReferences = new MultiMap();
     private final MultiMap frontenCrossReferences = new MultiMap();
@@ -815,17 +815,21 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenBean  DOCUMENT ME!
-     * @param   editMode           DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      *
      * @throws  LockAlreadyExistsException  DOCUMENT ME!
      */
-    public boolean acquireLock(final CidsBean kassenzeichenBean, final boolean editMode)
-            throws LockAlreadyExistsException {
+    public boolean acquireLocks() throws LockAlreadyExistsException {
         try {
-            return acquireLock(Arrays.asList(new CidsBean[] { kassenzeichenBean }), editMode);
+            if (!csLocks.isEmpty()) {
+                log.error("there are still some locks, cant acquire");
+                return false;
+            }
+            final Collection<CidsBean> locks = acquireLock(kassenzeichenBean, true, true);
+            if (locks != null) {
+                csLocks.addAll(locks);
+            }
+            return (locks != null);
         } catch (final LockAlreadyExistsException ex) {
             showObjectsLockedDialog(ex.getAlreadyExisingLocks());
             return false;
@@ -835,20 +839,36 @@ public class CidsAppBackend implements CidsBeanStore {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenBeans  DOCUMENT ME!
-     * @param   editMode            DOCUMENT ME!
+     * @param   kassenzeichenBean       DOCUMENT ME!
+     * @param   includeCrossReferences  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  LockAlreadyExistsException  DOCUMENT ME!
      */
-    public boolean acquireLock(final Collection<CidsBean> kassenzeichenBeans, final boolean editMode)
+    public Collection<CidsBean> acquireLock(final CidsBean kassenzeichenBean, final boolean includeCrossReferences)
             throws LockAlreadyExistsException {
+        return acquireLock(kassenzeichenBean, includeCrossReferences, false);
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean       DOCUMENT ME!
+     * @param   includeCrossReferences  DOCUMENT ME!
+     * @param   editMode                DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  LockAlreadyExistsException  DOCUMENT ME!
+     */
+    public Collection<CidsBean> acquireLock(final CidsBean kassenzeichenBean,
+            final boolean includeCrossReferences,
+            final boolean editMode) throws LockAlreadyExistsException {
         try {
             final Collection<CidsBean> existingLocks = new ArrayList<CidsBean>();
-            final List<CidsBean> kassenzeichenBeansToLock = new HashArrayList<CidsBean>();
+            final List<CidsBean> allKassenzeichenBeansToLock = new HashArrayList<CidsBean>();
 
-            final Map<CidsBean, CidsBean> crossreferenceFromMap = new HashMap<CidsBean, CidsBean>();
+            final Map<Integer, CidsBean> crossreferenceFromMap = new HashMap<Integer, CidsBean>();
 
             if (editMode) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -859,51 +879,34 @@ public class CidsAppBackend implements CidsBeanStore {
                         }
                     });
             }
-            for (final CidsBean kassenzeichenToLockBean : kassenzeichenBeans) {
-                if (kassenzeichenToLockBean != null) {
-                    // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
-                    // doppelt geladen und  gespeichert werden
-                    final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
-                    if (editMode) {
-                        final Integer kassenzeichenNummer = (Integer)kassenzeichenToLockBean.getProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-                        for (final CrossReference flaechenCrossReference
-                                    : searchFlaechenCrossReferences(kassenzeichenNummer)) {
-                            final Integer kassenzeichennummer = flaechenCrossReference.getEntityToKassenzeichen();
-                            if (!kassenzeichenNummerToKassenzeichenMap.containsKey(kassenzeichennummer)) {
-                                final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
-                                            .loadKassenzeichenByNummer(kassenzeichennummer);
-                                kassenzeichenNummerToKassenzeichenMap.put(
-                                    kassenzeichennummer,
-                                    querverweisZielKassenzeichen);
-                                crossreferenceFromMap.put(querverweisZielKassenzeichen, kassenzeichenToLockBean);
-                            }
-                        }
-                        for (final CrossReference frontenCrossReference
-                                    : searchFrontenCrossReferences(kassenzeichenNummer)) {
-                            final Integer kassenzeichennummer = frontenCrossReference.getEntityToKassenzeichen();
-                            if (!kassenzeichenNummerToKassenzeichenMap.containsKey(kassenzeichennummer)) {
-                                final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
-                                            .loadKassenzeichenByNummer(kassenzeichennummer);
-                                kassenzeichenNummerToKassenzeichenMap.put(
-                                    kassenzeichennummer,
-                                    querverweisZielKassenzeichen);
-                                crossreferenceFromMap.put(querverweisZielKassenzeichen, kassenzeichenToLockBean);
-                            }
-                        }
+            if (kassenzeichenBean != null) {
+                if (includeCrossReferences) {
+                    for (final CrossReference flaechenCrossReference
+                                : searchFlaechenCrossReferences(
+                                    (Integer)kassenzeichenBean.getProperty(
+                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER))) {
+                        final Integer querverweisKassenzeichennummer =
+                            flaechenCrossReference.getEntityToKassenzeichen();
+                        crossreferenceFromMap.put(querverweisKassenzeichennummer, kassenzeichenBean);
                     }
-
-                    // gesperrt werden sollen das eigentliche Kassenzeichen UND alle
-                    // Kassenzeichen mit einem Querverweis zu diesem.
-                    kassenzeichenBeansToLock.add(kassenzeichenToLockBean);
-                    kassenzeichenBeansToLock.addAll(kassenzeichenNummerToKassenzeichenMap.values());
+                    for (final CrossReference frontenCrossReference
+                                : searchFrontenCrossReferences(
+                                    (Integer)kassenzeichenBean.getProperty(
+                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER))) {
+                        final Integer querverweisKassenzeichennummer = frontenCrossReference.getEntityToKassenzeichen();
+                        crossreferenceFromMap.put(querverweisKassenzeichennummer, kassenzeichenBean);
+                    }
                 }
+
+                // gesperrt werden sollen das eigentliche Kassenzeichen UND alle
+                // Kassenzeichen mit einem Querverweis zu diesem.
+                allKassenzeichenBeansToLock.add(kassenzeichenBean);
             }
 
-            final Collection<Integer> kassenzeichenIds = new ArrayList<Integer>();
-            for (final CidsBean kassenzeichenToLock : kassenzeichenBeansToLock) {
-                kassenzeichenIds.add((Integer)kassenzeichenToLock.getProperty(
-                        KassenzeichenPropertyConstants.PROP__ID));
+            final Collection<Integer> allKassenzeichenNummernToLock = new ArrayList<Integer>();
+            for (final CidsBean kassenzeichenToLock : allKassenzeichenBeansToLock) {
+                allKassenzeichenNummernToLock.add((Integer)kassenzeichenToLock.getProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
             }
 
             if (editMode) {
@@ -916,11 +919,18 @@ public class CidsAppBackend implements CidsBeanStore {
                     });
             }
 
-            final String idInString = implode(kassenzeichenIds.toArray(new Integer[0]), ", ");
-            final MetaObject[] oldCsLocks = getMetaObject("SELECT " + getVerdisMetaClass("cs_locks").getId()
-                            + ", id FROM cs_locks WHERE class_id = "
+            final String nummernInString = implode(allKassenzeichenNummernToLock.toArray(new Integer[0]), ", ");
+            final MetaObject[] oldCsLocks = getMetaObject(""
+                            + "SELECT " + getVerdisMetaClass("cs_locks").getId() + ", cs_locks.id "
+                            + "FROM cs_locks, "
+                            + getVerdisMetaClass(VerdisMetaClassConstants.MC_KASSENZEICHEN).getTableName()
+                            + " AS kassenzeichen "
+                            + "WHERE kassenzeichen.id = cs_locks.object_id "
+                            + "AND cs_locks.class_id = "
                             + getVerdisMetaClass(VerdisMetaClassConstants.MC_KASSENZEICHEN).getId()
-                            + " AND object_id IN (" + idInString + ")",
+                            + " "
+                            + "AND kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IN ("
+                            + nummernInString + ")",
                     DOMAIN);
             for (final MetaObject oldcsLock : oldCsLocks) {
                 existingLocks.add(oldcsLock.getBean());
@@ -932,19 +942,15 @@ public class CidsAppBackend implements CidsBeanStore {
 
                             @Override
                             public void run() {
-                                LockingDialog.getInstance().setMaxProgress(kassenzeichenBeansToLock.size());
+                                LockingDialog.getInstance().setMaxProgress(allKassenzeichenBeansToLock.size());
                             }
                         });
                 }
 
-                for (int i = 0; i < kassenzeichenBeansToLock.size(); i++) {
-                    final CidsBean kassenzeichenBeanToLock = kassenzeichenBeansToLock.get(i);
+                final Collection<CidsBean> createdLocks = new ArrayList<CidsBean>();
+                for (int i = 0; i < allKassenzeichenBeansToLock.size(); i++) {
+                    final CidsBean kassenzeichenBeanToLock = allKassenzeichenBeansToLock.get(i);
                     if (kassenzeichenBeanToLock != null) {
-                        final Integer kassenzeichenNummerHoldingCsLock = (Integer)kassenzeichenBean.getProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-                        final Integer kassenzeichenNummerToLock = (Integer)kassenzeichenBeanToLock.getProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-
                         final CidsBean newCsLock = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "cs_locks");
                         newCsLock.setProperty("object_id", kassenzeichenBeanToLock.getMetaObject().getId());
                         newCsLock.setProperty(
@@ -953,12 +959,12 @@ public class CidsAppBackend implements CidsBeanStore {
                         newCsLock.setProperty("user_string", getAccountName());
                         newCsLock.setProperty(
                             "additional_info",
-                            kassenzeichenNummerToLock
+                            kassenzeichenBeanToLock
                                     + ";"
-                                    + kassenzeichenNummerHoldingCsLock
+                                    + kassenzeichenBean
                                     + ";"
                                     + new Date().toString());
-                        csLocksBeanMap.put(kassenzeichenNummerHoldingCsLock, newCsLock.persist());
+                        createdLocks.add(newCsLock.persist());
                         if (log.isDebugEnabled()) {
                             log.debug("Sperre konnte erfolgreich angelegt werden");
                         }
@@ -974,7 +980,7 @@ public class CidsAppBackend implements CidsBeanStore {
                             });
                     }
                 }
-                return true;
+                return createdLocks;
             } else {
                 LockingDialog.getInstance().setVisible(false);
                 throw new LockAlreadyExistsException(
@@ -985,32 +991,28 @@ public class CidsAppBackend implements CidsBeanStore {
             throw ex;
         } catch (final Exception ex) {
             log.error("Fehler beim anlegen der Sperre", ex);
-            return false;
+            return null;
         }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenNummer  DOCUMENT ME!
+     * @param   csLock  kassenzeichenNummer DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public boolean releaseLock(final Integer kassenzeichenNummer) {
-        final Collection<CidsBean> csLocks = (Collection)csLocksBeanMap.get(kassenzeichenNummer);
-        if (csLocks != null) {
-            for (final CidsBean csLock : csLocks) {
-                try {
-                    csLock.delete();
-                    csLock.persist();
-                    if (log.isDebugEnabled()) {
-                        log.debug("Sperre konnte erfolgreich gelöst werden");
-                    }
-                    csLocksBeanMap.remove(kassenzeichenNummer);
-                } catch (Exception ex) {
-                    log.error("Fehler beim lösen der Sperre", ex);
-                    return false;
+    public boolean releaseLock(final CidsBean csLock) {
+        if (csLock != null) {
+            try {
+                csLock.delete();
+                csLock.persist();
+                if (log.isDebugEnabled()) {
+                    log.debug("Sperre konnte erfolgreich gelöst werden");
                 }
+            } catch (Exception ex) {
+                log.error("Fehler beim lösen der Sperre", ex);
+                return false;
             }
             return true;
         } else {
@@ -1027,14 +1029,25 @@ public class CidsAppBackend implements CidsBeanStore {
      * @return  DOCUMENT ME!
      */
     public boolean releaseLocks() {
-        if (!csLocksBeanMap.isEmpty()) {
+        return releaseLocks(csLocks);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   locks  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean releaseLocks(final Collection<CidsBean> locks) {
+        if (!locks.isEmpty()) {
             boolean allOK = true;
-            for (final Integer kassenzeichenNummer : (Set<Integer>)csLocksBeanMap.keySet()) {
-                if (!releaseLock(kassenzeichenNummer)) {
+            for (final CidsBean lock : locks) {
+                if (!releaseLock(lock)) {
                     allOK = false;
                 }
             }
-            csLocksBeanMap.clear();
+            locks.clear();
             return allOK;
         } else {
             if (log.isDebugEnabled()) {
