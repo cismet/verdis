@@ -848,7 +848,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
             mainApp.disableKassenzeichenCmds();
             txtSearch.setEnabled(false);
             btnSearch.setEnabled(false);
-            KassenzeichenGeomSearchDialog.getInstance().setEnabled(false);
             GrundbuchblattSucheDialog.getInstance().setEnabled(false);
             setKZSearchField(kz);
 
@@ -856,8 +855,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        return CidsAppBackend.getInstance()
+                        final CidsBean cidsBean = CidsAppBackend.getInstance()
                                     .loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
+                        CidsAppBackend.getInstance().updateCrossReferences(cidsBean);
+                        return cidsBean;
                     }
 
                     @Override
@@ -882,7 +883,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                         }
                         txtSearch.setEnabled(true);
                         btnSearch.setEnabled(true);
-                        KassenzeichenGeomSearchDialog.getInstance().setEnabled(true);
                         GrundbuchblattSucheDialog.getInstance().setEnabled(true);
                         mainApp.refreshLeftTitleBarColor();
                         mainApp.refreshKassenzeichenButtons();

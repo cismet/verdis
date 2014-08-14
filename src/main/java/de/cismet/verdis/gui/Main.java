@@ -107,6 +107,7 @@ import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
 import de.cismet.cismap.commons.MappingModelListener;
 import de.cismet.cismap.commons.ModeLayer;
+import de.cismet.cismap.commons.ModeLayerRegistry;
 import de.cismet.cismap.commons.PNodeProvider;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
@@ -157,6 +158,7 @@ import de.cismet.verdis.ClipboardListener;
 import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.FrontenClipboard;
 import de.cismet.verdis.KassenzeichenGeometrienClipboard;
+import de.cismet.verdis.Version;
 
 import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
@@ -464,11 +466,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // EventDispatchThreadHangMonitor.initMonitoring();
         // RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
 
-        regenSumPanel = new de.cismet.verdis.gui.RegenFlaechenSummenPanel();
+        regenSumPanel = new RegenFlaechenSummenPanel();
 
-        dokPanel = new de.cismet.verdis.gui.DokumentenPanel();
+        dokPanel = new DokumentenPanel();
 
-        kassenzeichenPanel = new de.cismet.verdis.gui.KassenzeichenPanel();
+        kassenzeichenPanel = new KassenzeichenPanel();
 
         kanaldatenPanel = new de.cismet.verdis.gui.KanaldatenPanel();
 
@@ -1535,8 +1537,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         refreshKassenzeichenButtons();
         refreshClipboardButtonsToolTipText();
         refreshItemButtons();
-        final ModeLayer ml = de.cismet.cismap.commons.ModeLayerRegistry.getInstance()
-                    .getModeLayer("verdisAppModeLayer");
+        final ModeLayer ml = ModeLayerRegistry.getInstance().getModeLayer("verdisAppModeLayer");
         if (ml != null) {
             ml.forceMode(mode.toString());
         }
@@ -2618,7 +2619,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menWindows.add(jSeparator11);
 
         mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_6,
+                java.awt.event.KeyEvent.VK_7,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKarte.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
@@ -2634,7 +2635,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menWindows.add(mniKarte);
 
         mniTabelle.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_7,
+                java.awt.event.KeyEvent.VK_8,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniTabelle.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
@@ -2650,7 +2651,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menWindows.add(mniTabelle);
 
         mniDetails.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_8,
+                java.awt.event.KeyEvent.VK_9,
                 java.awt.event.InputEvent.CTRL_MASK));
         mniDetails.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
@@ -3196,7 +3197,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteActionPerformed
-        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
+        final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.storeToFile();
             clipboard.paste();
@@ -3206,10 +3207,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public AbstractClipboard getCurrentClipboard() {
+        return clipboards.get(CidsAppBackend.getInstance().getMode());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  evt  DOCUMENT ME!
      */
     private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCutActionPerformed
-        final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
+        final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.cut();
         }
@@ -3231,14 +3241,14 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final JDialog d = new JDialog(this, "Info");
             d.setLayout(new BorderLayout());
 
-            // JLabel infoLabel=new JLabel(de.cismet.verdis.Version.getVersion()+"\n"+
+            // JLabel infoLabel=new JLabel(Version.getVersion()+"\n"+
             // de.cismet.cismap.commons.Version.getVersion());
 
             // d.add(infoLabel,BorderLayout.SOUTH);
 
             final JLabel image = new JLabel(new ImageIcon(getBannerImage()));
             d.add(image, BorderLayout.CENTER);
-            final JLabel version = new JLabel(de.cismet.verdis.Version.getVersion());
+            final JLabel version = new JLabel(Version.getVersion());
 
             d.add(version, BorderLayout.SOUTH);
             d.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
@@ -3363,7 +3373,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        CidsAppBackend.getInstance().releaseLock();
+                        CidsAppBackend.getInstance().releaseLocks();
                         return null;
                     }
                 }.execute();
@@ -3467,7 +3477,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                 @Override
                 protected Void doInBackground() throws Exception {
-                    CidsAppBackend.getInstance().releaseLock();
+                    CidsAppBackend.getInstance().releaseLocks();
                     return null;
                 }
 
@@ -3485,16 +3495,29 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        StaticSwingTools.showDialog(LockingDialog.getInstance());
+                    }
+                });
             new SwingWorker<Void, Void>() {
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        if (!editmode && CidsAppBackend.getInstance().acquireLock(kassenzeichenPanel.getCidsBean())) {
+                        if (!editmode
+                                    && CidsAppBackend.getInstance().acquireLock(
+                                        kassenzeichenPanel.getCidsBean(),
+                                        true)) {
+                            LockingDialog.getInstance().dispose();
                             enableEditing(true);
                         } else if (!changesPending()) {
-                            CidsAppBackend.getInstance().releaseLock();
+                            LockingDialog.getInstance().dispose();
+                            CidsAppBackend.getInstance().releaseLocks();
                             enableEditing(false);
                         }
+                        LockingDialog.getInstance().dispose();
                         return null;
                     }
                 }.execute();
@@ -3970,7 +3993,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                                         @Override
                                         protected Void doInBackground() throws Exception {
-                                            CidsAppBackend.getInstance().releaseLock();
+                                            CidsAppBackend.getInstance().releaseLocks();
                                             try {
                                                 kassenzeichenBean.setProperty(
                                                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
@@ -4161,6 +4184,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     // und ab dafür!
                     kassenzeichenBean.persist();
 
+                    CidsAppBackend.getInstance().clearCrossReferences();
                     CidsAppBackend.getInstance().setCidsBean(null);
 
                     kassenzeichenPanel.setKZSearchField("");
@@ -4293,7 +4317,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        CidsAppBackend.getInstance().releaseLock();
+                        CidsAppBackend.getInstance().releaseLocks();
                         return null;
                     }
                 }.execute();
@@ -4759,7 +4783,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     try {
                         querverweisKassenzeichenBean.persist();
                     } finally {
-                        CidsAppBackend.getInstance().releaseLock();
+                        CidsAppBackend.getInstance().releaseLocks();
                         // TODO unlock
                     }
                 }
@@ -4945,7 +4969,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         try {
             setCidsBean(kassenzeichenBean.persist());
 
-            CidsAppBackend.getInstance().releaseLock();
+            CidsAppBackend.getInstance().releaseLocks();
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override

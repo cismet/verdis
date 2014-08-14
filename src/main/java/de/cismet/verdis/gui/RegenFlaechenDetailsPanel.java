@@ -74,7 +74,7 @@ import de.cismet.validation.display.EmbeddedValidatorDisplay;
 import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.FlaecheCrossreference;
+import de.cismet.verdis.CrossReference;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
@@ -925,14 +925,14 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
 
                     @Override
                     protected String doInBackground() throws Exception {
-                        final Collection<FlaecheCrossreference> crossReference = CidsAppBackend.getInstance()
-                                    .getFlaechenCrossReferencesFor(flaecheBean.getMetaObject().getID());
+                        final Collection<CrossReference> crossReference = CidsAppBackend.getInstance()
+                                    .getFlaechenCrossReferencesForFlaecheid((Integer)flaecheBean.getProperty("id"));
 
                         if (crossReference != null) {
                             String html = "<html><body><center>";
-                            for (final FlaecheCrossreference crossreference : crossReference) {
-                                final String link = crossreference.getFlaecheToKassenzeichen() + ":"
-                                            + crossreference.getFlaecheToBezeichnung();
+                            for (final CrossReference crossreference : crossReference) {
+                                final String link = crossreference.getEntityToKassenzeichen() + ":"
+                                            + crossreference.getEntityToBezeichnung();
                                 html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
                             }
                             html += "</center></body></html>";

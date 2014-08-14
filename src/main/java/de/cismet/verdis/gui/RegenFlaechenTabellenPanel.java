@@ -72,7 +72,7 @@ import de.cismet.validation.Validator;
 import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
-import de.cismet.verdis.FlaecheCrossreference;
+import de.cismet.verdis.CrossReference;
 
 import de.cismet.verdis.commons.constants.*;
 
@@ -477,8 +477,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
 
         final int lastSplitFlaecheId = CidsAppBackend.getInstance().getLastSplitFlaecheId();
-        final Collection<FlaecheCrossreference> crossreferences = CidsAppBackend.getInstance()
-                    .getFlaechenCrossReferencesFor(lastSplitFlaecheId);
+        final Collection<CrossReference> crossreferences = CidsAppBackend.getInstance()
+                    .getFlaechenCrossReferencesForFlaecheid(lastSplitFlaecheId);
 
         final NewFlaecheDialog dialog = new NewFlaecheDialog();
         dialog.setSoleNewExists((sole != null) && (sole.getFeature().getGeometry() instanceof Polygon));
@@ -505,8 +505,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
             if (dialog.isQuerverweiseChecked()) {
                 if (crossreferences != null) {
-                    for (final FlaecheCrossreference crossreference : crossreferences) {
-                        final int kassenzeichenNummer = crossreference.getFlaecheToKassenzeichen();
+                    for (final CrossReference crossreference : crossreferences) {
+                        final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
                         CidsAppBackend.getInstance()
                                 .getFlaecheToKassenzeichenQuerverweisMap()
                                 .put(flaecheBean, kassenzeichenNummer);

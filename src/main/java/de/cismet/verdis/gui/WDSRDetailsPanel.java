@@ -72,6 +72,7 @@ import de.cismet.validation.display.EmbeddedValidatorDisplay;
 import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.CrossReference;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
@@ -1176,19 +1177,19 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
                     @Override
                     protected String doInBackground() throws Exception {
-                        final Collection crossReference = (Collection)CidsAppBackend.getInstance()
-                                    .getFrontenCrossReferencesFor(frontBean.getMetaObject().getID());
+                        final Collection<CrossReference> crossReference = (Collection)CidsAppBackend.getInstance()
+                                    .getFrontenCrossReferencesForFrontid((Integer)frontBean.getProperty("id"));
 
                         if (crossReference != null) {
                             String html = "<html><body><center>";
-                            for (final Object o : crossReference) {
-                                final String link = o.toString();
+                            for (final CrossReference crossreference : crossReference) {
+                                final String link = crossreference.getEntityToKassenzeichen() + ":"
+                                            + crossreference.getEntityToBezeichnung();
                                 html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
                             }
                             html += "</center></body></html>";
                             return html;
                         }
-
                         return null;
                     }
 

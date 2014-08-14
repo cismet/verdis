@@ -219,7 +219,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="mniKarte">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+6"/>
+                  <KeyStroke key="Ctrl+7"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
@@ -234,7 +234,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="mniTabelle">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+7"/>
+                  <KeyStroke key="Ctrl+8"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
@@ -249,7 +249,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="mniDetails">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+8"/>
+                  <KeyStroke key="Ctrl+9"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
