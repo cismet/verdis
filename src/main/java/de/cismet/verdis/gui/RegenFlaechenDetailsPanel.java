@@ -58,6 +58,7 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
+import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -986,7 +987,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
         txtFEB_ID.setEditable(b);
         try {
             txtGroesseGrafik.setEditable(b
-                        && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                        && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                             != (Integer)getCidsBean().getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                 + "."
@@ -1001,7 +1002,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
         chkSperre.setEnabled(b);
         try {
             cboAnschlussgrad.setEnabled(b
-                        && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                        && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                             != (Integer)getCidsBean().getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                 + "."
@@ -1155,14 +1156,15 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                             numerisch = false;
                         }
 
-                        if (art == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
+                        if (art == VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
                             if (!"A".equals(bezeichnung)) {
                                 return new ValidatorStateImpl(
                                         ValidatorState.Type.ERROR,
                                         "Fl\u00E4chenbezeichnung muss \"A\" sein.",
                                         action);
                             }
-                        } else if ((art == Main.PROPVAL_ART_DACH) || (art == Main.PROPVAL_ART_GRUENDACH)) {
+                        } else if ((art == VerdisUtils.PROPVAL_ART_DACH)
+                                    || (art == VerdisUtils.PROPVAL_ART_GRUENDACH)) {
                             if (!numerisch) {
                                 return new ValidatorStateImpl(
                                         ValidatorState.Type.ERROR,
@@ -1229,7 +1231,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                 @Override
                                 public void actionPerformed(final ActionEvent event) {
                                     if (Main.getCurrentInstance().isInEditMode()) {
-                                        if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                        if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                                     == (Integer)flaecheBean.getProperty(
                                                         FlaechePropertyConstants.PROP__FLAECHENINFO
                                                         + "."
@@ -1283,12 +1285,12 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                     ValidatorState.Type.WARNING,
                                     "kann nicht validiert werden, Flächenart ist nicht gesetzt.");
                         } else if (gr_grafik == null) {
-                            if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG != artId) {
+                            if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG != artId) {
                                 return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
                             } else {
                                 return new ValidatorStateImpl(ValidatorState.Type.VALID);
                             }
-                        } else if (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG == artId) {
+                        } else if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG == artId) {
                             return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert muss leer sein", action);
                         } else if ((geom != null) && !gr_grafik.equals(new Integer((int)(geom.getArea())))) {
                             return new ValidatorStateImpl(
@@ -1595,7 +1597,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                         + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
 
                         if ((flaechenart != null)
-                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                    && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))) {
                             try {
                                 flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
@@ -1621,7 +1623,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
 
                         final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
                         if ((flaechenart != null)
-                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                    && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         == (Integer)flaechenart.getProperty(FlaechenartPropertyConstants.PROP__ID))
                                     && (geom != null)) {
                             return new ValidatorStateImpl(
@@ -1677,7 +1679,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                 if ((object instanceof CidsBean)
                                             && ((Integer)((CidsBean)object).getProperty(
                                                     FlaechenartPropertyConstants.PROP__ID)
-                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
+                                                == VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
                                     vvobject = object;
                                 }
                             }

@@ -7,13 +7,11 @@
 ****************************************************/
 package de.cismet.verdis;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
+import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 import de.cismet.verdis.gui.KassenzeichenGeometrienList;
 
@@ -49,17 +47,12 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
 
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
+        final CidsBean pasteBean = VerdisUtils.createPastedInfoBean(
+                clipboardBean);
+
         final int id = getNextNewBeanId();
         pasteBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
-
-        final int geoId = getNextNewBeanId();
-        final CidsBean geometrie = (CidsBean)pasteBean.getProperty(
-                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE);
-        geometrie.getMetaObject().setID(geoId);
-        geometrie.setProperty(GeomPropertyConstants.PROP__ID, geoId);
-
         return pasteBean;
     }
 

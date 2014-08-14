@@ -36,7 +36,8 @@ public abstract class AbstractClipboard {
     //~ Instance fields --------------------------------------------------------
 
     private CidsBeanComponent component;
-    private Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
+    private final Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
+    private CidsBean fromKassenzeichenBean;
     private List<ClipboardListener> listeners = new ArrayList<ClipboardListener>();
     private boolean isCutted = false;
 
@@ -139,6 +140,15 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean getFromKassenzeichenBean() {
+        return fromKassenzeichenBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   clipboardBean  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
@@ -195,16 +205,18 @@ public abstract class AbstractClipboard {
     /**
      * DOCUMENT ME!
      *
-     * @param   cidsBeans  DOCUMENT ME!
+     * @param   cidsBeans          DOCUMENT ME!
+     * @param   kassenzeichenBean  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private boolean cutOrCopy(final Collection<CidsBean> cidsBeans) {
+    private boolean cutOrCopy(final Collection<CidsBean> cidsBeans, final CidsBean kassenzeichenBean) {
         if ((cidsBeans != null) && !cidsBeans.isEmpty()) {
             if (!checkNotPasted()) {
                 return false;
             }
             try {
+                fromKassenzeichenBean = kassenzeichenBean;
                 clipboardBeans.clear();
                 for (final CidsBean cidsBean : cidsBeans) {
                     this.clipboardBeans.add(CidsBeanSupport.deepcloneCidsBean(cidsBean));
@@ -213,6 +225,7 @@ public abstract class AbstractClipboard {
                 return true;
             } catch (Exception ex) {
                 LOG.error("error while copying or cutting cidsbean", ex);
+                fromKassenzeichenBean = null;
                 clipboardBeans.clear();
                 return false;
             }
@@ -227,7 +240,7 @@ public abstract class AbstractClipboard {
     public void copy() {
         if (isCopyable()) {
             final Collection<CidsBean> selectedBeans = getSelectedBeans();
-            cutOrCopy(selectedBeans);
+            cutOrCopy(selectedBeans, CidsAppBackend.getInstance().getCidsBean());
         }
     }
 
@@ -237,13 +250,21 @@ public abstract class AbstractClipboard {
     public void cut() {
         if (isCutable()) {
             final Collection<CidsBean> selectedBeans = getSelectedBeans();
-            isCutted = cutOrCopy(selectedBeans);
+            isCutted = cutOrCopy(selectedBeans, CidsAppBackend.getInstance().getCidsBean());
             if (isCutted) {
                 for (final CidsBean selectedBean : selectedBeans) {
                     component.removeBean(selectedBean);
                 }
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void clear() {
+        clipboardBeans.clear();
+        fireClipboardChanged();
     }
 
     /**
