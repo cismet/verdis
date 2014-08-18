@@ -54,6 +54,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 
+import de.cismet.cids.custom.util.VerdisUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
@@ -198,7 +200,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                     FlaechePropertyConstants.PROP__FLAECHENINFO
                                             + "."
                                             + FlaecheninfoPropertyConstants.PROP__FLAECHENART) != null)
-                                    && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                                    && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         != (Integer)cidsBean.getProperty(
                                             FlaechePropertyConstants.PROP__FLAECHENINFO
                                             + "."
@@ -270,7 +272,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 final List<CidsBean> selectedBeans = getSelectedBeans();
                 final CidsBean selectedBean = (!selectedBeans.isEmpty()) ? selectedBeans.get(0) : null;
                 if ((selectedBean != null)
-                            && (Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+                            && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                 != selectedBean.getProperty(
                                     FlaechePropertyConstants.PROP__FLAECHENINFO
                                     + "."
@@ -370,7 +372,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     case 5:
                     case 6:
                     default: {
-                        counterString = nextFlBez(counterString);
+                        counterString = VerdisUtils.nextFlBez(counterString);
                         try {
                             flaecheBean.setProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
@@ -423,7 +425,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         final int newId = getNextNewBeanId();
         final String bezeichnung;
         if (flaechenartBean != null) {
-            bezeichnung = getValidFlaechenname(flaechenartBean.getMetaObject().getId(), otherFlaechenBeans);
+            bezeichnung = VerdisUtils.getValidFlaechenname(flaechenartBean.getMetaObject().getId(), otherFlaechenBeans);
         } else {
             bezeichnung = null;
         }
@@ -489,7 +491,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         if (dialog.getReturnStatus() == NewFlaecheDialog.RET_OK) {
             final CidsBean flaechenartBean = dialog.getSelectedArt();
             Geometry geom = null;
-            if ((Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
+            if ((VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                             != (Integer)flaechenartBean.getProperty(FlaechenartPropertyConstants.PROP__ID))
                         && dialog.isSoleNewChecked()) {
                 if (sole != null) {
@@ -528,125 +530,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
      * @return  DOCUMENT ME!
      */
     public String getValidFlaechenname(final int art) {
-        return getValidFlaechenname(art, getAllBeans());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   art           DOCUMENT ME!
-     * @param   flaecheBeans  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static String getValidFlaechenname(final int art, final Collection<CidsBean> flaecheBeans) {
-        int highestNumber = 0;
-        String highestBezeichner = null;
-        boolean noFlaeche = true;
-        for (final CidsBean flaecheBean : flaecheBeans) {
-            noFlaeche = false;
-            final int a = (Integer)flaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                            + "."
-                            + FlaechenartPropertyConstants.PROP__ID);
-            final String bezeichnung = (String)flaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            if (bezeichnung == null) {
-                break;
-            }
-            if (a == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG) {
-                return "A";
-            } else if ((a == Main.PROPVAL_ART_DACH) || (a == Main.PROPVAL_ART_GRUENDACH)) {
-                // In Bezeichnung m\u00FCsste eigentlich ne Zahl stehen. Einfach ignorieren falls nicht.
-                try {
-                    final int num = new Integer(bezeichnung).intValue();
-                    if (num > highestNumber) {
-                        highestNumber = num;
-                    }
-                } catch (Exception e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("getValidFlaechenname", e);
-                    }
-                    break;
-                }
-            } else {
-                if (highestBezeichner == null) {
-                    highestBezeichner = bezeichnung;
-                } else if ((bezeichnung.trim().length() > highestBezeichner.trim().length())
-                            || ((bezeichnung.trim().length() == highestBezeichner.trim().length())
-                                && (bezeichnung.compareTo(highestBezeichner) > 0))) {
-                    highestBezeichner = bezeichnung;
-                }
-            }
-        }
-        if (noFlaeche == true) {
-            highestBezeichner = null;
-        }
-        // highestBezeichner steht jetzt der lexikographisch h\u00F6chste Bezeichner
-        // In highestNumber steht die gr\u00F6\u00DFte vorkommende Zahl f\u00FCr Dachfl\u00E4chen
-        // log.debug(highestBezeichner);
-        // log.debug(highestNumber+"");
-
-        // n\u00E4chste freie Zahl f\u00FCr Dachfl\u00E4chen
-        final int newHighestNumber = highestNumber
-                    + 1;
-
-        // n\u00E4chste freie Bezeichnung f\u00FCr versiegelte Fl\u00E4chen
-        final String newHighestBezeichner = nextFlBez(highestBezeichner);
-
-        switch (art) {
-            case Main.PROPVAL_ART_DACH:
-            case Main.PROPVAL_ART_GRUENDACH: {
-                return newHighestNumber
-                            + "";
-            }
-            case Main.PROPVAL_ART_VERSIEGELTEFLAECHE:
-            case Main.PROPVAL_ART_OEKOPFLASTER:
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE:
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER:
-            default: {
-                if (noFlaeche) {
-                    return "A";
-                }
-                return newHighestBezeichner;
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   s  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private static String nextFlBez(String s) {
-        boolean carry = false;
-        if (s != null) {
-            s = s.trim().toUpperCase();
-            final char[] charArr = s.toCharArray();
-            for (int i = charArr.length - 1; i >= 0; --i) {
-                if (charArr[i] != 'Z') {
-                    charArr[i] = (char)(charArr[i] + 1);
-                    carry = false;
-                    break;
-                } else {
-                    charArr[i] = 'A';
-                    carry = true;
-                }
-            }
-            final String end = new String(charArr);
-
-            if (carry) {
-                return "A"
-                            + end;
-            } else {
-                return end;
-            }
-        }
-        return "A";
+        return VerdisUtils.getValidFlaechenname(art, getAllBeans());
     }
 
     @Override

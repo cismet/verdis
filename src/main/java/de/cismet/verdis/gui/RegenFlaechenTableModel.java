@@ -28,6 +28,8 @@ import java.text.SimpleDateFormat;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import de.cismet.cids.custom.util.VerdisUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
@@ -175,27 +177,6 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
 
     @Override
     public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-        final CidsBean deepclone = super.deepcloneBean(cidsBean);
-        final CidsBean origFlaecheninfo = (CidsBean)cidsBean.getProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO);
-        if (origFlaecheninfo != null) {
-            deepclone.setProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO
-                        + "."
-                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
-                cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD));
-            deepclone.setProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO
-                        + "."
-                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
-                cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART));
-        }
-        return deepclone;
+        return VerdisUtils.deepcloneFlaecheBean(cidsBean);
     }
 }

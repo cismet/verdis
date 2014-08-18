@@ -199,8 +199,5 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-        final CidsBean deepclone = CidsBeanSupport.deepcloneCidsBean(cidsBean);
-        return deepclone;
-    }
+    public abstract CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception;
 }

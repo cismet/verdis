@@ -61,6 +61,7 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JProgressBar jProgressBar1;
     private de.cismet.verdis.gui.KassenzeichenListPanel kassenzeichenGeomSearchPanel1;
     // End of variables declaration//GEN-END:variables
 
@@ -101,11 +102,12 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
-        kassenzeichenGeomSearchPanel1 = new de.cismet.verdis.gui.KassenzeichenListPanel();
+        kassenzeichenGeomSearchPanel1 = KassenzeichenListPanel.getInstance();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         cmdLagisCrossover1 = new javax.swing.JButton();
+        jProgressBar1 = KassenzeichenListPanel.getInstance().getProgressBar();
 
         setTitle("Suche über Grundbuchblatt");
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -113,12 +115,11 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
         jPanel1.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel1.add(kassenzeichenGeomSearchPanel1, gridBagConstraints);
 
         jLabel1.setText("Grundbuchblatt:");
@@ -167,6 +168,13 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
                 }
             });
         jPanel1.add(cmdLagisCrossover1, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 0);
+        jPanel1.add(jProgressBar1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;

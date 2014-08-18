@@ -16,6 +16,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import de.cismet.cids.custom.util.VerdisUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
@@ -298,7 +300,7 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
                                 if ((object instanceof CidsBean)
                                             && ((Integer)((CidsBean)object).getProperty(
                                                     FlaechenartPropertyConstants.PROP__ID)
-                                                == Main.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
+                                                == VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
                                     vvobject = object;
                                 }
                             }

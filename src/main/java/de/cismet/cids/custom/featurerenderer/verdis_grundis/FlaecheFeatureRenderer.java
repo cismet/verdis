@@ -25,6 +25,8 @@ package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
 import java.awt.Paint;
 
+import de.cismet.cids.custom.util.VerdisUtils;
+
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
@@ -67,22 +69,22 @@ public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
         }
         final int alpha = 255;
         switch (art) {
-            case Main.PROPVAL_ART_DACH: {
+            case VerdisUtils.PROPVAL_ART_DACH: {
                 return new java.awt.Color(162, 76, 41, alpha);
             }
-            case Main.PROPVAL_ART_GRUENDACH: {
+            case VerdisUtils.PROPVAL_ART_GRUENDACH: {
                 return new java.awt.Color(106, 122, 23, alpha);
             }
-            case Main.PROPVAL_ART_VERSIEGELTEFLAECHE: {
+            case VerdisUtils.PROPVAL_ART_VERSIEGELTEFLAECHE: {
                 return new java.awt.Color(120, 129, 128, alpha);
             }
-            case Main.PROPVAL_ART_OEKOPFLASTER: {
+            case VerdisUtils.PROPVAL_ART_OEKOPFLASTER: {
                 return new java.awt.Color(159, 155, 108, alpha);
             }
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE: {
+            case VerdisUtils.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE: {
                 return new java.awt.Color(138, 134, 132, alpha);
             }
-            case Main.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER: {
+            case VerdisUtils.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER: {
                 return new java.awt.Color(126, 91, 71, alpha);
             }
             default: {

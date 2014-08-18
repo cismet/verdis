@@ -25,6 +25,8 @@ package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.MetaObject;
 
+import de.cismet.cids.custom.util.VerdisUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
@@ -139,54 +141,6 @@ public class WDSRTableModel extends CidsBeanTableModel {
 
     @Override
     public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-        final CidsBean deepclone = super.deepcloneBean(cidsBean);
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__STRASSE));
-        // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
-        // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
-
-        final CidsBean sr_klasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
-        if (sr_klasse != null) {
-            sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-
-        final CidsBean wd_prio = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
-        if (wd_prio != null) {
-            wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-
-        final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__STRASSE);
-        if (strasse != null) {
-            strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-        return deepclone;
+        return VerdisUtils.deepcloneFrontBean(cidsBean);
     }
 }
