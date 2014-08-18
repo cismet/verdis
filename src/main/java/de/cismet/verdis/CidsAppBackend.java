@@ -981,6 +981,8 @@ public class CidsAppBackend implements CidsBeanStore {
                     "A lock for the desired object is already existing",
                     existingLocks);
             }
+        } catch (final LockAlreadyExistsException ex) {
+            throw ex;
         } catch (final Exception ex) {
             log.error("Fehler beim anlegen der Sperre", ex);
             return false;
