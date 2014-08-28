@@ -1394,7 +1394,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 frontBean,
                 FrontPropertyConstants.PROP__FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK) {
+                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                FrontPropertyConstants.PROP__FRONTINFO
+                        + "."
+                        + FrontinfoPropertyConstants.PROP__GEOMETRIE) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1445,7 +1448,12 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                         return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
                     }
 
-                    if ((geom != null) && (laenge_grafik != (int)Math.abs(geom.getLength()))) {
+                    if ((geom != null) && !geom.isValid()) {
+                        return new ValidatorStateImpl(
+                                ValidatorState.Type.ERROR,
+                                "Die Geometrie ist ung\u00FCltig",
+                                action);
+                    } else if ((geom != null) && (laenge_grafik != (int)Math.abs(geom.getLength()))) {
                         return new ValidatorStateImpl(
                                 ValidatorState.Type.WARNING,
                                 "L\u00E4nge der Geometrie stimmt nicht \u00FCberein ("
