@@ -1211,7 +1211,10 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                         + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
-                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART) {
+                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+                FlaechePropertyConstants.PROP__FLAECHENINFO
+                        + "."
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1280,7 +1283,12 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                         + FlaecheninfoPropertyConstants.PROP__FLAECHENART
                                         + "."
                                         + FlaechenartPropertyConstants.PROP__ID);
-                        if (artId == null) {
+                        if ((geom != null) && !geom.isValid()) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.ERROR,
+                                    "Die Geometrie ist ung\u00FCltig",
+                                    action);
+                        } else if (artId == null) {
                             return new ValidatorStateImpl(
                                     ValidatorState.Type.WARNING,
                                     "kann nicht validiert werden, Flächenart ist nicht gesetzt.");
