@@ -981,6 +981,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
 
     @Override
     public final void setEnabled(final boolean b) {
+        super.setEnabled(b);
         txtAnteil.setEditable(b);
         txtBemerkung.setEditable(b);
         txtBezeichnung.setEditable(b);
