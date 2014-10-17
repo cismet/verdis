@@ -93,9 +93,9 @@ public class VerdisUtils {
                     flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD));
                 pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
-                    flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG));
+                    flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__FLAECHENART));
                 pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+                            + FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG,
                     flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG));
             }
         }
