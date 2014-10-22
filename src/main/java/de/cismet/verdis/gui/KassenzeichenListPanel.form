@@ -204,14 +204,14 @@
           <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="KassenzeichenListPanel.jDialog2.title" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[260, 115]"/>
+          <Dimension value="[260, 130]"/>
         </Property>
         <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[260, 115]"/>
+          <Dimension value="[260, 130]"/>
         </Property>
         <Property name="modal" type="boolean" value="true"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[260, 115]"/>
+          <Dimension value="[260, 130]"/>
         </Property>
         <Property name="resizable" type="boolean" value="false"/>
       </Properties>
