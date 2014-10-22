@@ -24,10 +24,7 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
@@ -53,7 +50,7 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
     private boolean querverweiseExists = false;
     private int returnStatus = RET_CANCEL;
 
-    private boolean soleNewChecked = false;
+    private boolean soleNewChecked = true;
     private boolean querverweiseChecked = false;
 
     private CidsBean selectedArt = null;
@@ -183,6 +180,7 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 10, 0);
         jPanel3.add(jCheckBox1, gridBagConstraints);
 
+        jCheckBox2.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(
             jCheckBox2,
             org.openide.util.NbBundle.getMessage(NewFlaecheDialog.class, "NewFlaecheDialog.jCheckBox2.text")); // NOI18N
