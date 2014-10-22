@@ -385,10 +385,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jDialog2.setTitle(org.openide.util.NbBundle.getMessage(
                 KassenzeichenListPanel.class,
                 "KassenzeichenListPanel.jDialog2.title")); // NOI18N
-        jDialog2.setMaximumSize(new java.awt.Dimension(260, 115));
-        jDialog2.setMinimumSize(new java.awt.Dimension(260, 115));
+        jDialog2.setMaximumSize(new java.awt.Dimension(260, 130));
+        jDialog2.setMinimumSize(new java.awt.Dimension(260, 130));
         jDialog2.setModal(true);
-        jDialog2.setPreferredSize(new java.awt.Dimension(260, 115));
+        jDialog2.setPreferredSize(new java.awt.Dimension(260, 130));
         jDialog2.setResizable(false);
         jDialog2.getContentPane().setLayout(new java.awt.GridBagLayout());
 
