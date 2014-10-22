@@ -11,8 +11,6 @@ import Sirius.util.collections.MultiMap;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Color;
 import java.awt.Component;
 
@@ -22,7 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -82,6 +79,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JDialog jDialog1;
@@ -93,9 +91,6 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -103,7 +98,6 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JProgressBar jProgressBar2;
     private javax.swing.JProgressBar jProgressBar3;
@@ -228,14 +222,11 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jLabel2 = new javax.swing.JLabel();
         jDialog2 = new javax.swing.JDialog();
         jPanel8 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
-        jProgressBar3 = new javax.swing.JProgressBar();
-        jPanel10 = new javax.swing.JPanel();
-        jButton6 = new javax.swing.JButton();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jLabel3 = new javax.swing.JLabel();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jProgressBar3 = new javax.swing.JProgressBar();
+        jButton7 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstKassenzeichen = new javax.swing.JList();
         jButton1 = new javax.swing.JButton();
@@ -394,13 +385,44 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jDialog2.setTitle(org.openide.util.NbBundle.getMessage(
                 KassenzeichenListPanel.class,
                 "KassenzeichenListPanel.jDialog2.title")); // NOI18N
+        jDialog2.setMaximumSize(new java.awt.Dimension(260, 115));
+        jDialog2.setMinimumSize(new java.awt.Dimension(260, 115));
         jDialog2.setModal(true);
+        jDialog2.setPreferredSize(new java.awt.Dimension(260, 115));
         jDialog2.setResizable(false);
         jDialog2.getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanel8.setLayout(new java.awt.GridBagLayout());
 
-        jPanel9.setLayout(new java.awt.GridBagLayout());
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel3,
+            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        jPanel8.add(jLabel3, gridBagConstraints);
+
+        try {
+            jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+                    new javax.swing.text.MaskFormatter("########")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jFormattedTextField1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        jPanel8.add(jFormattedTextField1, gridBagConstraints);
 
         jProgressBar3.setString(org.openide.util.NbBundle.getMessage(
                 KassenzeichenListPanel.class,
@@ -408,13 +430,32 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jProgressBar3.setStringPainted(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 0, 0, 5);
-        jPanel9.add(jProgressBar3, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        jPanel8.add(jProgressBar3, gridBagConstraints);
 
-        jPanel10.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
+        jButton7.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));                              // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton7,
+            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton7.text")); // NOI18N
+        jButton7.setDisabledIcon(null);
+        jButton7.setDisabledSelectedIcon(null);
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton7ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel8.add(jButton7, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton6,
@@ -426,56 +467,14 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     jButton6ActionPerformed(evt);
                 }
             });
-        jPanel10.add(jButton6);
-        jDialog2.getRootPane().setDefaultButton(jButton6);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel9.add(jPanel10, gridBagConstraints);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        jPanel8.add(jPanel9, gridBagConstraints);
-
-        jPanel11.setLayout(new java.awt.GridLayout(1, 0));
-
-        jPanel12.setLayout(new java.awt.GridBagLayout());
-
-        try {
-            jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
-                    new javax.swing.text.MaskFormatter("########")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        jPanel12.add(jFormattedTextField1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel3,
-            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jLabel3.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        jPanel12.add(jLabel3, gridBagConstraints);
-
-        jPanel11.add(jPanel12);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel8.add(jPanel11, gridBagConstraints);
+        jPanel8.add(jButton6, gridBagConstraints);
+        jDialog2.getRootPane().setDefaultButton(jButton6);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -679,7 +678,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * @param  evt  DOCUMENT ME!
      */
     private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
-        jDialog2.pack();
+        jFormattedTextField1.requestFocus();
         StaticSwingTools.showDialog(jDialog2);
     }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
@@ -825,6 +824,15 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * @param  evt  DOCUMENT ME!
      */
     private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
+        jDialog2.setVisible(false);
+    }                                                                            //GEN-LAST:event_jButton6ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
         jProgressBar3.setIndeterminate(true);
         new SwingWorker<CidsBean, Void>() {
 
@@ -840,10 +848,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     try {
                         final CidsBean kassenzeichenBean = get();
                         if (kassenzeichenBean != null) {
-                            addKassenzeichenToList((Integer)kassenzeichenBean.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                            addOneKassenzeichenToList((Integer)kassenzeichenBean.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER),
+                                false);
                             jFormattedTextField1.setValue(null);
-                            jDialog2.setVisible(false);
                         } else {
                             flashSearchField(Color.red);
                         }
@@ -854,7 +862,16 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     jProgressBar3.setIndeterminate(false);
                 }
             }.execute();
-    } //GEN-LAST:event_jButton6ActionPerformed
+    } //GEN-LAST:event_jButton7ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jFormattedTextField1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jFormattedTextField1ActionPerformed
+        jButton7ActionPerformed(evt);
+    }                                                                                        //GEN-LAST:event_jFormattedTextField1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -908,7 +925,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 kassenzeichenList.add(kassenzeichenNummer);
             }
         }
-        addKassenzeichenToList(kassenzeichenList);
+        addManyKassenzeichenToList(kassenzeichenList);
     }
 
     /**
@@ -916,8 +933,18 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  kassenzeichen  DOCUMENT ME!
      */
-    private void addKassenzeichenToList(final Integer kassenzeichen) {
-        addKassenzeichenToList((List<Integer>)Arrays.asList(new Integer[] { kassenzeichen }));
+    private void addOneKassenzeichenToList(final Integer kassenzeichen) {
+        addOneKassenzeichenToList(kassenzeichen, !jCheckBox1.isSelected());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kassenzeichen  DOCUMENT ME!
+     * @param  removeOld      DOCUMENT ME!
+     */
+    private void addOneKassenzeichenToList(final Integer kassenzeichen, final boolean removeOld) {
+        addManyKassenzeichenToList((List<Integer>)Arrays.asList(new Integer[] { kassenzeichen }), removeOld);
     }
 
     /**
@@ -925,8 +952,18 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  kassenzeichenList  DOCUMENT ME!
      */
-    private void addKassenzeichenToList(final List<Integer> kassenzeichenList) {
-        final int count = setKassenzeichenList(kassenzeichenList);
+    private void addManyKassenzeichenToList(final List<Integer> kassenzeichenList) {
+        addManyKassenzeichenToList(kassenzeichenList, !jCheckBox1.isSelected());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kassenzeichenList  DOCUMENT ME!
+     * @param  removeOld          DOCUMENT ME!
+     */
+    private void addManyKassenzeichenToList(final List<Integer> kassenzeichenList, final boolean removeOld) {
+        final int count = setKassenzeichenList(kassenzeichenList, removeOld);
         jProgressBar1.setIndeterminate(false);
         jProgressBar1.setValue(0);
         if (count > 0) {
@@ -966,9 +1003,21 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * @return  DOCUMENT ME!
      */
     private int setKassenzeichenList(final List<Integer> kassenzeichenList) {
+        return setKassenzeichenList(kassenzeichenList, !jCheckBox1.isSelected());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenList  DOCUMENT ME!
+     * @param   removeOld          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private int setKassenzeichenList(final List<Integer> kassenzeichenList, final boolean removeOld) {
         final DefaultListModel model = (DefaultListModel)lstKassenzeichen.getModel();
         int counter = 0;
-        if (!jCheckBox1.isSelected()) {
+        if (removeOld) {
             model.removeAllElements();
         }
         final ArrayList<Integer> indices = new ArrayList<Integer>();
@@ -1003,7 +1052,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         if (jCheckBox1.isSelected() && (previousBean != null) && !previousBean.equals(cidsBean)) {
             final Integer previousKassenzeichen = (Integer)previousBean.getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-            addKassenzeichenToList(previousKassenzeichen);
+            addOneKassenzeichenToList(previousKassenzeichen);
         }
     }
 
