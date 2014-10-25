@@ -35,6 +35,11 @@ import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 
+import net.infonode.docking.DockingWindow;
+import net.infonode.docking.RootWindow;
+import net.infonode.docking.SplitWindow;
+import net.infonode.docking.TabWindow;
+import net.infonode.docking.View;
 import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
@@ -58,6 +63,11 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -66,13 +76,45 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
@@ -178,48 +220,6 @@ import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import net.infonode.docking.DockingWindow;
-import net.infonode.docking.RootWindow;
-import net.infonode.docking.SplitWindow;
-import net.infonode.docking.TabWindow;
-import net.infonode.docking.View;
 
 /**
  * DOCUMENT ME!
@@ -248,12 +248,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private static final String FILE_LAYOUT = "verdis.layout";
     private static final String FILE_SCREEN = "verdis.screen";
     private static final String FILE_MAP = "verdis.map";
-    private static final String FILE_PLUGINLAYOUT = "plugin.layout";
     private static final String DIRECTORYPATH_VERDIS = DIRECTORYPATH_HOME + FILESEPARATOR + DIRECTORY_VERDISHOME;
     private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
     private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
-    private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
     private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
@@ -291,9 +289,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final Color myBlue = new Color(124, 160, 221);
     private boolean editMode = false;
     private boolean readonly = true;
-    /** Creates new form Main. */
     private String userString;
-    private final String userGroup = "noGroup";
     private final EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards =
         new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
 
@@ -314,7 +310,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 //    private View vHistory;
     private RootWindow rootWindow;
     private final StringViewMap viewMap = new StringViewMap();
-    private final ArrayList<JMenuItem> menues = new ArrayList<JMenuItem>();
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
@@ -781,7 +776,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 .addListener(
                     kartenPanel,
                     "coordinatesChanged",
-                        SimpleMoveListener.COORDINATES_CHANGED,
+                    SimpleMoveListener.COORDINATES_CHANGED,
                     getMappingComponent().getInputListener(MappingComponent.MOTION));
         PNotificationCenter.defaultCenter()
                 .addListener(
@@ -793,31 +788,31 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 .addListener(
                     kartenPanel,
                     "doubleClickPerformed",
-                        SelectionListener.DOUBLECLICK_POINT_NOTIFICATION,
+                    SelectionListener.DOUBLECLICK_POINT_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.SELECT));
         PNotificationCenter.defaultCenter()
                 .addListener(
                     kartenPanel,
                     "selectionChanged",
-                        FeatureMoveListener.SELECTION_CHANGED_NOTIFICATION,
+                    FeatureMoveListener.SELECTION_CHANGED_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.MOVE_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
                     kartenPanel,
                     "selectionChanged",
-                        SplitPolygonListener.SELECTION_CHANGED,
+                    SplitPolygonListener.SELECTION_CHANGED,
                     getMappingComponent().getInputListener(MappingComponent.SPLIT_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
                     kartenPanel,
                     "featureDeleteRequested",
-                        DeleteFeatureListener.FEATURE_DELETE_REQUEST_NOTIFICATION,
+                    DeleteFeatureListener.FEATURE_DELETE_REQUEST_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.REMOVE_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
                     this,
                     "attachFeatureRequested",
-                        AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
+                    AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA));
         PNotificationCenter.defaultCenter()
                 .addListener(
@@ -829,7 +824,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 .addListener(
                     kartenPanel,
                     "joinPolygons",
-                        JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
+                    JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.JOIN_POLYGONS));
 
         initValidator();
@@ -1608,12 +1603,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         cmdTest = new javax.swing.JButton();
         cmdTest2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
-        exceptionNotificationStatusPanel = new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
+        exceptionNotificationStatusPanel =
+            new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
         tobVerdis = new javax.swing.JToolBar();
         cmdEditMode = new javax.swing.JButton();
         cmdCancel = new javax.swing.JButton();
@@ -1681,45 +1676,57 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdTest.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdTest.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdTest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdTestActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdTestActionPerformed(evt);
+                }
+            });
 
         cmdTest2.setText("Test Clipboard Load");
         cmdTest2.setFocusable(false);
         cmdTest2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdTest2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdTest2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdTest2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdTest2ActionPerformed(evt);
+                }
+            });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(getTitle());
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
-        });
+
+                @Override
+                public void windowClosed(final java.awt.event.WindowEvent evt) {
+                    formWindowClosed(evt);
+                }
+                @Override
+                public void windowClosing(final java.awt.event.WindowEvent evt) {
+                    formWindowClosing(evt);
+                }
+                @Override
+                public void windowOpened(final java.awt.event.WindowEvent evt) {
+                    formWindowOpened(evt);
+                }
+            });
         addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                formKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                formKeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                formKeyTyped(evt);
-            }
-        });
+
+                @Override
+                public void keyPressed(final java.awt.event.KeyEvent evt) {
+                    formKeyPressed(evt);
+                }
+                @Override
+                public void keyReleased(final java.awt.event.KeyEvent evt) {
+                    formKeyReleased(evt);
+                }
+                @Override
+                public void keyTyped(final java.awt.event.KeyEvent evt) {
+                    formKeyTyped(evt);
+                }
+            });
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -1739,120 +1746,150 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         tobVerdis.setMinimumSize(new java.awt.Dimension(667, 33));
         tobVerdis.setPreferredSize(new java.awt.Dimension(691, 35));
 
-        cmdEditMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/editmode.png"))); // NOI18N
+        cmdEditMode.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/editmode.png"))); // NOI18N
         cmdEditMode.setToolTipText("Editormodus");
         cmdEditMode.setEnabled(false);
         cmdEditMode.setFocusPainted(false);
         cmdEditMode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdEditModeActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdEditModeActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdEditMode);
 
-        cmdCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png"))); // NOI18N
+        cmdCancel.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png"))); // NOI18N
         cmdCancel.setToolTipText("Änderungen abbrechen");
         cmdCancel.setFocusPainted(false);
         cmdCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdCancelActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCancelActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdCancel);
 
         cmdOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/ok.png"))); // NOI18N
         cmdOk.setToolTipText("Änderungen annehmen");
         cmdOk.setFocusPainted(false);
         cmdOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdOkActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdOkActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdOk);
 
-        cmdDeleteKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/deleteKassenzeichen.png"))); // NOI18N
+        cmdDeleteKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/deleteKassenzeichen.png"))); // NOI18N
         cmdDeleteKassenzeichen.setToolTipText("Kassenzeichen löschen");
         cmdDeleteKassenzeichen.setEnabled(false);
         cmdDeleteKassenzeichen.setFocusPainted(false);
         cmdDeleteKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdDeleteKassenzeichenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdDeleteKassenzeichenActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdDeleteKassenzeichen);
 
-        cmdNewKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newKassenzeichen.png"))); // NOI18N
+        cmdNewKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newKassenzeichen.png"))); // NOI18N
         cmdNewKassenzeichen.setToolTipText("Neues Kassenzeichen");
         cmdNewKassenzeichen.setFocusPainted(false);
         cmdNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNewKassenzeichenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNewKassenzeichenActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNewKassenzeichen);
 
-        cmdNextKassenzeichenWithoutGeom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/next_kassenzeichen_without_geometries.png"))); // NOI18N
+        cmdNextKassenzeichenWithoutGeom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource(
+                    "/de/cismet/verdis/res/images/toolbar/next_kassenzeichen_without_geometries.png"))); // NOI18N
         cmdNextKassenzeichenWithoutGeom.setToolTipText("Nächstes Kassenzeichen ohne allgemeine Geometrien");
         cmdNextKassenzeichenWithoutGeom.setFocusable(false);
         cmdNextKassenzeichenWithoutGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdNextKassenzeichenWithoutGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdNextKassenzeichenWithoutGeom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdNextKassenzeichenWithoutGeom);
 
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator6);
 
-        cmdCut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
+        cmdCut.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
         cmdCut.setToolTipText("Fläche ausschneiden");
         cmdCut.setEnabled(false);
         cmdCut.setFocusPainted(false);
         cmdCut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdCutActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCutActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdCut);
 
-        cmdCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
+        cmdCopy.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
         cmdCopy.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
         cmdCopy.setEnabled(false);
         cmdCopy.setFocusPainted(false);
         cmdCopy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdCopyActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCopyActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdCopy);
 
-        cmdPaste.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
+        cmdPaste.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
         cmdPaste.setToolTipText("Fläche einfügen");
         cmdPaste.setEnabled(false);
         cmdPaste.setFocusPainted(false);
         cmdPaste.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdPasteActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdPasteActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdPaste);
 
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator4.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator4);
 
-        cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
+        cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
         cmdRefreshEnumeration.setToolTipText("Alle Flächen neu nummerieren");
         cmdRefreshEnumeration.setEnabled(false);
         cmdRefreshEnumeration.setFocusPainted(false);
         cmdRefreshEnumeration.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRefreshEnumerationActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRefreshEnumerationActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRefreshEnumeration);
         tobVerdis.add(jSeparator12);
 
@@ -1860,147 +1897,183 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator7.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator7);
 
-        cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
+        cmdAdd.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));  // NOI18N
         cmdAdd.setEnabled(false);
         cmdAdd.setFocusable(false);
         cmdAdd.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add2.png"))); // NOI18N
+        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add2.png"))); // NOI18N
         cmdAdd.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdAdd);
 
-        cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
+        cmdRemove.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png")));  // NOI18N
         cmdRemove.setEnabled(false);
         cmdRemove.setFocusable(false);
         cmdRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdRemove.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove2.png"))); // NOI18N
+        cmdRemove.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove2.png"))); // NOI18N
         cmdRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRemove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdRemoveActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRemoveActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdRemove);
 
-        cmdUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo.png"))); // NOI18N
+        cmdUndo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo.png")));  // NOI18N
         cmdUndo.setEnabled(false);
         cmdUndo.setFocusable(false);
         cmdUndo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdUndo.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo2.png"))); // NOI18N
+        cmdUndo.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo2.png"))); // NOI18N
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdUndoActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdUndoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdUndo);
         tobVerdis.add(jSeparator13);
 
-        cmdPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
+        cmdPdf.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
         cmdPdf.setToolTipText("Drucken");
         cmdPdf.setFocusPainted(false);
         cmdPdf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdPdfActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdPdfActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdPdf);
 
-        cmdWorkflow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/workflow.png"))); // NOI18N
+        cmdWorkflow.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/workflow.png"))); // NOI18N
         cmdWorkflow.setToolTipText("Workflow");
         cmdWorkflow.setEnabled(false);
         cmdWorkflow.setFocusPainted(false);
         cmdWorkflow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdWorkflowActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdWorkflowActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdWorkflow);
 
         jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator3.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator3);
 
-        cmdInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
+        cmdInfo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
         cmdInfo.setToolTipText("Versionsanzeige");
         cmdInfo.setFocusPainted(false);
         cmdInfo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdInfoActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdInfoActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdInfo);
 
         jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator8);
 
-        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
+        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
         cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
         cmdLagisCrossover.setFocusPainted(false);
         cmdLagisCrossover.setFocusable(false);
         cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdLagisCrossoverActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdLagisCrossoverActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdLagisCrossover);
 
-        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
+        btnHistory.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
         btnHistory.setToolTipText("öffne Kassenzeichen-Verlauf");
         btnHistory.setFocusPainted(false);
         btnHistory.setFocusable(false);
         btnHistory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnHistory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnHistoryActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnHistoryActionPerformed(evt);
+                }
+            });
         tobVerdis.add(btnHistory);
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
-        cmdDownloads.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/download.png"))); // NOI18N
+        cmdDownloads.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/download.png"))); // NOI18N
         cmdDownloads.setFocusPainted(false);
         cmdDownloads.setFocusable(false);
         cmdDownloads.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdDownloads.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tobVerdis.add(cmdDownloads);
 
-        cmdFortfuehrung.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fortfuehrung.png"))); // NOI18N
+        cmdFortfuehrung.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fortfuehrung.png"))); // NOI18N
         cmdFortfuehrung.setFocusable(false);
         cmdFortfuehrung.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdFortfuehrung.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdFortfuehrung.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdFortfuehrungActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdFortfuehrungActionPerformed(evt);
+                }
+            });
         try {
-            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.fortfuehrungsanlaesse.dialog") != null);
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.fortfuehrungsanlaesse.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdFortfuehrung);
 
-        cmdLagisCrossover1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
+        cmdLagisCrossover1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
         cmdLagisCrossover1.setToolTipText("Kassenzeichensuche über Buchungsblatt");
         cmdLagisCrossover1.setFocusPainted(false);
         cmdLagisCrossover1.setFocusable(false);
         cmdLagisCrossover1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdLagisCrossover1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdLagisCrossover1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdLagisCrossover1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdLagisCrossover1ActionPerformed(evt);
+                }
+            });
         tobVerdis.add(cmdLagisCrossover1);
 
         jPanel1.add(tobVerdis, java.awt.BorderLayout.CENTER);
@@ -2014,34 +2087,48 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menFile.setText("Datei");
         menFile.add(jSeparator9);
 
-        mniSaveLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        mniSaveLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniSaveLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_S,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniSaveLayout.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniSaveLayout.setText("Aktuelles Layout speichern");
         mniSaveLayout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniSaveLayoutActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniSaveLayoutActionPerformed(evt);
+                }
+            });
         menFile.add(mniSaveLayout);
 
-        mniLoadLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-        mniLoadLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniLoadLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_O,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniLoadLayout.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniLoadLayout.setText("Layout laden");
         mniLoadLayout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniLoadLayoutActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniLoadLayoutActionPerformed(evt);
+                }
+            });
         menFile.add(mniLoadLayout);
         menFile.add(jSeparator10);
 
-        mniClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        mniClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_F4,
+                java.awt.event.InputEvent.ALT_MASK));
         mniClose.setText("Beenden");
         mniClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuExitActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuExitActionPerformed(evt);
+                }
+            });
         menFile.add(mniClose);
 
         jMenuBar1.add(menFile);
@@ -2050,27 +2137,33 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         mnuEditMode.setText("In den Editormodus wechseln");
         mnuEditMode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuEditModeActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuEditModeActionPerformed(evt);
+                }
+            });
         menEdit.add(mnuEditMode);
 
         mnuNewKassenzeichen.setText("Neues Kassenzeichen");
         mnuNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuNewKassenzeichenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuNewKassenzeichenActionPerformed(evt);
+                }
+            });
         menEdit.add(mnuNewKassenzeichen);
 
         mnuRenameKZ.setText("Kassenzeichen umbenennen");
         mnuRenameKZ.setEnabled(false);
         mnuRenameKZ.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRenameKZActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuRenameKZActionPerformed(evt);
+                }
+            });
         menEdit.add(mnuRenameKZ);
 
         jMenuBar1.add(menEdit);
@@ -2078,30 +2171,37 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menExtras.setMnemonic('E');
         menExtras.setText("Extras");
 
-        mniOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/tooloptions.png"))); // NOI18N
+        mniOptions.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/tooloptions.png"))); // NOI18N
         mniOptions.setText("Optionen");
         mniOptions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniOptionsActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniOptionsActionPerformed(evt);
+                }
+            });
         menExtras.add(mniOptions);
         menExtras.add(sepOptions);
 
         mnuChangeUser.setText("User wechseln");
         mnuChangeUser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuChangeUserActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuChangeUserActionPerformed(evt);
+                }
+            });
         menExtras.add(mnuChangeUser);
 
         jMenuItem1.setText("WindowManagementTool");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jMenuItem1ActionPerformed(evt);
+                }
+            });
         menExtras.add(jMenuItem1);
 
         jMenuBar1.add(menExtras);
@@ -2109,109 +2209,156 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menWindows.setMnemonic('F');
         menWindows.setText("Fenster");
         menWindows.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menWindowsActionPerformed(evt);
-            }
-        });
 
-        mniKassenzeichen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
-        mniKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    menWindowsActionPerformed(evt);
+                }
+            });
+
+        mniKassenzeichen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_1,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
         mniKassenzeichen.setMnemonic('L');
         mniKassenzeichen.setText("Kassenzeichen");
         mniKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniKassenzeichenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniKassenzeichenActionPerformed(evt);
+                }
+            });
         menWindows.add(mniKassenzeichen);
 
-        mniKassenzeichen1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
-        mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniKassenzeichen1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_2,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
         mniKassenzeichen1.setMnemonic('L');
         mniKassenzeichen1.setText("Kassenzeichen-Liste");
         mniKassenzeichen1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniKassenzeichen1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniKassenzeichen1ActionPerformed(evt);
+                }
+            });
         menWindows.add(mniKassenzeichen1);
 
-        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_3, java.awt.event.InputEvent.CTRL_MASK));
-        mniSummen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
+        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_3,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniSummen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
         mniSummen.setMnemonic('C');
         mniSummen.setText("Summen");
         mniSummen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniSummenActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniSummenActionPerformed(evt);
+                }
+            });
         menWindows.add(mniSummen);
 
-        mniKanalanschluss.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_4, java.awt.event.InputEvent.CTRL_MASK));
-        mniKanalanschluss.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
+        mniKanalanschluss.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_4,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniKanalanschluss.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
         mniKanalanschluss.setMnemonic('F');
         mniKanalanschluss.setText("Kanalanschluss");
         mniKanalanschluss.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniKanalanschlussActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniKanalanschlussActionPerformed(evt);
+                }
+            });
         menWindows.add(mniKanalanschluss);
 
-        mniDokumente.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_5, java.awt.event.InputEvent.CTRL_MASK));
-        mniDokumente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/docs.png"))); // NOI18N
+        mniDokumente.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_5,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniDokumente.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/docs.png"))); // NOI18N
         mniDokumente.setMnemonic('a');
         mniDokumente.setText("Dokumente");
         mniDokumente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniDokumenteActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniDokumenteActionPerformed(evt);
+                }
+            });
         menWindows.add(mniDokumente);
         menWindows.add(jSeparator11);
 
-        mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_7, java.awt.event.InputEvent.CTRL_MASK));
-        mniKarte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_7,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniKarte.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniKarte.setMnemonic('S');
         mniKarte.setText("Karte");
         mniKarte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniKarteActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniKarteActionPerformed(evt);
+                }
+            });
         menWindows.add(mniKarte);
 
-        mniTabelle.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
-        mniTabelle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniTabelle.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_8,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniTabelle.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniTabelle.setMnemonic('T');
         mniTabelle.setText("Tabellenansicht");
         mniTabelle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniTabelleActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniTabelleActionPerformed(evt);
+                }
+            });
         menWindows.add(mniTabelle);
 
-        mniDetails.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
-        mniDetails.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniDetails.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_9,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniDetails.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniDetails.setMnemonic('D');
         mniDetails.setText("Details");
         mniDetails.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniDetailsActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniDetailsActionPerformed(evt);
+                }
+            });
         menWindows.add(mniDetails);
 
-        mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
-        mniResetWindowLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_R,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniResetWindowLayout.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniResetWindowLayout.setText("Fensteranordnung zurücksetzen");
         mniResetWindowLayout.setToolTipText("Standard Fensteranordnung wiederherstellen");
         mniResetWindowLayout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mniResetWindowLayoutActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniResetWindowLayoutActionPerformed(evt);
+                }
+            });
         menWindows.add(mniResetWindowLayout);
 
         jMenuBar1.add(menWindows);
@@ -2227,10 +2374,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mnuInfo.setMnemonic('I');
         mnuInfo.setText("Info");
         mnuInfo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuInfoActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuInfoActionPerformed(evt);
+                }
+            });
         menHelp.add(mnuInfo);
 
         jMenuBar1.add(menHelp);
@@ -2239,68 +2388,68 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         setSize(new java.awt.Dimension(1024, 868));
         setLocationRelativeTo(null);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menWindowsActionPerformed
+    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_menWindowsActionPerformed
 // TODO add your handling code here:
-    }//GEN-LAST:event_menWindowsActionPerformed
+    } //GEN-LAST:event_menWindowsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniResetWindowLayoutActionPerformed
+    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
-    }//GEN-LAST:event_mniResetWindowLayoutActionPerformed
+    }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDokumenteActionPerformed
+    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDokumenteActionPerformed
         showOrHideView(vDokumente);
-    }//GEN-LAST:event_mniDokumenteActionPerformed
+    }                                                                                //GEN-LAST:event_mniDokumenteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKanalanschlussActionPerformed
+    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKanalanschlussActionPerformed
         showOrHideView(vKanaldaten);
-    }//GEN-LAST:event_mniKanalanschlussActionPerformed
+    }                                                                                     //GEN-LAST:event_mniKanalanschlussActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSummenActionPerformed
+    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSummenActionPerformed
         showOrHideView(vSummen);
-    }//GEN-LAST:event_mniSummenActionPerformed
+    }                                                                             //GEN-LAST:event_mniSummenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichenActionPerformed
+    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichenActionPerformed
         showOrHideView(vKassenzeichen);
-    }//GEN-LAST:event_mniKassenzeichenActionPerformed
+    }                                                                                    //GEN-LAST:event_mniKassenzeichenActionPerformed
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniLoadLayoutActionPerformed
+    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniLoadLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2336,14 +2485,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.error("error while loading layout", ex);
             }
         }
-    }//GEN-LAST:event_mniLoadLayoutActionPerformed
+    } //GEN-LAST:event_mniLoadLayoutActionPerformed
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSaveLayoutActionPerformed
+    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSaveLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2375,7 +2524,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 saveLayout(name + ".layout");
             }
         }
-    }//GEN-LAST:event_mniSaveLayoutActionPerformed
+    } //GEN-LAST:event_mniSaveLayoutActionPerformed
 
     /**
      * TODO Bundle Inserting Docking Window functionalty (Sebastian) 24.07.07.
@@ -2541,44 +2690,44 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuChangeUserActionPerformed
+    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuChangeUserActionPerformed
         formWindowOpened(null);
-    }//GEN-LAST:event_mnuChangeUserActionPerformed
+    }                                                                                 //GEN-LAST:event_mnuChangeUserActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
+    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
         cmdNewKassenzeichenActionPerformed(null);
-    }//GEN-LAST:event_mnuNewKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_mnuNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditModeActionPerformed
+    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
         cmdEditModeActionPerformed(null);
-    }//GEN-LAST:event_mnuEditModeActionPerformed
+    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
+    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuExitActionPerformed
         dispose();
-    }//GEN-LAST:event_mnuExitActionPerformed
+    }                                                                           //GEN-LAST:event_mnuExitActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowOpened(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-    }//GEN-LAST:event_formWindowOpened
+    private void formWindowOpened(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowOpened
+    }                                                                     //GEN-LAST:event_formWindowOpened
 
     /**
      * DOCUMENT ME!
@@ -2668,16 +2817,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
+    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
         regenFlaechenTabellenPanel.reEnumerateFlaechen();
-    }//GEN-LAST:event_cmdRefreshEnumerationActionPerformed
+    }                                                                                         //GEN-LAST:event_cmdRefreshEnumerationActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
+    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
             final EBGeneratorDialog.Mode ebMode;
             if (CidsAppBackend.Mode.ESW.equals(CidsAppBackend.getInstance().getMode())) {
@@ -2695,29 +2844,29 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 });
         }
-    }//GEN-LAST:event_cmdPdfActionPerformed
+    } //GEN-LAST:event_cmdPdfActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
+    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
         deleteKassenzeichen();
-    }//GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteActionPerformed
+    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteActionPerformed
         final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.storeToFile();
             clipboard.paste();
         }
-    }//GEN-LAST:event_cmdPasteActionPerformed
+    }                                                                            //GEN-LAST:event_cmdPasteActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2733,19 +2882,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutActionPerformed
+    private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCutActionPerformed
         final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.cut();
         }
-    }//GEN-LAST:event_cmdCutActionPerformed
+    }                                                                          //GEN-LAST:event_cmdCutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdInfoActionPerformed
+    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
 //        String info="Verdis Plugin\n"
 //                + "cismet GmbH\n\n"
 //                + de.cismet.verdis.Version.getVersion()+"\n"
@@ -2771,60 +2920,60 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             about = d;
         }
         StaticSwingTools.showDialog(about);
-    }//GEN-LAST:event_cmdInfoActionPerformed
+    } //GEN-LAST:event_cmdInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoActionPerformed
+    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuInfoActionPerformed
         cmdInfoActionPerformed(null);
-    }//GEN-LAST:event_mnuInfoActionPerformed
+    }                                                                           //GEN-LAST:event_mnuInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
+    private void formKeyReleased(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyReleased
         // TODO add your handling code here:
-    }//GEN-LAST:event_formKeyReleased
+    } //GEN-LAST:event_formKeyReleased
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyPressed(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+    private void formKeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyPressed
 
         if ((evt.getKeyCode() == KeyEvent.VK_F1) && evt.isControlDown()) {
         }
         // TODO add your handling code here:
-    }//GEN-LAST:event_formKeyPressed
+    } //GEN-LAST:event_formKeyPressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyTyped(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
-    }//GEN-LAST:event_formKeyTyped
+    private void formKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyTyped
+    }                                                              //GEN-LAST:event_formKeyTyped
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
-    }//GEN-LAST:event_cmdWorkflowActionPerformed
+    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWorkflowActionPerformed
+    }                                                                               //GEN-LAST:event_cmdWorkflowActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         LOG.info("formWindowClosing");
         if (editMode && !kassenzeichenPanel.isEmpty()) {
             if (changesPending()) {
@@ -2841,7 +2990,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
         closeAllConnections();
-    }//GEN-LAST:event_formWindowClosing
+    }                                                                      //GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
@@ -2858,15 +3007,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosed(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-    }//GEN-LAST:event_formWindowClosed
+    private void formWindowClosed(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosed
+    }                                                                     //GEN-LAST:event_formWindowClosed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
+    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -2884,25 +3033,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 newKassenzeichen();
             }
         }
-    }//GEN-LAST:event_cmdNewKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOkActionPerformed
+    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
         if (changesPending()) {
             saveKassenzeichenAndAssessement();
         }
-    }//GEN-LAST:event_cmdOkActionPerformed
+    }                                                                         //GEN-LAST:event_cmdOkActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
         if (changesPending()) {
             final int answer = JOptionPane.showConfirmDialog(
                     this,
@@ -2932,14 +3081,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     kassenzeichenPanel.refresh();
                 }
             }.execute();
-    }//GEN-LAST:event_cmdCancelActionPerformed
+    } //GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditModeActionPerformed
+    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
             WaitDialog.getInstance().showDialog();
             new SwingWorker<Boolean, Void>() {
@@ -2975,7 +3124,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 }.execute();
         }
-    }//GEN-LAST:event_cmdEditModeActionPerformed
+    } //GEN-LAST:event_cmdEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3002,36 +3151,36 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyActionPerformed
+    private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCopyActionPerformed
         final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
         if (clipboard != null) {
             clipboard.storeToFile();
             clipboard.copy();
         }
-    }//GEN-LAST:event_cmdCopyActionPerformed
+    }                                                                           //GEN-LAST:event_cmdCopyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestActionPerformed
-    }//GEN-LAST:event_cmdTestActionPerformed
+    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTestActionPerformed
+    }                                                                           //GEN-LAST:event_cmdTestActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
-    }//GEN-LAST:event_cmdTest2ActionPerformed
+    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTest2ActionPerformed
+    }                                                                            //GEN-LAST:event_cmdTest2ActionPerformed
 
     /**
      * ToDo Threading and Progressbar.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
+    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
             final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(CidsAppBackend.getInstance()
@@ -3047,14 +3196,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             LOG.error("Crossover: Fehler im LagIS Crossover", ex);
             // ToDo Meldung an Benutzer
         }
-    }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
+    }                                                                                     //GEN-LAST:event_cmdLagisCrossoverActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRenameKZActionPerformed
+    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameKZActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -3075,7 +3224,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 renameKassenzeichen();
             }
         }
-    }//GEN-LAST:event_mnuRenameKZActionPerformed
+    }                                                                               //GEN-LAST:event_mnuRenameKZActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3098,16 +3247,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKarteActionPerformed
+    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKarteActionPerformed
         showOrHideView(vKarte);
-    }//GEN-LAST:event_mniKarteActionPerformed
+    }                                                                            //GEN-LAST:event_mniKarteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniTabelleActionPerformed
+    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniTabelleActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vTabelleRegen);
@@ -3118,14 +3267,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             break;
         }
-    }//GEN-LAST:event_mniTabelleActionPerformed
+    }                                                                              //GEN-LAST:event_mniTabelleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDetailsActionPerformed
+    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDetailsActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vDetailsRegen);
@@ -3139,23 +3288,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             break;
         }
-    }//GEN-LAST:event_mniDetailsActionPerformed
+    }                                                                              //GEN-LAST:event_mniDetailsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jMenuItem1ActionPerformed
         DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }                                                                              //GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
+    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnHistoryActionPerformed
         final HistoryPanel historyPan = new HistoryPanel();
         historyPan.setCidsBean(kassenzeichenBean);
 
@@ -3164,7 +3313,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         dial.setContentPane(historyPan);
         dial.setSize(800, 600);
         StaticSwingTools.showDialog(dial);
-    }//GEN-LAST:event_btnHistoryActionPerformed
+    } //GEN-LAST:event_btnHistoryActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3335,7 +3484,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             setKZGeomFromSole();
         } else {
@@ -3344,14 +3493,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 cidsBeanTable.addNewBean();
             }
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveActionPerformed
+    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
         if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             removeKZGeometrie();
         } else {
@@ -3360,45 +3509,45 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 cidsBeanTable.removeSelectedBeans();
             }
         }
-    }//GEN-LAST:event_cmdRemoveActionPerformed
+    }                                                                             //GEN-LAST:event_cmdRemoveActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
         final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
         if (cidsBeanTable != null) {
             cidsBeanTable.restoreSelectedBeans();
         }
-    }//GEN-LAST:event_cmdUndoActionPerformed
+    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniOptionsActionPerformed
+    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniOptionsActionPerformed
         final OptionsDialog od = new OptionsDialog(this, true);
         StaticSwingTools.showDialog(od);
-    }//GEN-LAST:event_mniOptionsActionPerformed
+    }                                                                              //GEN-LAST:event_mniOptionsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCMENT ME!
      */
-    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFortfuehrungActionPerformed
+    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
         StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
-    }//GEN-LAST:event_cmdFortfuehrungActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdFortfuehrungActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
         final Integer kassenzeichennummer8;
         if (getCidsBean() != null) {
             kassenzeichennummer8 = (Integer)getCidsBean().getProperty(
@@ -3419,25 +3568,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (final ConnectionException ex) {
             LOG.error("error while executing next kassenzeichensearch", ex);
         }
-    }//GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    } //GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
+    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
         StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
-    }//GEN-LAST:event_cmdLagisCrossover1ActionPerformed
+    }                                                                                      //GEN-LAST:event_cmdLagisCrossover1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichen1ActionPerformed
+    private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichen1ActionPerformed
         showOrHideView(vKassenzeichenList);
-    }//GEN-LAST:event_mniKassenzeichen1ActionPerformed
+    }                                                                                     //GEN-LAST:event_mniKassenzeichen1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3518,7 +3667,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         this,
                         "Kassenzeichen muss eine Zahl sein.",
                         "Fehler",
-                            JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -5148,7 +5297,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         flaechenClipboard.loadFromFile();
 
         if (flaechenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -5161,7 +5311,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         frontenClipboard.loadFromFile();
 
         if (frontenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -5175,7 +5326,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         kassenzeichenClipboard.loadFromFile();
 
         if (kassenzeichenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
