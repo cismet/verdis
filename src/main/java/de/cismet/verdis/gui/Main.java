@@ -20,14 +20,6 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.navigator.plugin.context.PluginContext;
-import Sirius.navigator.plugin.interfaces.*;
-import Sirius.navigator.plugin.listener.MetaNodeSelectionListener;
-import Sirius.navigator.search.dynamic.FormDataBean;
-import Sirius.navigator.types.iterator.AttributeRestriction;
-import Sirius.navigator.types.iterator.ComplexAttributeRestriction;
-import Sirius.navigator.types.iterator.SingleAttributeIterator;
-import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
@@ -43,7 +35,11 @@ import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 
-import net.infonode.docking.*;
+import net.infonode.docking.DockingWindow;
+import net.infonode.docking.RootWindow;
+import net.infonode.docking.SplitWindow;
+import net.infonode.docking.TabWindow;
+import net.infonode.docking.View;
 import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
@@ -67,7 +63,11 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -76,17 +76,45 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
@@ -105,13 +133,24 @@ import de.cismet.cismap.commons.ModeLayer;
 import de.cismet.cismap.commons.ModeLayerRegistry;
 import de.cismet.cismap.commons.PNodeProvider;
 import de.cismet.cismap.commons.ServiceLayer;
-import de.cismet.cismap.commons.features.*;
+import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
+import de.cismet.cismap.commons.features.FeatureCollectionEvent;
+import de.cismet.cismap.commons.features.PostgisFeature;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.DeleteFeatureListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.SimpleMoveListener;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
@@ -188,11 +227,7 @@ import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeome
  * @author   hell
  * @version  $Revision$, $Date$
  */
-public final class Main extends javax.swing.JFrame implements PluginSupport,
-    FloatingPluginUI,
-    AppModeListener,
-    Configurable,
-    CidsBeanStore {
+public final class Main extends javax.swing.JFrame implements AppModeListener, Configurable, CidsBeanStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -213,12 +248,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private static final String FILE_LAYOUT = "verdis.layout";
     private static final String FILE_SCREEN = "verdis.screen";
     private static final String FILE_MAP = "verdis.map";
-    private static final String FILE_PLUGINLAYOUT = "plugin.layout";
     private static final String DIRECTORYPATH_VERDIS = DIRECTORYPATH_HOME + FILESEPARATOR + DIRECTORY_VERDISHOME;
     private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
     private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
-    private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
     private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
@@ -253,14 +286,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private final Icon icoDetails = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
     // private Color myBlue=new java.awt.Color(0, 51, 153);
-    private Color myBlue = new Color(124, 160, 221);
+    private final Color myBlue = new Color(124, 160, 221);
     private boolean editMode = false;
-    private boolean plugin = false;
     private boolean readonly = true;
-    /** Creates new form Main. */
     private String userString;
-    private final String kassenzeichenSuche = "kassenzeichenSuche";
-    private String userGroup = "noGroup";
     private final EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards =
         new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
 
@@ -281,7 +310,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 //    private View vHistory;
     private RootWindow rootWindow;
     private final StringViewMap viewMap = new StringViewMap();
-    private final ArrayList<JMenuItem> menues = new ArrayList<JMenuItem>();
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
@@ -301,7 +329,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private RMPlugin rmPlugin;
     private boolean fixMapExtent;
     private boolean isInit = true;
-    private PluginContext context;
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -322,7 +349,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JButton cmdOk;
     private javax.swing.JButton cmdPaste;
     private javax.swing.JButton cmdPdf;
-    private javax.swing.JButton cmdPutKassenzeichenToSearchTree;
     private javax.swing.JButton cmdRefreshEnumeration;
     private javax.swing.JButton cmdRemove;
     private javax.swing.JButton cmdTest;
@@ -340,7 +366,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private javax.swing.JToolBar.Separator jSeparator13;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
@@ -389,19 +414,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void init() {
-        init(null);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  context  DOCUMENT ME!
-     */
-    public void init(final PluginContext context) {
         readonly = CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase().equals("readonly");
-
-        plugin = !(context == null);
-        this.context = context;
 
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
@@ -491,37 +504,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         try {
             try {
-                if ((context != null) && (context.getEnvironment() != null)
-                            && this.context.getEnvironment().isProgressObservable()) {
-                    this.context.getEnvironment().getProgressObserver().setProgress(0, "verdis Plugin laden...");
-                }
-            } catch (Exception e) {
-                LOG.error("Keine Progressmeldung", e);
-            }
-
-            try {
                 javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
             } catch (Exception e) {
                 LOG.warn("Fehler beim Einstellen des Look&Feels's!", e);
             }
 
             LOG.info("Verdis gestartet :-)");
-            if ((context != null) && (context.getEnvironment() != null)
-                        && this.context.getEnvironment().isProgressObservable()) {
-                this.context.getEnvironment()
-                        .getProgressObserver()
-                        .setProgress(100, "verdis Plugin DB Verbindung setzen...");
-            }
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Gui kram erledigt");
                 LOG.debug("initComponents()");
-            }
-            if ((context != null) && (context.getEnvironment() != null)
-                        && this.context.getEnvironment().isProgressObservable()) {
-                this.context.getEnvironment()
-                        .getProgressObserver()
-                        .setProgress(200, "verdis Plugin: Oberfl\u00E4che initialisieren ...");
             }
 
             initComponents();
@@ -546,25 +538,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             alkisRendererDialog.setContentPane(descriptionPane);
             alkisRendererDialog.setSize(1000, 800);
 
-            // Menu for Navigator
-            if (plugin) {
-                final JMenu navigatorMenue = new JMenu("Verdis");
-                navigatorMenue.add(mniKassenzeichen);
-                navigatorMenue.add(mniDokumente);
-                navigatorMenue.add(mniSummen);
-                navigatorMenue.add(mniKanalanschluss);
-                navigatorMenue.add(new JSeparator());
-                navigatorMenue.add(mniLoadLayout);
-                navigatorMenue.add(mniSaveLayout);
-                navigatorMenue.add(mniResetWindowLayout);
-                menues.add(navigatorMenue);
-            }
-
-            if (!plugin) {
-                configurationManager.setFileName("configuration.xml");
-            } else {
-                configurationManager.setFileName("configurationPlugin.xml");
-            }
+            configurationManager.setFileName("configuration.xml");
             configurationManager.setClassPathFolder("/verdis/");
             configurationManager.setFolder(DIRECTORY_VERDISHOME);
             if (LOG.isDebugEnabled()) {
@@ -578,19 +552,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             configurationManager.configure(OptionsClient.getInstance());
 
             // Anwendungslogik
-            if ((context != null) && (context.getEnvironment() != null)
-                        && this.context.getEnvironment().isProgressObservable()) {
-                this.context.getEnvironment()
-                        .getProgressObserver()
-                        .setProgress(300, "verdis Plugin: Widgets verbinden ...");
-            }
 
-            if ((context != null) && (context.getEnvironment() != null)
-                        && this.context.getEnvironment().isProgressObservable()) {
-                this.context.getEnvironment()
-                        .getProgressObserver()
-                        .setProgress(500, "verdis Plugin: GIS Einstellungen ...");
-            }
             LOG.info("Einstellungen der Karte vornehmen");
             setEditMode(false);
             if (LOG.isDebugEnabled()) {
@@ -785,49 +747,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             LOG.error("Fehler im Konstruktor", t);
         }
         isInit = false;
-
-        if (context != null) {
-            try {
-                this.cmdPutKassenzeichenToSearchTree.setEnabled(true);
-                if ((context != null) && (context.getEnvironment() != null)
-                            && this.context.getEnvironment().isProgressObservable()) {
-                    this.context.getEnvironment()
-                            .getProgressObserver()
-                            .setProgress(700, "verdis Plugin: Methoden initialisieren ...");
-                }
-
-                this.context.getMetadata().addMetaNodeSelectionListener(new NodeChangeListener());
-                setUserString(Sirius.navigator.connection.SessionManager.getSession().getUser().getName() + "@"
-                            + Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup()
-                            .getName());
-                userGroup = Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup().toString();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("prefs: Vector index of "
-                                + (CidsAppBackend.getInstance().getAppPreferences().getRwGroups().indexOf(
-                                        userGroup.toLowerCase()) >= 0));
-                }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("prefs: userGroup " + userGroup.toLowerCase());
-                }
-                if (CidsAppBackend.getInstance().getAppPreferences().getRwGroups().indexOf(userGroup.toLowerCase())
-                            >= 0) {
-                    readonly = false;
-                } else {
-                    readonly = true;
-                }
-                if ((context.getEnvironment() != null) && context.getEnvironment().isProgressObservable()) {
-                    this.context.getEnvironment().getProgressObserver().setProgress(1000, "verdis Plugin fertig...");
-                }
-                if ((context.getEnvironment() != null) && context.getEnvironment().isProgressObservable()) {
-                    this.context.getEnvironment().getProgressObserver().setFinished(true);
-                }
-            } catch (Throwable t) {
-                LOG.error("Fehler im PluginKonstruktor", t);
-            }
-        } else {
-            this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/money_add.png"))
-                        .getImage());
-        }
 
         final MappingComponent mainMap = CidsAppBackend.getInstance().getMainMap();
         configurationManager.configure(mappingModel);
@@ -1425,7 +1344,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     counter++;
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.error("Problem beim Lesen des MapFiles " + fileName);
         }
     }
@@ -1691,8 +1610,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         exceptionNotificationStatusPanel =
             new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
         tobVerdis = new javax.swing.JToolBar();
-        cmdPutKassenzeichenToSearchTree = new javax.swing.JButton();
-        jSeparator5 = new javax.swing.JSeparator();
         cmdEditMode = new javax.swing.JButton();
         cmdCancel = new javax.swing.JButton();
         cmdOk = new javax.swing.JButton();
@@ -1828,24 +1745,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         tobVerdis.setMaximumSize(new java.awt.Dimension(679, 32769));
         tobVerdis.setMinimumSize(new java.awt.Dimension(667, 33));
         tobVerdis.setPreferredSize(new java.awt.Dimension(691, 35));
-
-        cmdPutKassenzeichenToSearchTree.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/show_kassenzeichen_in_search_tree.png"))); // NOI18N
-        cmdPutKassenzeichenToSearchTree.setToolTipText("Zeige Kassenzeichen im Navigator");
-        cmdPutKassenzeichenToSearchTree.setEnabled(false);
-        cmdPutKassenzeichenToSearchTree.setFocusPainted(false);
-        cmdPutKassenzeichenToSearchTree.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdPutKassenzeichenToSearchTreeActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdPutKassenzeichenToSearchTree);
-
-        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator5.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator5);
 
         cmdEditMode.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/editmode.png"))); // NOI18N
@@ -2859,7 +2758,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             login.setUserName(u);
         }
 
-        JFrame parent = null;
+        final JFrame parent;
         if (SPLASH == null) {
             parent = getInstance();
         } else {
@@ -3060,46 +2959,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void formKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyTyped
     }                                                              //GEN-LAST:event_formKeyTyped
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdPutKassenzeichenToSearchTreeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
-        if ((kassenzeichenPanel.getShownKassenzeichen() != null)
-                    && !kassenzeichenPanel.getShownKassenzeichen().trim().equals("")) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Alle verf\u00FCgbaren Suchen:" + context.getSearch().getDataBeans().keySet());
-            }
-            final Object object = context.getSearch()
-                        .getDataBeans()
-                        .get(kassenzeichenSuche + "@" + VerdisConstants.DOMAIN);
-            if (object != null) {
-                final FormDataBean kassenzeichenSucheParam = (FormDataBean)object;
-                kassenzeichenSucheParam.setBeanParameter("Kassenzeichen", kassenzeichenPanel.getShownKassenzeichen());
-                final Vector v = new Vector();
-                final String cid = String.valueOf(11) + "@" + VerdisConstants.DOMAIN;
-                v.add(cid);
-                try {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("vor KassenzeichenSuche aus Plugin");
-                    }
-                    context.getSearch()
-                            .performSearch(
-                                v,
-                                kassenzeichenSucheParam,
-                                context.getUserInterface().getFrameFor((PluginUI)this),
-                                true);
-                } catch (Exception e) {
-                    kassenzeichenPanel.flashSearchField(java.awt.Color.red);
-                }
-            } else {
-                LOG.warn("KassenzeichenSuche (" + kassenzeichenSuche + "@" + VerdisConstants.DOMAIN
-                            + ") nicht vorhanden!!!");
-            }
-        }
-    }                                                                                                   //GEN-LAST:event_cmdPutKassenzeichenToSearchTreeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -4157,179 +4016,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     @Override
     public void setVisible(final boolean b) {
-        if (!plugin) {
-            super.setVisible(b);
-        }
-    }
-
-    /**
-     * Methoden f\u00FCr die Plugin Schnittstelle.
-     *
-     * @param   str  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public PluginUI getUI(final String str) {
-        return this;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   str  DOCUME NT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public PluginMethod getMethod(final String str) {
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  param  DOCUMENT ME!
-     */
-    @Override
-    public void setActive(final boolean param) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("setActive(" + param + ")");
-        }
-        if ((param == false) && editMode && !kassenzeichenPanel.isEmpty()) {
-            if (changesPending()) {
-                final int answer = JOptionPane.showConfirmDialog(
-                        this,
-                        "Wollen Sie die gemachten \u00C4nderungen speichern?",
-                        "Verdis \u00C4nderungen",
-                        JOptionPane.YES_NO_OPTION);
-                if (answer == JOptionPane.YES_OPTION) {
-                    saveKassenzeichenAndAssessement();
-                }
-            }
-        }
-        if (param == false) {
-            closeAllConnections();
-            // Inserting Docking Window functionalty (Sebastian) 24.07.07
-            configurationManager.writeConfiguration();
-            saveLayout(FILEPATH_PLUGINLAYOUT);
-        }
-        allClipboardsDeleteStoreFile();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public java.util.Iterator getUIs() {
-        final LinkedList ll = new LinkedList();
-        ll.add(this);
-        return ll.iterator();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public PluginProperties getProperties() {
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public java.util.Iterator getMethods() {
-        return new LinkedList().iterator();
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void shown() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void resized() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void moved() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void hidden() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public java.util.Collection getMenus() {
-        return menues;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public String getId() {
-        return "verdis";
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public JComponent getComponent() {
-        return panMain;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    @Override
-    public java.util.Collection getButtons() {
-        return Arrays.asList(this.tobVerdis.getComponents());
-            // return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void floatingStopped() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    @Override
-    public void floatingStarted() {
+        super.setVisible(b);
     }
 
     /**
@@ -5610,7 +5297,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         flaechenClipboard.loadFromFile();
 
         if (flaechenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -5623,7 +5311,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         frontenClipboard.loadFromFile();
 
         if (frontenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -5637,7 +5326,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         kassenzeichenClipboard.loadFromFile();
 
         if (kassenzeichenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
+            JOptionPane.showMessageDialog(
+                this,
                 "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
                 "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -5647,101 +5337,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     }
 
     //~ Inner Classes ----------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private class NodeChangeListener extends MetaNodeSelectionListener {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private final SingleAttributeIterator attributeIterator;
-        private final Collection classNames;
-        private final Collection attributeNames;
-        private final Object nodeSelectionChangedBlocker = new Object();
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new NodeChangeListener object.
-         */
-        private NodeChangeListener() {
-            this.classNames = context.getEnvironment().getAttributeMappings("className");
-            this.attributeNames = context.getEnvironment().getAttributeMappings("attributeName");
-            if (this.attributeNames.isEmpty()) {
-                this.attributeNames.add("id");
-            }
-
-            final AttributeRestriction attributeRestriction = new ComplexAttributeRestriction(
-                    AttributeRestriction.OBJECT,
-                    AttributeRestriction.IGNORE,
-                    null,
-                    this.attributeNames,
-                    null);
-            this.attributeIterator = new SingleAttributeIterator(attributeRestriction, false);
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param  collection  DOCUMENT ME!
-         */
-        @Override
-        protected void nodeSelectionChanged(final Collection collection) {
-            final Thread t = new Thread() {
-
-                    @Override
-                    public void run() {
-                        synchronized (nodeSelectionChangedBlocker) {
-                            if ((collection != null) || (!collection.isEmpty())) {
-                                final Object selectedNode = collection.iterator().next();
-                                if (selectedNode instanceof ObjectTreeNode) {
-                                    final ObjectTreeNode objectTreeNode = (ObjectTreeNode)selectedNode;
-                                    try {
-                                        if ((NodeChangeListener.this.classNames.isEmpty())
-                                                    || NodeChangeListener.this.classNames.contains(
-                                                        objectTreeNode.getMetaClass().getName())) {
-                                            attributeIterator.init(objectTreeNode);
-                                            Object kassenzeichen = null;
-                                            if (attributeIterator.hasNext()) {
-                                                kassenzeichen = attributeIterator.next().getValue();
-                                                CidsAppBackend.getInstance()
-                                                        .gotoKassenzeichen(kassenzeichen.toString());
-                                            } else {
-                                                if (LOG.isDebugEnabled()) {
-                                                    LOG.debug("falscher attribute name");
-                                                    LOG.debug(kassenzeichen);
-                                                }
-                                            }
-                                        } else {
-                                            if (LOG.isDebugEnabled()) {
-                                                LOG.debug("falscher class name");
-                                                LOG.debug(objectTreeNode.getMetaClass().getName());
-                                            }
-                                            if (LOG.isDebugEnabled()) {
-                                                LOG.debug(classNames);
-                                            }
-                                        }
-                                    } catch (Throwable t) {
-                                        LOG.error(t.getMessage(), t);
-                                    }
-                                } else {
-                                    if (LOG.isDebugEnabled()) {
-                                        LOG.debug("keine object node");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-            t.setPriority(Thread.NORM_PRIORITY);
-            t.start();
-        }
-    }
 
     /**
      * DOCUMENT ME!

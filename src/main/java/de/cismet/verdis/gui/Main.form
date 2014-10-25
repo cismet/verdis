@@ -417,27 +417,6 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JButton" name="cmdPutKassenzeichenToSearchTree">
-              <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/show_kassenzeichen_in_search_tree.png"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Zeige Kassenzeichen im Navigator"/>
-                <Property name="enabled" type="boolean" value="false"/>
-                <Property name="focusPainted" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdPutKassenzeichenToSearchTreeActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JSeparator" name="jSeparator5">
-              <Properties>
-                <Property name="orientation" type="int" value="1"/>
-                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[2, 32767]"/>
-                </Property>
-              </Properties>
-            </Component>
             <Component class="javax.swing.JButton" name="cmdEditMode">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
