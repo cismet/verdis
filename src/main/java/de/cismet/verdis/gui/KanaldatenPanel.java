@@ -205,24 +205,6 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
         // panTitle.repaint();
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Main getMain() {
-        return main;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  main  DOCUMENT ME!
-     */
-    public void setMain(final Main main) {
-        this.main = main;
-    }
-
     @Override
     public CidsBean getCidsBean() {
         return kassenzeichenBean;

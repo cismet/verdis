@@ -299,7 +299,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
             }
 
             getJXTable().getSelectionModel().addListSelectionListener(this);
-            Main.getCurrentInstance().selectionChanged();
+            Main.getInstance().selectionChanged();
         }
     }
 
@@ -443,7 +443,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
 //                setDetailBean(null);
 //            }
 
-            Main.getCurrentInstance().selectionChanged();
+            Main.getInstance().selectionChanged();
         }
     }
 

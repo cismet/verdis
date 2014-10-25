@@ -166,8 +166,8 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
                 final Map<String, Double> veranlagungHash = new HashMap<String, Double>();
                 final Map<String, Double> anschlussgradHash = new HashMap<String, Double>();
 
-                Main.getCurrentInstance().fillFlaechenVeranlagungSummeMap(veranlagungHash);
-                Main.getCurrentInstance().fillFlaechenAnschlussgradSummeMap(anschlussgradHash);
+                Main.getInstance().fillFlaechenVeranlagungSummeMap(veranlagungHash);
+                Main.getInstance().fillFlaechenAnschlussgradSummeMap(anschlussgradHash);
 
                 final List<String> veranlagungKeys = Arrays.asList(veranlagungHash.keySet().toArray(new String[0]));
                 final List<String> anschlussgradKeys = Arrays.asList(anschlussgradHash.keySet().toArray(new String[0]));

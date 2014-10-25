@@ -87,7 +87,7 @@ public class GoToKassenzeichenRemoteMethod extends AbstractRESTRemoteControlMeth
         }
 
         // Mit History
-        if (Main.getCurrentInstance().isLoggedIn()) {
+        if (Main.getInstance().isLoggedIn()) {
             try {
                 // ToDo ugly
                 CidsAppBackend.getInstance().gotoKassenzeichen(kassenzeichen);

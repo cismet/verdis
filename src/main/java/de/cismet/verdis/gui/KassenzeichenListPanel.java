@@ -130,7 +130,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                             false);
                     if (comp instanceof JLabel) {
                         ((JLabel)comp).setText(
-                            Main.getCurrentInstance().getCurrentClipboard().getFromKassenzeichenBean()
+                            Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
                                     + ":"
                                     + ((JLabel)comp).getText());
                     }
@@ -755,7 +755,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 LOG.fatal(ex, ex);
             }
         }
-        final AbstractClipboard clipboard = Main.getCurrentInstance().getCurrentClipboard();
+        final AbstractClipboard clipboard = Main.getInstance().getCurrentClipboard();
         if (clipboard != null) {
             clipboard.clear();
         }
@@ -1075,7 +1075,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jButton2.setEnabled(!CidsAppBackend.getInstance().isEditable());
         jButton3.setEnabled((count > 0) && !CidsAppBackend.getInstance().isEditable());
         cmdPaste.setEnabled(!lstKassenzeichen.getSelectionModel().isSelectionEmpty()
-                    && Main.getCurrentInstance().getCurrentClipboard().isPastable());
+                    && Main.getInstance().getCurrentClipboard().isPastable());
         jCheckBox1.setEnabled(!CidsAppBackend.getInstance().isEditable());
     }
 
@@ -1160,8 +1160,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
 
                                     if (addToList) {
                                         for (final CidsBean entity
-                                                    : Main.getCurrentInstance().getCurrentClipboard()
-                                                    .getClipboardBeans()) {
+                                                    : Main.getInstance().getCurrentClipboard().getClipboardBeans()) {
                                             switch (CidsAppBackend.getInstance().getMode()) {
                                                 case REGEN: {
                                                     infoBeans.add((CidsBean)entity.getProperty(
@@ -1204,8 +1203,8 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                             break;
                                         }
                                         if (count
-                                                    == Main.getCurrentInstance().getCurrentClipboard()
-                                                    .getClipboardBeans().size()) {
+                                                    == Main.getInstance().getCurrentClipboard().getClipboardBeans()
+                                                    .size()) {
                                             bgColorMap.put(kassenzeichenBean, Color.orange);
                                         } else if (count > 0) {
                                             bgColorMap.put(kassenzeichenBean, Color.yellow);
@@ -1281,11 +1280,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
             if (visible == isVisible()) {
                 return;
             }
-            final AbstractClipboard clipboard = Main.getCurrentInstance().getCurrentClipboard();
+            final AbstractClipboard clipboard = Main.getInstance().getCurrentClipboard();
             if (clipboard != null) {
                 final List<Integer> kassenzeichenToLockOrRelease = new ArrayList<Integer>();
-                final Integer mainToLock = (Integer)Main.getCurrentInstance().getCurrentClipboard()
-                            .getFromKassenzeichenBean()
+                final Integer mainToLock = (Integer)Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
                             .getProperty(
                                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
                 if (visible) {

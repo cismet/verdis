@@ -84,7 +84,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
      * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
      */
     public AssessmentDialog(final boolean veranlagungOnlyForChangedValues) {
-        super(Main.getCurrentInstance(), true);
+        super(Main.getInstance(), true);
         initComponents();
 
         this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;

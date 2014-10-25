@@ -28,18 +28,11 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
-
-import org.deegree.model.feature.DefaultFeature;
-
-import org.openide.util.Exceptions;
 
 import java.awt.Event;
 import java.awt.EventQueue;
@@ -52,13 +45,11 @@ import java.beans.PropertyChangeListener;
 import java.sql.Date;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -98,8 +89,6 @@ import de.cismet.verdis.commons.constants.*;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
-
-import static javax.swing.JComponent.TOOL_TIP_TEXT_KEY;
 
 /**
  * DOCUMENT ME!
@@ -2056,7 +2045,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         return;
                                     }
 
-                                    Main.getCurrentInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
+                                    Main.getInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
 
                                     cbOne.setProperty(
                                         FlaechePropertyConstants.PROP__FLAECHENINFO

@@ -28,8 +28,6 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import Sirius.server.middleware.types.MetaObject;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -273,7 +271,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 final CidsBean selectedBean = (!selectedBeans.isEmpty()) ? selectedBeans.get(0) : null;
                 if ((selectedBean != null)
                             && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                                != selectedBean.getProperty(
+                                != (Integer)selectedBean.getProperty(
                                     FlaechePropertyConstants.PROP__FLAECHENINFO
                                     + "."
                                     + FlaecheninfoPropertyConstants.PROP__FLAECHENART
@@ -406,12 +404,11 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE)
                     .getEmptyInstance()
                     .getBean();
-        final CidsBean anschlussgradBean = SessionManager.getProxy()
-                    .getMetaObject(
+        final CidsBean anschlussgradBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaObject(
                             1,
-                            CidsAppBackend.getInstance().getVerdisMetaClass(
-                                VerdisMetaClassConstants.MC_ANSCHLUSSGRAD).getId(),
-                            VerdisConstants.DOMAIN)
+                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD)
+                                .getId())
                     .getBean();
         final CidsBean flaecheninfoBean = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO)

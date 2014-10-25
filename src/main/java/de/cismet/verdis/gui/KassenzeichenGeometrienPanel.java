@@ -594,7 +594,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             return;
         }
         refreshLstAlkisLandparcels();
-        Main.getCurrentInstance().selectionChanged();
+        Main.getInstance().selectionChanged();
     }                                                                                                     //GEN-LAST:event_lstKassenzeichenGeometrienValueChanged
 
     /**
@@ -658,7 +658,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             final Object listObject = lstAlkisLandparcels.getModel().getElementAt(selectedIndex);
             if (listObject instanceof CidsBean) {
                 final CidsBean alkisLandparcelBean = (CidsBean)listObject;
-                Main.getCurrentInstance().showRenderer(alkisLandparcelBean.getMetaObject());
+                Main.getInstance().showRenderer(alkisLandparcelBean.getMetaObject());
             }
         }
     }                                                                                   //GEN-LAST:event_lstAlkisLandparcelsMouseClicked
@@ -679,7 +679,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 coll.add(kassenzeichenGeometrieBean.getMetaObject());
             }
         }
-        Main.getCurrentInstance().showRenderer(coll.toArray(new MetaObject[0]));
+        Main.getInstance().showRenderer(coll.toArray(new MetaObject[0]));
     }                                                                                                   //GEN-LAST:event_cmdShowAlkisRendererForSelectedActionPerformed
 
     /**
@@ -763,7 +763,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 coll.add(alkisLandparcelBean.getMetaObject());
             }
         }
-        Main.getCurrentInstance().showRenderer(coll.toArray(new MetaObject[0]));
+        Main.getInstance().showRenderer(coll.toArray(new MetaObject[0]));
     } //GEN-LAST:event_cmdShowAlkisRendererForAllActionPerformed
 
     /**
@@ -800,7 +800,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                                 coll.add(alkisLandparcelBean.getMetaObject());
                             }
                         }
-                        Main.getCurrentInstance().showRenderer(coll.toArray(new MetaObject[0]));
+                        Main.getInstance().showRenderer(coll.toArray(new MetaObject[0]));
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
                     }
@@ -1174,7 +1174,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             }
 
             lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
-            Main.getCurrentInstance().selectionChanged();
+            Main.getInstance().selectionChanged();
         }
     }
 

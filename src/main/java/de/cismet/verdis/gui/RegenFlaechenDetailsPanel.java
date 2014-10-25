@@ -28,9 +28,6 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -82,7 +79,6 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
@@ -159,19 +155,12 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                 VerdisMetaClassConstants.MC_FLAECHENART));
         setEnabled(false);
 
-        edtQuer.addHyperlinkListener(this);
-
-        try {
-            anschlussgradBean = SessionManager.getProxy()
-                        .getMetaObject(
-                                1,
-                                CidsAppBackend.getInstance().getVerdisMetaClass(
-                                    VerdisMetaClassConstants.MC_ANSCHLUSSGRAD).getId(),
-                                VerdisConstants.DOMAIN)
-                        .getBean();
-        } catch (ConnectionException ex) {
-            LOG.error(ex, ex);
-        }
+        anschlussgradBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaObject(
+                            1,
+                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD)
+                                .getId())
+                    .getBean();
 
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtBezeichnung,
@@ -249,6 +238,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
     public static RegenFlaechenDetailsPanel getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new RegenFlaechenDetailsPanel();
+            INSTANCE.edtQuer.addHyperlinkListener(INSTANCE);
         }
         return INSTANCE;
     }
@@ -867,7 +857,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
     private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
         final boolean sperre = chkSperre.isSelected();
         if (sperre) {
-            final String answer = JOptionPane.showInputDialog(Main.getCurrentInstance().getRootPane(),
+            final String answer = JOptionPane.showInputDialog(Main.getInstance().getRootPane(),
                     "Bitte eine Bemerkung zur Sperre angeben.",
                     txtSperreBemerkung.getText());
             if (answer == null) {
@@ -1116,7 +1106,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                 @Override
                                 public void actionPerformed(final ActionEvent e) {
                                     final int answer = JOptionPane.showConfirmDialog(
-                                            Main.getCurrentInstance(),
+                                            Main.getInstance(),
                                             "Soll die n\u00E4chste freie Bezeichnung gew\u00E4hlt werden?",
                                             "Bezeichnung automatisch setzen",
                                             JOptionPane.YES_NO_OPTION);
@@ -1132,7 +1122,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                         } catch (final NumberFormatException ex) {
                                             art = 0;
                                         }
-                                        final String newValue = Main.getCurrentInstance()
+                                        final String newValue = Main.getInstance()
                                                     .getRegenFlaechenTabellenPanel()
                                                     .getValidFlaechenname(art);
                                         try {
@@ -1234,7 +1224,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
 
                                 @Override
                                 public void actionPerformed(final ActionEvent event) {
-                                    if (Main.getCurrentInstance().isInEditMode()) {
+                                    if (Main.getInstance().isInEditMode()) {
                                         if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                                     == (Integer)flaecheBean.getProperty(
                                                         FlaechePropertyConstants.PROP__FLAECHENINFO
@@ -1255,7 +1245,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                             }
                                         } else if (geom != null) {
                                             final int answer = JOptionPane.showConfirmDialog(
-                                                    Main.getCurrentInstance(),
+                                                    Main.getInstance(),
                                                     "Soll die Gr\u00F6\u00DFe aus der Grafik \u00FCbernommen werden?",
                                                     "Gr\u00F6\u00DFe automatisch setzen",
                                                     JOptionPane.YES_NO_OPTION);
@@ -1360,10 +1350,10 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                 public void actionPerformed(final ActionEvent event) {
                                     final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
 
-                                    if (Main.getCurrentInstance().isInEditMode()) {
+                                    if (Main.getInstance().isInEditMode()) {
                                         if (geom != null) {
                                             final int answer = JOptionPane.showConfirmDialog(
-                                                    Main.getCurrentInstance(),
+                                                    Main.getInstance(),
                                                     "Soll die Gr\u00F6\u00DFe aus dem Feld \"Gr\u00F6\u00DFe (Grafik)\" \u00FCbernommen werden?",
                                                     "Gr\u00F6\u00DFe automatisch setzen",
                                                     JOptionPane.YES_NO_OPTION);
@@ -1614,7 +1604,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                                     anschlussgradBean);
                                 flaecheBean.setProperty(
                                     FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
-                                    Main.getCurrentInstance().getRegenFlaechenTabellenPanel().getValidFlaechenname(
+                                    Main.getInstance().getRegenFlaechenTabellenPanel().getValidFlaechenname(
                                         (Integer)flaechenart.getProperty("id")));
                                 flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                             + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
@@ -1628,7 +1618,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
                             cboAnschlussgrad.setEnabled(txtBezeichnung.isEditable());
                             txtGroesseGrafik.setEditable(txtBezeichnung.isEditable());
                         }
-                        Main.getCurrentInstance().refreshItemButtons();
+                        Main.getInstance().refreshItemButtons();
 
                         final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
                         if ((flaechenart != null)
