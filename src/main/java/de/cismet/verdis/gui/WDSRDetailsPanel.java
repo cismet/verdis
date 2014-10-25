@@ -1663,7 +1663,7 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 public void run() {
                     if (he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         try {
-                            Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(he.getDescription());
+                            CidsAppBackend.getInstance().gotoKassenzeichen(he.getDescription());
                         } catch (Exception ex) {
                             LOG.error("Fehler im Hyperlinken", ex);
                         }

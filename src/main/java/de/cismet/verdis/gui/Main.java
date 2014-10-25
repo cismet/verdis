@@ -31,7 +31,6 @@ import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
-import Sirius.navigator.ui.status.StatusChangeListener;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -41,7 +40,6 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 
@@ -71,6 +69,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import org.openide.util.Exceptions;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,12 +82,15 @@ import java.beans.PropertyChangeListener;
 
 import java.io.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
@@ -180,7 +183,6 @@ import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.CidsBeanTable;
-import de.cismet.verdis.interfaces.Storable;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
@@ -188,9 +190,6 @@ import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
-
-import static de.cismet.verdis.CidsAppBackend.Mode.ESW;
-import static de.cismet.verdis.CidsAppBackend.Mode.REGEN;
 
 /**
  * DOCUMENT ME!
@@ -200,19 +199,15 @@ import static de.cismet.verdis.CidsAppBackend.Mode.REGEN;
  */
 public final class Main extends javax.swing.JFrame implements PluginSupport,
     FloatingPluginUI,
-    Storable,
     AppModeListener,
     Configurable,
     CidsBeanStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static boolean noLoginDuringDev = false;
+    private static Main INSTANCE;
+
     private static boolean loggedIn = false;
-    public static int KASSENZEICHEN_CLASS_ID = 11;
-    public static int GEOM_CLASS_ID = 0;
-    public static int DMS_URL_BASE_ID = 1;
-    public static int DMS_URL_ID = 2;
     public static double INITIAL_WMS_BB_X1 = 2569442.79;
     public static double INITIAL_WMS_BB_Y1 = 5668858.33;
     public static double INITIAL_WMS_BB_X2 = 2593744.91;
@@ -235,9 +230,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
     private static final String FILEPATH_PLUGINLAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_PLUGINLAYOUT;
-    private static Main THIS;
     private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
+    private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
+                "/de/cismet/verdis/login.png")).getImage();
+    private static AppPreferences APP_PREFERENCES;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -249,37 +246,35 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
-    private Icon icoKassenzeichen = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoKassenzeichen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
-    private Icon icoKassenzeichenList = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoKassenzeichenList = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
-    private Icon icoSummen = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoSummen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/sum.png"));
-    private Icon icoKanal = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoKanal = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/pipe.png"));
-    private Icon icoDokumente = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoDokumente = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/docs.png"));
-    private Icon icoKarte = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoKarte = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
-    private Icon icoTabelle = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoTabelle = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
-    private Icon icoDetails = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoDetails = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
-    private Image banner = new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/login.png")).getImage();
     // private Color myBlue=new java.awt.Color(0, 51, 153);
     private Color myBlue = new Color(124, 160, 221);
-    private boolean editmode = false;
+    private boolean editMode = false;
     private boolean plugin = false;
     private boolean readonly = true;
     /** Creates new form Main. */
     private String userString;
-    private String kassenzeichenSuche = "kassenzeichenSuche";
+    private final String kassenzeichenSuche = "kassenzeichenSuche";
     private String userGroup = "noGroup";
     private EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards;
     private FlaechenClipboard flaechenClipboard;
     private FrontenClipboard frontenClipboard;
-    private KassenzeichenGeometrienClipboard kassenzeichenClipboard;
-    private AppPreferences prefs;
+    private final KassenzeichenGeometrienClipboard kassenzeichenClipboard;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
     private View vKassenzeichenList;
@@ -409,51 +404,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  context  DOCUMENT ME!
      */
     public Main(final PluginContext context) {
-        if (StaticDebuggingTools.checkHomeForFile("cismetBeansbindingDebuggingOn")) { // NOI18N
-            System.setProperty("cismet.beansdebugging", "true");                      // NOI18N
-        }
-
-        if (context == null) { // ACHTUNG
-            try {
-                if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
-                    try {
-                        org.apache.log4j.PropertyConfigurator.configure(DIRECTORYPATH_VERDIS + FILESEPARATOR
-                                    + "custom.log4j.properties");
-                        LOG.info("CustomLoggingOn");
-                    } catch (Exception ex) {
-                        org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource(
-                                "log4j.properties"));
-                    }
-                } else {
-                    org.apache.log4j.PropertyConfigurator.configure(getClass().getResource(
-                            "log4j.properties"));
-                }
-            } catch (Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Fehler bei Log4J-Config", e);
-                }
-            }
-        }
-        System.setProperty("cismet.beansdebugging", "true");
-
-        try {
-            javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-        } catch (Exception ex) {
-            LOG.error("error while setting setLookAndFeel", ex);
-        }
-
-        try {
-            this.loadProperties();
-        } catch (Exception propEx) {
-            LOG.fatal("Fehler beim Laden der Properties!", propEx);
-        }
-
-        if (context == null) {
-            login();
-        } else {
-            CidsAppBackend.init(Sirius.navigator.connection.SessionManager.getProxy());
-        }
-
+        readonly = APP_PREFERENCES.getMode().trim().toLowerCase().equals("readonly");
 //        toolbarSearches.add(new KassenzeichenToolbarSearch());
 //
 //        CidsSearchComboBar searchBar = new CidsSearchComboBar();
@@ -493,7 +444,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 //        historyPanel = new HistoryPanel();
 
         kanaldatenPanel.setMain(this);
-        THIS = this;
         plugin = !(context == null);
         this.context = context;
 
@@ -666,7 +616,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 null,
                 null,
                 descriptionPane);
-            alkisRendererDialog = new JDialog(Main.THIS, false);
+            alkisRendererDialog = new JDialog(this, false);
             alkisRendererDialog.setTitle("Alkis Renderer");
             alkisRendererDialog.setContentPane(descriptionPane);
             alkisRendererDialog.setSize(1000, 800);
@@ -723,7 +673,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
             LOG.info("Einstellungen der Karte vornehmen");
 //            flPanel.setCismapPreferences(prefs.getCismapPrefs());
-            enableEditing(false);
+            setEditMode(false);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("fertig");
             }
@@ -763,7 +713,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             // WFSForms
 // Thread wfsformsThread=new Thread() {
 // public void run() {
-            final Set<String> keySet = prefs.getWfsForms().keySet();
+            final Set<String> keySet = APP_PREFERENCES.getWfsForms().keySet();
 //            JMenu wfsFormsMenu=new JMenu();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("WFSForms " + keySet);
@@ -774,7 +724,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("WFSForms: " + key);
                     }
-                    final AbstractWFSForm form = prefs.getWfsForms().get(key);
+                    final AbstractWFSForm form = APP_PREFERENCES.getWfsForms().get(key);
 //                form.setPreferredSize(new Dimension(450,50));
                     final JDialog formView = new JDialog(this, form.getTitle());
                     formView.getContentPane().setLayout(new BorderLayout());
@@ -938,7 +888,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Crossover: starte server.");
             }
-            initCrossoverServer(prefs.getVerdisCrossoverPort());
+            initCrossoverServer(APP_PREFERENCES.getVerdisCrossoverPort());
         } catch (Throwable t) {
             LOG.error("Fehler im Konstruktor", t);
         }
@@ -962,12 +912,13 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             .getName();
                 userGroup = Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup().toString();
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("prefs: Vector index of " + (prefs.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0));
+                    LOG.debug("prefs: Vector index of "
+                                + (APP_PREFERENCES.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0));
                 }
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("prefs: userGroup " + userGroup.toLowerCase());
                 }
-                if (prefs.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0) {
+                if (APP_PREFERENCES.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0) {
                     readonly = false;
                 } else {
                     readonly = true;
@@ -1004,7 +955,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // CustomFeatureInfo
         final CustomFeatureInfoListener cfil = (CustomFeatureInfoListener)mainMap.getInputListener(
                 MappingComponent.CUSTOM_FEATUREINFO);
-        cfil.setFeatureInforetrievalUrl(prefs.getAlbUrl());
+        cfil.setFeatureInforetrievalUrl(APP_PREFERENCES.getAlbUrl());
 
         final File dotverdisDir = new File(DIRECTORYPATH_VERDIS);
         dotverdisDir.mkdir();
@@ -1272,7 +1223,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         final Collection<Integer> ids = (Collection<Integer>)evt.getNewValue();
                         if ((ids == null) || ids.isEmpty()) {
                             JOptionPane.showMessageDialog(
-                                Main.THIS,
+                                Main.this,
                                 "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
                                 "Keine FLurstücke gefunden.",
                                 JOptionPane.INFORMATION_MESSAGE);
@@ -1314,7 +1265,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             final Collection data = (Collection)evt.getNewValue();
                             if ((data == null) || data.isEmpty()) {
                                 JOptionPane.showMessageDialog(
-                                    Main.THIS,
+                                    Main.this,
                                     "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
                                     "Keine FLurstücke gefunden.",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -1416,7 +1367,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @return  DOCUMENT ME!
      */
     public static Main getCurrentInstance() {
-        return Main.THIS;
+        if (INSTANCE == null) {
+            INSTANCE = new Main();
+        }
+        return INSTANCE;
     }
 
     /**
@@ -1424,9 +1378,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void setupDefaultLayout() {
         if (currentMode != null) {
-            if (currentMode.equals(currentMode.ALLGEMEIN)) {
+            if (currentMode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
                 setupDefaultLayoutInfo();
-            } else if (currentMode.equals(currentMode.ESW)) {
+            } else if (currentMode.equals(CidsAppBackend.Mode.ESW)) {
                 setupDefaultLayoutWDSR();
             } else {
                 setupDefaultLayoutRegen();
@@ -1553,11 +1507,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
 
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(mode.ALLGEMEIN)) {
+        if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             setupLayoutInfo();
-        } else if (mode.equals(mode.ESW)) {
+        } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
             setupLayoutWDSR();
-        } else if (mode.equals(mode.REGEN)) {
+        } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
             setupLayoutRegen();
         }
         currentMode = mode;
@@ -1837,27 +1791,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    private void loadProperties() {
+    private static void loadProperties() {
         // Read properties file.
-        prefs = new AppPreferences(getClass().getResourceAsStream("/verdis2properties.xml"));
+        APP_PREFERENCES = new AppPreferences(Main.class.getResourceAsStream("/verdis2properties.xml"));
         if (LOG.isDebugEnabled()) {
-            LOG.debug(getClass().getClassLoader());
-        }
-        KASSENZEICHEN_CLASS_ID = prefs.getKassenzeichenClassId();
-        GEOM_CLASS_ID = prefs.getGeomClassId();
-        DMS_URL_BASE_ID = prefs.getDmsUrlBaseClassId();
-        DMS_URL_ID = prefs.getDmsUrlClassId();
-//        INITIAL_WMS_BB_X1 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getX1();
-//        INITIAL_WMS_BB_Y1 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getY1();
-//        INITIAL_WMS_BB_X2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getX2();
-//        INITIAL_WMS_BB_Y2 = prefs.getCismapPrefs().getGlobalPrefs().getInitialBoundingBox().getY2();
-
-        if (!plugin) {
-            if (prefs.getMode().trim().toLowerCase().equals("readonly")) {
-                readonly = true;
-            } else {
-                readonly = false;
-            }
+            LOG.debug(Main.class.getClassLoader());
         }
     }
 
@@ -1875,7 +1813,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void refreshLeftTitleBarColor() {
-        if (editmode) {
+        if (editMode) {
             setLeftTitleBarColor(Color.red);
         } else {
             if (kassenzeichenPanel.isLocked()) {
@@ -2491,6 +2429,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         menEdit.add(mnuNewKassenzeichen);
 
         mnuRenameKZ.setText("Kassenzeichen umbenennen");
+        mnuRenameKZ.setEnabled(false);
         mnuRenameKZ.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -3066,61 +3005,57 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    private void login() {
-        if (noLoginDuringDev || plugin) {
-            return;
-        } else {
-            final DefaultUserNameStore usernames = new DefaultUserNameStore();
-            final Preferences appPrefs = Preferences.userNodeForPackage(this.getClass());
-            usernames.setPreferences(appPrefs.node("login"));
-            final CidsAuthentification cidsAuth = new CidsAuthentification();
-            final JXLoginPane login = new JXLoginPane(cidsAuth, null, usernames) {
+    private static void login() {
+        final DefaultUserNameStore usernames = new DefaultUserNameStore();
+        final Preferences appPrefs = Preferences.userNodeForPackage(Main.class);
+        usernames.setPreferences(appPrefs.node("login"));
+        final CidsAuthentification cidsAuth = new CidsAuthentification();
+        final JXLoginPane login = new JXLoginPane(cidsAuth, null, usernames) {
 
-                    @Override
-                    protected Image createLoginBanner() {
-                        return getBannerImage();
-                    }
-                };
+                @Override
+                protected Image createLoginBanner() {
+                    return getBannerImage();
+                }
+            };
 
-            String u = null;
-            try {
-                u = usernames.getUserNames()[usernames.getUserNames().length - 1];
-            } catch (Exception skip) {
-            }
-            if (u != null) {
-                login.setUserName(u);
-            }
-
-            JFrame parent = null;
-            if (SPLASH == null) {
-                parent = Main.this;
-            } else {
-                parent = SPLASH;
-            }
-
-            final JXLoginPane.JXLoginDialog d = new JXLoginPane.JXLoginDialog(parent, login);
-
-            login.setPassword("".toCharArray());
-            if (SPLASH != null) {
-                final double x = SPLASH.getBounds().getCenterX();
-                final double y = SPLASH.getBounds().getCenterY();
-                final double dWidth = d.getWidth();
-                final double dHeight = d.getHeight();
-
-                d.setLocation((int)(x - (dWidth / 2)), (int)(y - (dHeight / 2)));
-            } else {
-                LOG.fatal("splash was null");
-                d.setLocationRelativeTo(parent);
-            }
-
-            try {
-                ((JXPanel)((JXPanel)login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
-            } catch (Exception skip) {
-            }
-            d.setVisible(true);
-
-            handleLoginStatus(d.getStatus(), usernames, login);
+        String u = null;
+        try {
+            u = usernames.getUserNames()[usernames.getUserNames().length - 1];
+        } catch (final Exception skip) {
         }
+        if (u != null) {
+            login.setUserName(u);
+        }
+
+        JFrame parent = null;
+        if (SPLASH == null) {
+            parent = INSTANCE;
+        } else {
+            parent = SPLASH;
+        }
+
+        final JXLoginPane.JXLoginDialog d = new JXLoginPane.JXLoginDialog(parent, login);
+
+        login.setPassword("".toCharArray());
+        if (SPLASH != null) {
+            final double x = SPLASH.getBounds().getCenterX();
+            final double y = SPLASH.getBounds().getCenterY();
+            final double dWidth = d.getWidth();
+            final double dHeight = d.getHeight();
+
+            d.setLocation((int)(x - (dWidth / 2)), (int)(y - (dHeight / 2)));
+        } else {
+            LOG.fatal("splash was null");
+            d.setLocationRelativeTo(parent);
+        }
+
+        try {
+            ((JXPanel)((JXPanel)login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
+        } catch (final Exception skip) {
+        }
+        d.setVisible(true);
+
+        handleLoginStatus(d.getStatus(), usernames, login);
     }
 
     /**
@@ -3130,7 +3065,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  usernames  DOCUMENT ME!
      * @param  login      DOCUMENT ME!
      */
-    private void handleLoginStatus(final JXLoginPane.Status status,
+    private static void handleLoginStatus(final JXLoginPane.Status status,
             final DefaultUserNameStore usernames,
             final JXLoginPane login) {
         if (status == JXLoginPane.Status.SUCCEEDED) {
@@ -3164,15 +3099,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @throws  UnsupportedOperationException  DOCUMENT ME!
-     */
-    private void reEnumerateFlaechen() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  evt  DOCUMENT ME!
      */
     private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
@@ -3201,7 +3127,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @param  evt  DOCUMENT ME!
      */
     private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
-        deleteKZ();
+        deleteKassenzeichen();
     }                                                                                          //GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
 
     /**
@@ -3327,7 +3253,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 final FormDataBean kassenzeichenSucheParam = (FormDataBean)object;
                 kassenzeichenSucheParam.setBeanParameter("Kassenzeichen", kassenzeichenPanel.getShownKassenzeichen());
                 final Vector v = new Vector();
-                final String cid = String.valueOf(this.KASSENZEICHEN_CLASS_ID) + "@" + VerdisConstants.DOMAIN;
+                final String cid = String.valueOf(11) + "@" + VerdisConstants.DOMAIN;
                 v.add(cid);
                 try {
                     if (LOG.isDebugEnabled()) {
@@ -3364,7 +3290,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         LOG.info("formWindowClosing");
-        if (editmode && !kassenzeichenPanel.isEmpty()) {
+        if (editMode && !kassenzeichenPanel.isEmpty()) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
                         this,
@@ -3372,35 +3298,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         "Verdis \u00C4nderungen",
                         JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    new SwingWorker<Void, Void>() {
-
-                            @Override
-                            protected Void doInBackground() throws Exception {
-                                prepareSaveKassenzeichen();
-                                return null;
-                            }
-                        }.execute();
+                    saveKassenzeichenAndAssessement();
+                } else {
+                    releaseLocks();
                 }
             }
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        CidsAppBackend.getInstance().releaseLocks();
-                        return null;
-                    }
-                }.execute();
         }
         closeAllConnections();
-    } //GEN-LAST:event_formWindowClosing
+    }                                                                      //GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
      */
     private void closeAllConnections() {
         try {
-        } catch (Exception e) {
-            LOG.error("Fehler beim Schlie\u00DFen der Connections");
+        } catch (final Exception ex) {
+            LOG.error("Fehler beim Schlie\u00DFen der Connections", ex);
         }
     }
 
@@ -3426,19 +3339,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         "Neues Kassenzeichen",
                         JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    new SwingWorker<Void, Void>() {
-
-                            @Override
-                            protected Void doInBackground() throws Exception {
-                                prepareSaveKassenzeichen();
-                                return null;
-                            }
-
-                            @Override
-                            protected void done() {
-                                newKassenzeichen();
-                            }
-                        }.execute();
+                    saveKassenzeichenAndAssessement();
+                    newKassenzeichen();
                 } else if (answer == JOptionPane.NO_OPTION) {
                     newKassenzeichen();
                 }
@@ -3446,7 +3348,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 newKassenzeichen();
             }
         }
-    } //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3455,16 +3357,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
         if (changesPending()) {
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        prepareSaveKassenzeichen();
-                        return null;
-                    }
-                }.execute();
+            saveKassenzeichenAndAssessement();
         }
-    } //GEN-LAST:event_cmdOkActionPerformed
+    }                                                                         //GEN-LAST:event_cmdOkActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3485,17 +3380,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 return;
             }
         }
-        enableEditing(false);
+        WaitDialog.getInstance().showDialog();
         new SwingWorker<Void, Void>() {
 
                 @Override
                 protected Void doInBackground() throws Exception {
-                    CidsAppBackend.getInstance().releaseLocks();
+                    releaseLocks();
                     return null;
                 }
 
                 @Override
                 protected void done() {
+                    WaitDialog.getInstance().dispose();
+                    setEditMode(false);
                     kassenzeichenPanel.refresh();
                 }
             }.execute();
@@ -3508,32 +3405,61 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            WaitDialog.getInstance().showDialog();
+            new SwingWorker<Boolean, Void>() {
 
                     @Override
-                    public void run() {
-                        StaticSwingTools.showDialog(LockingDialog.getInstance());
-                    }
-                });
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        if (!editmode
-                                    && CidsAppBackend.getInstance().acquireLocks()) {
-                            LockingDialog.getInstance().dispose();
-                            enableEditing(true);
-                        } else if (!changesPending()) {
-                            LockingDialog.getInstance().dispose();
-                            CidsAppBackend.getInstance().releaseLocks();
-                            enableEditing(false);
+                    protected Boolean doInBackground() throws Exception {
+                        if (editMode) {              // this is before switching the mode
+                            if (!changesPending()) { // only if no save is needed
+                                releaseLocks();
+                                return false;
+                            }
+                        } else {
+                            if (acquireLocks()) {    // try to acquire
+                                return true;
+                            }
+                            releaseLocks();          // release if acquire failed
                         }
-                        LockingDialog.getInstance().dispose();
                         return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final Boolean enableEditing = get();
+                            if (enableEditing != null) {
+                                setEditMode(enableEditing);
+                            }
+                        } catch (final Exception ex) {
+                            LOG.error(ex, ex);
+                        } finally {
+                            WaitDialog.getInstance().dispose();
+                        }
                     }
                 }.execute();
         }
     } //GEN-LAST:event_cmdEditModeActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean acquireLocks() {
+        try {
+            CidsAppBackend.getInstance().acquireLocks();
+            return true;
+        } catch (final LockAlreadyExistsException ex) {
+            CidsAppBackend.getInstance().showObjectsLockedDialog(ex.getAlreadyExisingLocks());
+            return false;
+        } catch (final Exception ex) {
+            LOG.error("error during acquireLocks", ex);
+            CidsAppBackend.getInstance()
+                    .showError("Fehler beim Sperren", "Beim Sperren des Kassenzeichens kam es zu einem Fehler.", ex);
+            return false;
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -3572,7 +3498,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
-            final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(prefs.getLagisCrossoverPort(), this);
+            final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(APP_PREFERENCES.getLagisCrossoverPort(),
+                    this);
             dialog.add(lcp);
             dialog.pack();
             dialog.setIconImage(new javax.swing.ImageIcon(
@@ -3600,30 +3527,35 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         "Kassenzeichen umbenennen",
                         JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    new SwingWorker<Void, Void>() {
-
-                            @Override
-                            protected Void doInBackground() throws Exception {
-                                prepareSaveKassenzeichen();
-                                return null;
-                            }
-
-                            @Override
-                            protected void done() {
-                                renameKZ();
-                            }
-                        }.execute();
+                    saveKassenzeichenAndAssessement();
+                    renameKassenzeichen();
                 } else if (answer == JOptionPane.NO_OPTION) {
-                    enableEditing(false);
+                    releaseLocks();
                     kassenzeichenPanel.refresh();
-                    renameKZ();
+                    renameKassenzeichen();
                 }
             } else {
-                enableEditing(false);
-                renameKZ();
+                releaseLocks();
+                renameKassenzeichen();
             }
         }
-    } //GEN-LAST:event_mnuRenameKZActionPerformed
+    }                                                                               //GEN-LAST:event_mnuRenameKZActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void releaseLocks() {
+        try {
+            CidsAppBackend.getInstance().releaseLocks();
+        } catch (final Exception ex) {
+            LOG.error("error during releaseLocks", ex);
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Freigeben",
+                        "Beim Freigeben der Kassenzeichensperre kam es zu einem Fehler.",
+                        ex);
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -3747,7 +3679,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // gegebenenfalls transformieren
         if (srid != defaultSrid) {
             final int ans = JOptionPane.showConfirmDialog(
-                    Main.THIS,
+                    getCurrentInstance(),
                     "Die angegebene Geometrie befindet sich nicht im Standard-CRS. Soll die Geometrie konvertiert werden?",
                     "Geometrie konvertieren?",
                     JOptionPane.YES_NO_OPTION,
@@ -3946,7 +3878,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         .customServerSearch(SessionManager.getSession().getUser(), serverSearch);
             if ((result != null) && !result.isEmpty()) {
                 final Integer nextKassenzeichennummer = result.get(0);
-                kassenzeichenPanel.gotoKassenzeichen(Integer.toString(nextKassenzeichennummer));
+                CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(nextKassenzeichennummer));
             }
         } catch (final ConnectionException ex) {
             LOG.error("error while executing next kassenzeichensearch", ex);
@@ -3974,69 +3906,84 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    public void renameKZ() {
-        // final String oldKZ = this.kassenzeichenPanel.getShownKassenzeichen();
-        final String newKZ = JOptionPane.showInputDialog(
-                this,
-                "Geben Sie das neue Kassenzeichens ein:",
-                "Kassenzeichen umbenennen",
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (newKZ != null) {
-            try {
-                final int newKZInt = new Integer(newKZ);
-
-                // prüfen ob kz bereits existiert
-                new SwingWorker<CidsBean, Void>() {
-
-                        @Override
-                        protected CidsBean doInBackground() throws Exception {
-                            final CidsBean newBean = CidsAppBackend.getInstance().loadKassenzeichenByNummer(newKZInt);
-                            return newBean;
-                        }
-
-                        @Override
-                        protected void done() {
-                            try {
-                                final CidsBean newBean = get();
-                                if (newBean != null) {
-                                    JOptionPane.showMessageDialog(
-                                        Main.this,
-                                        "Dieses Kassenzeichen existiert bereits.",
-                                        "Fehler",
-                                        JOptionPane.ERROR_MESSAGE);
-                                    return;
-                                }
-
-                                disableKassenzeichenCmds();
-                                new SwingWorker<Void, Void>() {
-
-                                        @Override
-                                        protected Void doInBackground() throws Exception {
-                                            CidsAppBackend.getInstance().releaseLocks();
-                                            try {
-                                                kassenzeichenBean.setProperty(
-                                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
-                                                    newKZInt);
-                                            } catch (Exception ex) {
-                                                LOG.error("error while setting kassenzeichennummer", ex);
-                                            }
-                                            persistAndReloadKassenzeichen();
-                                            return null;
-                                        }
-                                    }.execute();
-                            } catch (final Exception ex) {
-                                LOG.error("error while loading kassenzeichen " + newKZInt, ex);
-                            }
-                        }
-                    }.execute();
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(
+    public void renameKassenzeichen() {
+        if (editMode) {
+            final String newKZ = JOptionPane.showInputDialog(
                     this,
-                    "Kassenzeichen muss eine Zahl sein.",
-                    "Fehler",
-                    JOptionPane.ERROR_MESSAGE);
-                return;
+                    "Geben Sie das neue Kassenzeichens ein:",
+                    "Kassenzeichen umbenennen",
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (newKZ != null) {
+                try {
+                    final int newKZInt = new Integer(newKZ);
+
+                    // prüfen ob kz bereits existiert
+                    new SwingWorker<CidsBean, Void>() {
+
+                            @Override
+                            protected CidsBean doInBackground() throws Exception {
+                                return CidsAppBackend.getInstance().loadKassenzeichenByNummer(newKZInt);
+                            }
+
+                            @Override
+                            protected void done() {
+                                try {
+                                    final CidsBean newBean = get();
+                                    if (newBean != null) {
+                                        JOptionPane.showMessageDialog(
+                                            Main.this,
+                                            "Dieses Kassenzeichen existiert bereits.",
+                                            "Fehler",
+                                            JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+
+                                    disableKassenzeichenCmds();
+                                    new SwingWorker<CidsBean, Void>() {
+
+                                            @Override
+                                            protected CidsBean doInBackground() throws Exception {
+                                                releaseLocks();
+                                                try {
+                                                    kassenzeichenBean.setProperty(
+                                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
+                                                        newKZInt);
+                                                } catch (Exception ex) {
+                                                    LOG.error("error while setting kassenzeichennummer", ex);
+                                                }
+                                                return persistKassenzeichen(
+                                                        kassenzeichenBean);
+                                            }
+
+                                            @Override
+                                            protected void done() {
+                                                try {
+                                                    final CidsBean persistedKassenzeichenBean = get();
+                                                    setEditMode(false);
+                                                    reloadKassenzeichen(persistedKassenzeichenBean);
+                                                } catch (final Exception ex) {
+                                                    LOG.error(ex, ex);
+                                                }
+                                            }
+                                        }.execute();
+                                } catch (final Exception ex) {
+                                    LOG.error("error while loading kassenzeichen " + newKZInt, ex);
+                                    CidsAppBackend.getInstance()
+                                            .showError(
+                                                "Fehler beim Überprüfen",
+                                                "<html>Beim Überprüfen ob das Kassenzeichen schon<br/>existiert ist ein Fehler aufgetreten.",
+                                                ex);
+                                }
+                            }
+                        }.execute();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Kassenzeichen muss eine Zahl sein.",
+                        "Fehler",
+                        JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }
@@ -4052,38 +3999,48 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 JOptionPane.QUESTION_MESSAGE);
         if (!((newKassenzeichennummer == null) || newKassenzeichennummer.equals(""))) {
             try {
-                final int kzNummer = new Integer(newKassenzeichennummer);
+                final int kassenzeichenNummer = new Integer(newKassenzeichennummer);
 
-                new SwingWorker<Void, Void>() {
+                new SwingWorker<Integer, Void>() {
 
                         @Override
-                        protected Void doInBackground() throws Exception {
+                        protected Integer doInBackground() throws Exception {
                             // prüfen ob kz bereits existiert
-                            final CidsBean newBean = CidsAppBackend.getInstance().loadKassenzeichenByNummer(kzNummer);
+                            final CidsBean newBean = CidsAppBackend.getInstance()
+                                        .loadKassenzeichenByNummer(kassenzeichenNummer);
                             if (newBean != null) {
-                                JOptionPane.showMessageDialog(
-                                    Main.this,
-                                    "Dieses Kassenzeichen existiert bereits.",
-                                    "Fehler",
-                                    JOptionPane.ERROR_MESSAGE);
                                 return null;
+                            } else {
+                                final CidsBean kassenzeichen = createNewKassenzeichen(kassenzeichenNummer);
+                                kassenzeichen.persist();
+                                return kassenzeichenNummer;
                             }
-
-                            final CidsBean kassenzeichen = createNewKassenzeichen(kzNummer);
-                            kassenzeichen.persist();
-
-                            kassenzeichenPanel.setKZSearchField(newKassenzeichennummer);
-                            kassenzeichenPanel.gotoKassenzeichen(newKassenzeichennummer);
-
-                            enableEditing(true);
-                            return null;
                         }
 
                         @Override
                         protected void done() {
+                            try {
+                                final Integer kassenzeichenNummer = get();
+                                if (kassenzeichenNummer != null) {
+                                    CidsAppBackend.getInstance().gotoKassenzeichen(newKassenzeichennummer);
+                                } else {
+                                    JOptionPane.showMessageDialog(
+                                        Main.this,
+                                        "Dieses Kassenzeichen existiert bereits.",
+                                        "Fehler",
+                                        JOptionPane.ERROR_MESSAGE);
+                                }
+                            } catch (final Exception ex) {
+                                LOG.error(ex, ex);
+                                CidsAppBackend.getInstance()
+                                        .showError(
+                                            "Fehler beim Erzeugen",
+                                            "Beim Erzeugen des Kassenzeichens ist ein Fehler aufgetreten.",
+                                            ex);
+                            }
                         }
                     }.execute();
-            } catch (Exception e) {
+            } catch (final Exception ex) {
                 JOptionPane.showMessageDialog(
                     this,
                     "Kassenzeichen muss eine Zahl sein.",
@@ -4139,7 +4096,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             new Timestamp(new java.util.Date().getTime()));
         kassenzeichen.setProperty(
             KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
-            Main.THIS.getUserString());
+            getUserString());
         kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE, geomBean);
 
         return kassenzeichen;
@@ -4148,7 +4105,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      */
-    public void deleteKZ() {
+    public void deleteKassenzeichen() {
         if ((kassenzeichenPanel.getShownKassenzeichen() != null)
                     && !(kassenzeichenPanel.getShownKassenzeichen().trim().equals(""))) {
             final int answer = JOptionPane.showConfirmDialog(
@@ -4160,62 +4117,95 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.YES_OPTION) {
-                try {
-                    // flaechen loeschen
-                    final Collection<CidsBean> flaechenBeans = regenFlaechenTabellenPanel.getAllBeans();
-                    for (final CidsBean flaecheBean : flaechenBeans.toArray(new CidsBean[0])) {
-                        regenFlaechenTabellenPanel.removeBean(flaecheBean);
-                    }
+                WaitDialog.getInstance().showDialog();
+                new SwingWorker<Void, Void>() {
 
-                    // fronten loeschen
-                    final Collection<CidsBean> frontenBeans = wdsrFrontenTabellenPanel.getAllBeans();
-                    for (final CidsBean frontBean : frontenBeans.toArray(new CidsBean[0])) {
-                        wdsrFrontenTabellenPanel.removeBean(frontBean);
-                    }
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            WaitDialog.getInstance().startDeletingKassenzeichen(1);
 
-                    // kanalanschluss löschen
-                    final Collection<CidsBean> toDeleteBefrBeans = new ArrayList<CidsBean>();
-                    final CidsBean kanalanschlussBean = (CidsBean)kassenzeichenBean.getProperty(
-                            KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS);
-                    if (kanalanschlussBean != null) {
-                        // befreiungen und erlaubnisse von kanalanschluss löschen
-                        final Collection<CidsBean> befUndErlBeans = (Collection<CidsBean>)
-                            kanalanschlussBean.getProperty("befreiungenunderlaubnisse");
-                        for (final CidsBean befUndErlBean : befUndErlBeans) {
-                            toDeleteBefrBeans.add(befUndErlBean);
+                            final List<CidsBean> toDeleteBeans = new ArrayList<CidsBean>();
+
+                            // flaechen loeschen
+                            final Collection<CidsBean> flaechenBeans = regenFlaechenTabellenPanel.getAllBeans();
+                            for (final CidsBean flaecheBean : flaechenBeans.toArray(new CidsBean[0])) {
+                                regenFlaechenTabellenPanel.removeBean(flaecheBean);
+                            }
+                            toDeleteBeans.addAll(flaechenBeans);
+
+                            // fronten loeschen
+                            final Collection<CidsBean> frontenBeans = wdsrFrontenTabellenPanel.getAllBeans();
+                            for (final CidsBean frontBean : frontenBeans.toArray(new CidsBean[0])) {
+                                wdsrFrontenTabellenPanel.removeBean(frontBean);
+                            }
+                            toDeleteBeans.addAll(frontenBeans);
+
+                            // kassenzeichengeometrien loeschen
+                            final Collection<CidsBean> kassenzeichenGeomtrieBeans =
+                                kassenzeichenGeometrienList.getAllBeans();
+                            for (final CidsBean kassenzeichenGeomtrieBean
+                                        : kassenzeichenGeomtrieBeans.toArray(new CidsBean[0])) {
+                                kassenzeichenGeometrienList.removeBean(kassenzeichenGeomtrieBean);
+                            }
+                            toDeleteBeans.addAll(kassenzeichenGeomtrieBeans);
+
+                            // kanalanschluss löschen
+                            final CidsBean kanalanschlussBean = (CidsBean)kassenzeichenBean.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS);
+                            if (kanalanschlussBean != null) {
+                                // befreiungen und erlaubnisse von kanalanschluss löschen
+                                final Collection<CidsBean> befUndErlBeans = (Collection<CidsBean>)
+                                    kanalanschlussBean.getProperty("befreiungenunderlaubnisse");
+                                for (final CidsBean befUndErlBean : befUndErlBeans.toArray(new CidsBean[0])) {
+                                    befUndErlBeans.remove(befUndErlBean);
+                                }
+                                toDeleteBeans.addAll(befUndErlBeans);
+                                toDeleteBeans.add(kanalanschlussBean);
+                            }
+
+                            // kassenzeichen-geometrie löschen
+                            final CidsBean geomBean = (CidsBean)kassenzeichenBean.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__GEOMETRIE);
+                            if (geomBean != null) {
+                                toDeleteBeans.add(geomBean);
+                            }
+
+                            // kassenzeichen selbst löschen
+                            toDeleteBeans.add(kassenzeichenBean);
+
+                            // und ab dafür!
+                            WaitDialog.getInstance().startDeletingKassenzeichen(toDeleteBeans.size());
+
+                            for (int index = 0; index < toDeleteBeans.size(); index++) {
+                                final CidsBean toDeleteBean = toDeleteBeans.get(index);
+                                WaitDialog.getInstance().progressKassenzeichen(index);
+                                toDeleteBean.delete();
+                                toDeleteBean.persist();
+                            }
+                            WaitDialog.getInstance().progressKassenzeichen(toDeleteBeans.size());
+                            return null;
                         }
-                        for (final CidsBean toDeleteBean : toDeleteBefrBeans) {
-                            befUndErlBeans.remove(toDeleteBean);
-                            toDeleteBean.delete();
+
+                        @Override
+                        protected void done() {
+                            try {
+                                get();
+                                releaseLocks();
+                                CidsAppBackend.getInstance().clearCrossReferences();
+                                CidsAppBackend.getInstance().setCidsBean(null);
+                                setEditMode(false);
+                            } catch (final Exception ex) {
+                                JOptionPane.showMessageDialog(
+                                    Main.this,
+                                    "Das Kassenzeichen konnte nicht gelöscht werden.",
+                                    "Fehler beim Löschen",
+                                    JOptionPane.ERROR_MESSAGE);
+                                LOG.error("error while deleting kassenzeichen", ex);
+                            } finally {
+                                WaitDialog.getInstance().dispose();
+                            }
                         }
-                        kanalanschlussBean.delete();
-                    }
-
-                    // kassenzeichen-geometrie löschen
-                    final CidsBean geomBean = (CidsBean)kassenzeichenBean.getProperty(
-                            KassenzeichenPropertyConstants.PROP__GEOMETRIE);
-                    if (geomBean != null) {
-                        geomBean.delete();
-                    }
-
-                    // kassenzeichen selbst löschen
-                    kassenzeichenBean.delete();
-
-                    // und ab dafür!
-                    kassenzeichenBean.persist();
-
-                    CidsAppBackend.getInstance().clearCrossReferences();
-                    CidsAppBackend.getInstance().setCidsBean(null);
-
-                    kassenzeichenPanel.setKZSearchField("");
-                    enableEditing(false);
-                } catch (final Exception ex) {
-                    JOptionPane.showMessageDialog(this.getComponent(),
-                        "Das Kassenzeichen konnte nicht gelöscht werden.",
-                        "Fehler beim Löschen",
-                        JOptionPane.ERROR_MESSAGE);
-                    LOG.error("error while deleting kassenzeichen", ex);
-                }
+                    }.execute();
             }
         }
     }
@@ -4228,44 +4218,69 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public static void main(final String[] args) {
         Thread.setDefaultUncaughtExceptionHandler(DefaultNavigatorExceptionHandler.getInstance());
 
-//        EventQueue.invokeLater(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                JDialog d = new JDialog();
-//                d.setTitle("test");
-//                d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//                JProgressBar pb = new JProgressBar();
-//                pb.setIndeterminate(true);
-//                d.getContentPane().add(pb);
-//                d.pack();
-//
-//                d.setVisible(true);
+        // LOOK AND FEEL
+        try {
+            javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
+        } catch (Exception ex) {
+            LOG.error("error while setting setLookAndFeel", ex);
+        }
 
+        // SPLASHSCREEN
         try {
             SPLASH = StaticStartupTools.showGhostFrame(FILEPATH_SCREEN, "verdis [Startup]");
         } catch (Exception e) {
             LOG.warn("Problem beim Darstellen des Pre-Loading-Frame", e);
         }
 
-        final Main m = new Main();
-
-        if (SPLASH != null) {
-//            EventQueue.invokeLater(new Runnable() {
-//
-//                @Override
-//                public void run() {
-            m.setBounds(SPLASH.getBounds());
-//                }
-//            });
+        // BEANSBINDING DEBUGGING
+        try {
+            if (StaticDebuggingTools.checkHomeForFile("cismetBeansbindingDebuggingOn")) { // NOI18N
+                System.setProperty("cismet.beansdebugging", "true");                      // NOI18N
+            }
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Fehler bei cismetBeansbindingDebuggingOn", e);
+            }
         }
-//            }
-//        });
-        ((JFrame)m).setVisible(true);
 
+        // CUSTOM LOG4J
+        try {
+            if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
+                try {
+                    org.apache.log4j.PropertyConfigurator.configure(DIRECTORYPATH_VERDIS + FILESEPARATOR
+                                + "custom.log4j.properties");
+                    LOG.info("CustomLoggingOn");
+                } catch (Exception ex) {
+                    org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource(
+                            "log4j.properties"));
+                }
+            } else {
+                org.apache.log4j.PropertyConfigurator.configure(Main.class.getResource(
+                        "log4j.properties"));
+            }
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Fehler bei Log4J-Config", e);
+            }
+        }
+
+        // LOAD PROPERTIES
+        try {
+            loadProperties();
+        } catch (Exception propEx) {
+            LOG.fatal("Fehler beim Laden der Properties!", propEx);
+        }
+
+        // LOGIN
+        login();
+
+        // REMOVE SPLASHSCREEN
         if (SPLASH != null) {
+            getCurrentInstance().setBounds(SPLASH.getBounds());
             SPLASH.dispose();
         }
+
+        ((JFrame)getCurrentInstance()).setVisible(true);
         SPLASH = null;
     }
 
@@ -4296,7 +4311,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
-     * @param   str  DOCUMENT ME!
+     * @param   str  DOCUME NT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -4315,7 +4330,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         if (LOG.isDebugEnabled()) {
             LOG.debug("setActive(" + param + ")");
         }
-        if ((param == false) && editmode && !kassenzeichenPanel.isEmpty()) {
+        if ((param == false) && editMode && !kassenzeichenPanel.isEmpty()) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
                         this,
@@ -4323,24 +4338,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         "Verdis \u00C4nderungen",
                         JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    new SwingWorker<Void, Void>() {
-
-                            @Override
-                            protected Void doInBackground() throws Exception {
-                                prepareSaveKassenzeichen();
-                                return null;
-                            }
-                        }.execute();
+                    saveKassenzeichenAndAssessement();
                 }
             }
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        CidsAppBackend.getInstance().releaseLocks();
-                        return null;
-                    }
-                }.execute();
         }
         if (param == false) {
             closeAllConnections();
@@ -4472,9 +4472,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    @Override
     public boolean changesPending() {
-        if ((kassenzeichenBean == null) || !editmode) {
+        if ((kassenzeichenBean == null) || !editMode) {
             return false;
         }
         return kassenzeichenBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
@@ -4600,7 +4599,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * DOCUMENT ME!
      */
     public void refreshKassenzeichenButtons() {
-        final boolean b = editmode;
+        final boolean b = editMode;
 
         cmdOk.setEnabled(b && !aggValidator.getState().isError());
         cmdCancel.setEnabled(b);
@@ -4609,11 +4608,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cmdEditMode.setEnabled(!b && !readonly && (kassenzeichenBean != null));
 
         cmdRefreshEnumeration.setEnabled(b);
-        if (REGEN.equals(CidsAppBackend.getInstance().getMode())) {
+        if (CidsAppBackend.Mode.ESW.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
                         .isEmpty());
-        } else if (ESW.equals(CidsAppBackend.getInstance().getMode())) {
+        } else if (CidsAppBackend.Mode.ESW.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)
                         .isEmpty());
@@ -4627,11 +4626,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  b  DOCUMENT ME!
      */
-    @Override
-    public void enableEditing(final boolean b) {
+    public void setEditMode(final boolean b) {
         CidsAppBackend.getInstance().setEditable(b);
         try {
-            editmode = b;
+            editMode = b;
 
             refreshKassenzeichenButtons();
             refreshClipboardButtons();
@@ -4665,14 +4663,18 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     /**
      * DOCUMENT ME!
+     *
+     * @param   oldVeranlagungSummeMap  DOCUMENT ME!
+     * @param   newVeranlagungSummeMap  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public void prepareSaveKassenzeichen() {
+    private Map<String, Double> calculateChangedVeranlagungSummeMap(final Map<String, Double> oldVeranlagungSummeMap,
+            final Map<String, Double> newVeranlagungSummeMap) {
         Map<String, Double> changedVeranlagungSummeMap;
-        final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
-        final Map<String, Double> oldVeranlagungSummeMap = veranlagungSummeMap;
         fillVeranlagungMaps(newVeranlagungSummeMap);
 
-        if (prefs.isVeranlagungOnlyForChangedValues()) {
+        if (APP_PREFERENCES.isVeranlagungOnlyForChangedValues()) {
             changedVeranlagungSummeMap = new HashMap<String, Double>();
             for (final String bezeichner : veranlagungBezeichners) {
                 if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
@@ -4684,7 +4686,19 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         } else {
             changedVeranlagungSummeMap = newVeranlagungSummeMap;
         }
+        return changedVeranlagungSummeMap;
+    }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   oldVeranlagungSummeMap  DOCUMENT ME!
+     * @param   newVeranlagungSummeMap  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private AssessmentDialog createAssessmentDialog(final Map<String, Double> oldVeranlagungSummeMap,
+            final Map<String, Double> newVeranlagungSummeMap) {
         final Date datumJetzt = new Date();
         final Calendar cal = GregorianCalendar.getInstance();
         cal.setTime(datumJetzt);
@@ -4692,7 +4706,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cal.add(Calendar.MONTH, 1);
         final Date datumVeranlagung = cal.getTime();
 
-        final AssessmentDialog assessmentDialog = new AssessmentDialog(prefs.isVeranlagungOnlyForChangedValues());
+        final AssessmentDialog assessmentDialog = new AssessmentDialog(APP_PREFERENCES
+                        .isVeranlagungOnlyForChangedValues());
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
         final Collection<String> allBezeichners = new ArrayList<String>();
@@ -4702,260 +4717,371 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         assessmentDialog.setBezeichners(allBezeichners);
         assessmentDialog.setOldSchluesselSummeMap(oldVeranlagungSummeMap);
         assessmentDialog.setNewSchluesselSummeMap(newVeranlagungSummeMap);
-        StaticSwingTools.showDialog(assessmentDialog, true);
+        return assessmentDialog;
+    }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   flaecheToKassenzeichenQuerverweisMap  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private Map<Integer, CidsBean> loadCrosslinkKassenzeichenBeanMap(
+            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap) throws Exception {
+        // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
+        // doppelt geladen und  gespeichert werden
+        final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
+
+        final List<Integer> zielKassenzeichennummern = new ArrayList<Integer>(
+                flaecheToKassenzeichenQuerverweisMap.values());
+        WaitDialog.getInstance().startLoadingKassenzeichen(zielKassenzeichennummern.size());
+        for (int index = 0; index < zielKassenzeichennummern.size(); index++) {
+            WaitDialog.getInstance().progressLoadingKassenzeichen(index);
+            final Integer zielKassenzeichennummer = zielKassenzeichennummern.get(index);
+            if (!kassenzeichenNummerToKassenzeichenMap.containsKey(zielKassenzeichennummer)) {
+                final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
+                            .loadKassenzeichenByNummer(zielKassenzeichennummer);
+                kassenzeichenNummerToKassenzeichenMap.put(
+                    zielKassenzeichennummer,
+                    querverweisZielKassenzeichen);
+            }
+        }
+        WaitDialog.getInstance().progressLoadingKassenzeichen(zielKassenzeichennummern.size());
+
+        return kassenzeichenNummerToKassenzeichenMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean                    DOCUMENT ME!
+     * @param   bezeichnungToKassenzeichennummerMap  DOCUMENT ME!
+     * @param   crosslinkKassenzeichenBeanMap        DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private List<CidsBean> createCrosslinkFlaechen(final CidsBean kassenzeichenBean,
+            final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap,
+            final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
+        final List<CidsBean> savedFlaechen = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+        WaitDialog.getInstance().startCreateCrossLinks(savedFlaechen.size());
+        for (int index = 0; index < savedFlaechen.size(); index++) {
+            WaitDialog.getInstance().progressCreateCrossLinks(index);
+            final CidsBean savedFlaeche = savedFlaechen.get(index);
+            final String flaechenBezeichnung = (String)savedFlaeche.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+
+            // in der Map schauen ob für die abgespeicherte Flaechen ein Querverweis erzeugt werden soll
+            if (bezeichnungToKassenzeichennummerMap.containsKey(flaechenBezeichnung)) {
+                final int zielKassenzeichennummer = bezeichnungToKassenzeichennummerMap.get(
+                        flaechenBezeichnung);
+
+                // in welches Kassenzeichen soll der Querverweis erzeugt werden
+                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
+                        zielKassenzeichennummer);
+                if (querverweisKassenzeichenBean != null) {
+                    final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
+                        querverweisKassenzeichenBean.getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__FLAECHEN);
+
+                    // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
+                    final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    + "."
+                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
+                    final CidsBean querverweisFlaecheBean = RegenFlaechenTabellenPanel.createNewFlaecheBean(
+                            flaechenartBean,
+                            flaechenOfQuerverweisKassenzeichen,
+                            null);
+
+                    // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
+                    querverweisFlaecheBean.setProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENINFO,
+                        savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
+
+                    flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
+                } else {
+                    LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                }
+            }
+        }
+        WaitDialog.getInstance().progressCreateCrossLinks(savedFlaechen.size());
+
+        return new ArrayList<CidsBean>(crosslinkKassenzeichenBeanMap.values());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean saveKassenzeichen(final CidsBean kassenzeichenBean) {
+        try {
+            WaitDialog.getInstance().startSavingKassenzeichen(1);
+
+            // set change date for flaechen
+            for (final CidsBean flaecheBean
+                        : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                if ((flaecheBean != null)
+                            && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
+                                || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
+                    flaecheBean.setProperty(
+                        FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+                        new java.sql.Date(Calendar.getInstance().getTime().getTime()));
+                }
+            }
+
+            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
+                        .getFlaecheToKassenzeichenQuerverweisMap();
+
+            // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
+            // soll einen Querverweis im Kassenzeichen y anlegen
+            // MUSS VOR PERSIST GESCHEHEN
+            final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
+            for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
+                final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
+                        unsavedFlaecheBean);
+                bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
+            }
+
+            final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
+
+            final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap = loadCrosslinkKassenzeichenBeanMap(
+                    flaecheToKassenzeichenQuerverweisMap);
+
+            final List<CidsBean> crosslinkKassenzeichenBeans = createCrosslinkFlaechen(
+                    persistedKassenzeichenBean,
+                    bezeichnungToKassenzeichennummerMap,
+                    crosslinkKassenzeichenBeanMap);
+
+            // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
+            WaitDialog.getInstance().startSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
+            for (int index = 0; index < crosslinkKassenzeichenBeans.size(); index++) {
+                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeans.get(index);
+                WaitDialog.getInstance().progressSavingKassenzeichen(index);
+                try {
+                    persistKassenzeichen(querverweisKassenzeichenBean);
+                } catch (final Exception ex) {
+                    CidsAppBackend.getInstance()
+                            .showError(
+                                "Fehler beim Schreiben",
+                                "Beim Speichern des Querverweises "
+                                + querverweisKassenzeichenBean
+                                + " kam es zu einem Fehler.",
+                                ex);
+                }
+            }
+            WaitDialog.getInstance().progressSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
+            // querverweise wurden angelegt, map muss leer gemacht werden
+            // damit beim nächsten Speichern nicht nochmal die selben
+            // Querverweise angelegt werden
+            flaecheToKassenzeichenQuerverweisMap.clear();
+        } catch (final Exception ex) {
+            LOG.error("error during persist", ex);
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Schreiben",
+                        "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
+                        ex);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   changedVeranlagungSummeMap  DOCUMENT ME!
+     * @param   datum                       DOCUMENT ME!
+     * @param   veranlagungsdatum           DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void saveAssessement(final Map<String, Double> changedVeranlagungSummeMap,
+            final Date datum,
+            final Date veranlagungsdatum) throws Exception {
+        final MetaObject veranlagungMo = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
+                    .getEmptyInstance();
+        final CidsBean veranlagungBean = veranlagungMo.getBean();
+        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__DATUM,
+            new java.sql.Date(datum.getTime()));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+            new java.sql.Date(veranlagungsdatum.getTime()));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G_200,
+            changedVeranlagungSummeMap.get("null--200"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G_100,
+            changedVeranlagungSummeMap.get("null--100"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G305,
+            changedVeranlagungSummeMap.get("A1-305"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G306,
+            changedVeranlagungSummeMap.get("Z1-306"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G310,
+            changedVeranlagungSummeMap.get("A1V-310"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G311,
+            changedVeranlagungSummeMap.get("Z1V-311"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G315,
+            changedVeranlagungSummeMap.get("A2-315"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G320,
+            changedVeranlagungSummeMap.get("A2V-320"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G321,
+            changedVeranlagungSummeMap.get("A3-321"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G322,
+            changedVeranlagungSummeMap.get("A3V-322"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G325,
+            changedVeranlagungSummeMap.get("B1-325"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G330,
+            changedVeranlagungSummeMap.get("B1V-330"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G335,
+            changedVeranlagungSummeMap.get("B2-335"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G340,
+            changedVeranlagungSummeMap.get("B2V-340"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G345,
+            changedVeranlagungSummeMap.get("D1-345"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G350,
+            changedVeranlagungSummeMap.get("D2-350"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G361,
+            changedVeranlagungSummeMap.get("P1-361"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G362,
+            changedVeranlagungSummeMap.get("P2-362"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G710,
+            changedVeranlagungSummeMap.get("710-DF"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G715,
+            changedVeranlagungSummeMap.get("715-GDF"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G720,
+            changedVeranlagungSummeMap.get("720-VF"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G725,
+            changedVeranlagungSummeMap.get("725-VFÖ"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G730,
+            changedVeranlagungSummeMap.get("730-Va-über"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G740,
+            changedVeranlagungSummeMap.get("740-VFS"));
+        veranlagungBean.setProperty(
+            VeranlagungPropertyConstants.PROP__G999,
+            changedVeranlagungSummeMap.get("999-Rest"));
+
+        veranlagungBean.persist();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void saveKassenzeichenAndAssessement() {
+        final Map<String, Double> oldVeranlagungSummeMap = veranlagungSummeMap;
+        final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
+
+        final Map<String, Double> changedVeranlagungSummeMap = calculateChangedVeranlagungSummeMap(
+                oldVeranlagungSummeMap,
+                newVeranlagungSummeMap);
+
+        final AssessmentDialog assessmentDialog = createAssessmentDialog(
+                oldVeranlagungSummeMap,
+                newVeranlagungSummeMap);
+        StaticSwingTools.showDialog(assessmentDialog, true);
         final int returnType = assessmentDialog.getReturnType();
 
         if (returnType != AssessmentDialog.RETURN_CANCEL) {
-            SwingUtilities.invokeLater(new Runnable() {
+            WaitDialog.getInstance().showDialog();
+
+            new SwingWorker<CidsBean, Void>() {
 
                     @Override
-                    public void run() {
-                        enableEditing(false);
-                        disableKassenzeichenCmds();
-                    }
-                });
+                    protected CidsBean doInBackground() throws Exception {
+                        if (saveKassenzeichen(kassenzeichenBean)) {
+                            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                                try {
+                                    saveAssessement(
+                                        changedVeranlagungSummeMap,
+                                        assessmentDialog.getDatum(),
+                                        assessmentDialog.getVeranlagungsdatum());
 
-            try {
-                for (final CidsBean flaecheBean
-                            : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-                    if ((flaecheBean != null)
-                                && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
-                                    || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
-                        flaecheBean.setProperty(
-                            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
-                            new java.sql.Date(Calendar.getInstance().getTime().getTime()));
-                    }
-                }
+                                    kassenzeichenBean.setProperty(
+                                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                        null);
+                                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                                    kassenzeichenBean.setProperty(
+                                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                        "");
+                                } catch (Exception ex) {
+                                    LOG.error("error while storing veranlagung", ex);
+                                }
+                            } else {
+                                try {
+                                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
+                                    kassenzeichenBean.setProperty(
+                                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                        veranlagungszettel);
+                                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                                    kassenzeichenBean.setProperty(
+                                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                        "beim letzten Speichern nicht veranlagt");
+                                } catch (Exception ex) {
+                                    LOG.error("error while storing veranlagungszettel", ex);
+                                }
+                            }
 
-                final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
-                            .getFlaecheToKassenzeichenQuerverweisMap();
-
-                // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
-                // soll einen Querverweis im Kassenzeichen y anlegen
-                final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
-                for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
-                    final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-                    final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
-                            unsavedFlaecheBean);
-                    bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
-                }
-
-                setCidsBean(kassenzeichenBean.persist());
-
-                // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
-                // doppelt geladen und  gespeichert werden
-                final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
-                for (final Integer zielKassenzeichennummer : flaecheToKassenzeichenQuerverweisMap.values()) {
-                    if (!kassenzeichenNummerToKassenzeichenMap.containsKey(zielKassenzeichennummer)) {
-                        final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
-                                    .loadKassenzeichenByNummer(zielKassenzeichennummer);
-                        kassenzeichenNummerToKassenzeichenMap.put(
-                            zielKassenzeichennummer,
-                            querverweisZielKassenzeichen);
-                    }
-                }
-
-                final Collection<CidsBean> savedFlaechen = (Collection<CidsBean>)
-                    kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN);
-                for (final CidsBean savedFlaeche : savedFlaechen) {
-                    final String flaechenBezeichnung = (String)savedFlaeche.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-
-                    // in der Map schauen ob für die abgespeicherte Flaechen ein Querverweis erzeugt werden soll
-                    if (bezeichnungToKassenzeichennummerMap.containsKey(flaechenBezeichnung)) {
-                        final int zielKassenzeichennummer = bezeichnungToKassenzeichennummerMap.get(
-                                flaechenBezeichnung);
-
-                        // in welches Kassenzeichen soll der Querverweis erzeugt werden
-                        final CidsBean querverweisKassenzeichenBean = kassenzeichenNummerToKassenzeichenMap.get(
-                                zielKassenzeichennummer);
-                        if (querverweisKassenzeichenBean != null) {
-                            final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
-                                querverweisKassenzeichenBean.getBeanCollectionProperty(
-                                    KassenzeichenPropertyConstants.PROP__FLAECHEN);
-
-                            // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
-                            final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                                            + "."
-                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                            final CidsBean querverweisFlaecheBean = RegenFlaechenTabellenPanel.createNewFlaecheBean(
-                                    flaechenartBean,
-                                    flaechenOfQuerverweisKassenzeichen,
-                                    null);
-
-                            // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
-                            querverweisFlaecheBean.setProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENINFO,
-                                savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
-
-                            flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
-                        } else {
-                            LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                            final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
+                            releaseLocks();
+                            return persistedKassenzeichenBean;
                         }
+                        return null;
                     }
-                }
 
-                // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
-                for (final CidsBean querverweisKassenzeichenBean : kassenzeichenNummerToKassenzeichenMap.values()) {
-                    try {
-                        querverweisKassenzeichenBean.persist();
-                    } finally {
-                        CidsAppBackend.getInstance().releaseLocks();
-                        // TODO unlock
-                    }
-                }
-
-                // querverweise wurden angelegt, map muss leer gemacht werden
-                // damit beim nächsten Speichern nicht nochmal die selben
-                // Querverweise angelegt werden
-                flaecheToKassenzeichenQuerverweisMap.clear();
-            } catch (final Exception e) {
-                LOG.error("error during persist", e);
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                JXErrorPane.showDialog(
-                                    Main.this,
-                                    new ErrorInfo(
+                    @Override
+                    protected void done() {
+                        try {
+                            final CidsBean persistedKassenzeichenBean = get();
+                            setEditMode(false);
+                            reloadKassenzeichen(persistedKassenzeichenBean);
+                        } catch (final Exception ex) {
+                            LOG.error("error during persist", ex);
+                            CidsAppBackend.getInstance()
+                                    .showError(
                                         "Fehler beim Schreiben",
                                         "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
-                                        null,
-                                        "",
-                                        e,
-                                        null,
-                                        null));
-                            }
-                        });
-                } catch (final Exception ex) {
-                }
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            enableEditing(true);
+                                        ex);
+                        } finally {
+                            WaitDialog.getInstance().dispose();
                         }
-                    });
-                return;
-            }
-
-            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
-                try {
-                    final MetaObject veranlagungMo = CidsAppBackend.getInstance()
-                                .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
-                                .getEmptyInstance();
-                    final CidsBean veranlagungBean = veranlagungMo.getBean();
-                    veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__DATUM,
-                        new java.sql.Date(assessmentDialog.getDatum().getTime()));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
-                        new java.sql.Date(assessmentDialog.getVeranlagungsdatum().getTime()));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G_200,
-                        changedVeranlagungSummeMap.get("null--200"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G_100,
-                        changedVeranlagungSummeMap.get("null--100"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G305,
-                        changedVeranlagungSummeMap.get("A1-305"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G306,
-                        changedVeranlagungSummeMap.get("Z1-306"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G310,
-                        changedVeranlagungSummeMap.get("A1V-310"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G311,
-                        changedVeranlagungSummeMap.get("Z1V-311"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G315,
-                        changedVeranlagungSummeMap.get("A2-315"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G320,
-                        changedVeranlagungSummeMap.get("A2V-320"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G321,
-                        changedVeranlagungSummeMap.get("A3-321"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G322,
-                        changedVeranlagungSummeMap.get("A3V-322"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G325,
-                        changedVeranlagungSummeMap.get("B1-325"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G330,
-                        changedVeranlagungSummeMap.get("B1V-330"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G335,
-                        changedVeranlagungSummeMap.get("B2-335"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G340,
-                        changedVeranlagungSummeMap.get("B2V-340"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G345,
-                        changedVeranlagungSummeMap.get("D1-345"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G350,
-                        changedVeranlagungSummeMap.get("D2-350"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G361,
-                        changedVeranlagungSummeMap.get("P1-361"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G362,
-                        changedVeranlagungSummeMap.get("P2-362"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G710,
-                        changedVeranlagungSummeMap.get("710-DF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G715,
-                        changedVeranlagungSummeMap.get("715-GDF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G720,
-                        changedVeranlagungSummeMap.get("720-VF"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G725,
-                        changedVeranlagungSummeMap.get("725-VFÖ"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G730,
-                        changedVeranlagungSummeMap.get("730-Va-über"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G740,
-                        changedVeranlagungSummeMap.get("740-VFS"));
-                    veranlagungBean.setProperty(
-                        VeranlagungPropertyConstants.PROP__G999,
-                        changedVeranlagungSummeMap.get("999-Rest"));
-
-                    veranlagungBean.persist();
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL, null);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
-                } catch (Exception ex) {
-                    LOG.error("error while storing veranlagung", ex);
-                }
-            } else {
-                try {
-                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
-                    kassenzeichenBean.setProperty(
-                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
-                        veranlagungszettel);
-                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
-                    kassenzeichenBean.setProperty(
-                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
-                        "beim letzten Speichern nicht veranlagt");
-                } catch (Exception ex) {
-                    LOG.error("error while storing veranlagungszettel", ex);
-                }
-            }
-
-            persistAndReloadKassenzeichen();
+                    }
+                }.execute();
         }
     }
 
@@ -4972,73 +5098,42 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * DOCUMENT ME!
      *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public boolean persistAndReloadKassenzeichen() {
+    private CidsBean persistKassenzeichen(final CidsBean kassenzeichenBean) throws Exception {
         try {
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
                 new Timestamp(new java.util.Date().getTime()));
             kassenzeichenBean.setProperty(
                 KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
-                Main.THIS.getUserString());
+                getUserString());
         } catch (Exception ex) {
             LOG.error("error while setting letzte aenderung", ex);
         }
+        return kassenzeichenBean.persist();
+    }
 
-        try {
-            setCidsBean(kassenzeichenBean.persist());
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kassenzeichenBean  DOCUMENT ME!
+     */
+    public void reloadKassenzeichen(final CidsBean kassenzeichenBean) {
+        CidsAppBackend.getInstance().setCidsBean(kassenzeichenBean);
 
-            CidsAppBackend.getInstance().releaseLocks();
-            SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        enableEditing(false);
-                    }
-                });
-
-            fixMapExtent = CidsAppBackend.getInstance().getMainMap().isFixedMapExtent();
-            CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(true);
-            final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
-            if (refreshingKassenzeichen == null) {
-                getKzPanel().refresh();
-            } else {
-                getKzPanel().gotoKassenzeichen(refreshingKassenzeichen);
-            }
-            return true;
-        } catch (final Exception e) {
-            LOG.error("error during persist", e);
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            JXErrorPane.showDialog(
-                                Main.this,
-                                new ErrorInfo(
-                                    "Fehler beim Schreiben",
-                                    "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
-                                    null,
-                                    "",
-                                    e,
-                                    null,
-                                    null));
-                        }
-                    });
-            } catch (final Exception ex) {
-            }
-
-            SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        enableEditing(true);
-                    }
-                });
-
-            return false;
+        fixMapExtent = CidsAppBackend.getInstance().getMainMap().isFixedMapExtent();
+        CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(true);
+        final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+        if (refreshingKassenzeichen == null) {
+            getKzPanel().refresh();
+        } else {
+            CidsAppBackend.getInstance().gotoKassenzeichen(refreshingKassenzeichen);
         }
     }
 
@@ -5082,7 +5177,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @return  DOCUMENT ME!
      */
     public boolean isInEditMode() {
-        return editmode;
+        return editMode;
     }
 
     /**
@@ -5182,8 +5277,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    public Image getBannerImage() {
-        return banner;
+    public static Image getBannerImage() {
+        return BANNER_IMAGE;
     }
 
     /**
@@ -5223,7 +5318,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @return  DOCUMENT ME!
      */
     public AppPreferences getPrefs() {
-        return prefs;
+        return APP_PREFERENCES;
     }
 
     /**
@@ -5232,7 +5327,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      * @return  DOCUMENT ME!
      */
     public static boolean isLoggedIn() {
-        return loggedIn || noLoginDuringDev;
+        return loggedIn;
     }
 
     /**
@@ -5701,7 +5796,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                             Object kassenzeichen = null;
                                             if (attributeIterator.hasNext()) {
                                                 kassenzeichen = attributeIterator.next().getValue();
-                                                getKzPanel().gotoKassenzeichen(kassenzeichen.toString());
+                                                CidsAppBackend.getInstance()
+                                                        .gotoKassenzeichen(kassenzeichen.toString());
                                             } else {
                                                 if (LOG.isDebugEnabled()) {
                                                     LOG.debug("falscher attribute name");
@@ -5739,7 +5835,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @version  $Revision$, $Date$
      */
-    class CidsAuthentification extends LoginService {
+    static class CidsAuthentification extends LoginService {
 
         //~ Static fields/initializers -----------------------------------------
 
@@ -5765,12 +5861,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String user = name.split("@")[0];
             final String group = name.split("@")[1];
 
-            final String callServerURL = prefs.getAppbackendCallserverurl();
+            final String callServerURL = APP_PREFERENCES.getAppbackendCallserverurl();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("callServerUrl:" + callServerURL);
             }
-            final String domain = prefs.getAppbackendDomain();
-            final String connectionclass = prefs.getAppbackendConnectionclass();
+            final String domain = APP_PREFERENCES.getAppbackendDomain();
+            final String connectionclass = APP_PREFERENCES.getAppbackendConnectionclass();
 
             try {
                 final Connection connection = ConnectionFactory.getFactory()
@@ -5794,50 +5890,50 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     LOG.debug("authentication: name = :" + name);
                     LOG.debug("authentication: RM Plugin key = :" + name + "@" + domain);
                 }
-                if (prefs.getRwGroups().contains(tester)) {
-                    Main.this.readonly = false;
-                    setUserString(name);
+                if (APP_PREFERENCES.getRwGroups().contains(tester)) {
+                    getCurrentInstance().readonly = false;
+                    getCurrentInstance().setUserString(name);
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("RMPlugin: wird initialisiert (VerdisStandalone)");
-                        LOG.debug("RMPlugin: Mainframe " + Main.this);
-                        LOG.debug("RMPlugin: PrimaryPort " + prefs.getPrimaryPort());
+                        LOG.debug("RMPlugin: Mainframe " + getCurrentInstance());
+                        LOG.debug("RMPlugin: PrimaryPort " + APP_PREFERENCES.getPrimaryPort());
                     }
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: SecondaryPort " + prefs.getSecondaryPort());
+                        LOG.debug("RMPlugin: SecondaryPort " + APP_PREFERENCES.getSecondaryPort());
                     }
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: Username " + (name + "@" + prefs.getStandaloneDomainname()));
+                        LOG.debug("RMPlugin: Username " + (name + "@" + APP_PREFERENCES.getStandaloneDomainname()));
                     }
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: RegistryPath " + prefs.getRmRegistryServerPath());
+                        LOG.debug("RMPlugin: RegistryPath " + APP_PREFERENCES.getRmRegistryServerPath());
                     }
 
-                    if (prefs.getRmRegistryServerPath() != null) {
-                        rmPlugin = new RMPlugin(
-                                Main.this,
-                                prefs.getPrimaryPort(),
-                                prefs.getSecondaryPort(),
-                                prefs.getRmRegistryServerPath(),
+                    if (APP_PREFERENCES.getRmRegistryServerPath() != null) {
+                        getCurrentInstance().rmPlugin = new RMPlugin(
+                                Main.getCurrentInstance(),
+                                APP_PREFERENCES.getPrimaryPort(),
+                                APP_PREFERENCES.getSecondaryPort(),
+                                APP_PREFERENCES.getRmRegistryServerPath(),
                                 name
                                         + "@"
-                                        + prefs.getStandaloneDomainname());
+                                        + APP_PREFERENCES.getStandaloneDomainname());
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("RMPlugin: erfolgreich initialisiert (VerdisStandalone)");
                         }
                     }
                     return true;
-                } else if (prefs.getUsergroups().contains(tester)) {
-                    readonly = true;
-                    setUserString(name);
-                    if (prefs.getRmRegistryServerPath() != null) {
-                        rmPlugin = new RMPlugin(
-                                Main.this,
-                                prefs.getPrimaryPort(),
-                                prefs.getSecondaryPort(),
-                                prefs.getRmRegistryServerPath(),
+                } else if (APP_PREFERENCES.getUsergroups().contains(tester)) {
+                    Main.getCurrentInstance().readonly = true;
+                    Main.getCurrentInstance().setUserString(name);
+                    if (APP_PREFERENCES.getRmRegistryServerPath() != null) {
+                        Main.getCurrentInstance().rmPlugin = new RMPlugin(
+                                Main.getCurrentInstance(),
+                                APP_PREFERENCES.getPrimaryPort(),
+                                APP_PREFERENCES.getSecondaryPort(),
+                                APP_PREFERENCES.getRmRegistryServerPath(),
                                 name
                                         + "@"
-                                        + prefs.getStandaloneDomainname());
+                                        + APP_PREFERENCES.getStandaloneDomainname());
                     }
                     return true;
                 } else {
@@ -5846,7 +5942,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     }
                     return false;
                 }
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 LOG.error("Fehler beim Anmelden", t);
                 return false;
             }

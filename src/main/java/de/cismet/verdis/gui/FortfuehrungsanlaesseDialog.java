@@ -848,7 +848,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      */
     private void gotoSelectedKassenzeichen() {
         final int kassenzeichennummer = (Integer)lstKassenzeichen.getSelectedValue();
-        Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(Integer.toString(kassenzeichennummer));
+        CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichennummer));
     }
 
     /**

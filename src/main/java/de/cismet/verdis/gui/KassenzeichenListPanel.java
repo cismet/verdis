@@ -858,6 +858,11 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     } catch (final Exception ex) {
                         LOG.info(ex, ex);
                         flashSearchField(Color.red);
+                        CidsAppBackend.getInstance()
+                                .showError(
+                                    "Fehler beim Laden",
+                                    "Beim Laden des Kassenzeichens ist ein Fehler aufgetreten.",
+                                    ex);
                     }
                     jProgressBar3.setIndeterminate(false);
                 }
@@ -991,7 +996,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private void gotoSelectedKassenzeichen() {
         final Integer kassenzeichen = (Integer)lstKassenzeichen.getSelectedValue();
         if (kassenzeichen != null) {
-            Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(Integer.toString(kassenzeichen));
+            CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
         }
     }
 
@@ -1223,7 +1228,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                             lock);
                                     }
                                 } else {
-                                    final Collection<CidsBean> locks = (Collection<CidsBean>)lockMap.get(
+                                    final List<CidsBean> locks = (List<CidsBean>)lockMap.get(
                                             kassenzeichenNummer);
                                     if (locks != null) {
                                         CidsAppBackend.getInstance().releaseLocks(locks);
@@ -1240,9 +1245,16 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                         protected void done() {
                             try {
                                 final Collection existingLocks = get();
-                                allExistingLocks.addAll(existingLocks);
+                                if (existingLocks != null) {
+                                    allExistingLocks.addAll(existingLocks);
+                                }
                             } catch (final Exception ex) {
                                 LOG.error(ex, ex);
+                                CidsAppBackend.getInstance()
+                                        .showError(
+                                            "Fehler beim Sperren",
+                                            "Beim Sperren des Kassenzeichens ist es zu einem Fehler gekommen.",
+                                            ex);
                             } finally {
                                 jProgressBar2.setValue(jProgressBar2.getValue() + 1);
                                 if (jProgressBar2.getValue() == jProgressBar2.getMaximum()) {

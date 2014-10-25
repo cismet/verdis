@@ -23,6 +23,8 @@ import javax.ws.rs.core.UriInfo;
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
 
+import de.cismet.verdis.CidsAppBackend;
+
 import de.cismet.verdis.gui.Main;
 
 /**
@@ -88,7 +90,7 @@ public class GoToKassenzeichenRemoteMethod extends AbstractRESTRemoteControlMeth
         if (Main.getCurrentInstance().isLoggedIn()) {
             try {
                 // ToDo ugly
-                Main.getCurrentInstance().getKzPanel().gotoKassenzeichen(kassenzeichen);
+                CidsAppBackend.getInstance().gotoKassenzeichen(kassenzeichen);
             } catch (Exception ex) {
                 log.error("Fehler bei gotoKassenzeichen: ", ex);
                 return "<html>Fehler beim laden des Kassenzeichens: " + ex.getMessage() + "</html>";

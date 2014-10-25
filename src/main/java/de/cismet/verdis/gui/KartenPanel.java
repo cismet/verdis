@@ -2463,9 +2463,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                                     || !kassenzeichennummer.equals(
                                                         (Integer)kassenzeichenBean.getProperty(
                                                             KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER)))) {
-                                        Main.getCurrentInstance()
-                                                .getKzPanel()
-                                                .gotoKassenzeichen(kassenzeichennummer.toString());
+                                        CidsAppBackend.getInstance().gotoKassenzeichen(kassenzeichennummer.toString());
                                     }
                                 }
                             }
