@@ -1418,10 +1418,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                                 final CidsBean cidsBean = getCidsBean();
                                 final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
 
-                                if (Main.getCurrentInstance().isInEditMode()) {
+                                if (Main.getInstance().isInEditMode()) {
                                     if (geom != null) {
                                         final int answer = JOptionPane.showConfirmDialog(
-                                                Main.getCurrentInstance(),
+                                                Main.getInstance(),
                                                 "Soll die Länge aus der Grafik \u00FCbernommen werden?",
                                                 "Länge automatisch setzen",
                                                 JOptionPane.YES_NO_OPTION);
@@ -1502,10 +1502,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                                 final CidsBean cidsBean = getCidsBean();
                                 final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
 
-                                if (Main.getCurrentInstance().isInEditMode()) {
+                                if (Main.getInstance().isInEditMode()) {
                                     if (geom != null) {
                                         final int answer = JOptionPane.showConfirmDialog(
-                                                Main.getCurrentInstance(),
+                                                Main.getInstance(),
                                                 "Soll die Länge aus der Grafik \u00FCbernommen werden?",
                                                 "Länge automatisch setzen",
                                                 JOptionPane.YES_NO_OPTION);

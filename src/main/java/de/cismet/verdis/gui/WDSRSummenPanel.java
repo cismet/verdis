@@ -169,7 +169,7 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
             if (cidsBean != null) {
                 final Map<String, Double> strasseHash = new HashMap<String, Double>();
 
-                Main.getCurrentInstance().fillStrasseSummeMap(strasseHash);
+                Main.getInstance().fillStrasseSummeMap(strasseHash);
 
                 final List<String> strasseKeys = Arrays.asList(strasseHash.keySet().toArray(new String[0]));
 

@@ -58,18 +58,14 @@ import net.infonode.util.Direction;
 
 import org.apache.commons.lang.StringUtils;
 
-import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.JXLoginPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
 import org.jdesktop.swingx.auth.LoginService;
-import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-
-import org.openide.util.Exceptions;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -82,15 +78,12 @@ import java.beans.PropertyChangeListener;
 
 import java.io.*;
 
-import java.lang.reflect.InvocationTargetException;
-
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
@@ -103,8 +96,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-
-import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 
 import de.cismet.cismap.commons.CidsLayerFactory;
 import de.cismet.cismap.commons.CrsTransformer;
@@ -206,8 +197,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     //~ Static fields/initializers ---------------------------------------------
 
     private static Main INSTANCE;
-
-    private static boolean loggedIn = false;
     public static double INITIAL_WMS_BB_X1 = 2569442.79;
     public static double INITIAL_WMS_BB_Y1 = 5668858.33;
     public static double INITIAL_WMS_BB_X2 = 2593744.91;
@@ -234,9 +223,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private static JFrame SPLASH;
     private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
                 "/de/cismet/verdis/login.png")).getImage();
-    private static AppPreferences APP_PREFERENCES;
 
     //~ Instance fields --------------------------------------------------------
+
+    private boolean loggedIn = false;
 
     private final Collection<String> veranlagungBezeichners = new ArrayList<String>();
     private final Collection<String> winterdienstBezeichners = new ArrayList<String>();
@@ -271,10 +261,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private String userString;
     private final String kassenzeichenSuche = "kassenzeichenSuche";
     private String userGroup = "noGroup";
-    private EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards;
-    private FlaechenClipboard flaechenClipboard;
-    private FrontenClipboard frontenClipboard;
-    private final KassenzeichenGeometrienClipboard kassenzeichenClipboard;
+    private final EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards =
+        new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
+
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
     private View vKassenzeichenList;
@@ -295,23 +284,20 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private final ArrayList<JMenuItem> menues = new ArrayList<JMenuItem>();
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
-    private final RegenFlaechenSummenPanel regenSumPanel;
-    private final DokumentenPanel dokPanel;
-    private final KassenzeichenPanel kassenzeichenPanel;
-    private final KassenzeichenListPanel kassenzeichenListPanel;
-    private final KanaldatenPanel kanaldatenPanel;
-    private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel;
-    private final AllgemeineInfosPanel allgInfosPanel;
-    private final RegenFlaechenDetailsPanel regenFlaechenDetailsPanel;
-    private final RegenFlaechenTabellenPanel regenFlaechenTabellenPanel;
-    private final KassenzeichenGeometrienList kassenzeichenGeometrienList;
-    private final KartenPanel kartenPanel;
-    private final WDSRTabellenPanel wdsrFrontenTabellenPanel;
-    private final WDSRDetailsPanel wdsrFrontenDetailsPanel;
-    private final WDSRSummenPanel wdsrSummenPanel;
+    private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
+    private final DokumentenPanel dokPanel = new DokumentenPanel();
+    private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
+    private final KassenzeichenListPanel kassenzeichenListPanel = KassenzeichenListPanel.getInstance();
+    private final KanaldatenPanel kanaldatenPanel = new KanaldatenPanel();
+    private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
+    private final AllgemeineInfosPanel allgInfosPanel = new AllgemeineInfosPanel();
+    private final RegenFlaechenDetailsPanel regenFlaechenDetailsPanel = RegenFlaechenDetailsPanel.getInstance();
+    private final RegenFlaechenTabellenPanel regenFlaechenTabellenPanel = new RegenFlaechenTabellenPanel();
+    private final KartenPanel kartenPanel = new KartenPanel();
+    private final WDSRTabellenPanel wdsrFrontenTabellenPanel = new WDSRTabellenPanel();
+    private final WDSRDetailsPanel wdsrFrontenDetailsPanel = new WDSRDetailsPanel();
+    private final WDSRSummenPanel wdsrSummenPanel = new WDSRSummenPanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
-    private final Collection<CidsToolbarSearch> toolbarSearches = new ArrayList<CidsToolbarSearch>();
-//    private HistoryPanel historyPanel;
     private RMPlugin rmPlugin;
     private boolean fixMapExtent;
     private boolean isInit = true;
@@ -394,56 +380,26 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     /**
      * Creates a new Main object.
      */
-    public Main() {
-        this(null);
+    private Main() {
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void init() {
+        init(null);
     }
 
     /**
-     * Creates a new Main object.
+     * DOCUMENT ME!
      *
      * @param  context  DOCUMENT ME!
      */
-    public Main(final PluginContext context) {
-        readonly = APP_PREFERENCES.getMode().trim().toLowerCase().equals("readonly");
-//        toolbarSearches.add(new KassenzeichenToolbarSearch());
-//
-//        CidsSearchComboBar searchBar = new CidsSearchComboBar();
-//        searchBar.setSearches(toolbarSearches);
-//        JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-//        innerPanel.add(searchBar);
-//        tobVerdis.add(innerPanel, -1);
+    public void init(final PluginContext context) {
+        readonly = CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase().equals("readonly");
 
-        // EventDispatchThreadHangMonitor.initMonitoring();
-        // RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
-
-        regenSumPanel = new RegenFlaechenSummenPanel();
-
-        dokPanel = new DokumentenPanel();
-
-        kassenzeichenPanel = new KassenzeichenPanel();
-
-        kassenzeichenListPanel = KassenzeichenListPanel.getInstance();
-
-        kanaldatenPanel = new KanaldatenPanel();
-
-        kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
-
-        allgInfosPanel = new AllgemeineInfosPanel();
-
-        regenFlaechenDetailsPanel = RegenFlaechenDetailsPanel.getInstance();
-        regenFlaechenTabellenPanel = new RegenFlaechenTabellenPanel();
-
-        kartenPanel = new KartenPanel();
-
-        wdsrFrontenTabellenPanel = new WDSRTabellenPanel();
-        wdsrFrontenDetailsPanel = new WDSRDetailsPanel();
-        wdsrSummenPanel = new WDSRSummenPanel();
-
-        kassenzeichenGeometrienList = kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList();
-
-//        historyPanel = new HistoryPanel();
-
-        kanaldatenPanel.setMain(this);
         plugin = !(context == null);
         this.context = context;
 
@@ -543,31 +499,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 LOG.error("Keine Progressmeldung", e);
             }
 
-//            else {
-//                try {
-//                   String log4jProperties = context.getEnvironment().getParameter("log4j");//context.getEnvironment().getAppletContext().getApplet("cids - WuNDa Navigator Applet").getParameter("log4j");
-//                   org.apache.log4j.PropertyConfigurator.configure(new URL(context.getEnvironment().getCodeBase().toString() + '/' + log4jProperties));
-//                } catch (Exception e) {
-//                   try {
-//                       org.apache.log4j.PropertyConfigurator.configure(new URL(context.getEnvironment().getCodeBase().toString() + "/config/log4j.properties"));
-//                   }
-//                   catch(Throwable t) {
-//                       t.printStackTrace();
-//                   }
-//                   System.err.println("Error before");
-//                   e.printStackTrace();
-//                }
-//            }
-
-            // ClearLookManager.setMode(ClearLookMode.ON);
-            // PlasticLookAndFeel.setMyCurrentTheme(new DesertBlue());
             try {
-                // UIManager.setLookAndFeel(UIManager.getSysaptemLookAndFeelClassName()) ;
                 javax.swing.UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-                // javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
-                // javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.PlasticXPLookAndFeel());
-                // UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-                // UIManager.setLookAndFeel(new PlasticLookAndFeel());
             } catch (Exception e) {
                 LOG.warn("Fehler beim Einstellen des Look&Feels's!", e);
             }
@@ -582,14 +515,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Gui kram erledigt");
-
-//                 UIDefaults uiDefaults = UIManager.getDefaults();
-//                java.util.Enumeration keys = uiDefaults.keys();
-//                while (keys.hasMoreElements())
-//                {
-//                    Object key=keys.nextElement();
-//                    System.out.println(key.toString()+":"+uiDefaults.get(key));
-//                }
                 LOG.debug("initComponents()");
             }
             if ((context != null) && (context.getEnvironment() != null)
@@ -652,11 +577,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             configurationManager.addConfigurable(OptionsClient.getInstance());
             configurationManager.configure(OptionsClient.getInstance());
 
-//            getMappingComponent().setPreferredSize(new Dimension(100,100));
-            // validateTree();
-            // is needed to compute the mappingComponent size, so that
-            // the layers are displayed correctly
-
             // Anwendungslogik
             if ((context != null) && (context.getEnvironment() != null)
                         && this.context.getEnvironment().isProgressObservable()) {
@@ -672,23 +592,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                         .setProgress(500, "verdis Plugin: GIS Einstellungen ...");
             }
             LOG.info("Einstellungen der Karte vornehmen");
-//            flPanel.setCismapPreferences(prefs.getCismapPrefs());
             setEditMode(false);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("fertig");
-            }
-            String host = "unknown";
-            try {
-                final java.net.InetAddress i = java.net.InetAddress.getLocalHost();
-                host = i.getHostAddress();
-                host = i.getHostName();
-            } catch (Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("kein Hostname", e);
-                }
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(userString);
             }
 
             kassenzeichenPanel.setMainApp(this);
@@ -711,10 +617,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             getRootPane().getActionMap().put("CONFIGLOGGING", configAction);
 
             // WFSForms
-// Thread wfsformsThread=new Thread() {
-// public void run() {
-            final Set<String> keySet = APP_PREFERENCES.getWfsForms().keySet();
-//            JMenu wfsFormsMenu=new JMenu();
+            final Set<String> keySet = CidsAppBackend.getInstance().getAppPreferences().getWfsForms().keySet();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("WFSForms " + keySet);
             }
@@ -724,8 +627,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("WFSForms: " + key);
                     }
-                    final AbstractWFSForm form = APP_PREFERENCES.getWfsForms().get(key);
-//                form.setPreferredSize(new Dimension(450,50));
+                    final AbstractWFSForm form = CidsAppBackend.getInstance()
+                                .getAppPreferences()
+                                .getWfsForms()
+                                .get(key);
                     final JDialog formView = new JDialog(this, form.getTitle());
                     formView.getContentPane().setLayout(new BorderLayout());
                     formView.getContentPane().add(form, BorderLayout.CENTER);
@@ -733,11 +638,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     form.setMappingComponent(CidsAppBackend.getInstance().getMainMap());
 
                     formView.pack();
-//                final View formView=createView(form.getId(),form.getTitle(),form);
-//                wfsFormViews.add(formView);
-//                formView.setTabText("   "+formView.getTabText()+"   ");
-//                formView.setTabIcon(Static2DTools.borderIcon(form.getIcon(),10,0,3,0));
-//                formView.setIcon(form.getIcon());
+
                     // Menu
                     final JButton cmd = new JButton(null, form.getIcon());
                     cmd.setToolTipText(form.getMenuString());
@@ -760,15 +661,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     LOG.error("Fehler beim Hinzuf\u00FCgen einer WFSForm", thr);
                 }
             }
-//                }
-//            };
-//            wfsformsThread.setPriority(Thread.NORM_PRIORITY);
-//            wfsformsThread.start();
+
             // Inserting Docking Window functionalty (Sebastian) 24.07.07
             rootWindow = DockingUtil.createRootWindow(viewMap, true);
 
             // Views anlegen
-
             vKassenzeichen = new View(
                     "Kassenzeichen",
                     Static2DTools.borderIcon(icoKassenzeichen, 0, 3, 0, 1),
@@ -836,9 +733,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     regenFlaechenDetailsPanel);
             viewMap.addView("Details (versiegelte Flaechen)", vDetailsRegen);
 
-//            vHistory = new View("Historie", Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1), historyPanel);
-//            viewMap.addView("Historie", vHistory);
-
             rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
 
             final DockingWindowsTheme theme = new ShapedGradientDockingTheme();
@@ -859,7 +753,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     java.awt.SystemColor.activeCaptionText,
                     java.awt.SystemColor.activeCaptionText,
                     java.awt.SystemColor.inactiveCaptionText);
-            // vMap.getViewProperties().getViewTitleBarProperties().getNormalProperties().getCloseButtonProperties().setVisible(true);
             rootWindow.getRootWindowProperties().getDragRectangleShapedPanelProperties().setComponentPainter(x);
             rootWindow.getRootWindowProperties()
                     .getViewProperties()
@@ -884,11 +777,10 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
 
             panMain.add(rootWindow);
-            // doConfigKeystrokes();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Crossover: starte server.");
             }
-            initCrossoverServer(APP_PREFERENCES.getVerdisCrossoverPort());
+            initCrossoverServer(CidsAppBackend.getInstance().getAppPreferences().getVerdisCrossoverPort());
         } catch (Throwable t) {
             LOG.error("Fehler im Konstruktor", t);
         }
@@ -905,32 +797,28 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
 
                 this.context.getMetadata().addMetaNodeSelectionListener(new NodeChangeListener());
-                userString = Sirius.navigator.connection.SessionManager.getSession().getUser().getName() + "@"
-                            + Sirius.navigator.connection.SessionManager.getSession()
-                            .getUser()
-                            .getUserGroup()
-                            .getName();
+                setUserString(Sirius.navigator.connection.SessionManager.getSession().getUser().getName() + "@"
+                            + Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup()
+                            .getName());
                 userGroup = Sirius.navigator.connection.SessionManager.getSession().getUser().getUserGroup().toString();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("prefs: Vector index of "
-                                + (APP_PREFERENCES.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0));
+                                + (CidsAppBackend.getInstance().getAppPreferences().getRwGroups().indexOf(
+                                        userGroup.toLowerCase()) >= 0));
                 }
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("prefs: userGroup " + userGroup.toLowerCase());
                 }
-                if (APP_PREFERENCES.getRwGroups().indexOf(userGroup.toLowerCase()) >= 0) {
+                if (CidsAppBackend.getInstance().getAppPreferences().getRwGroups().indexOf(userGroup.toLowerCase())
+                            >= 0) {
                     readonly = false;
                 } else {
                     readonly = true;
                 }
-//                kzPanel.setUserString(userString);
-                // java.lang.Runtime.getRuntime().addShutdownHook(hook)
-                if ((context != null) && (context.getEnvironment() != null)
-                            && this.context.getEnvironment().isProgressObservable()) {
+                if ((context.getEnvironment() != null) && context.getEnvironment().isProgressObservable()) {
                     this.context.getEnvironment().getProgressObserver().setProgress(1000, "verdis Plugin fertig...");
                 }
-                if ((context != null) && (context.getEnvironment() != null)
-                            && context.getEnvironment().isProgressObservable()) {
+                if ((context.getEnvironment() != null) && context.getEnvironment().isProgressObservable()) {
                     this.context.getEnvironment().getProgressObserver().setFinished(true);
                 }
             } catch (Throwable t) {
@@ -955,63 +843,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // CustomFeatureInfo
         final CustomFeatureInfoListener cfil = (CustomFeatureInfoListener)mainMap.getInputListener(
                 MappingComponent.CUSTOM_FEATUREINFO);
-        cfil.setFeatureInforetrievalUrl(APP_PREFERENCES.getAlbUrl());
+        cfil.setFeatureInforetrievalUrl(CidsAppBackend.getInstance().getAppPreferences().getAlbUrl());
 
         final File dotverdisDir = new File(DIRECTORYPATH_VERDIS);
         dotverdisDir.mkdir();
 
-        clipboards = new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
-
-        final ClipboardListener clipboardListener = new ClipboardListener() {
-
-                @Override
-                public void clipboardChanged() {
-                    kassenzeichenListPanel.clipboardChanged();
-                    refreshClipboardButtons();
-                }
-            };
-
-        flaechenClipboard = new FlaechenClipboard(regenFlaechenTabellenPanel);
-        flaechenClipboard.addListener(clipboardListener);
-
-        flaechenClipboard.loadFromFile();
-
-        if (flaechenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
-
-        frontenClipboard = new FrontenClipboard(wdsrFrontenTabellenPanel);
-        frontenClipboard.addListener(clipboardListener);
-
-        frontenClipboard.loadFromFile();
-
-        if (frontenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        clipboards.put(CidsAppBackend.Mode.ESW, frontenClipboard);
-
-        kassenzeichenClipboard = new KassenzeichenGeometrienClipboard(kassenzeichenGeometrienList);
-        kassenzeichenClipboard.addListener(clipboardListener);
-
-        kassenzeichenClipboard.loadFromFile();
-
-        if (kassenzeichenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(this.getComponent(),
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        clipboards.put(CidsAppBackend.Mode.ALLGEMEIN, kassenzeichenClipboard);
+        initClipboards();
 
         configurationManager.configure(this);
 
@@ -1071,18 +908,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                     JoinPolygonsListener.FEATURE_JOIN_REQUEST_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.JOIN_POLYGONS));
 
-        aggValidator.addListener(new ValidatorListener() {
-
-                @Override
-                public void stateChanged(final Validator source, final ValidatorState state) {
-                    enableSave(!state.isError());
-                }
-            });
-        aggValidator.add(kassenzeichenPanel.getValidator());
-        aggValidator.add(regenFlaechenTabellenPanel.getValidator());
-        aggValidator.add(wdsrFrontenTabellenPanel.getValidator());
-        aggValidator.add(regenFlaechenDetailsPanel.getValidator());
-        aggValidator.add(wdsrFrontenDetailsPanel.getValidator());
+        initValidator();
 
         setPostgisFeaturesSelectable(false);
 
@@ -1090,8 +916,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         initVeranlagung();
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -1116,6 +940,24 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             // TODO fehlerdialog
             LOG.error("error while loading renderer", ex);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  readonly  DOCUMENT ME!
+     */
+    public void setReadonly(final boolean readonly) {
+        this.readonly = readonly;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  rmPlugin  DOCUMENT ME!
+     */
+    public void setRmPlugin(final RMPlugin rmPlugin) {
+        this.rmPlugin = rmPlugin;
     }
 
     /**
@@ -1287,8 +1129,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                                     transformedGeom,
                                                     bezeichnung,
                                                     false);
-                                            kassenzeichenGeometrienList.addKassenzeichenGeometrieBean(
-                                                kassenzeichenGeometrieBean);
+                                            kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList()
+                                                    .addKassenzeichenGeometrieBean(
+                                                        kassenzeichenGeometrieBean);
                                         } catch (Exception ex) {
                                             LOG.fatal("", ex);
                                         }
@@ -1330,15 +1173,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    public RegenFlaechenDetailsPanel getRegenFlaechenDetailsPanel() {
-        return regenFlaechenDetailsPanel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
     public RegenFlaechenTabellenPanel getRegenFlaechenTabellenPanel() {
         return regenFlaechenTabellenPanel;
     }
@@ -1366,7 +1200,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    public static Main getCurrentInstance() {
+    public static Main getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Main();
         }
@@ -1790,13 +1624,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     /**
      * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private static void loadProperties() {
+    private static AppPreferences loadAppPreferences() {
         // Read properties file.
-        APP_PREFERENCES = new AppPreferences(Main.class.getResourceAsStream("/verdis2properties.xml"));
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(Main.class.getClassLoader());
-        }
+        return new AppPreferences(Main.class.getResourceAsStream("/verdis2properties.xml"));
     }
 
     /**
@@ -1843,11 +1676,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                             c,
                             new Color(236, 233, 216)));
         }
-//        sumPanel.setLeftTitlebarColor(c);
-//        kanaldatenPanel.setLeftTitlebarColor(c);
-//        dokPanel.setLeftTitlebarColor(c);
-//        flPanel.setLeftTitlebarColor(c);
-//        kzPanel.setLeftTitlebarColor(c);
     }
 
     /**
@@ -3004,12 +2832,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
     /**
      * DOCUMENT ME!
+     *
+     * @param   appPreferences  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private static void login() {
+    private static CidsAuthentification login(final AppPreferences appPreferences) {
         final DefaultUserNameStore usernames = new DefaultUserNameStore();
         final Preferences appPrefs = Preferences.userNodeForPackage(Main.class);
         usernames.setPreferences(appPrefs.node("login"));
-        final CidsAuthentification cidsAuth = new CidsAuthentification();
+        final CidsAuthentification cidsAuth = new CidsAuthentification(appPreferences);
         final JXLoginPane login = new JXLoginPane(cidsAuth, null, usernames) {
 
                 @Override
@@ -3029,43 +2861,37 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
         JFrame parent = null;
         if (SPLASH == null) {
-            parent = INSTANCE;
+            parent = getInstance();
         } else {
             parent = SPLASH;
         }
 
         final JXLoginPane.JXLoginDialog d = new JXLoginPane.JXLoginDialog(parent, login);
-
         login.setPassword("".toCharArray());
-        if (SPLASH != null) {
-            final double x = SPLASH.getBounds().getCenterX();
-            final double y = SPLASH.getBounds().getCenterY();
-            final double dWidth = d.getWidth();
-            final double dHeight = d.getHeight();
-
-            d.setLocation((int)(x - (dWidth / 2)), (int)(y - (dHeight / 2)));
-        } else {
-            LOG.fatal("splash was null");
-            d.setLocationRelativeTo(parent);
-        }
 
         try {
             ((JXPanel)((JXPanel)login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
         } catch (final Exception skip) {
         }
-        d.setVisible(true);
+        StaticSwingTools.showDialog(d);
 
-        handleLoginStatus(d.getStatus(), usernames, login);
+        if (handleLoginStatus(d.getStatus(), usernames, login)) {
+            return cidsAuth;
+        } else {
+            return null;
+        }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  status     DOCUMENT ME!
-     * @param  usernames  DOCUMENT ME!
-     * @param  login      DOCUMENT ME!
+     * @param   status     DOCUMENT ME!
+     * @param   usernames  DOCUMENT ME!
+     * @param   login      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private static void handleLoginStatus(final JXLoginPane.Status status,
+    private static boolean handleLoginStatus(final JXLoginPane.Status status,
             final DefaultUserNameStore usernames,
             final JXLoginPane login) {
         if (status == JXLoginPane.Status.SUCCEEDED) {
@@ -3074,16 +2900,16 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             usernames.saveUserNames();
             usernames.addUserName((login.getUserName()));
             usernames.saveUserNames();
-            setLoggedIn(true);
             if (LOG.isDebugEnabled()) {
                 // Added for RM Plugin functionalty 22.07.2007 Sebastian Puhl
                 LOG.debug("Login erfolgreich");
             }
+            return true;
         } else {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Login fehlgeschlagen");
             }
-            System.exit(0);
+            return false;
         }
     }
 
@@ -3498,8 +3324,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
-            final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(APP_PREFERENCES.getLagisCrossoverPort(),
-                    this);
+            final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(CidsAppBackend.getInstance()
+                            .getAppPreferences().getLagisCrossoverPort());
             dialog.add(lcp);
             dialog.pack();
             dialog.setIconImage(new javax.swing.ImageIcon(
@@ -3679,7 +3505,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         // gegebenenfalls transformieren
         if (srid != defaultSrid) {
             final int ans = JOptionPane.showConfirmDialog(
-                    getCurrentInstance(),
+                    getInstance(),
                     "Die angegebene Geometrie befindet sich nicht im Standard-CRS. Soll die Geometrie konvertiert werden?",
                     "Geometrie konvertieren?",
                     JOptionPane.YES_NO_OPTION,
@@ -3908,22 +3734,22 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     public void renameKassenzeichen() {
         if (editMode) {
-            final String newKZ = JOptionPane.showInputDialog(
+            final String newKassenzeichen = JOptionPane.showInputDialog(
                     this,
                     "Geben Sie das neue Kassenzeichens ein:",
                     "Kassenzeichen umbenennen",
                     JOptionPane.QUESTION_MESSAGE);
 
-            if (newKZ != null) {
+            if (newKassenzeichen != null) {
                 try {
-                    final int newKZInt = new Integer(newKZ);
+                    final int newKassenzeichenNummer = new Integer(newKassenzeichen);
 
-                    // prüfen ob kz bereits existiert
+                    // prüfen ob kassenzeichen bereits existiert
                     new SwingWorker<CidsBean, Void>() {
 
                             @Override
                             protected CidsBean doInBackground() throws Exception {
-                                return CidsAppBackend.getInstance().loadKassenzeichenByNummer(newKZInt);
+                                return CidsAppBackend.getInstance().loadKassenzeichenByNummer(newKassenzeichenNummer);
                             }
 
                             @Override
@@ -3948,7 +3774,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                                 try {
                                                     kassenzeichenBean.setProperty(
                                                         KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
-                                                        newKZInt);
+                                                        newKassenzeichenNummer);
                                                 } catch (Exception ex) {
                                                     LOG.error("error while setting kassenzeichennummer", ex);
                                                 }
@@ -3968,7 +3794,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                                             }
                                         }.execute();
                                 } catch (final Exception ex) {
-                                    LOG.error("error while loading kassenzeichen " + newKZInt, ex);
+                                    LOG.error("error while loading kassenzeichen " + newKassenzeichenNummer, ex);
                                     CidsAppBackend.getInstance()
                                             .showError(
                                                 "Fehler beim Überprüfen",
@@ -4005,7 +3831,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                         @Override
                         protected Integer doInBackground() throws Exception {
-                            // prüfen ob kz bereits existiert
+                            // prüfen ob kassenzeichen bereits existiert
                             final CidsBean newBean = CidsAppBackend.getInstance()
                                         .loadKassenzeichenByNummer(kassenzeichenNummer);
                             if (newBean != null) {
@@ -4142,10 +3968,11 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
 
                             // kassenzeichengeometrien loeschen
                             final Collection<CidsBean> kassenzeichenGeomtrieBeans =
-                                kassenzeichenGeometrienList.getAllBeans();
+                                kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList().getAllBeans();
                             for (final CidsBean kassenzeichenGeomtrieBean
                                         : kassenzeichenGeomtrieBeans.toArray(new CidsBean[0])) {
-                                kassenzeichenGeometrienList.removeBean(kassenzeichenGeomtrieBean);
+                                kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList()
+                                        .removeBean(kassenzeichenGeomtrieBean);
                             }
                             toDeleteBeans.addAll(kassenzeichenGeomtrieBeans);
 
@@ -4264,24 +4091,63 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             }
         }
 
-        // LOAD PROPERTIES
         try {
-            loadProperties();
+            // LOAD PROPERTIES
+            final AppPreferences appPreferences = loadAppPreferences();
+
+            // LOGIN
+            final CidsAuthentification cidsAuth = login(appPreferences);
+            if (cidsAuth != null) {
+                CidsAppBackend.init(cidsAuth.getProxy(), appPreferences);
+
+                final Main main = getInstance();
+                main.setLoggedIn(true);
+                main.setUserString(cidsAuth.getUserString());
+                main.setReadonly(cidsAuth.isReadOnly());
+
+                if (appPreferences.getRmRegistryServerPath() != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("RMPlugin: wird initialisiert (VerdisStandalone)");
+                        LOG.debug("RMPlugin: Mainframe " + getInstance());
+                        LOG.debug("RMPlugin: PrimaryPort " + appPreferences.getPrimaryPort());
+                    }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("RMPlugin: SecondaryPort " + appPreferences.getSecondaryPort());
+                    }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("RMPlugin: Username "
+                                    + (cidsAuth.getUserString() + "@" + appPreferences.getStandaloneDomainname()));
+                    }
+
+                    final RMPlugin rmPlugin = new RMPlugin(
+                            Main.getInstance(),
+                            appPreferences.getPrimaryPort(),
+                            appPreferences.getSecondaryPort(),
+                            appPreferences.getRmRegistryServerPath(),
+                            cidsAuth.getUserString()
+                                    + "@"
+                                    + appPreferences.getStandaloneDomainname());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("RMPlugin: erfolgreich initialisiert (VerdisStandalone)");
+                    }
+                    main.setRmPlugin(rmPlugin);
+                }
+
+                main.init();
+
+                // REMOVE SPLASHSCREEN
+                if (SPLASH != null) {
+                    main.setBounds(SPLASH.getBounds());
+                    SPLASH.dispose();
+                }
+
+                main.setVisible(true);
+                SPLASH = null;
+            }
         } catch (Exception propEx) {
             LOG.fatal("Fehler beim Laden der Properties!", propEx);
+            System.exit(1);
         }
-
-        // LOGIN
-        login();
-
-        // REMOVE SPLASHSCREEN
-        if (SPLASH != null) {
-            getCurrentInstance().setBounds(SPLASH.getBounds());
-            SPLASH.dispose();
-        }
-
-        ((JFrame)getCurrentInstance()).setVisible(true);
-        SPLASH = null;
     }
 
     /**
@@ -4380,8 +4246,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      */
     @Override
     public java.util.Iterator getMethods() {
-        final LinkedList ll = new LinkedList();
-        return ll.iterator();
+        return new LinkedList().iterator();
     }
 
     /**
@@ -4674,7 +4539,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         Map<String, Double> changedVeranlagungSummeMap;
         fillVeranlagungMaps(newVeranlagungSummeMap);
 
-        if (APP_PREFERENCES.isVeranlagungOnlyForChangedValues()) {
+        if (CidsAppBackend.getInstance().getAppPreferences().isVeranlagungOnlyForChangedValues()) {
             changedVeranlagungSummeMap = new HashMap<String, Double>();
             for (final String bezeichner : veranlagungBezeichners) {
                 if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
@@ -4706,7 +4571,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         cal.add(Calendar.MONTH, 1);
         final Date datumVeranlagung = cal.getTime();
 
-        final AssessmentDialog assessmentDialog = new AssessmentDialog(APP_PREFERENCES
+        final AssessmentDialog assessmentDialog = new AssessmentDialog(CidsAppBackend.getInstance().getAppPreferences()
                         .isVeranlagungOnlyForChangedValues());
         assessmentDialog.setDatum(datumJetzt);
         assessmentDialog.setVeranlagungsdatum(datumVeranlagung);
@@ -5131,7 +4996,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
         if (refreshingKassenzeichen == null) {
-            getKzPanel().refresh();
+            getKassenzeichenPanel().refresh();
         } else {
             CidsAppBackend.getInstance().gotoKassenzeichen(refreshingKassenzeichen);
         }
@@ -5149,26 +5014,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    public KassenzeichenPanel getKzPanel() {
+    public KassenzeichenPanel getKassenzeichenPanel() {
         return kassenzeichenPanel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public KassenzeichenListPanel getKzListPanel() {
-        return kassenzeichenListPanel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!c
-     */
-    public KanaldatenPanel getKanalPanel() {
-        return kanaldatenPanel;
     }
 
     /**
@@ -5250,7 +5097,6 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public void setUserString(final String userString) {
         this.userString = userString;
         refreshTitle();
-//        kzPanel.setUserString(userString);
     }
 
     /**
@@ -5259,9 +5105,9 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
     public void refreshTitle() {
         String zusatz = " [" + userString + "]";
 
-        if (getKzPanel() != null) {
-            final String kassenzeichen = getKzPanel().getShownKassenzeichen();
-            final String bemerkung = getKzPanel().getShownBemerkung();
+        if (getKassenzeichenPanel() != null) {
+            final String kassenzeichen = getKassenzeichenPanel().getShownKassenzeichen();
+            final String bemerkung = getKassenzeichenPanel().getShownBemerkung();
             if ((kassenzeichen != null) && (kassenzeichen.length() > 1)) {
                 zusatz += " " + kassenzeichen;
                 if ((bemerkung != null) && (bemerkung.length() > 1)) {
@@ -5269,7 +5115,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 }
             }
         }
-        Main.this.setTitle("verdis" + zusatz);
+        setTitle("verdis" + zusatz);
     }
 
     /**
@@ -5317,16 +5163,7 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @return  DOCUMENT ME!
      */
-    public AppPreferences getPrefs() {
-        return APP_PREFERENCES;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static boolean isLoggedIn() {
+    public boolean isLoggedIn() {
         return loggedIn;
     }
 
@@ -5335,8 +5172,8 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
      *
      * @param  loggedIn  DOCUMENT ME!
      */
-    public static void setLoggedIn(final boolean loggedIn) {
-        Main.loggedIn = loggedIn;
+    public void setLoggedIn(final boolean loggedIn) {
+        this.loggedIn = loggedIn;
     }
 
     /**
@@ -5733,6 +5570,82 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    private void initValidator() {
+        aggValidator.clear();
+        aggValidator.addListener(new ValidatorListener() {
+
+                @Override
+                public void stateChanged(final Validator source, final ValidatorState state) {
+                    enableSave(!state.isError());
+                }
+            });
+        aggValidator.add(kassenzeichenPanel.getValidator());
+        aggValidator.add(regenFlaechenTabellenPanel.getValidator());
+        aggValidator.add(wdsrFrontenTabellenPanel.getValidator());
+        aggValidator.add(regenFlaechenDetailsPanel.getValidator());
+        aggValidator.add(wdsrFrontenDetailsPanel.getValidator());
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initClipboards() {
+        clipboards.clear();
+
+        final ClipboardListener clipboardListener = new ClipboardListener() {
+
+                @Override
+                public void clipboardChanged() {
+                    kassenzeichenListPanel.clipboardChanged();
+                    refreshClipboardButtons();
+                }
+            };
+
+        clipboards.clear();
+        final AbstractClipboard flaechenClipboard = new FlaechenClipboard(regenFlaechenTabellenPanel);
+        flaechenClipboard.addListener(clipboardListener);
+        flaechenClipboard.loadFromFile();
+
+        if (flaechenClipboard.isPastable()) {
+            JOptionPane.showMessageDialog(this.getComponent(),
+                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
+
+        final AbstractClipboard frontenClipboard = new FrontenClipboard(wdsrFrontenTabellenPanel);
+        frontenClipboard.addListener(clipboardListener);
+        frontenClipboard.loadFromFile();
+
+        if (frontenClipboard.isPastable()) {
+            JOptionPane.showMessageDialog(this.getComponent(),
+                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        clipboards.put(CidsAppBackend.Mode.ESW, frontenClipboard);
+
+        final AbstractClipboard kassenzeichenClipboard = new KassenzeichenGeometrienClipboard(
+                kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList());
+        kassenzeichenClipboard.addListener(clipboardListener);
+        kassenzeichenClipboard.loadFromFile();
+
+        if (kassenzeichenClipboard.isPastable()) {
+            JOptionPane.showMessageDialog(this.getComponent(),
+                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        clipboards.put(CidsAppBackend.Mode.ALLGEMEIN, kassenzeichenClipboard);
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -5842,7 +5755,52 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
         public static final String CONNECTION_PROXY_CLASS =
             "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler";
 
+        //~ Instance fields ----------------------------------------------------
+
+        private final AppPreferences appPreferences;
+        private ConnectionProxy proxy = null;
+        private boolean readOnly = true;
+        private String userString = null;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new CidsAuthentification object.
+         *
+         * @param  appPreferences  DOCUMENT ME!
+         */
+        public CidsAuthentification(final AppPreferences appPreferences) {
+            this.appPreferences = appPreferences;
+        }
+
         //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public ConnectionProxy getProxy() {
+            return proxy;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public boolean isReadOnly() {
+            return readOnly;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getUserString() {
+            return userString;
+        }
 
         /**
          * DOCUMENT ME!
@@ -5861,12 +5819,12 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
             final String user = name.split("@")[0];
             final String group = name.split("@")[1];
 
-            final String callServerURL = APP_PREFERENCES.getAppbackendCallserverurl();
+            final String callServerURL = appPreferences.getAppbackendCallserverurl();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("callServerUrl:" + callServerURL);
             }
-            final String domain = APP_PREFERENCES.getAppbackendDomain();
-            final String connectionclass = APP_PREFERENCES.getAppbackendConnectionclass();
+            final String domain = appPreferences.getAppbackendDomain();
+            final String connectionclass = appPreferences.getAppbackendConnectionclass();
 
             try {
                 final Connection connection = ConnectionFactory.getFactory()
@@ -5880,70 +5838,26 @@ public final class Main extends javax.swing.JFrame implements PluginSupport,
                 connectionInfo.setUsername(user);
                 final ConnectionSession session = ConnectionFactory.getFactory()
                             .createSession(connection, connectionInfo, true);
-                final ConnectionProxy proxy = ConnectionFactory.getFactory()
-                            .createProxy(CONNECTION_PROXY_CLASS, session);
-                CidsAppBackend.init(proxy);
+                proxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, session);
 
                 final String tester = (group + "@" + domain).toLowerCase();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("authentication: tester = :" + tester);
                     LOG.debug("authentication: name = :" + name);
-                    LOG.debug("authentication: RM Plugin key = :" + name + "@" + domain);
                 }
-                if (APP_PREFERENCES.getRwGroups().contains(tester)) {
-                    getCurrentInstance().readonly = false;
-                    getCurrentInstance().setUserString(name);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: wird initialisiert (VerdisStandalone)");
-                        LOG.debug("RMPlugin: Mainframe " + getCurrentInstance());
-                        LOG.debug("RMPlugin: PrimaryPort " + APP_PREFERENCES.getPrimaryPort());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: SecondaryPort " + APP_PREFERENCES.getSecondaryPort());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: Username " + (name + "@" + APP_PREFERENCES.getStandaloneDomainname()));
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: RegistryPath " + APP_PREFERENCES.getRmRegistryServerPath());
-                    }
-
-                    if (APP_PREFERENCES.getRmRegistryServerPath() != null) {
-                        getCurrentInstance().rmPlugin = new RMPlugin(
-                                Main.getCurrentInstance(),
-                                APP_PREFERENCES.getPrimaryPort(),
-                                APP_PREFERENCES.getSecondaryPort(),
-                                APP_PREFERENCES.getRmRegistryServerPath(),
-                                name
-                                        + "@"
-                                        + APP_PREFERENCES.getStandaloneDomainname());
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("RMPlugin: erfolgreich initialisiert (VerdisStandalone)");
-                        }
-                    }
+                if (appPreferences.getRwGroups().contains(tester)) {
+                    userString = name;
+                    readOnly = false;
                     return true;
-                } else if (APP_PREFERENCES.getUsergroups().contains(tester)) {
-                    Main.getCurrentInstance().readonly = true;
-                    Main.getCurrentInstance().setUserString(name);
-                    if (APP_PREFERENCES.getRmRegistryServerPath() != null) {
-                        Main.getCurrentInstance().rmPlugin = new RMPlugin(
-                                Main.getCurrentInstance(),
-                                APP_PREFERENCES.getPrimaryPort(),
-                                APP_PREFERENCES.getSecondaryPort(),
-                                APP_PREFERENCES.getRmRegistryServerPath(),
-                                name
-                                        + "@"
-                                        + APP_PREFERENCES.getStandaloneDomainname());
-                    }
+                } else if (appPreferences.getUsergroups().contains(tester)) {
+                    readOnly = true;
+                    userString = name;
                     return true;
                 } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("authentication else false");
-                    }
                     return false;
                 }
-            } catch (final Throwable t) {
-                LOG.error("Fehler beim Anmelden", t);
+            } catch (final Exception ex) {
+                LOG.error("Fehler beim Anmelden", ex);
                 return false;
             }
         }

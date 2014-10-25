@@ -28,8 +28,6 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
@@ -309,16 +307,13 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
                     .getEmptyInstance()
                     .getBean();
-        final CidsBean strassenreinigungBean = SessionManager.getProxy().getMetaObjectByQuery(srQuery, 0)[0].getBean();
-        final CidsBean winterdienstBean = SessionManager.getProxy().getMetaObjectByQuery(wdQuery, 0)[0].getBean();
+        final CidsBean strassenreinigungBean = CidsAppBackend.getInstance().getVerdisMetaObject(srQuery)[0].getBean();
+        final CidsBean winterdienstBean = CidsAppBackend.getInstance().getVerdisMetaObject(wdQuery)[0].getBean();
 
         final int newId = getNextNewBeanId();
         frontBean.setProperty(FrontinfoPropertyConstants.PROP__ID,
             newId);
         frontBean.getMetaObject().setID(newId);
-
-        // final CidsBean strasseBean = SessionManager.getProxy().getVerdisMetaObject(8, PROP__"strasse".getId(),
-        // Main.DOMAIN).getBean();
 
         // cidsBean.setProperty(PROP__"strasse", strasseBean);
         frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
@@ -340,12 +335,12 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
                     + "."
                     + FrontinfoPropertyConstants.PROP__STRASSE,
-            Main.getCurrentInstance().getWdsrFrontenDetailsPanel().getLastStrasseBean());
+            Main.getInstance().getWdsrFrontenDetailsPanel().getLastStrasseBean());
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if ((sole != null) && (sole.getFeature().getGeometry() instanceof LineString)) {
             final int answer = JOptionPane.showConfirmDialog(
-                    Main.getCurrentInstance(),
+                    Main.getInstance(),
                     "Soll die vorhandene, noch nicht zugeordnete Geometrie der neuen Front zugeordnet werden?",
                     "Geometrie verwenden?",
                     JOptionPane.YES_NO_OPTION,

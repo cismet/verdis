@@ -77,7 +77,6 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
     private final FlurstueckTableModel tableModel = new FlurstueckTableModel();
     private int lagisCrossoverPort = -1;
-    private final Main mainApp;
     private final ExecutorService execService = Executors.newCachedThreadPool();
     private FadingCardLayout layout = new FadingCardLayout();
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -103,9 +102,8 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      * Creates new form LagisCrossoverPanel.
      *
      * @param  lagisCrossoverPort  DOCUMENT ME!
-     * @param  verdisMain          DOCUMENT ME!
      */
-    public PopupLagisCrossoverPanel(final int lagisCrossoverPort, final Main verdisMain) {
+    public PopupLagisCrossoverPanel(final int lagisCrossoverPort) {
         initComponents();
         panAll.setLayout(layout);
         panAll.removeAll();
@@ -116,7 +114,6 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
         tblFlurstuecke.addMouseListener(this);
         tblFlurstuecke.getSelectionModel().addListSelectionListener(this);
         this.lagisCrossoverPort = lagisCrossoverPort;
-        mainApp = verdisMain;
         pgbProgress.setIndeterminate(true);
         layout.show(panAll, PROGRESS_CARD_NAME);
     }
@@ -667,18 +664,18 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
         @Override
         protected List<CidsBean> doInBackground() throws Exception {
-            final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
+            final String currentKZ = Main.getInstance().getKassenzeichenPanel().getShownKassenzeichen();
             if ((currentKZ != null) && (currentKZ.length() > 0)) {
-                final Geometry kassenzeichenGeom = mainApp.getGeometry();
+                final Geometry kassenzeichenGeom = Main.getInstance().getGeometry();
                 if (kassenzeichenGeom != null) {
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
                     if (log.isDebugEnabled()) {
-                        log.debug("buffer: " + mainApp.getPrefs().getFlurstueckBuffer());
+                        log.debug("buffer: " + CidsAppBackend.getInstance().getAppPreferences().getFlurstueckBuffer());
                     }
 
                     final List<CidsBean> wfsFlurstuecke = this.getIntersectingFlurstuecke(
                             kassenzeichenGeom,
-                            mainApp.getPrefs().getFlurstueckBuffer());
+                            CidsAppBackend.getInstance().getAppPreferences().getFlurstueckBuffer());
 
                     if ((wfsFlurstuecke.size() > 0)) {
                         if (log.isDebugEnabled()) {

@@ -285,7 +285,7 @@ public abstract class AbstractClipboard {
         int answer = JOptionPane.YES_OPTION;
         if (isCutted && (clipboardBeans != null) && !clipboardBeans.isEmpty()) {
             answer = JOptionPane.showConfirmDialog(
-                    Main.getCurrentInstance(),
+                    Main.getInstance(),
                     "In der Verdis-Zwischenablage befinden sich noch Daten die\nausgeschnitten und noch nicht wieder eingef\u00FCgt wurden.\nMöchten Sie diese Daten jetzt verwerfen ?",
                     "Ausschneiden",
                     JOptionPane.YES_NO_OPTION,

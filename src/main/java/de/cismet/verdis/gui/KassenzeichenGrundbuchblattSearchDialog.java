@@ -87,7 +87,7 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
      */
     public static KassenzeichenGrundbuchblattSearchDialog getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new KassenzeichenGrundbuchblattSearchDialog(Main.getCurrentInstance(), false);
+            INSTANCE = new KassenzeichenGrundbuchblattSearchDialog(Main.getInstance(), false);
         }
         return INSTANCE;
     }
@@ -192,7 +192,7 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        Main.getCurrentInstance().showRenderer(grundbuchblatt);
+        Main.getInstance().showRenderer(grundbuchblatt);
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -255,8 +255,8 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
                     try {
                         kassenzeichennummern = get();
                         kassenzeichenGeomSearchPanel1.searchFinished(kassenzeichennummern);
-                        if (Main.getCurrentInstance().isRendererVisible()) {
-                            Main.getCurrentInstance().showRenderer(grundbuchblatt);
+                        if (Main.getInstance().isRendererVisible()) {
+                            Main.getInstance().showRenderer(grundbuchblatt);
                         }
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);

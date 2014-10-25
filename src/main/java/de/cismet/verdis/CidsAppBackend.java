@@ -68,10 +68,13 @@ import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
+import de.cismet.verdis.data.AppPreferences;
+
 import de.cismet.verdis.gui.AlreadyLockedObjectsPanel;
 import de.cismet.verdis.gui.GrundbuchblattSucheDialog;
 import de.cismet.verdis.gui.LockAlreadyExistsException;
 import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.gui.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.gui.WaitDialog;
 
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
@@ -129,8 +132,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
 
     //~ Instance fields --------------------------------------------------------
 
-    private List<CidsBean> csLocks = new ArrayList();
-
+    private final List<CidsBean> csLocks = new ArrayList();
     private final DefaultHistoryModel historyModel = new DefaultHistoryModel();
     private final MultiMap flaechenidToCrossReferences = new MultiMap();
     private final MultiMap frontenCrossReferences = new MultiMap();
@@ -138,33 +140,32 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
     private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
     private final ArrayList<AppModeListener> appModeListeners = new ArrayList<AppModeListener>();
+    private final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
+    private final Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
     private String domain = DOMAIN;
-    private ConnectionProxy proxy = null;
+    private final ConnectionProxy proxy;
+    private final AppPreferences appPreferences;
     private CidsBean kassenzeichenBean = null;
     private boolean editable = false;
     private Frame frameToDisplayDialogs = null;
     private MappingComponent mainMap = null;
     private Mode mode = null;
     private int lastSplitFlaecheId = -1;
-    private Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
-    private Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CidsAppBackend object.
      *
-     * @param  proxy  DOCUMENT ME!
+     * @param  proxy           DOCUMENT ME!
+     * @param  appPreferences  DOCUMENT ME!
      */
-    private CidsAppBackend(final ConnectionProxy proxy) {
-        try {
-            this.proxy = proxy;
-            if (!SessionManager.isInitialized()) {
-                SessionManager.init(proxy);
-                ClassCacheMultiple.setInstance(domain);
-            }
-        } catch (Throwable e) {
-            LOG.fatal("no connection to the cids server possible. too bad.", e);
+    private CidsAppBackend(final ConnectionProxy proxy, final AppPreferences appPreferences) {
+        this.proxy = proxy;
+        this.appPreferences = appPreferences;
+        if (!SessionManager.isInitialized()) {
+            SessionManager.init(proxy);
+            ClassCacheMultiple.setInstance(domain);
         }
     }
 
@@ -173,15 +174,43 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  proxy  DOCUMENT ME!
+     * @return  DOCUMENT ME!
+     */
+    public AppPreferences getAppPreferences() {
+        return appPreferences;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   proxy  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
      */
     public static synchronized void init(final ConnectionProxy proxy) {
-//       if (instance!=null){
-//           throw new IllegalStateException("Backend is already inited. Please call init(AppPreferences prefs) only once.");
-//       }else {
-        INSTANCE = new CidsAppBackend(proxy);
-        INSTANCE.historyModel.addHistoryModelListener(INSTANCE);
-//       }
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Backend is already inited.");
+        } else {
+            INSTANCE = new CidsAppBackend(proxy, null);
+            INSTANCE.historyModel.addHistoryModelListener(INSTANCE);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   proxy           DOCUMENT ME!
+     * @param   appPreferences  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
+     */
+    public static synchronized void init(final ConnectionProxy proxy, final AppPreferences appPreferences) {
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Backend is already inited.");
+        } else {
+            INSTANCE = new CidsAppBackend(proxy, appPreferences);
+            INSTANCE.historyModel.addHistoryModelListener(INSTANCE);
+        }
     }
 
     /**
@@ -210,7 +239,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         MetaObject[] mos = null;
         try {
             final User user = SessionManager.getSession().getUser();
-            final ConnectionProxy proxy = getProxy();
             mos = proxy.getMetaObjectByQuery(user, query, domain);
         } catch (ConnectionException ex) {
             LOG.error("error retrieving metaobject by query", ex);
@@ -427,7 +455,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     frontenCrossReferences.put(crossReference.getEntityFromId(), crossReference);
                 }
                 // TODO inform via listener
-                Main.getCurrentInstance().getWdsrFrontenDetailsPanel().updateCrossReferences();
+                Main.getInstance().getWdsrFrontenDetailsPanel().updateCrossReferences();
             } catch (ConnectionException ex) {
                 LOG.error("error during retrieval of object", ex);
             }
@@ -450,7 +478,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     flaechenidToCrossReferences.put(crossReference.getEntityFromId(), crossReference);
                 }
                 // TODO inform via listener
-                Main.getCurrentInstance().getRegenFlaechenDetailsPanel().updateCrossReferences();
+                RegenFlaechenDetailsPanel.getInstance().updateCrossReferences();
             } catch (ConnectionException ex) {
                 LOG.error("error during retrieval of object", ex);
             }
@@ -632,9 +660,25 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public MetaObject getVerdisMetaObject(final int objectId, final int classtId) {
         try {
-            return proxy.getMetaObject(objectId, classtId, DOMAIN);
+            return proxy.getMetaObject(SessionManager.getSession().getUser(), objectId, classtId, DOMAIN);
         } catch (ConnectionException ex) {
             LOG.error("error in retrieving the metaobject " + objectId + " of classid " + classtId, ex);
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   query  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject[] getVerdisMetaObject(final String query) {
+        try {
+            return proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(), query, DOMAIN);
+        } catch (ConnectionException ex) {
+            LOG.error("error in retrieving the metaobject: " + query, ex);
             return null;
         }
     }
@@ -1093,11 +1137,11 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             flaechenBez = "";
         }
 
-        if (!Main.getCurrentInstance().isInEditMode()) {
-            Main.getCurrentInstance().disableKassenzeichenCmds();
-            Main.getCurrentInstance().getKzPanel().setSearchStarted();
+        if (!Main.getInstance().isInEditMode()) {
+            Main.getInstance().disableKassenzeichenCmds();
+            Main.getInstance().getKassenzeichenPanel().setSearchStarted();
             GrundbuchblattSucheDialog.getInstance().setEnabled(false);
-            Main.getCurrentInstance().getKzPanel().setSearchField(kassenzeichen);
+            Main.getInstance().getKassenzeichenPanel().setSearchField(kassenzeichen);
 
             new SwingWorker<CidsBean, Void>() {
 
@@ -1116,29 +1160,29 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                             if (cidsBean != null) {
                                 setCidsBean(cidsBean);
                                 selectCidsBeanByIdentifier(flaechenBez);
-                                Main.getCurrentInstance().getKzPanel().flashSearchField(Color.GREEN);
+                                Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.GREEN);
                                 if (historyEnabled) {
                                     historyModel.addToHistory(kassenzeichen);
                                 }
                             } else {
-                                Main.getCurrentInstance().getKzPanel().flashSearchField(Color.RED);
+                                Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
                             }
                         } catch (final Exception ex) {
                             LOG.error("Exception in Background Thread", ex);
-                            Main.getCurrentInstance().getKzPanel().flashSearchField(Color.RED);
+                            Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
                             showError("Fehler beim Laden", "Kassenzeichen konnte nicht geladen werden", ex);
                         }
-                        Main.getCurrentInstance().getKzPanel().setSearchFinished();
+                        Main.getInstance().getKassenzeichenPanel().setSearchFinished();
                         GrundbuchblattSucheDialog.getInstance().setEnabled(true);
-                        Main.getCurrentInstance().refreshKassenzeichenButtons();
+                        Main.getInstance().refreshKassenzeichenButtons();
                         if (edit) {
-                            Main.getCurrentInstance().setEditMode(true);
+                            Main.getInstance().setEditMode(true);
                         }
                     }
                 }.execute();
         } else {
             JOptionPane.showMessageDialog(
-                Main.getCurrentInstance(),
+                Main.getInstance(),
                 "Das Kassenzeichen kann nur gewechselt werden wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
                 "Wechseln nicht m\u00F6glich",
                 JOptionPane.WARNING_MESSAGE);
@@ -1169,7 +1213,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         for (final CidsBean flaeche
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
             if (((String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
-                Main.getCurrentInstance().getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
+                Main.getInstance().getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
                 return;
             }
         }
@@ -1192,7 +1236,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         for (final CidsBean front
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)) {
             if (((Integer)front.getProperty(FrontPropertyConstants.PROP__NUMMER)).equals(nummerAsInt)) {
-                Main.getCurrentInstance().getWdsrFrontenTabellenPanel().selectCidsBean(front);
+                Main.getInstance().getWdsrFrontenTabellenPanel().selectCidsBean(front);
                 return;
             }
         }
@@ -1208,7 +1252,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public void showError(final String title, final String message, final Exception exception) {
         if (SwingUtilities.isEventDispatchThread()) {
             final ErrorInfo errorInfo = new ErrorInfo(title, message, null, "", exception, null, null);
-            JXErrorPane.showDialog(Main.getCurrentInstance(), errorInfo);
+            JXErrorPane.showDialog(Main.getInstance(), errorInfo);
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {

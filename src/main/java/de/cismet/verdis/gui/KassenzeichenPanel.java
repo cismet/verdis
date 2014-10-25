@@ -147,7 +147,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
         aggVal.validate();
 
-        Main.getCurrentInstance().refreshTitle();
+        Main.getInstance().refreshTitle();
     }
 
     /**
@@ -743,10 +743,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     /**
      * DOCUMENT ME!
      *
-     * @param  kz  DOCUMENT ME!
+     * @param  kassenzeichen  DOCUMENT ME!
      */
-    public void setSearchField(final String kz) {
-        this.txtSearch.setText(kz);
+    public void setSearchField(final String kassenzeichen) {
+        this.txtSearch.setText(kassenzeichen);
     }
 
     /**
