@@ -48,10 +48,16 @@ import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
  */
 public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static Color erColor = new Color(5164484);
+
     //~ Instance fields --------------------------------------------------------
 
-    CustomFixedWidthStroke stroke = new CustomFixedWidthStroke(10f, CismapBroker.getInstance().getMappingComponent());
-    boolean sr = false;
+    private CustomFixedWidthStroke stroke = new CustomFixedWidthStroke(
+            10f,
+            CismapBroker.getInstance().getMappingComponent());
+    private String key = null;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -61,7 +67,6 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
                 FrontPropertyConstants.PROP__FRONTINFO
                         + "."
                         + FrontinfoPropertyConstants.PROP__LAGE_SR);
-        final String key;
         if (satzung_strassenreinigung == null) {
             key = (String)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
@@ -69,8 +74,6 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
         } else {
             key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
         }
-
-        sr = key != null;
     }
 
     @Override
@@ -78,10 +81,13 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
         if (cidsBean != null) {
             assign();
         }
-        if (sr) {
-            return Color.ORANGE;
-        } else {
+        if (key == null) {
             return Color.GREEN.darker();
+        }
+        if (key.equals("C2")) {
+            return erColor;
+        } else {
+            return Color.ORANGE;
         }
     }
 
