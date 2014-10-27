@@ -493,6 +493,24 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdNextKassenzeichenWithoutGeomActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JToggleButton" name="cmdSAPCheck">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="SAP Check"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap_selected.png"/>
+                </Property>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdSAPCheckActionPerformed"/>
+              </Events>
+            </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator6">
               <Properties>
                 <Property name="orientation" type="int" value="1"/>
@@ -737,7 +755,7 @@
                 <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="try {&#xa;    cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), &quot;grundis.fortfuehrungsanlaesse.dialog&quot;) != null);&#xa;} catch (final Exception ex) {&#xa;    LOG.error(&quot;error while checking for grundis.fortfuehrungsanlaesse.dialog&quot;, ex);&#xa;    cmdFortfuehrung.setVisible(false);&#xa;}"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JButton" name="cmdLagisCrossover1">
+            <Component class="javax.swing.JButton" name="cmdGrundbuchblattSuche">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/BPlan.png"/>
@@ -749,7 +767,7 @@
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdLagisCrossover1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdGrundbuchblattSucheActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
