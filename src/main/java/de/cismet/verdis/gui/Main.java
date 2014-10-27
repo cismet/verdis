@@ -68,6 +68,11 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -326,12 +331,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final WDSRDetailsPanel wdsrFrontenDetailsPanel = new WDSRDetailsPanel();
     private final WDSRSummenPanel wdsrSummenPanel = new WDSRSummenPanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
+    private final SAPClipboardListener sapClipboardListener = new SAPClipboardListener();
+
     private RMPlugin rmPlugin;
     private boolean fixMapExtent;
     private boolean isInit = true;
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
@@ -342,9 +349,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdDownloads;
     private javax.swing.JButton cmdEditMode;
     private javax.swing.JButton cmdFortfuehrung;
+    private javax.swing.JButton cmdGrundbuchblattSuche;
     private javax.swing.JButton cmdInfo;
     private javax.swing.JButton cmdLagisCrossover;
-    private javax.swing.JButton cmdLagisCrossover1;
     private javax.swing.JButton cmdNewKassenzeichen;
     private javax.swing.JButton cmdNextKassenzeichenWithoutGeom;
     private javax.swing.JButton cmdOk;
@@ -352,6 +359,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdPdf;
     private javax.swing.JButton cmdRefreshEnumeration;
     private javax.swing.JButton cmdRemove;
+    private javax.swing.JToggleButton cmdSAPCheck;
     private javax.swing.JButton cmdTest;
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
@@ -1617,6 +1625,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdDeleteKassenzeichen = new javax.swing.JButton();
         cmdNewKassenzeichen = new javax.swing.JButton();
         cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
+        cmdSAPCheck = new javax.swing.JToggleButton();
         jSeparator6 = new javax.swing.JSeparator();
         cmdCut = new javax.swing.JButton();
         cmdCopy = new javax.swing.JButton();
@@ -1638,7 +1647,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         btnHistory = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
-        cmdLagisCrossover1 = new javax.swing.JButton();
+        cmdGrundbuchblattSuche = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -1828,6 +1837,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdNextKassenzeichenWithoutGeom);
+
+        cmdSAPCheck.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap.png")));          // NOI18N
+        cmdSAPCheck.setToolTipText("SAP Check");
+        cmdSAPCheck.setContentAreaFilled(false);
+        cmdSAPCheck.setFocusable(false);
+        cmdSAPCheck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSAPCheck.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap_selected.png"))); // NOI18N
+        cmdSAPCheck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSAPCheck.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSAPCheckActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSAPCheck);
 
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
@@ -2061,21 +2088,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
         tobVerdis.add(cmdFortfuehrung);
 
-        cmdLagisCrossover1.setIcon(new javax.swing.ImageIcon(
+        cmdGrundbuchblattSuche.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
-        cmdLagisCrossover1.setToolTipText("Kassenzeichensuche über Buchungsblatt");
-        cmdLagisCrossover1.setFocusPainted(false);
-        cmdLagisCrossover1.setFocusable(false);
-        cmdLagisCrossover1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdLagisCrossover1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdLagisCrossover1.addActionListener(new java.awt.event.ActionListener() {
+        cmdGrundbuchblattSuche.setToolTipText("Kassenzeichensuche über Buchungsblatt");
+        cmdGrundbuchblattSuche.setFocusPainted(false);
+        cmdGrundbuchblattSuche.setFocusable(false);
+        cmdGrundbuchblattSuche.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdGrundbuchblattSuche.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdGrundbuchblattSuche.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdLagisCrossover1ActionPerformed(evt);
+                    cmdGrundbuchblattSucheActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdLagisCrossover1);
+        tobVerdis.add(cmdGrundbuchblattSuche);
 
         jPanel1.add(tobVerdis, java.awt.BorderLayout.CENTER);
 
@@ -3576,9 +3603,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
+    private void cmdGrundbuchblattSucheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdGrundbuchblattSucheActionPerformed
         StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
-    }//GEN-LAST:event_cmdLagisCrossover1ActionPerformed
+    }//GEN-LAST:event_cmdGrundbuchblattSucheActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3588,6 +3615,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichen1ActionPerformed
         showOrHideView(vKassenzeichenList);
     }//GEN-LAST:event_mniKassenzeichen1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSAPCheckActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSAPCheckActionPerformed
+        if (cmdSAPCheck.isSelected()) {
+            sapClipboardListener.gainOwnership();
+        }
+    }//GEN-LAST:event_cmdSAPCheckActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -4177,19 +4215,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
-     * @param  b  DOCUMENT ME!
+     * @param  editMode  DOCUMENT ME!
      */
-    public void setEditMode(final boolean b) {
-        CidsAppBackend.getInstance().setEditable(b);
+    public void setEditMode(final boolean editMode) {
+        CidsAppBackend.getInstance().setEditable(editMode);
         try {
-            editMode = b;
+            this.editMode = editMode;
 
             refreshKassenzeichenButtons();
             refreshClipboardButtons();
             refreshItemButtons();
 
-            mnuRenameKZ.setEnabled(b);
-            kartenPanel.setEnabled(b);
+            cmdSAPCheck.setEnabled(!editMode);
+            if (editMode) {
+                cmdSAPCheck.setSelected(false);
+            }
+            mnuRenameKZ.setEnabled(editMode);
+            kartenPanel.setEnabled(editMode);
 
 //            final Iterator it = stores.iterator();
 //            while (it.hasNext()) {
@@ -5337,6 +5379,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         clipboards.put(CidsAppBackend.Mode.ALLGEMEIN, kassenzeichenClipboard);
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    private void processSapClipboardContents() {
+        final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                final String string = ((String)transferable.getTransferData(DataFlavor.stringFlavor)).trim();
+                if ((string.length() == 8)
+                            && (string.startsWith("6") || string.startsWith("8"))) {
+                    Integer.parseInt(string); // check if its a number
+                    CidsAppBackend.getInstance().gotoKassenzeichen(string);
+                }
+            } catch (final Exception ex) {
+                LOG.warn("error processing system clipboard", ex);
+            }
+        }
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -5456,6 +5517,41 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.error("Fehler beim Anmelden", ex);
                 return false;
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    class SAPClipboardListener implements ClipboardOwner {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void lostOwnership(final Clipboard clipboard, final Transferable transferable) {
+            if (cmdSAPCheck.isSelected()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (!isInEditMode()) {
+                                processSapClipboardContents();
+                            }
+                        }
+                    });
+                gainOwnership();
+            }
+        }
+
+        /**
+         * DOCUMENT ME!
+         */
+        public void gainOwnership() {
+            Toolkit.getDefaultToolkit()
+                    .getSystemClipboard()
+                    .setContents(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null), this);
         }
     }
 }
