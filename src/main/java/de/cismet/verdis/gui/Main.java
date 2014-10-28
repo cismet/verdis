@@ -2988,6 +2988,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 } else {
                     releaseLocks();
                 }
+            } else {
+                releaseLocks();                
             }
         }
         closeAllConnections();
