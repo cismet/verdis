@@ -295,6 +295,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdSearchAlkisLandparcel;
     private javax.swing.JButton cmdSearchKassenzeichen;
     private javax.swing.JToggleButton cmdSelect;
+    private javax.swing.JToggleButton cmdSelect1;
     private javax.swing.JToggleButton cmdSnap;
     private javax.swing.JToggleButton cmdSplitPoly;
     private javax.swing.JButton cmdUndo;
@@ -468,6 +469,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdNewLinestring = new javax.swing.JToggleButton();
         cmdNewPoint = new javax.swing.JToggleButton();
         cmdOrthogonalRectangle = new javax.swing.JToggleButton();
+        cmdSelect1 = new javax.swing.JToggleButton();
         cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
         cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(
                 Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER,
@@ -938,6 +940,27 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdOrthogonalRectangle);
+
+        mainGroup.add(cmdSelect1);
+        cmdSelect1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/ruler--plus.png")));          // NOI18N
+        cmdSelect1.setToolTipText("Lot fällen");
+        cmdSelect1.setBorderPainted(false);
+        cmdSelect1.setContentAreaFilled(false);
+        cmdSelect1.setFocusPainted(false);
+        cmdSelect1.setFocusable(false);
+        cmdSelect1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSelect1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/ruler--plus_selected.png"))); // NOI18N
+        cmdSelect1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSelect1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSelect1ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSelect1);
 
         mainGroup.add(cmdSearchAlkisLandparcel);
         cmdSearchAlkisLandparcel.setIcon(new javax.swing.ImageIcon(
@@ -1587,6 +1610,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private void cmdAngleMeasurementActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAngleMeasurementActionPerformed
         StaticSwingTools.showDialog(AngleMeasurementDialog.getInstance());
     }                                                                                       //GEN-LAST:event_cmdAngleMeasurementActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSelect1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSelect1ActionPerformed
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    mappingComp.setHandleInteractionMode(MappingComponent.ADD_HANDLE);
+                    mappingComp.setInteractionMode(MappingComponent.PERPENDICULAR_INTERSECTION);
+                    ((PerpendicularIntersectionListener)mappingComp.getInputListener(
+                            MappingComponent.PERPENDICULAR_INTERSECTION)).init();
+                }
+            });
+    } //GEN-LAST:event_cmdSelect1ActionPerformed
 
     /**
      * DOCUMENT ME!
