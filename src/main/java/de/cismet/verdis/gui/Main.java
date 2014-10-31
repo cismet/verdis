@@ -4270,9 +4270,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             refreshItemButtons();
 
             cmdSAPCheck.setEnabled(!editMode);
-            if (editMode) {
-                cmdSAPCheck.setSelected(false);
-            }
             mnuRenameKZ.setEnabled(editMode);
             kartenPanel.setEnabled(editMode);
 
