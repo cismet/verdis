@@ -4460,80 +4460,73 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param   kassenzeichenBean  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public boolean saveKassenzeichen(final CidsBean kassenzeichenBean) {
-        try {
-            WaitDialog.getInstance().startSavingKassenzeichen(1);
+    public CidsBean saveKassenzeichen(final CidsBean kassenzeichenBean) throws Exception {
+        WaitDialog.getInstance().startSavingKassenzeichen(1);
 
-            // set change date for flaechen
-            for (final CidsBean flaecheBean
-                        : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-                if ((flaecheBean != null)
-                            && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
-                                || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
-                    flaecheBean.setProperty(
-                        FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
-                        new java.sql.Date(Calendar.getInstance().getTime().getTime()));
-                }
+        // set change date for flaechen
+        for (final CidsBean flaecheBean
+                    : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+            if ((flaecheBean != null)
+                        && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
+                            || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
+                flaecheBean.setProperty(
+                    FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+                    new java.sql.Date(Calendar.getInstance().getTime().getTime()));
             }
-
-            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
-                        .getFlaecheToKassenzeichenQuerverweisMap();
-
-            // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
-            // soll einen Querverweis im Kassenzeichen y anlegen
-            // MUSS VOR PERSIST GESCHEHEN
-            final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
-            for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
-                final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-                final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
-                        unsavedFlaecheBean);
-                bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
-            }
-
-            final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
-
-            final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap = loadCrosslinkKassenzeichenBeanMap(
-                    flaecheToKassenzeichenQuerverweisMap);
-
-            final List<CidsBean> crosslinkKassenzeichenBeans = createCrosslinkFlaechen(
-                    persistedKassenzeichenBean,
-                    bezeichnungToKassenzeichennummerMap,
-                    crosslinkKassenzeichenBeanMap);
-
-            // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
-            WaitDialog.getInstance().startSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
-            for (int index = 0; index < crosslinkKassenzeichenBeans.size(); index++) {
-                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeans.get(index);
-                WaitDialog.getInstance().progressSavingKassenzeichen(index);
-                try {
-                    persistKassenzeichen(querverweisKassenzeichenBean);
-                } catch (final Exception ex) {
-                    CidsAppBackend.getInstance()
-                            .showError(
-                                "Fehler beim Schreiben",
-                                "Beim Speichern des Querverweises "
-                                + querverweisKassenzeichenBean
-                                + " kam es zu einem Fehler.",
-                                ex);
-                }
-            }
-            WaitDialog.getInstance().progressSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
-            // querverweise wurden angelegt, map muss leer gemacht werden
-            // damit beim nächsten Speichern nicht nochmal die selben
-            // Querverweise angelegt werden
-            flaecheToKassenzeichenQuerverweisMap.clear();
-        } catch (final Exception ex) {
-            LOG.error("error during persist", ex);
-            CidsAppBackend.getInstance()
-                    .showError(
-                        "Fehler beim Schreiben",
-                        "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
-                        ex);
-            return false;
         }
-        return true;
+
+        final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
+                    .getFlaecheToKassenzeichenQuerverweisMap();
+
+        // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
+        // soll einen Querverweis im Kassenzeichen y anlegen
+        // MUSS VOR PERSIST GESCHEHEN
+        final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
+        for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
+            final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+            final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
+                    unsavedFlaecheBean);
+            bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
+        }
+
+        final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
+
+        final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap = loadCrosslinkKassenzeichenBeanMap(
+                flaecheToKassenzeichenQuerverweisMap);
+
+        final List<CidsBean> crosslinkKassenzeichenBeans = createCrosslinkFlaechen(
+                persistedKassenzeichenBean,
+                bezeichnungToKassenzeichennummerMap,
+                crosslinkKassenzeichenBeanMap);
+
+        // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
+        WaitDialog.getInstance().startSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
+        for (int index = 0; index < crosslinkKassenzeichenBeans.size(); index++) {
+            final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeans.get(index);
+            WaitDialog.getInstance().progressSavingKassenzeichen(index);
+            try {
+                persistKassenzeichen(querverweisKassenzeichenBean);
+            } catch (final Exception ex) {
+                CidsAppBackend.getInstance()
+                        .showError(
+                            "Fehler beim Schreiben",
+                            "Beim Speichern des Querverweises "
+                            + querverweisKassenzeichenBean
+                            + " kam es zu einem Fehler.",
+                            ex);
+            }
+        }
+        WaitDialog.getInstance().progressSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
+        // querverweise wurden angelegt, map muss leer gemacht werden
+        // damit beim nächsten Speichern nicht nochmal die selben
+        // Querverweise angelegt werden
+        flaecheToKassenzeichenQuerverweisMap.clear();
+
+        return persistedKassenzeichenBean;
     }
 
     /**
@@ -4542,17 +4535,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param   changedVeranlagungSummeMap  DOCUMENT ME!
      * @param   datum                       DOCUMENT ME!
      * @param   veranlagungsdatum           DOCUMENT ME!
+     * @param   kassenzeichenBean           DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
     private void saveAssessement(final Map<String, Double> changedVeranlagungSummeMap,
             final Date datum,
-            final Date veranlagungsdatum) throws Exception {
+            final Date veranlagungsdatum,
+            final CidsBean kassenzeichenBean) throws Exception {
         final MetaObject veranlagungMo = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
                     .getEmptyInstance();
         final CidsBean veranlagungBean = veranlagungMo.getBean();
-        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, getCidsBean());
+        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, kassenzeichenBean);
         veranlagungBean.setProperty(
             VeranlagungPropertyConstants.PROP__DATUM,
             new java.sql.Date(datum.getTime()));
@@ -4662,44 +4657,43 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        if (saveKassenzeichen(kassenzeichenBean)) {
-                            if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
-                                try {
-                                    saveAssessement(
-                                        changedVeranlagungSummeMap,
-                                        assessmentDialog.getDatum(),
-                                        assessmentDialog.getVeranlagungsdatum());
+                        final CidsBean savedKassenzeichenBean = saveKassenzeichen(kassenzeichenBean);
+                        if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                            try {
+                                saveAssessement(
+                                    changedVeranlagungSummeMap,
+                                    assessmentDialog.getDatum(),
+                                    assessmentDialog.getVeranlagungsdatum(),
+                                    savedKassenzeichenBean);
 
-                                    kassenzeichenBean.setProperty(
-                                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
-                                        null);
-                                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
-                                    kassenzeichenBean.setProperty(
-                                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
-                                        "");
-                                } catch (Exception ex) {
-                                    LOG.error("error while storing veranlagung", ex);
-                                }
-                            } else {
-                                try {
-                                    final String veranlagungszettel = assessmentDialog.getZettelHtml();
-                                    kassenzeichenBean.setProperty(
-                                        KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
-                                        veranlagungszettel);
-                                    kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
-                                    kassenzeichenBean.setProperty(
-                                        KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
-                                        "beim letzten Speichern nicht veranlagt");
-                                } catch (Exception ex) {
-                                    LOG.error("error while storing veranlagungszettel", ex);
-                                }
+                                savedKassenzeichenBean.setProperty(
+                                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                    null);
+                                savedKassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                                savedKassenzeichenBean.setProperty(
+                                    KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                    "");
+                            } catch (Exception ex) {
+                                LOG.error("error while storing veranlagung", ex);
                             }
-
-                            final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
-                            releaseLocks();
-                            return persistedKassenzeichenBean;
+                        } else {
+                            try {
+                                final String veranlagungszettel = assessmentDialog.getZettelHtml();
+                                savedKassenzeichenBean.setProperty(
+                                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                    veranlagungszettel);
+                                savedKassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                                savedKassenzeichenBean.setProperty(
+                                    KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                    "beim letzten Speichern nicht veranlagt");
+                            } catch (Exception ex) {
+                                LOG.error("error while storing veranlagungszettel", ex);
+                            }
                         }
-                        return null;
+
+                        final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
+                        releaseLocks();
+                        return assessedKassenzeichenBean;
                     }
 
                     @Override
