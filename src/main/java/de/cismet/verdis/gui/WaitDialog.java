@@ -340,7 +340,7 @@ public class WaitDialog extends javax.swing.JDialog {
             if (lockOrRelease) {
                 jProgressBar1.setString("Kassenzeichen werden gesperrt...");
             } else {
-                jProgressBar1.setString("Kassenzeichen werden fregegeben...");
+                jProgressBar1.setString("Kassenzeichen werden freigegeben...");
             }
             jProgressBar1.setMaximum(max);
             jProgressBar1.setIndeterminate(false);

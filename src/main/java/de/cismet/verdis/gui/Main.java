@@ -63,6 +63,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import org.openide.util.Exceptions;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -358,6 +360,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdOk;
     private javax.swing.JButton cmdPaste;
     private javax.swing.JButton cmdPdf;
+    private javax.swing.JButton cmdRecalculateArea;
     private javax.swing.JButton cmdRefreshEnumeration;
     private javax.swing.JButton cmdRemove;
     private javax.swing.JToggleButton cmdSAPCheck;
@@ -1638,6 +1641,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdPaste = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
         cmdRefreshEnumeration = new javax.swing.JButton();
+        cmdRecalculateArea = new javax.swing.JButton();
         jSeparator12 = new javax.swing.JToolBar.Separator();
         jSeparator7 = new javax.swing.JSeparator();
         cmdAdd = new javax.swing.JButton();
@@ -1945,6 +1949,22 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdRefreshEnumeration);
+
+        cmdRecalculateArea.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/recalculateArea.png"))); // NOI18N
+        cmdRecalculateArea.setToolTipText("Neuberechnung der Flächen");
+        cmdRecalculateArea.setFocusPainted(false);
+        cmdRecalculateArea.setFocusable(false);
+        cmdRecalculateArea.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdRecalculateArea.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdRecalculateArea.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRecalculateAreaActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdRecalculateArea);
         tobVerdis.add(jSeparator12);
 
         jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -3665,6 +3685,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRecalculateAreaActionPerformed
+        if (isInEditMode()) {
+            regenFlaechenTabellenPanel.recalculateAreaOfFlaechen();
+        }
+    }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
+
+    /**
+     * DOCUMENT ME!
      */
     public void renameKassenzeichen() {
         if (editMode) {
@@ -4234,7 +4265,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdNewKassenzeichen.setEnabled(!b && !readonly);
         cmdEditMode.setEnabled(!b && !readonly && (kassenzeichenBean != null));
 
-        cmdRefreshEnumeration.setEnabled(b);
+        cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
+        cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         if (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)

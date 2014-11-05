@@ -595,6 +595,21 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdRefreshEnumerationActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="cmdRecalculateArea">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/recalculateArea.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Neuberechnung der Fl&#xe4;chen"/>
+                <Property name="focusPainted" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmdRecalculateAreaActionPerformed"/>
+              </Events>
+            </Component>
             <Component class="javax.swing.JToolBar$Separator" name="jSeparator12">
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator7">
