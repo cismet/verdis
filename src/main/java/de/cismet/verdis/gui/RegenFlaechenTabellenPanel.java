@@ -35,6 +35,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import edu.umd.cs.piccolox.event.PNotification;
 
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.*;
 
 import java.awt.Color;
@@ -89,13 +90,39 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             RegenFlaechenTabellenPanel.class);
 
+    private static final String[] PREVIEW_COLUMN_NAMES = {
+            "Bezeichnung",
+            "Grafik (alt)",
+            "Grafik (neu)",
+            "Korrektur (alt)",
+            "Korrektur (neu)"
+        };
+
+    private static final Class[] PREVIEW_COLUMN_CLASSES = {
+            String.class,
+            Integer.class,
+            Integer.class,
+            Integer.class,
+            Integer.class
+        };
+
     //~ Instance fields --------------------------------------------------------
 
     private CidsBean cidsBean;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JDialog jDialog1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private org.jdesktop.swingx.JXTable jxtOverview;
+    private org.jdesktop.swingx.JXTable jxtOverview1;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -232,6 +259,57 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jxtOverview.getTableHeader().setResizingAllowed(false);
         jxtOverview.getTableHeader().setReorderingAllowed(false);
         jxtOverview.setSortOrder(1, SortOrder.ASCENDING);
+
+        final HighlightPredicate equalsPredicate = new HighlightPredicate() {
+
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    if ((componentAdapter.column != 2) && (componentAdapter.column != 4)) {
+                        return false;
+                    }
+
+                    final int displayedIndex = componentAdapter.row;
+                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+                    final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+
+                    return ((componentAdapter.column == 2) && (oldGrafik != newGrafik))
+                                || ((componentAdapter.column == 4) && (oldKorrektur != newKorrektur));
+                }
+            };
+
+        final HighlightPredicate differsPredicate = new HighlightPredicate() {
+
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    if ((componentAdapter.column != 3)) {
+                        return false;
+                    }
+
+                    final int displayedIndex = componentAdapter.row;
+                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+
+                    return oldGrafik != oldKorrektur;
+                }
+            };
+
+        final Highlighter equalsHighlighter = new ColorHighlighter(
+                equalsPredicate,
+                Color.YELLOW,
+                Color.BLACK);
+        final Highlighter differsHighlighter = new ColorHighlighter(
+                differsPredicate,
+                Color.RED.brighter().brighter().brighter(),
+                Color.WHITE);
+
+        jxtOverview1.setHighlighters(equalsHighlighter, differsHighlighter);
+        jxtOverview1.getColumnModel().getColumn(0).setPreferredWidth(50);
+        jxtOverview1.getColumnModel().getColumn(1).setPreferredWidth(50);
+        jxtOverview1.getColumnModel().getColumn(2).setPreferredWidth(50);
+        jxtOverview1.getColumnModel().getColumn(3).setPreferredWidth(50);
+        jxtOverview1.getColumnModel().getColumn(4).setPreferredWidth(50);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -243,8 +321,117 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jDialog1 = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jxtOverview1 = new JXTable(new GrafikPreviewTableModel());
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jxtOverview = getJXTable();
+
+        jDialog1.setTitle(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenTabellenPanel.class,
+                "RegenFlaechenTabellenPanel.jDialog1.title")); // NOI18N
+        jDialog1.setMinimumSize(new java.awt.Dimension(600, 400));
+        jDialog1.setModal(true);
+        jDialog1.setResizable(false);
+        jDialog1.getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        jxtOverview1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jxtOverview1.setRowSelectionAllowed(false);
+        jScrollPane2.setViewportView(jxtOverview1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanel2.add(jScrollPane2, gridBagConstraints);
+
+        jPanel1.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
+
+        jButton1.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenTabellenPanel.class,
+                "RegenFlaechenTabellenPanel.jButton1.text")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        jPanel1.add(jButton1);
+
+        jButton2.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenTabellenPanel.class,
+                "RegenFlaechenTabellenPanel.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        jPanel1.add(jButton2);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        jPanel2.add(jPanel1, gridBagConstraints);
+
+        jPanel3.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
+
+        jLabel1.setBackground(Color.YELLOW);
+        jLabel1.setForeground(Color.BLACK);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenTabellenPanel.class,
+                "RegenFlaechenTabellenPanel.jLabel1.text")); // NOI18N
+        jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel1.setOpaque(true);
+        jPanel3.add(jLabel1);
+
+        jLabel3.setBackground(Color.RED.brighter().brighter().brighter());
+        jLabel3.setForeground(Color.WHITE);
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenTabellenPanel.class,
+                "RegenFlaechenTabellenPanel.jLabel3.text")); // NOI18N
+        jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel3.setOpaque(true);
+        jPanel3.add(jLabel3);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        jPanel2.add(jPanel3, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jDialog1.getContentPane().add(jPanel2, gridBagConstraints);
 
         setLayout(new java.awt.BorderLayout());
 
@@ -255,6 +442,53 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        jDialog1.setVisible(false);
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        for (int displayedIndex = 0; displayedIndex < jxtOverview1.getRowCount(); ++displayedIndex) {
+            final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
+
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(modelIndex);
+
+            final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+            final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+            final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+            final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+
+            if (oldGrafik != newGrafik) {
+                try {
+                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                        newGrafik);
+                } catch (final Exception ex) {
+                    LOG.warn(ex, ex);
+                }
+            }
+            if (oldKorrektur != newKorrektur) {
+                try {
+                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                        newKorrektur);
+                } catch (final Exception ex) {
+                    LOG.warn(ex, ex);
+                }
+            }
+        }
+        jDialog1.setVisible(false);
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -324,15 +558,36 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @Override
     public Validator getItemValidator(final CidsBean flaecheBean) {
         final AggregatedValidator aggVal = new AggregatedValidator();
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorFlaechenBezeichnung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorGroesseGrafik(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorGroesseKorrektur(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorAnteil(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumErfassung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorDatumVeranlagung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getInstance().getValidatorFebId(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFlaechenBezeichnung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseGrafik(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorGroesseKorrektur(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
+        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
         aggVal.validate();
         return aggVal;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void recalculateAreaOfFlaechen() {
+        final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<CidsBean>();
+
+        final TableSorter sort = new TableSorter(getModel());
+        sort.setSortingStatus(1, TableSorter.ASCENDING);
+        for (int index = 0; index < getModel().getRowCount(); ++index) {
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(index));
+            toCorrectFlaecheBeans.add(flaecheBean);
+        }
+
+        ((GrafikPreviewTableModel)jxtOverview1.getModel()).setCidsBeans(toCorrectFlaecheBeans);
+        jDialog1.pack();
+        StaticSwingTools.showDialog(jDialog1);
+
+        getModel().fireTableDataChanged();
+        repaint();
     }
 
     /**
@@ -567,5 +822,71 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     @Override
     public Geometry getGeometry(final CidsBean cidsBean) {
         return RegenFlaechenDetailsPanel.getGeometry(cidsBean);
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    class GrafikPreviewTableModel extends CidsBeanTableModel {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GrafikPreviewTableModel object.
+         */
+        public GrafikPreviewTableModel() {
+            super(PREVIEW_COLUMN_NAMES, PREVIEW_COLUMN_CLASSES);
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
+            throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                           // choose Tools | Templates.
+        }
+
+        @Override
+        public Object getValueAt(final int rowIndex, final int columnIndex) {
+            final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
+            if (cidsBean == null) {
+                return null;
+            }
+
+            final Geometry geom = getGeometry(cidsBean);
+
+            final int oldGrafik = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+            final int oldKorrektur = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+            final boolean korrekturEqualsGrafik = oldKorrektur == oldGrafik;
+            final int newGrafik = (geom != null) ? (int)geom.getArea() : 0;
+            final int newKorrektur = (korrekturEqualsGrafik) ? newGrafik : oldKorrektur;
+
+            switch (columnIndex) {
+                case 0: {
+                    return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                }
+                case 1: {
+                    return oldGrafik;
+                }
+                case 2: {
+                    return newGrafik;
+                }
+                case 3: {
+                    return oldKorrektur;
+                }
+                case 4: {
+                    return newKorrektur;
+                }
+                default: {
+                    return null;
+                }
+            }
+        }
     }
 }
