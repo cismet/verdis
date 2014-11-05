@@ -37,34 +37,42 @@
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement mode="Transparent" x="0" y="0" width="802" height="411"/>
+				<reportElement mode="Transparent" x="47" y="-228" width="802" height="411"/>
 			</rectangle>
-			<textField>
-				<reportElement x="721" y="453" width="78" height="20"/>
-				<textElement verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{scale}]]></textFieldExpression>
-			</textField>
+			<rectangle>
+				<reportElement x="620" y="430" width="80" height="4" forecolor="#00B200" backcolor="#4ECDC4"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="200" y="430" width="80" height="4" forecolor="#B28C00" backcolor="#FFC800"/>
+			</rectangle>
 			<staticText>
-				<reportElement x="655" y="453" width="66" height="20"/>
+				<reportElement x="15" y="455" width="66" height="20"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Maßstab ca. ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="105" y="448" width="220" height="30"/>
-				<textElement verticalAlignment="Middle"/>
-				<text><![CDATA[Straßenfronten die zur Reinigungsgebühr herangezogen werden]]></text>
+				<reportElement x="620" y="440" width="180" height="40"/>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Straßenfronten ohne Gebührenerhebung / Reinigung durch Anlieger]]></text>
 			</staticText>
+			<rectangle>
+				<reportElement x="410" y="430" width="80" height="4" forecolor="#00B200" backcolor="#00C800"/>
+			</rectangle>
 			<staticText>
-				<reportElement x="435" y="448" width="120" height="30"/>
-				<textElement verticalAlignment="Middle"/>
+				<reportElement x="410" y="440" width="180" height="40"/>
+				<textElement verticalAlignment="Top"/>
 				<text><![CDATA[Straßenfronten ohne Gebührenerhebung]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="345" y="460" width="80" height="4" forecolor="#00B200" backcolor="#00C800"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="15" y="460" width="80" height="4" forecolor="#B28C00" backcolor="#FFC800"/>
-			</rectangle>
+			<staticText>
+				<reportElement x="200" y="440" width="180" height="40"/>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Straßenfronten die zur Reinigungsgebühr herangezogen werden]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="455" width="78" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{scale}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<pageFooter>
