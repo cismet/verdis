@@ -63,8 +63,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import org.openide.util.Exceptions;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -148,7 +146,6 @@ import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
-import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
@@ -165,8 +162,6 @@ import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
-
-import de.cismet.cismap.navigatorplugin.BeanUpdatingCidsFeature;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
@@ -207,7 +202,6 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
@@ -259,7 +253,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
     private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
-    private static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
     private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
                 "/de/cismet/verdis/login.png")).getImage();
@@ -3412,16 +3406,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
-     */
-    private void setKZGeomFromSole() {
-        final PFeature sole = getMappingComponent().getSolePureNewFeature();
-        if (sole != null) {
-            setKZGeomFromFeature(sole.getFeature());
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @param  geom  DOCUMENT ME!
      */
@@ -3457,112 +3441,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
-     * @param  feature  DOCUMENT ME!
-     */
-    private void setKZGeomFromFeature(final Feature feature) {
-        try {
-            final Geometry geom = feature.getGeometry();
-
-            setGeometry(geom);
-            getMappingComponent().getFeatureCollection().removeFeature(feature);
-            final Feature add = new BeanUpdatingCidsFeature(
-                    kassenzeichenBean,
-                    KassenzeichenPropertyConstants.PROP__GEOMETRIE
-                            + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
-            final boolean editable = CidsAppBackend.getInstance().isEditable();
-            add.setEditable(editable);
-            getMappingComponent().getFeatureCollection().addFeature(add);
-        } catch (Exception ex) {
-            LOG.error("error while setting geometrie to kassenzeichen bean", ex);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void removeKZGeometrie() {
-        try {
-            final Feature remove = new BeanUpdatingCidsFeature(
-                    kassenzeichenBean,
-                    KassenzeichenPropertyConstants.PROP__GEOMETRIE
-                            + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
-            setGeometry(null);
-            getMappingComponent().getFeatureCollection().removeFeature(remove);
-        } catch (Exception ex) {
-            LOG.error("error while removing geometrie from kassenzeichen bean", ex);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Geometry getGeometry() {
-        return getGeometry(getCidsBean());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   geom  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    private void setGeometry(final Geometry geom) throws Exception {
-        setGeometry(geom, getCidsBean());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   kassenzeichenBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static Geometry getGeometry(final CidsBean kassenzeichenBean) {
-        if ((kassenzeichenBean != null)
-                    && (kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   geom               DOCUMENT ME!
-     * @param   kassenzeichenBean  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public static void setGeometry(final Geometry geom, final CidsBean kassenzeichenBean) throws Exception {
-        transformToDefaultCrsNeeded(geom);
-        if (kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE) == null) {
-            final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
-                        .getEmptyInstance()
-                        .getBean();
-            kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
-        }
-        kassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE + "."
-                    + GeomPropertyConstants.PROP__GEO_FIELD,
-            geom);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  evt  DOCUMENT ME!
      */
     private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
-        if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-            setKZGeomFromSole();
-        } else {
+        if (!CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
             if (cidsBeanTable != null) {
                 cidsBeanTable.addNewBean();
@@ -3576,9 +3458,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
-        if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-            removeKZGeometrie();
-        } else {
+        if (!CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
             if (cidsBeanTable != null) {
                 cidsBeanTable.removeSelectedBeans();
@@ -3863,13 +3743,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final MetaObject kanalanschlussMo = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_KANALANSCHLUSS)
                     .getEmptyInstance();
-        final MetaObject geomMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
-                    .getEmptyInstance();
 
         final CidsBean kassenzeichen = kassenzeichenMo.getBean();
         final CidsBean kanalanschluss = kanalanschlussMo.getBean();
-        final CidsBean geomBean = geomMo.getBean();
 
         // TODO sobald die FEBs und DMS auf 8-stellige kassenzeichen umgestellt worden sind, kann diese zeile
         // rausfliegen
@@ -3888,8 +3764,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         kassenzeichen.setProperty(
             KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
             getUserString());
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__GEOMETRIE, geomBean);
-
         return kassenzeichen;
     }
 
@@ -3953,13 +3827,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 }
                                 toDeleteBeans.addAll(befUndErlBeans);
                                 toDeleteBeans.add(kanalanschlussBean);
-                            }
-
-                            // kassenzeichen-geometrie löschen
-                            final CidsBean geomBean = (CidsBean)kassenzeichenBean.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__GEOMETRIE);
-                            if (geomBean != null) {
-                                toDeleteBeans.add(geomBean);
                             }
 
                             // kassenzeichen selbst löschen
@@ -4229,15 +4096,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
                 break;
                 case ALLGEMEIN: {
-                    final Geometry geom = getGeometry();
-                    final PFeature sole = getMappingComponent().getSolePureNewFeature();
-
-                    // hat noch keine geometrie und es ist ein feature in der karte
-                    cmdAdd.setEnabled((geom == null) && (sole != null));
-                    // hat eine geometrie
-                    cmdRemove.setEnabled(geom != null);
-
-                    // undo nie möglich
+                    cmdAdd.setEnabled(false);
+                    cmdRemove.setEnabled(false);
                     cmdUndo.setEnabled(false);
                 }
                 return;
