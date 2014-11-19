@@ -459,7 +459,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
      */
     private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         for (int displayedIndex = 0; displayedIndex < jxtOverview1.getRowCount(); ++displayedIndex) {
-            final int modelIndex = jxtOverview.convertRowIndexToModel(displayedIndex);
+            final int modelIndex = jxtOverview1.convertRowIndexToModel(displayedIndex);
 
             final CidsBean flaecheBean = getModel().getCidsBeanByIndex(modelIndex);
 
@@ -575,10 +575,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     public void recalculateAreaOfFlaechen() {
         final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<CidsBean>();
 
-        final TableSorter sort = new TableSorter(getModel());
-        sort.setSortingStatus(1, TableSorter.ASCENDING);
         for (int index = 0; index < getModel().getRowCount(); ++index) {
-            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(index));
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(index);
             toCorrectFlaecheBeans.add(flaecheBean);
         }
 
