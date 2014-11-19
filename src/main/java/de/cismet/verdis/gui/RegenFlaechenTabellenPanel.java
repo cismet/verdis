@@ -448,16 +448,16 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         for (int displayedIndex = 0; displayedIndex < jxtOverview1.getRowCount(); ++displayedIndex) {
             final int modelIndex = jxtOverview1.convertRowIndexToModel(displayedIndex);
 
@@ -488,7 +488,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             }
         }
         jDialog1.setVisible(false);
-    } //GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -575,8 +575,10 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     public void recalculateAreaOfFlaechen() {
         final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<CidsBean>();
 
+        final TableSorter sort = new TableSorter(getModel());
+        sort.setSortingStatus(1, TableSorter.ASCENDING);
         for (int index = 0; index < getModel().getRowCount(); ++index) {
-            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(index);
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(index));
             toCorrectFlaecheBeans.add(flaecheBean);
         }
 
