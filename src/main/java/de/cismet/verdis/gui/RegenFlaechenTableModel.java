@@ -71,8 +71,8 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
     private static final Class[] COLUMN_CLASSES = {
             Icon.class,
             String.class,
-            javax.swing.Icon.class,
-            String.class,
+            Icon.class,
+            Integer.class,
             String.class,
             String.class,
             String.class
@@ -97,7 +97,6 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
         }
         switch (columnIndex) {
             case 0: {
-                // Bezeichnungsspalte
                 if (cidsBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL) != null) {
                     return MULT_IMAGE;
                 }
@@ -108,15 +107,13 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
                 return null;
             }
             case 1: {
+                // Bezeichnungsspalte
+                return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+            }
+            case 2: {
                 // Edit Icon Spalte
                 // hier kommt ein Edit Icon rein wenn die Gr\u00F6\u00DFe von
                 // Hand ge\u00E4ndert wurde
-                return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            }
-            case 2: {
-                // Groesse
-                // Wenn in flaecheninfo.groesse_korrektur was drinsteht
-                // wird das genommen
                 if (!((cidsBean.getProperty(
                                         FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
@@ -136,29 +133,29 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
                 }
             }
             case 3: {
-                // Flaechenart
+                // Größe
                 if (
                     cidsBean.getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                 + "."
                                 + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR)
                             != null) {
-                    return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    return (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                     + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
                 } else {
-                    return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                    return (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                     + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
                 }
             }
             case 4: {
-                // Anschlussgrad
-                return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                // Flaechenart
+                return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                 + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
                                 + FlaechenartPropertyConstants.PROP__ART_ABKUERZUNG);
             }
             case 5: {
                 // Anschlussgrad
-                return cidsBean.getProperty(
+                return (String)cidsBean.getProperty(
                         FlaechePropertyConstants.PROP__FLAECHENINFO
                                 + "."
                                 + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
@@ -167,7 +164,7 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
             }
             case 6: {
                 // Änderungsdatum
-                return DATE_FORMAT.format(cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG));
+                return (String)DATE_FORMAT.format(cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG));
             }
             default: {
                 return null;

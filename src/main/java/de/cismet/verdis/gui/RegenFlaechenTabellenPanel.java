@@ -310,6 +310,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jxtOverview1.getColumnModel().getColumn(2).setPreferredWidth(50);
         jxtOverview1.getColumnModel().getColumn(3).setPreferredWidth(50);
         jxtOverview1.getColumnModel().getColumn(4).setPreferredWidth(50);
+
+        jxtOverview1.getColumnExt(0).setComparator(new NumberStringComparator());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -448,20 +450,21 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         for (int displayedIndex = 0; displayedIndex < jxtOverview1.getRowCount(); ++displayedIndex) {
             final int modelIndex = jxtOverview1.convertRowIndexToModel(displayedIndex);
 
-            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(modelIndex);
+            final CidsBean flaecheBean = ((GrafikPreviewTableModel)jxtOverview1.getModel()).getCidsBeanByIndex(
+                    modelIndex);
 
             final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
             final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
@@ -488,7 +491,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             }
         }
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -575,10 +578,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     public void recalculateAreaOfFlaechen() {
         final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<CidsBean>();
 
-        final TableSorter sort = new TableSorter(getModel());
-        sort.setSortingStatus(1, TableSorter.ASCENDING);
-        for (int index = 0; index < getModel().getRowCount(); ++index) {
-            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(sort.getSortedIndex(index));
+        for (int index = 0; index < jxtOverview.getRowCount(); ++index) {
+            final CidsBean flaecheBean = getModel().getCidsBeanByIndex(jxtOverview.convertRowIndexToModel(index));
             toCorrectFlaecheBeans.add(flaecheBean);
         }
 
@@ -869,7 +870,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
             switch (columnIndex) {
                 case 0: {
-                    return cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
                 }
                 case 1: {
                     return oldGrafik;
