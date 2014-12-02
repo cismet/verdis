@@ -217,7 +217,6 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
     public void removeBean(final CidsBean cidsBean) {
         if (cidsBean != null) {
             try {
-                getAllBeans().remove(cidsBean);
                 model.removeCidsBean(cidsBean);
                 unbackupBean(cidsBean);
                 Main.getMappingComponent()

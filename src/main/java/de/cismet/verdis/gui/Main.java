@@ -338,6 +338,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
+    private javax.swing.JButton cmdArbeitspakete;
     private javax.swing.JButton cmdCancel;
     private javax.swing.JButton cmdCopy;
     private javax.swing.JButton cmdCut;
@@ -1652,6 +1653,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
+        cmdArbeitspakete = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2143,6 +2145,36 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdGrundbuchblattSuche);
+
+        cmdArbeitspakete.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/workdone.png"))); // NOI18N
+        cmdArbeitspakete.setFocusable(false);
+        cmdArbeitspakete.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdArbeitspakete.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdArbeitspakete.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdArbeitspaketeActionPerformed(evt);
+                }
+            });
+        try {
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            cmdFortfuehrung.setVisible(false);
+        }
+        tobVerdis.add(cmdArbeitspakete);
+        try {
+            cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.arbeitspaketemanager.dialog") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            cmdArbeitspakete.setVisible(false);
+        }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3573,6 +3605,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             regenFlaechenTabellenPanel.recalculateAreaOfFlaechen();
         }
     }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdArbeitspaketeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdArbeitspaketeActionPerformed
+        ArbeitspaketeManagerPanel.getInstance().loadArbeitspakete();
+        StaticSwingTools.showDialog(ArbeitspaketeManagerPanel.getInstance().getDialog());
+    }                                                                                    //GEN-LAST:event_cmdArbeitspaketeActionPerformed
 
     /**
      * DOCUMENT ME!

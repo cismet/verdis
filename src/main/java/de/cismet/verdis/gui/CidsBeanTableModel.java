@@ -29,8 +29,6 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.cismet.cids.custom.util.CidsBeanSupport;
-
 import de.cismet.cids.dynamics.CidsBean;
 
 /**
@@ -51,6 +49,7 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
     private List<CidsBean> cidsBeans;
     private final String[] columnNames;
     private final Class[] columnClasses;
+    private final List<CidsBean> removedCidsBeans = new ArrayList<CidsBean>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -97,6 +96,7 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
      * @param  cidsBeans  DOCUMENT ME!
      */
     public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        removedCidsBeans.clear();
         this.cidsBeans = cidsBeans;
         fireTableDataChanged();
     }
@@ -184,10 +184,21 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
     public void removeCidsBean(final CidsBean cidsBean) {
         try {
             cidsBean.delete();
+            cidsBeans.remove(cidsBean);
+            removedCidsBeans.add(cidsBean);
             fireTableDataChanged();
         } catch (Exception ex) {
             LOG.error("error while deleting bean", ex);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getRemovedCidsBeans() {
+        return new ArrayList<CidsBean>(removedCidsBeans);
     }
 
     /**
