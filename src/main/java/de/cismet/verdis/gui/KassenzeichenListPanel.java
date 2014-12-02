@@ -693,53 +693,53 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstKassenzeichenMouseClicked
+    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lstKassenzeichenMouseClicked
         if (jButton1.isEnabled() && (evt.getClickCount() == 2) && !CidsAppBackend.getInstance().isEditable()) {
             if (lstKassenzeichen.getSelectedValue() != null) {
                 gotoSelectedKassenzeichen();
             }
         }
-    }//GEN-LAST:event_lstKassenzeichenMouseClicked
+    }                                                                                //GEN-LAST:event_lstKassenzeichenMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstKassenzeichenValueChanged
+    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstKassenzeichenValueChanged
         final int count = lstKassenzeichen.getSelectedIndices().length;
         jProgressBar1.setIndeterminate(false);
         jProgressBar1.setValue(0);
         jProgressBar1.setString(count + " Kassenzeichen ausgewählt");
         updateButtons();
-    }//GEN-LAST:event_lstKassenzeichenValueChanged
+    }                                                                                           //GEN-LAST:event_lstKassenzeichenValueChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         gotoSelectedKassenzeichen();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         for (final Object entry : lstKassenzeichen.getSelectedValuesList()) {
             ((DefaultListModel)lstKassenzeichen.getModel()).removeElement(entry);
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         StaticSwingTools.showDialog(new KassenzeichenAddDialog(new KassenzeichenAddDialogListener() {
 
                     @Override
@@ -747,16 +747,16 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                         addOneKassenzeichenToList(kassenzeichennummer, false);
                     }
                 }));
-    }//GEN-LAST:event_jButton2ActionPerformed
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteActionPerformed
+    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteActionPerformed
         StaticSwingTools.showDialog(jDialog1);
-    }//GEN-LAST:event_cmdPasteActionPerformed
+    }                                                                            //GEN-LAST:event_cmdPasteActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -833,16 +833,16 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         final Collection<CidsBean> clipboardBeans = new ArrayList<CidsBean>();
         for (int i = 0; i < jList1.getModel().getSize(); i++) {
             clipboardBeans.add((CidsBean)jList1.getModel().getElementAt(i));
@@ -874,23 +874,23 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    } //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    } //GEN-LAST:event_jCheckBox2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jComboBox1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void jComboBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jComboBox1ActionPerformed
         updateButtons();
 
         final CidsBean selectedItem = (CidsBean)jComboBox1.getSelectedItem();
@@ -906,20 +906,20 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 lstKassenzeichen.setModel(tmpModel);
             }
         }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    } //GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton8ActionPerformed
         final CidsBean selectedItem = (CidsBean)jComboBox1.getSelectedItem();
         setButtonsEnabled(false);
         reloadArbeitsPakete();
         jComboBox1.setSelectedItem(selectedItem);
         setButtonsEnabled(true);
-    }//GEN-LAST:event_jButton8ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -971,44 +971,57 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         final int max = lstKassenzeichen.getSelectedIndices().length;
+        final boolean checked = jToggleButton1.isSelected();
+        setButtonsEnabled(false);
         jProgressBar1.setIndeterminate(false);
         jProgressBar1.setMaximum(max);
-        final List<CidsBean> tmpList = new ArrayList<CidsBean>();
-        for (final int index : lstKassenzeichen.getSelectedIndices()) {
-            final CidsBean kassenzeichenNummer = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
-            new SwingWorker<CidsBean, Object>() {
 
-                    @Override
-                    protected CidsBean doInBackground() throws Exception {
+        final int[] selectedIndices = lstKassenzeichen.getSelectedIndices();
+        new SwingWorker<Void, Object>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    int count = 0;
+                    for (final int index : selectedIndices) {
+                        final int tmpCount = ++count;
+                        final CidsBean kassenzeichenNummer = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
                         kassenzeichenNummer.setProperty(
                             ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET,
-                            jToggleButton1.isSelected());
-                        return kassenzeichenNummer.persist();
-                    }
+                            checked);
+                        final CidsBean persistedBean = kassenzeichenNummer.persist();
 
-                    @Override
-                    protected void done() {
-                        try {
-                            final CidsBean persistedBean = get();
-                            tmpList.add(persistedBean);
-                            final int tmpCount = tmpList.size();
-                            jProgressBar1.setString((tmpCount) + "/" + max + " Kassenzeichen markiert");
-                            jProgressBar1.setValue(tmpCount);
-                            ((DefaultListModel)lstKassenzeichen.getModel()).setElementAt(persistedBean, index);
-                        } catch (final Exception ex) {
-                            LOG.warn(ex, ex);
-                            CidsAppBackend.getInstance()
-                                    .showError(
-                                        "Fehler",
-                                        "Beim Speichern des Arbeitspakets-Status kam es zu einem Fehler",
-                                        ex);
-                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    ((DefaultListModel)lstKassenzeichen.getModel()).setElementAt(persistedBean, index);
+                                    jProgressBar1.setString((tmpCount) + "/" + max + " Kassenzeichen markiert");
+                                    jProgressBar1.setValue(tmpCount);
+                                }
+                            });
                     }
-                }.execute();
-        }
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (final Exception ex) {
+                        LOG.warn(ex, ex);
+                        CidsAppBackend.getInstance()
+                                .showError(
+                                    "Fehler",
+                                    "Beim Speichern des Arbeitspakets-Status kam es zu einem Fehler",
+                                    ex);
+                    } finally {
+                        setButtonsEnabled(true);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
