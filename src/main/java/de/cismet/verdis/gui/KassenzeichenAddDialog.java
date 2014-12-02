@@ -181,16 +181,16 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jFormattedTextField1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jFormattedTextField1ActionPerformed
+    private void jFormattedTextField1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextField1ActionPerformed
         jButton7ActionPerformed(evt);
-    }                                                                                        //GEN-LAST:event_jFormattedTextField1ActionPerformed
+    }//GEN-LAST:event_jFormattedTextField1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         jProgressBar3.setIndeterminate(true);
         new SwingWorker<CidsBean, Void>() {
 
@@ -224,7 +224,7 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
                     jProgressBar3.setIndeterminate(false);
                 }
             }.execute();
-    } //GEN-LAST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_jButton7ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -253,7 +253,7 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         dispose();
-    }                                                                            //GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_jButton6ActionPerformed
 }
