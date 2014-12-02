@@ -13,7 +13,7 @@ package de.cismet.verdis.gui;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public interface KassenzeichenListDialogListener {
+public interface KassenzeichenAddDialogListener {
 
     //~ Methods ----------------------------------------------------------------
 

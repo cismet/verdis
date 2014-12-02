@@ -33,7 +33,7 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final KassenzeichenListDialogListener listener;
+    private final KassenzeichenAddDialogListener listener;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton6;
@@ -51,7 +51,7 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
      *
      * @param  listener  DOCUMENT ME!
      */
-    public KassenzeichenAddDialog(final KassenzeichenListDialogListener listener) {
+    public KassenzeichenAddDialog(final KassenzeichenAddDialogListener listener) {
         initComponents();
         getRootPane().setDefaultButton(jButton6);
         jFormattedTextField1.requestFocus();
