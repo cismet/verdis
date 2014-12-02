@@ -63,6 +63,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
 
+import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
@@ -409,6 +410,21 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             crossReferences.add(crossReference);
         }
         return crossReferences;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   serverSearch  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Collection<Object> executeCustomServerSearch(final CidsServerSearch serverSearch)
+            throws ConnectionException {
+        final Collection collection = getProxy().customServerSearch(getSession().getUser(), serverSearch);
+        return collection;
     }
 
     /**
@@ -879,6 +895,31 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             LOG.error("Fehler beim anlegen der Sperre", ex);
             throw ex;
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public List<CidsBean> getArbeitspakete() throws ConnectionException {
+        final List<CidsBean> allArbeitspakete = new ArrayList<CidsBean>();
+        final MetaClass mcArbeitspaket = ClassCacheMultiple.getMetaClass(
+                DOMAIN,
+                VerdisMetaClassConstants.MC_ARBEITSPAKET);
+
+        final String query = "SELECT " + mcArbeitspaket.getId() + ", " + ArbeitspaketPropertyConstants.PROP__ID
+                    + " FROM " + mcArbeitspaket.getTableName() + " ORDER BY ID ASC;";
+
+        final MetaObject[] mos = proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(), query, DOMAIN);
+
+        for (final MetaObject mo : mos) {
+            allArbeitspakete.add(mo.getBean());
+        }
+
+        return allArbeitspakete;
     }
 
     /**

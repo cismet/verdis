@@ -341,7 +341,6 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jDialog1.setTitle(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenTabellenPanel.class,
                 "RegenFlaechenTabellenPanel.jDialog1.title")); // NOI18N
-        jDialog1.setMinimumSize(new java.awt.Dimension(600, 400));
         jDialog1.setModal(true);
         jDialog1.setResizable(false);
         jDialog1.getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -366,7 +365,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
 
-        jButton1.setText(org.openide.util.NbBundle.getMessage(
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(
                 RegenFlaechenTabellenPanel.class,
                 "RegenFlaechenTabellenPanel.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -378,7 +379,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             });
         jPanel1.add(jButton1);
 
-        jButton2.setText(org.openide.util.NbBundle.getMessage(
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
                 RegenFlaechenTabellenPanel.class,
                 "RegenFlaechenTabellenPanel.jButton2.text")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -403,7 +406,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jLabel1.setBackground(Color.YELLOW);
         jLabel1.setForeground(Color.BLACK);
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(
                 RegenFlaechenTabellenPanel.class,
                 "RegenFlaechenTabellenPanel.jLabel1.text")); // NOI18N
         jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -413,7 +418,9 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         jLabel3.setBackground(Color.RED.brighter().brighter().brighter());
         jLabel3.setForeground(Color.WHITE);
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText(org.openide.util.NbBundle.getMessage(
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel3,
+            org.openide.util.NbBundle.getMessage(
                 RegenFlaechenTabellenPanel.class,
                 "RegenFlaechenTabellenPanel.jLabel3.text")); // NOI18N
         jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
