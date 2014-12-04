@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.connection.SessionManager;
+
 import Sirius.util.collections.MultiMap;
 
 import org.apache.log4j.Logger;
@@ -18,9 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
@@ -42,9 +46,12 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.ClipboardListener;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.ArbeitspaketEintragPropertyConstants;
+import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import static de.cismet.verdis.CidsAppBackend.Mode.ALLGEMEIN;
 import static de.cismet.verdis.CidsAppBackend.Mode.ESW;
@@ -70,6 +77,8 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private CidsBean cidsBean;
     private volatile MultiMap lockMap = new MultiMap();
     private final HashMap<CidsBean, Color> bgColorMap = new HashMap<CidsBean, Color>();
+    private DefaultListModel nullListModel = new DefaultListModel();
+    private boolean buttonsEnabled = true;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdPaste;
@@ -78,32 +87,31 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JDialog jDialog1;
-    private javax.swing.JDialog jDialog2;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JDialog jDialog3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JProgressBar jProgressBar2;
-    private javax.swing.JProgressBar jProgressBar3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JList lstKassenzeichen;
     // End of variables declaration//GEN-END:variables
 
@@ -114,51 +122,109 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      */
     private KassenzeichenListPanel() {
         initComponents();
-        jList1.setCellRenderer(new DefaultListCellRenderer() {
 
-                @Override
-                public Component getListCellRendererComponent(final JList<?> list,
-                        final Object value,
-                        final int index,
-                        final boolean isSelected,
-                        final boolean cellHasFocus) {
-                    final Component comp = super.getListCellRendererComponent(
-                            list,
-                            value,
-                            index,
-                            false,
-                            false);
-                    if (comp instanceof JLabel) {
-                        ((JLabel)comp).setText(
-                            Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
-                                    + ":"
-                                    + ((JLabel)comp).getText());
-                    }
-                    return comp;
-                }
-            });
-        jList2.setCellRenderer(new DefaultListCellRenderer() {
+        try {
+            lstKassenzeichen.setCellRenderer(new DefaultListCellRenderer() {
 
-                @Override
-                public Component getListCellRendererComponent(final JList<?> list,
-                        final Object value,
-                        final int index,
-                        final boolean isSelected,
-                        final boolean cellHasFocus) {
-                    final Component comp = super.getListCellRendererComponent(
-                            list,
-                            value,
-                            index,
-                            false,
-                            false);
-                    final Color bgColor = bgColorMap.get((CidsBean)value);
-                    if (bgColor != null) {
-                        setBackground(bgColor);
+                    @Override
+                    public Component getListCellRendererComponent(final JList list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final JLabel renderer = (JLabel)super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus);
+
+                        if (value instanceof CidsBean) {
+                            final CidsBean cidsBean = (CidsBean)value;
+                            renderer.setText(
+                                Integer.toString(
+                                    (Integer)cidsBean.getProperty(
+                                        ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER)));
+                            final Boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
+                                    ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+                            if ((istAbgearbeitet != null) && istAbgearbeitet) {
+                                renderer.setEnabled(false);
+                            }
+                        }
+                        return renderer;
                     }
-                    return comp;
-                }
-            });
-        searchFinished(null);
+                });
+
+            jList1.setCellRenderer(new DefaultListCellRenderer() {
+
+                    @Override
+                    public Component getListCellRendererComponent(final JList<?> list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final Component comp = super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                false,
+                                false);
+                        if (comp instanceof JLabel) {
+                            ((JLabel)comp).setText(
+                                Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
+                                        + ":"
+                                        + ((JLabel)comp).getText());
+                        }
+                        return comp;
+                    }
+                });
+            jList2.setCellRenderer(new DefaultListCellRenderer() {
+
+                    @Override
+                    public Component getListCellRendererComponent(final JList<?> list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final Component comp = super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                false,
+                                false);
+                        final Color bgColor = bgColorMap.get((CidsBean)value);
+                        if (bgColor != null) {
+                            setBackground(bgColor);
+                        }
+                        return comp;
+                    }
+                });
+
+            jComboBox1.setRenderer(new DefaultListCellRenderer() {
+
+                    @Override
+                    public Component getListCellRendererComponent(final JList list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final JLabel label = (JLabel)super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus);
+                        if (value == null) {
+                            label.setText("temporäre Kassenzeichenliste");
+                        }
+                        return label;
+                    }
+                });
+            searchFinished(null);
+            reloadArbeitsPakete();
+        } catch (final Exception ex) {
+            LOG.warn(ex, ex);
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -220,22 +286,21 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         jScrollPane3 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList();
         jLabel2 = new javax.swing.JLabel();
-        jDialog2 = new javax.swing.JDialog();
-        jPanel8 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
-        jProgressBar3 = new javax.swing.JProgressBar();
-        jButton7 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        jDialog3 = new javax.swing.JDialog();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstKassenzeichen = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
         jPanel1 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jCheckBox1 = new javax.swing.JCheckBox();
         cmdPaste = new javax.swing.JButton();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jPanel9 = new javax.swing.JPanel();
+        jComboBox1 = new javax.swing.JComboBox();
+        jButton8 = new javax.swing.JButton();
+        jPanel10 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         jDialog1.setTitle(org.openide.util.NbBundle.getMessage(
                 KassenzeichenListPanel.class,
@@ -382,112 +447,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jDialog1.getContentPane().add(jPanel3, gridBagConstraints);
 
-        jDialog2.setTitle(org.openide.util.NbBundle.getMessage(
-                KassenzeichenListPanel.class,
-                "KassenzeichenListPanel.jDialog2.title")); // NOI18N
-        jDialog2.setMaximumSize(new java.awt.Dimension(260, 130));
-        jDialog2.setMinimumSize(new java.awt.Dimension(260, 130));
-        jDialog2.setModal(true);
-        jDialog2.setPreferredSize(new java.awt.Dimension(260, 130));
-        jDialog2.setResizable(false);
-        jDialog2.getContentPane().setLayout(new java.awt.GridBagLayout());
-
-        jPanel8.setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel3,
-            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jLabel3.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        jPanel8.add(jLabel3, gridBagConstraints);
-
-        try {
-            jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
-                    new javax.swing.text.MaskFormatter("########")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jFormattedTextField1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
-        jPanel8.add(jFormattedTextField1, gridBagConstraints);
-
-        jProgressBar3.setString(org.openide.util.NbBundle.getMessage(
-                KassenzeichenListPanel.class,
-                "KassenzeichenListPanel.jProgressBar3.string")); // NOI18N
-        jProgressBar3.setStringPainted(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        jPanel8.add(jProgressBar3, gridBagConstraints);
-
-        jButton7.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));                              // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton7,
-            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton7.text")); // NOI18N
-        jButton7.setDisabledIcon(null);
-        jButton7.setDisabledSelectedIcon(null);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton7ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        jPanel8.add(jButton7, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton6,
-            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton6.text")); // NOI18N
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton6ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        jPanel8.add(jButton6, gridBagConstraints);
-        jDialog2.getRootPane().setDefaultButton(jButton6);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jDialog2.getContentPane().add(jPanel8, gridBagConstraints);
-
-        jDialog2.getRootPane().setDefaultButton(jButton6);
-
         setLayout(new java.awt.GridBagLayout());
 
-        lstKassenzeichen.setModel(new DefaultListModel());
+        lstKassenzeichen.setModel(nullListModel);
         lstKassenzeichen.addMouseListener(new java.awt.event.MouseAdapter() {
 
                 @Override
@@ -506,30 +468,12 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane2, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton1,
-            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jButton1, gridBagConstraints);
 
         jProgressBar1.setBorderPainted(false);
         jProgressBar1.setString(org.openide.util.NbBundle.getMessage(
@@ -539,8 +483,8 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         add(jProgressBar1, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -550,8 +494,14 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton2,
             org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton2.text")); // NOI18N
+        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jButton2.toolTipText"));                                                         // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
         jButton2.setDisabledIcon(null);
         jButton2.setDisabledSelectedIcon(null);
+        jButton2.setFocusPainted(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -560,8 +510,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         jPanel1.add(jButton2, gridBagConstraints);
@@ -571,8 +522,14 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton3,
             org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton3.text")); // NOI18N
+        jButton3.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jButton3.toolTipText"));                                                         // NOI18N
+        jButton3.setBorderPainted(false);
+        jButton3.setContentAreaFilled(false);
         jButton3.setDisabledIcon(null);
         jButton3.setDisabledSelectedIcon(null);
+        jButton3.setFocusPainted(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -581,30 +538,19 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel1.add(jButton3, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jCheckBox1,
-            org.openide.util.NbBundle.getMessage(
-                KassenzeichenListPanel.class,
-                "KassenzeichenListPanel.jCheckBox1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jCheckBox1, gridBagConstraints);
 
         cmdPaste.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
         cmdPaste.setToolTipText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenListPanel.class,
                 "KassenzeichenListPanel.cmdPaste.toolTipText"));                              // NOI18N
-        cmdPaste.setEnabled(false);
+        cmdPaste.setBorderPainted(false);
+        cmdPaste.setContentAreaFilled(false);
         cmdPaste.setFocusPainted(false);
         cmdPaste.setMaximumSize(new java.awt.Dimension(28, 28));
         cmdPaste.setMinimumSize(new java.awt.Dimension(28, 28));
@@ -619,13 +565,127 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         jPanel1.add(cmdPaste, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox1,
+            org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jCheckBox1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(jCheckBox1, gridBagConstraints);
+
+        jToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/workdone.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jToggleButton1,
+            org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jToggleButton1.text"));                                                          // NOI18N
+        jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jToggleButton1.toolTipText"));                                                   // NOI18N
+        jToggleButton1.setBorderPainted(false);
+        jToggleButton1.setContentAreaFilled(false);
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jToggleButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        jPanel1.add(jToggleButton1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 1.0;
         add(jPanel1, gridBagConstraints);
+
+        jPanel9.setLayout(new java.awt.GridBagLayout());
+
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jComboBox1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jPanel9.add(jComboBox1, gridBagConstraints);
+
+        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/postion.png")));        // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton8,
+            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton8.text")); // NOI18N
+        jButton8.setToolTipText(org.openide.util.NbBundle.getMessage(
+                KassenzeichenListPanel.class,
+                "KassenzeichenListPanel.jButton8.toolTipText"));                                                         // NOI18N
+        jButton8.setBorderPainted(false);
+        jButton8.setContentAreaFilled(false);
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton8ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel9.add(jButton8, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        add(jPanel9, gridBagConstraints);
+
+        jPanel10.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(KassenzeichenListPanel.class, "KassenzeichenListPanel.jButton1.text")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jPanel10.add(jButton1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        add(jPanel10, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -648,7 +708,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      */
     private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstKassenzeichenValueChanged
         final int count = lstKassenzeichen.getSelectedIndices().length;
-        jProgressBar1.setString(count + " Kassenzeichen markiert");
+        jProgressBar1.setIndeterminate(false);
+        jProgressBar1.setValue(0);
+        jProgressBar1.setString(count + " Kassenzeichen ausgewählt");
         updateButtons();
     }                                                                                           //GEN-LAST:event_lstKassenzeichenValueChanged
 
@@ -678,9 +740,14 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * @param  evt  DOCUMENT ME!
      */
     private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
-        jFormattedTextField1.requestFocus();
-        StaticSwingTools.showDialog(jDialog2);
-    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
+        StaticSwingTools.showDialog(new KassenzeichenAddDialog(new KassenzeichenAddDialogListener() {
+
+                    @Override
+                    public void kassenzeichennummerAdded(final Integer kassenzeichennummer) {
+                        addOneKassenzeichenToList(kassenzeichennummer, false);
+                    }
+                }));
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -823,87 +890,145 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
-        jDialog2.setVisible(false);
-    }                                                                            //GEN-LAST:event_jButton6ActionPerformed
+    private void jComboBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jComboBox1ActionPerformed
+        updateButtons();
+
+        final CidsBean selectedItem = (CidsBean)jComboBox1.getSelectedItem();
+
+        if (selectedItem == null) {
+            lstKassenzeichen.setModel(nullListModel);
+        } else {
+            final DefaultListModel tmpModel = new DefaultListModel();
+            for (final CidsBean element
+                        : selectedItem.getBeanCollectionProperty(
+                            ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN)) {
+                tmpModel.addElement(element);
+                lstKassenzeichen.setModel(tmpModel);
+            }
+        }
+    } //GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
-        jProgressBar3.setIndeterminate(true);
-        new SwingWorker<CidsBean, Void>() {
+    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton8ActionPerformed
+        final CidsBean selectedItem = (CidsBean)jComboBox1.getSelectedItem();
+        setButtonsEnabled(false);
+        reloadArbeitsPakete();
+        jComboBox1.setSelectedItem(selectedItem);
+        setButtonsEnabled(true);
+    }                                                                            //GEN-LAST:event_jButton8ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  buttonsEnabled  DOCUMENT ME!
+     */
+    private void setButtonsEnabled(final boolean buttonsEnabled) {
+        this.buttonsEnabled = buttonsEnabled;
+        updateButtons();
+    }
+    /**
+     * DOCUMENT ME!
+     */
+    private void reloadArbeitsPakete() {
+        final String query = "SELECT "
+                    + CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ARBEITSPAKET).getId()
+                    + ", " + VerdisMetaClassConstants.MC_ARBEITSPAKET + ".id "
+                    + "FROM " + VerdisMetaClassConstants.MC_ARBEITSPAKET + " "
+                    + "WHERE fk_user = " + SessionManager.getSession().getUser().getId() + ";";
+        ((DefaultComboBoxModel)jComboBox1.getModel()).removeAllElements();
+        ((DefaultComboBoxModel)jComboBox1.getModel()).addElement(null);
+        jComboBox1.getModel().setSelectedItem(null);
+        new SwingWorker<Collection<CidsBean>, Void>() {
 
                 @Override
-                protected CidsBean doInBackground() throws Exception {
-                    final CidsBean cidsBean = CidsAppBackend.getInstance()
-                                .loadKassenzeichenByNummer(Integer.parseInt((String)jFormattedTextField1.getValue()));
-                    return cidsBean;
+                protected Collection<CidsBean> doInBackground() throws Exception {
+                    final Collection<CidsBean> cbs = CidsAppBackend.getInstance().getBeansByQuery(query);
+                    return cbs;
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        final CidsBean kassenzeichenBean = get();
-                        if (kassenzeichenBean != null) {
-                            addOneKassenzeichenToList((Integer)kassenzeichenBean.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER),
-                                false);
-                            jFormattedTextField1.setValue(null);
-                        } else {
-                            flashSearchField(Color.red);
+                        final Collection<CidsBean> cbs = get();
+                        for (final CidsBean cb : cbs) {
+                            ((DefaultComboBoxModel)jComboBox1.getModel()).addElement(cb);
                         }
                     } catch (final Exception ex) {
-                        LOG.info(ex, ex);
-                        flashSearchField(Color.red);
+                        LOG.warn(ex, ex);
                         CidsAppBackend.getInstance()
-                                .showError(
-                                    "Fehler beim Laden",
-                                    "Beim Laden des Kassenzeichens ist ein Fehler aufgetreten.",
-                                    ex);
+                                .showError("Fehler", "Beim Laden der Arbeitspakete kam es zu einem Fehler.", ex);
                     }
-                    jProgressBar3.setIndeterminate(false);
                 }
             }.execute();
-    } //GEN-LAST:event_jButton7ActionPerformed
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jFormattedTextField1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jFormattedTextField1ActionPerformed
-        jButton7ActionPerformed(evt);
-    }                                                                                        //GEN-LAST:event_jFormattedTextField1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
+        final int max = lstKassenzeichen.getSelectedIndices().length;
+        final boolean checked = jToggleButton1.isSelected();
+        setButtonsEnabled(false);
+        jProgressBar1.setIndeterminate(false);
+        jProgressBar1.setMaximum(max);
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  c  DOCUMENT ME!
-     */
-    public void flashSearchField(final java.awt.Color c) {
-        jFormattedTextField1.setBackground(c);
-
-        final java.awt.event.ActionListener timerAction = new java.awt.event.ActionListener() {
+        final int[] selectedIndices = lstKassenzeichen.getSelectedIndices();
+        new SwingWorker<Void, Object>() {
 
                 @Override
-                public void actionPerformed(final java.awt.event.ActionEvent event) {
-                    jFormattedTextField1.setBackground(javax.swing.UIManager.getDefaults().getColor(
-                            "TextField.background"));
-                }
-            };
+                protected Void doInBackground() throws Exception {
+                    int count = 0;
+                    for (final int index : selectedIndices) {
+                        final int tmpCount = ++count;
+                        final CidsBean kassenzeichenNummer = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
+                        kassenzeichenNummer.setProperty(
+                            ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET,
+                            checked);
+                        final CidsBean persistedBean = kassenzeichenNummer.persist();
 
-        final javax.swing.Timer timer = new javax.swing.Timer(250, timerAction);
-        timer.setRepeats(false);
-        timer.start();
-    }
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    ((DefaultListModel)lstKassenzeichen.getModel()).setElementAt(persistedBean, index);
+                                    jProgressBar1.setString((tmpCount) + "/" + max + " Kassenzeichen markiert");
+                                    jProgressBar1.setValue(tmpCount);
+                                }
+                            });
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (final Exception ex) {
+                        LOG.warn(ex, ex);
+                        CidsAppBackend.getInstance()
+                                .showError(
+                                    "Fehler",
+                                    "Beim Speichern des Arbeitspakets-Status kam es zu einem Fehler",
+                                    ex);
+                    } finally {
+                        setButtonsEnabled(true);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      */
     public void searchStarted() {
+        setButtonsEnabled(false);
+        jComboBox1.setSelectedItem(null);
         setKassenzeichenList(null);
         jProgressBar1.setString("Kassenzeichen werden gesucht...");
         jProgressBar1.setIndeterminate(true);
@@ -931,6 +1056,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
             }
         }
         addManyKassenzeichenToList(kassenzeichenList);
+        setButtonsEnabled(true);
     }
 
     /**
@@ -968,7 +1094,23 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * @param  removeOld          DOCUMENT ME!
      */
     private void addManyKassenzeichenToList(final List<Integer> kassenzeichenList, final boolean removeOld) {
-        final int count = setKassenzeichenList(kassenzeichenList, removeOld);
+        final List<CidsBean> kassenzeichennummern = new ArrayList<CidsBean>();
+        for (final Integer kassenzeichen : kassenzeichenList) {
+            final CidsBean newBean = CidsAppBackend.getInstance()
+                        .getVerdisMetaClass(
+                            VerdisMetaClassConstants.MC_ARBEITSPAKET_EINTRAG)
+                        .getEmptyInstance()
+                        .getBean();
+            try {
+                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER, kassenzeichen);
+                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET, false);
+            } catch (Exception ex) {
+                LOG.warn(ex, ex);
+            }
+            kassenzeichennummern.add(newBean);
+        }
+
+        final int count = setKassenzeichenList(kassenzeichennummern, removeOld);
         jProgressBar1.setIndeterminate(false);
         jProgressBar1.setValue(0);
         if (count > 0) {
@@ -994,9 +1136,13 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      * DOCUMENT ME!
      */
     private void gotoSelectedKassenzeichen() {
-        final Integer kassenzeichen = (Integer)lstKassenzeichen.getSelectedValue();
-        if (kassenzeichen != null) {
-            CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
+        final CidsBean arbeitspaketEintrag = (CidsBean)lstKassenzeichen.getSelectedValue();
+        if (arbeitspaketEintrag != null) {
+            final Integer kassenzeichen = (Integer)arbeitspaketEintrag.getProperty(
+                    ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            if (kassenzeichen != null) {
+                CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
+            }
         }
     }
 
@@ -1007,28 +1153,38 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      *
      * @return  DOCUMENT ME!
      */
-    private int setKassenzeichenList(final List<Integer> kassenzeichenList) {
+    private int setKassenzeichenList(final List<CidsBean> kassenzeichenList) {
         return setKassenzeichenList(kassenzeichenList, !jCheckBox1.isSelected());
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenList  DOCUMENT ME!
-     * @param   removeOld          DOCUMENT ME!
+     * @param   kassenzeichennummern  DOCUMENT ME!
+     * @param   removeOld             DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private int setKassenzeichenList(final List<Integer> kassenzeichenList, final boolean removeOld) {
+    private int setKassenzeichenList(final List<CidsBean> kassenzeichennummern, final boolean removeOld) {
         final DefaultListModel model = (DefaultListModel)lstKassenzeichen.getModel();
         int counter = 0;
         if (removeOld) {
             model.removeAllElements();
         }
         final ArrayList<Integer> indices = new ArrayList<Integer>();
-        if ((kassenzeichenList != null) && !kassenzeichenList.isEmpty()) {
-            Collections.sort(kassenzeichenList);
-            for (final Integer kassenzeichen : kassenzeichenList) {
+        if ((kassenzeichennummern != null) && !kassenzeichennummern.isEmpty()) {
+            Collections.sort(kassenzeichennummern, new Comparator<CidsBean>() {
+
+                    @Override
+                    public int compare(final CidsBean o1, final CidsBean o2) {
+                        final Integer i1 = (Integer)o1.getProperty(
+                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                        final Integer i2 = (Integer)o2.getProperty(
+                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                        return i1.compareTo(i2);
+                    }
+                });
+            for (final CidsBean kassenzeichen : kassenzeichennummern) {
                 if (!model.contains(kassenzeichen)) {
                     model.addElement(kassenzeichen);
                 }
@@ -1071,12 +1227,30 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      */
     public void updateButtons() {
         final int count = lstKassenzeichen.getSelectedIndices().length;
-        jButton1.setEnabled(!CidsAppBackend.getInstance().isEditable() && (count == 1));
-        jButton2.setEnabled(!CidsAppBackend.getInstance().isEditable());
-        jButton3.setEnabled((count > 0) && !CidsAppBackend.getInstance().isEditable());
-        cmdPaste.setEnabled(!lstKassenzeichen.getSelectionModel().isSelectionEmpty()
+        jComboBox1.setSelectedItem(buttonsEnabled);
+
+        jButton1.setEnabled(buttonsEnabled && !CidsAppBackend.getInstance().isEditable() && (count == 1));
+        jButton2.setEnabled(buttonsEnabled && (jComboBox1.getSelectedItem() == null)
+                    && !CidsAppBackend.getInstance().isEditable());
+        jButton3.setEnabled(buttonsEnabled && (jComboBox1.getSelectedItem() == null) && (count > 0)
+                    && !CidsAppBackend.getInstance().isEditable());
+        cmdPaste.setEnabled(buttonsEnabled && !lstKassenzeichen.getSelectionModel().isSelectionEmpty()
                     && Main.getInstance().getCurrentClipboard().isPastable());
-        jCheckBox1.setEnabled(!CidsAppBackend.getInstance().isEditable());
+
+        final Object value = lstKassenzeichen.getSelectedValue();
+        if (value instanceof CidsBean) {
+            final CidsBean cidsBean = (CidsBean)value;
+
+            final Boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
+                    ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+            jToggleButton1.setSelected((istAbgearbeitet != null) && istAbgearbeitet);
+        }
+
+        jToggleButton1.setEnabled(buttonsEnabled && (value instanceof CidsBean)
+                    && (jComboBox1.getSelectedItem() != null));
+
+        jCheckBox1.setEnabled(buttonsEnabled && (jComboBox1.getSelectedItem() == null)
+                    && !CidsAppBackend.getInstance().isEditable());
     }
 
     @Override
