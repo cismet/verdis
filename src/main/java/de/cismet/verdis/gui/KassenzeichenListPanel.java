@@ -241,19 +241,6 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         return INSTANCE;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Collection<Integer> getKassenzeichen() {
-        final Integer[] temp = new Integer[lstKassenzeichen.getModel().getSize()];
-        for (int i = 0; i < lstKassenzeichen.getModel().getSize(); i++) {
-            temp[i] = (Integer)lstKassenzeichen.getModel().getElementAt(i);
-        }
-        return Arrays.asList(temp);
-    }
-
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled); // To change body of generated methods, choose Tools | Templates.
@@ -1478,7 +1465,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
 
                     ((DefaultListModel)jList2.getModel()).clear();
                     for (final int index : lstKassenzeichen.getSelectedIndices()) {
-                        final Integer kassenzeichenNummer = (Integer)lstKassenzeichen.getModel().getElementAt(index);
+                        final CidsBean arbeitspaketEintrag = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
+                        final Integer kassenzeichenNummer = (Integer)arbeitspaketEintrag.getProperty(
+                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
                         kassenzeichenToLockOrRelease.add(kassenzeichenNummer);
                     }
 
