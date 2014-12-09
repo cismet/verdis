@@ -316,7 +316,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
     private final DokumentenPanel dokPanel = new DokumentenPanel();
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
-    private final KassenzeichenListPanel kassenzeichenListPanel = KassenzeichenListPanel.getInstance();
+    private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
     private final KanaldatenPanel kanaldatenPanel = new KanaldatenPanel();
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
     private final AllgemeineInfosPanel allgInfosPanel = new AllgemeineInfosPanel();
@@ -955,17 +955,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 @Override
                 public void propertyChange(final PropertyChangeEvent evt) {
                     if (evt.getPropertyName().equals(ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED)) {
-                        KassenzeichenListPanel.getInstance().searchStarted();
+                        kassenzeichenListPanel.searchStarted();
                     } else if (evt.getPropertyName().equals(
                                     ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE)) {
                         final Collection<Integer> kassenzeichenNummern = (Collection<Integer>)evt.getNewValue();
-                        KassenzeichenListPanel.getInstance().searchFinished(kassenzeichenNummern);
+                        kassenzeichenListPanel.searchFinished(kassenzeichenNummern);
                     } else if (evt.getPropertyName().equals(
                                     ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED)) {
                         final Exception ex = (Exception)evt.getNewValue();
                         LOG.error("error while searching kassenzeichen", ex);
                         final String exMessage = ex.getMessage();
-                        KassenzeichenListPanel.getInstance().searchFailed(exMessage);
+                        kassenzeichenListPanel.searchFailed(exMessage);
                     }
                 }
             });
