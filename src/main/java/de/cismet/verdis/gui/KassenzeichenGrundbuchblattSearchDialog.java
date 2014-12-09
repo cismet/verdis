@@ -20,7 +20,6 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTReader;
 
 import org.apache.commons.lang.StringUtils;
@@ -102,12 +101,12 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
-        kassenzeichenGeomSearchPanel1 = KassenzeichenListPanel.getInstance();
+        kassenzeichenGeomSearchPanel1 = new KassenzeichenListPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         cmdLagisCrossover1 = new javax.swing.JButton();
-        jProgressBar1 = KassenzeichenListPanel.getInstance().getProgressBar();
+        jProgressBar1 = kassenzeichenGeomSearchPanel1.getProgressBar();
 
         setTitle("Suche über Grundbuchblatt");
         getContentPane().setLayout(new java.awt.GridBagLayout());
