@@ -2561,13 +2561,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     }
                     final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
-                    try {
-                        cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
-                            null);
-                    } catch (Exception ex) {
-                        LOG.error("error while removing geometry", ex);
-                    }
 
                     try {
                         CidsAppBackend.getInstance().setLastSplitFlaecheId(cb.getMetaObject().getId());
@@ -2575,14 +2568,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                         LOG.error("error while saving last FlaecheQuerverweise", ex);
                     }
                 }
-                final Feature[] f_arr = pf.split();
-                if (f_arr != null) {
-                    mappingComp.getFeatureCollection().removeFeature(pf.getFeature());
+                final Feature f_split = pf.split();
+                if (f_split != null) {
                     final boolean editable = CidsAppBackend.getInstance().isEditable();
-                    f_arr[0].setEditable(editable);
-                    f_arr[1].setEditable(editable);
-                    mappingComp.getFeatureCollection().addFeature(f_arr[0]);
-                    mappingComp.getFeatureCollection().addFeature(f_arr[1]);
+                    f_split.setEditable(editable);
+                    mappingComp.getFeatureCollection().addFeature(f_split);
                     cmdAttachPolyToAlphadataActionPerformed(null);
                 }
             }
