@@ -1217,7 +1217,31 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                         GrundbuchblattSucheDialog.getInstance().setEnabled(true);
                         Main.getInstance().refreshKassenzeichenButtons();
                         if (edit) {
-                            Main.getInstance().setEditMode(true);
+                            WaitDialog.getInstance().showDialog();
+                            new SwingWorker<Boolean, Void>() {
+
+                                    @Override
+                                    protected Boolean doInBackground() throws Exception {
+                                        if (Main.getInstance().acquireLocks()) { // try to acquire
+                                            return true;
+                                        }
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void done() {
+                                        try {
+                                            final Boolean enableEditing = get();
+                                            if (enableEditing != null) {
+                                                Main.getInstance().setEditMode(enableEditing);
+                                            }
+                                        } catch (final Exception ex) {
+                                            LOG.error(ex, ex);
+                                        } finally {
+                                            WaitDialog.getInstance().dispose();
+                                        }
+                                    }
+                                }.execute();
                         }
                     }
                 }.execute();

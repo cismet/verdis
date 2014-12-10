@@ -3232,7 +3232,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private boolean acquireLocks() {
+    public boolean acquireLocks() {
         try {
             CidsAppBackend.getInstance().acquireLocks();
             return true;
@@ -3330,7 +3330,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    private void releaseLocks() {
+    public void releaseLocks() {
         try {
             CidsAppBackend.getInstance().releaseLocks();
         } catch (final Exception ex) {
@@ -3735,7 +3735,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             try {
                                 final Integer kassenzeichenNummer = get();
                                 if (kassenzeichenNummer != null) {
-                                    CidsAppBackend.getInstance().gotoKassenzeichen(newKassenzeichennummer);
+                                    CidsAppBackend.getInstance().gotoKassenzeichenAndEdit(newKassenzeichennummer);
                                 } else {
                                     JOptionPane.showMessageDialog(
                                         Main.this,
