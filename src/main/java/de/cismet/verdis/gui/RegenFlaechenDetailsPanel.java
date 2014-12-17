@@ -911,7 +911,7 @@ public class RegenFlaechenDetailsPanel extends AbstractDetailsPanel {
      * DOCUMENT ME!
      */
     public synchronized void updateCrossReferences() {
-        if (flaecheBean != null) {
+        if ((flaecheBean != null) && (flaecheBean.getProperty("id") != null)) {
             new SwingWorker<String, Void>() {
 
                     @Override
