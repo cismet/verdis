@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
 
+import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Converter;
 
 import org.openide.util.Exceptions;
@@ -99,6 +100,25 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     private final Validator bindingValidator;
     private CidsBean lastStrasseBean = null;
 
+    private final Binding cboSrKlasseBinding;
+    private final Binding cboWdPrioBinding;
+
+    private final ActionListener wdLageActionListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                updateLageWdCbo();
+            }
+        };
+
+    private final ActionListener srLageActionListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                updateLageSrCbo();
+            }
+        };
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanWdsrDetails;
     private javax.swing.JComboBox cboLageSR;
@@ -148,6 +168,9 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      */
     public WDSRDetailsPanel() {
         initComponents();
+
+        cboSrKlasseBinding = bindingGroup.getBinding("frontinfo.sr_klasse_or");
+        cboWdPrioBinding = bindingGroup.getBinding("frontinfo.wd_prio_or");
 
         ((DefaultBindableReferenceCombo)cboStrasse).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisMetaClassConstants.MC_STRASSE));
@@ -517,18 +540,13 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         cboSR.setToolTipText(org.openide.util.NbBundle.getMessage(
                 WDSRDetailsPanel.class,
                 "WDSRDetailsPanel.cboSR.toolTipText")); // NOI18N
+        cboSR.addActionListener(new java.awt.event.ActionListener() {
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_klasse_or}"),
-                cboSR,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
-                "sr_klasse_or");
-        binding.setSourceNullValue(null);
-        binding.setSourceUnreadableValue(null);
-        bindingGroup.addBinding(binding);
-
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cboSRActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -626,18 +644,13 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         cboWD.setToolTipText(org.openide.util.NbBundle.getMessage(
                 WDSRDetailsPanel.class,
                 "WDSRDetailsPanel.cboWD.toolTipText")); // NOI18N
+        cboWD.addActionListener(new java.awt.event.ActionListener() {
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_prio_or}"),
-                cboWD,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
-                "frontinfo.wd_prio_or");
-        binding.setSourceNullValue(null);
-        binding.setSourceUnreadableValue(null);
-        bindingGroup.addBinding(binding);
-
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cboWDActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 13;
@@ -821,18 +834,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         cboLageSR.setToolTipText(org.openide.util.NbBundle.getMessage(
                 WDSRDetailsPanel.class,
                 "WDSRDetailsPanel.cboLageSR.toolTipText")); // NOI18N
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_sr}"),
-                cboLageSR,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
-                "frontinfo.lage_sr");
-        binding.setSourceNullValue(null);
-        binding.setSourceUnreadableValue(null);
-        bindingGroup.addBinding(binding);
-
         cboLageSR.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -1039,8 +1040,25 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
-        updateLageDependendCbos();
-    }                                                                             //GEN-LAST:event_cboLageSRActionPerformed
+        try {
+            final CidsBean oldLageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final CidsBean newLageSRBean = (CidsBean)cboLageSR.getSelectedItem();
+
+            if (((oldLageSRBean != null) && !oldLageSRBean.equals(newLageSRBean))
+                        || ((newLageSRBean != null) && !newLageSRBean.equals(oldLageSRBean))) {
+                getCidsBean().setProperty(
+                    FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_SR,
+                    cboLageSR.getSelectedItem());
+            }
+        } catch (Exception ex) {
+            LOG.warn(ex, ex);
+        }
+        updateLageSrCbo();
+    } //GEN-LAST:event_cboLageSRActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1048,8 +1066,73 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageWDActionPerformed
-        updateLageDependendCbos();
-    }                                                                             //GEN-LAST:event_cboLageWDActionPerformed
+        try {
+            final CidsBean oldLageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
+            final CidsBean newLageWDBean = (CidsBean)cboLageWD.getSelectedItem();
+
+            if (((oldLageWDBean != null) && !oldLageWDBean.equals(newLageWDBean))
+                        || ((newLageWDBean != null) && !newLageWDBean.equals(oldLageWDBean))) {
+                getCidsBean().setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD,
+                    cboLageWD.getSelectedItem());
+            }
+        } catch (Exception ex) {
+            LOG.warn(ex, ex);
+        }
+        updateLageWdCbo();
+    } //GEN-LAST:event_cboLageWDActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cboSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboSRActionPerformed
+        if (getCidsBean() != null) {
+            try {
+                final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                if (lageSRBean == null) {
+                    getCidsBean().setProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+                        cboSR.getSelectedItem());
+                }
+            } catch (Exception ex) {
+                LOG.warn(ex, ex);
+            }
+            updateLageSrCbo();
+        }
+    }                                                                         //GEN-LAST:event_cboSRActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cboWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboWDActionPerformed
+        if (getCidsBean() != null) {
+            try {
+                final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_WD);
+                if (lageWDBean == null) {
+                    getCidsBean().setProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
+                        cboWD.getSelectedItem());
+                }
+            } catch (Exception ex) {
+                LOG.warn(ex, ex);
+            }
+            updateLageWdCbo();
+        }
+    }                                                                         //GEN-LAST:event_cboWDActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1163,7 +1246,8 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
             LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
             bpanWdsrDetails.setBackgroundEnabled(false);
         }
-        updateLageDependendCbos();
+        updateLageSrCbo();
+        updateLageWdCbo();
         updateCrossReferences();
         attachBeanValidators();
     }
@@ -1227,29 +1311,46 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     /**
      * DOCUMENT ME!
      */
-    private void updateLageDependendCbos() {
+    private void updateLageSrCbo() {
         if (getCidsBean() != null) {
-            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
-            if (lageWDBean != null) {
-                cboWD.setSelectedItem(lageWDBean.getProperty("wd_prio"));
-            }
-            cboWD.setEnabled(isEnabled() && (lageWDBean == null)
-                        && getMultiBeanHelper().isValuesAllEquals(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD));
-
             final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__LAGE_SR);
             if (lageSRBean != null) {
                 cboSR.setSelectedItem(lageSRBean.getProperty("sr_klasse"));
+            } else {
+                cboSR.setSelectedItem((CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
             }
             cboSR.setEnabled(isEnabled() && (lageSRBean == null)
                         && getMultiBeanHelper().isValuesAllEquals(
                             FrontPropertyConstants.PROP__FRONTINFO
                             + "."
                             + FrontinfoPropertyConstants.PROP__LAGE_SR));
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void updateLageWdCbo() {
+        if (getCidsBean() != null) {
+            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
+            if (lageWDBean != null) {
+                cboWD.setSelectedItem(lageWDBean.getProperty("wd_prio"));
+            } else {
+                cboWD.setSelectedItem((CidsBean)getCidsBean().getProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
+            }
+            cboWD.setEnabled(isEnabled() && (lageWDBean == null)
+                        && getMultiBeanHelper().isValuesAllEquals(
+                            FrontPropertyConstants.PROP__FRONTINFO
+                            + "."
+                            + FrontinfoPropertyConstants.PROP__LAGE_WD));
         }
     }
 
