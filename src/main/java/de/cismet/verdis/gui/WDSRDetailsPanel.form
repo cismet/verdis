@@ -161,13 +161,9 @@
               <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.cboSR.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.sr_klasse_or}" target="cboSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
-              <Property name="nullValue" type="java.lang.Object" value="null"/>
-              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
-              <Property name="name" type="java.lang.String" value="sr_klasse_or"/>
-            </BindingProperty>
-          </BindingProperties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboSRActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
           </AuxValues>
@@ -292,13 +288,9 @@
               <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.cboWD.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.wd_prio_or}" target="cboWD" targetPath="selectedItem" updateStrategy="0" immediately="false">
-              <Property name="nullValue" type="java.lang.Object" value="null"/>
-              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
-              <Property name="name" type="java.lang.String" value="frontinfo.wd_prio_or"/>
-            </BindingProperty>
-          </BindingProperties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboWDActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
           </AuxValues>
@@ -491,13 +483,6 @@
               <ResourceString bundle="de/cismet/verdis/gui/Bundle.properties" key="WDSRDetailsPanel.cboLageSR.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <BindingProperties>
-            <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.frontinfo.lage_sr}" target="cboLageSR" targetPath="selectedItem" updateStrategy="0" immediately="false">
-              <Property name="nullValue" type="java.lang.Object" value="null"/>
-              <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
-              <Property name="name" type="java.lang.String" value="frontinfo.lage_sr"/>
-            </BindingProperty>
-          </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboLageSRActionPerformed"/>
           </Events>
