@@ -813,12 +813,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     getMappingComponent().getInputListener(MappingComponent.SPLIT_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
-                    kartenPanel,
-                    "featureDeleteRequested",
-                    DeleteFeatureListener.FEATURE_DELETE_REQUEST_NOTIFICATION,
-                    getMappingComponent().getInputListener(MappingComponent.REMOVE_POLYGON));
-        PNotificationCenter.defaultCenter()
-                .addListener(
                     this,
                     "attachFeatureRequested",
                     AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
