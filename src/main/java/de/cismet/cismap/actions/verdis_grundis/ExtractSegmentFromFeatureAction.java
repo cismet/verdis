@@ -108,43 +108,45 @@ public class ExtractSegmentFromFeatureAction extends AbstractAction implements C
         double distance = Double.MAX_VALUE;
         final Feature nearestFeature = null;
         for (final Feature feature : allFeatures) {
-            final Point actionPoint = new Point(
-                    coordinate,
-                    feature.getGeometry().getPrecisionModel(),
-                    feature.getGeometry().getSRID());
-            distance = feature.getGeometry().getBoundary().distance(actionPoint);
+            if (feature instanceof InheritsLayerProperties) {
+                final Point actionPoint = new Point(
+                        coordinate,
+                        feature.getGeometry().getPrecisionModel(),
+                        feature.getGeometry().getSRID());
+                distance = feature.getGeometry().getBoundary().distance(actionPoint);
 
-            final Collection<LineString> lineStrings = new ArrayList<LineString>();
+                final Collection<LineString> lineStrings = new ArrayList<LineString>();
 
-            if (feature.getGeometry() instanceof LineString) {
-                lineStrings.add((LineString)feature.getGeometry());
-            } else if (feature.getGeometry() instanceof MultiLineString) {
-                final MultiLineString mls = (MultiLineString)feature.getGeometry();
-                for (int i = 0; i < mls.getNumGeometries(); i++) {
-                    lineStrings.add((LineString)mls.getGeometryN(i));
+                if (feature.getGeometry() instanceof LineString) {
+                    lineStrings.add((LineString)feature.getGeometry());
+                } else if (feature.getGeometry() instanceof MultiLineString) {
+                    final MultiLineString mls = (MultiLineString)feature.getGeometry();
+                    for (int i = 0; i < mls.getNumGeometries(); i++) {
+                        lineStrings.add((LineString)mls.getGeometryN(i));
+                    }
+                } else if (feature.getGeometry() instanceof Polygon) {
+                    lineStrings.add((LinearRing)feature.getGeometry().getBoundary());
+                } else if (feature.getGeometry() instanceof MultiPolygon) {
+                    final MultiLineString mls = (MultiLineString)feature.getGeometry().getBoundary();
+                    for (int i = 0; i < mls.getNumGeometries(); i++) {
+                        lineStrings.add((LineString)mls.getGeometryN(i));
+                    }
                 }
-            } else if (feature.getGeometry() instanceof Polygon) {
-                lineStrings.add((LinearRing)feature.getGeometry().getBoundary());
-            } else if (feature.getGeometry() instanceof MultiPolygon) {
-                final MultiLineString mls = (MultiLineString)feature.getGeometry().getBoundary();
-                for (int i = 0; i < mls.getNumGeometries(); i++) {
-                    lineStrings.add((LineString)mls.getGeometryN(i));
-                }
-            }
-            for (final LineString ls : lineStrings) {
-                for (int j = 0; j < ls.getCoordinates().length; j++) {
-                    final Coordinate a = ls.getCoordinateN(j);
-                    final Coordinate b = ((j + 1) < ls.getCoordinates().length) ? ls.getCoordinateN(j + 1)
-                                                                                : ls.getCoordinateN(0);
+                for (final LineString ls : lineStrings) {
+                    for (int j = 0; j < ls.getCoordinates().length; j++) {
+                        final Coordinate a = ls.getCoordinateN(j);
+                        final Coordinate b = ((j + 1) < ls.getCoordinates().length) ? ls.getCoordinateN(j + 1)
+                                                                                    : ls.getCoordinateN(0);
 
-                    final LineSegment segment = new LineSegment(a, b);
-                    final double segmentDistance = segment.distance(coordinate);
-                    if (segmentDistance <= distance) {
-                        nearestSegment = new LineString(
-                                new Coordinate[] { a, b },
-                                feature.getGeometry().getPrecisionModel(),
-                                feature.getGeometry().getSRID());
-                        distance = segmentDistance;
+                        final LineSegment segment = new LineSegment(a, b);
+                        final double segmentDistance = segment.distance(coordinate);
+                        if (segmentDistance <= distance) {
+                            nearestSegment = new LineString(
+                                    new Coordinate[] { a, b },
+                                    feature.getGeometry().getPrecisionModel(),
+                                    feature.getGeometry().getSRID());
+                            distance = segmentDistance;
+                        }
                     }
                 }
             }
