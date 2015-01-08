@@ -77,6 +77,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -149,7 +151,6 @@ import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
-import de.cismet.cismap.commons.gui.piccolo.eventlistener.DeleteFeatureListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.FeatureMoveListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.JoinPolygonsListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
@@ -260,6 +261,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     //~ Instance fields --------------------------------------------------------
 
+    final WindowAdapter loadLayoutWhenOpenedAdapter = new WindowAdapter() {
+
+            @Override
+            public void windowOpened(final WindowEvent e) {
+                final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+
+                if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
+                    setupLayoutInfo();
+                } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
+                    setupLayoutWDSR();
+                } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
+                    setupLayoutRegen();
+                }
+                removeWindowListener(loadLayoutWhenOpenedAdapter);
+            }
+        };
+
     private boolean loggedIn = false;
 
     private final Collection<String> veranlagungBezeichners = new ArrayList<String>();
@@ -316,6 +334,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
     private final DokumentenPanel dokPanel = new DokumentenPanel();
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
+
     private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
     private final KanaldatenPanel kanaldatenPanel = new KanaldatenPanel();
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
@@ -755,7 +774,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (Throwable t) {
             LOG.error("Fehler im Konstruktor", t);
         }
-        isInit = false;
 
         final MappingComponent mainMap = CidsAppBackend.getInstance().getMainMap();
         configurationManager.configure(mappingModel);
@@ -837,6 +855,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         initGeomServerSearches();
 
         initVeranlagung();
+
+        addWindowListener(loadLayoutWhenOpenedAdapter);
+
+        isInit = false;
     }
 
     /**
@@ -1257,18 +1279,20 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void appModeChanged() {
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-        if (currentMode != null) {
+        if ((currentMode != null) && !isInit) {
             saveLayout(FILEPATH_LAYOUT + "." + currentMode.name());
             saveConfig(FILEPATH_MAP + "." + currentMode.name());
         }
 
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-            setupLayoutInfo();
-        } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
-            setupLayoutWDSR();
-        } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
-            setupLayoutRegen();
+        if (!isInit) {
+            if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
+                setupLayoutInfo();
+            } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
+                setupLayoutWDSR();
+            } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
+                setupLayoutRegen();
+            }
         }
         currentMode = mode;
         refreshClipboardButtons();
@@ -2634,28 +2658,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @throws  Exception  DOCUMENT ME!
      */
     public void loadLayout(final String file) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Load Layout.. from " + file);
-        }
-        final File layoutFile = new File(file);
-
-        final FileInputStream layoutInput = new FileInputStream(layoutFile);
-        final ObjectInputStream in = new ObjectInputStream(layoutInput);
-        rootWindow.read(in);
-        in.close();
-        rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
-        rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-        if (isInit) {
-            final int count = viewMap.getViewCount();
-            for (int i = 0; i < count; i++) {
-                final View current = viewMap.getViewAtIndex(i);
-                if ((current != null) && current.isUndocked()) {
-                    current.dock();
-                }
+        if (!isInit) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Load Layout.. from " + file);
             }
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Loading Layout successfull");
+            final File layoutFile = new File(file);
+
+            final FileInputStream layoutInput = new FileInputStream(layoutFile);
+            final ObjectInputStream in = new ObjectInputStream(layoutInput);
+            rootWindow.read(in);
+            in.close();
+            rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
+            rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Loading Layout successfull");
+            }
         }
     }
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -2675,46 +2692,48 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  file  DOCUMENT ME!
      */
     public void saveLayout(final String file) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Saving Layout.. to " + file);
-        }
-        final File layoutFile = new File(file);
-        try {
-            if (!layoutFile.exists()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Saving Layout.. File does not exit");
-                }
-                final File verdisDir = new File(DIRECTORYPATH_VERDIS);
-                if (!verdisDir.exists()) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Verdis Directory angelegt");
-                    }
-                    verdisDir.mkdir();
-                }
-                layoutFile.createNewFile();
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Saving Layout.. File does exit");
-                }
-            }
-            final FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
-            final ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
-            setLeftTitleBarColor(myBlue);
-            rootWindow.write(out);
-            out.flush();
-            out.close();
+        if (!isInit) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Saving Layout.. to " + file + " successfull");
+                LOG.debug("Saving Layout.. to " + file);
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(
-                this,
-                java.util.ResourceBundle.getBundle("de/cismet/verdis/res/i18n/Bundle").getString(
-                    "CismapPlugin.InfoNode.saving_layout_failure"),
-                java.util.ResourceBundle.getBundle("de/cismet/verdis/res/i18n/Bundle").getString(
-                    "CismapPlugin.InfoNode.message_title"),
-                JOptionPane.INFORMATION_MESSAGE);
-            LOG.error("A failure occured during writing the layout file", ex);
+            final File layoutFile = new File(file);
+            try {
+                if (!layoutFile.exists()) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Saving Layout.. File does not exit");
+                    }
+                    final File verdisDir = new File(DIRECTORYPATH_VERDIS);
+                    if (!verdisDir.exists()) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Verdis Directory angelegt");
+                        }
+                        verdisDir.mkdir();
+                    }
+                    layoutFile.createNewFile();
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Saving Layout.. File does exit");
+                    }
+                }
+                final FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
+                final ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
+                setLeftTitleBarColor(myBlue);
+                rootWindow.write(out);
+                out.flush();
+                out.close();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Saving Layout.. to " + file + " successfull");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    java.util.ResourceBundle.getBundle("de/cismet/verdis/res/i18n/Bundle").getString(
+                        "CismapPlugin.InfoNode.saving_layout_failure"),
+                    java.util.ResourceBundle.getBundle("de/cismet/verdis/res/i18n/Bundle").getString(
+                        "CismapPlugin.InfoNode.message_title"),
+                    JOptionPane.INFORMATION_MESSAGE);
+                LOG.error("A failure occured during writing the layout file", ex);
+            }
         }
     }
 
@@ -4822,7 +4841,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (Exception ex) {
             LOG.fatal("Fehler beim Capturen des App-Inhaltes", ex);
         }
-        super.dispose();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Dispose: Verdis wird beendet.");
         }
@@ -4840,6 +4858,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         saveLayout(FILEPATH_LAYOUT + "." + currentMode);
         saveConfig(FILEPATH_MAP + "." + currentMode);
         allClipboardsDeleteStoreFile();
+        super.dispose();
         System.exit(0);
     }
 
