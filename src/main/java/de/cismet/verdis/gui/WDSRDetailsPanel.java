@@ -100,25 +100,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     private final Validator bindingValidator;
     private CidsBean lastStrasseBean = null;
 
-    private final Binding cboSrKlasseBinding;
-    private final Binding cboWdPrioBinding;
-
-    private final ActionListener wdLageActionListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent evt) {
-                updateLageWdCbo();
-            }
-        };
-
-    private final ActionListener srLageActionListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent evt) {
-                updateLageSrCbo();
-            }
-        };
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanWdsrDetails;
     private javax.swing.JComboBox cboLageSR;
@@ -168,9 +149,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      */
     public WDSRDetailsPanel() {
         initComponents();
-
-        cboSrKlasseBinding = bindingGroup.getBinding("frontinfo.sr_klasse_or");
-        cboWdPrioBinding = bindingGroup.getBinding("frontinfo.wd_prio_or");
 
         ((DefaultBindableReferenceCombo)cboStrasse).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisMetaClassConstants.MC_STRASSE));
@@ -1054,6 +1032,14 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                             + FrontinfoPropertyConstants.PROP__LAGE_SR,
                     cboLageSR.getSelectedItem());
             }
+            if ((oldLageSRBean != null) && (newLageSRBean == null)) {
+                for (int index = 0; index < cboSR.getItemCount(); index++) {
+                    final CidsBean sr = (CidsBean)cboSR.getItemAt(index);
+                    if ((sr != null) && (sr.getProperty("key") == null)) {
+                        cboSR.setSelectedItem(sr);
+                    }
+                }
+            }
         } catch (Exception ex) {
             LOG.warn(ex, ex);
         }
@@ -1077,6 +1063,14 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                 getCidsBean().setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__LAGE_WD,
                     cboLageWD.getSelectedItem());
+            }
+            if ((oldLageWDBean != null) && (newLageWDBean == null)) {
+                for (int index = 0; index < cboWD.getItemCount(); index++) {
+                    final CidsBean wd = (CidsBean)cboWD.getItemAt(index);
+                    if ((wd != null) && (wd.getProperty("key") == null)) {
+                        cboWD.setSelectedItem(wd);
+                    }
+                }
             }
         } catch (Exception ex) {
             LOG.warn(ex, ex);
