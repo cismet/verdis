@@ -881,7 +881,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
 
                         final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd = new ArrayList<CidsBean>();
                         for (final CidsBean alkisLandparcelBean : alkisLandparcelBeans) {
-                            final String bezeichnung = (String)alkisLandparcelBean.getProperty("bezeichnung");
+                            final String bezeichnung = (String)alkisLandparcelBean.getProperty("alkis_id");
                             final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
                                     "geometrie.geo_field");
 
@@ -1392,7 +1392,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 final CidsBean bean = (CidsBean)value;
                 final Component comp = super.getListCellRendererComponent(
                         list,
-                        bean.getProperty("bezeichnung"),
+                        bean.getProperty("alkis_id"),
                         index,
                         isSelected,
                         cellHasFocus);
