@@ -720,7 +720,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    private static String implode(final Object[] stringArray, final String delimiter) {
+    public static String implode(final Object[] stringArray, final String delimiter) {
         if (stringArray.length == 0) {
             return "";
         } else {
