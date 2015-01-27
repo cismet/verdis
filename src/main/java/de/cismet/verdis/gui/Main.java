@@ -20,12 +20,26 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.search.dynamic.SearchDialog;
+import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.DescriptionPaneFS;
+import Sirius.navigator.ui.LayoutedContainer;
+import Sirius.navigator.ui.MutableMenuBar;
+import Sirius.navigator.ui.MutablePopupMenu;
+import Sirius.navigator.ui.MutableToolBar;
+import Sirius.navigator.ui.attributes.AttributeViewer;
+import Sirius.navigator.ui.attributes.editor.AttributeEditor;
+import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.SearchResultsTree;
 
+import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
@@ -132,6 +146,9 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.search.QuerySearchResultsAction;
+import de.cismet.cids.search.QuerySearchResultsActionDialog;
+
 import de.cismet.cismap.commons.CidsLayerFactory;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
@@ -178,7 +195,9 @@ import de.cismet.tools.configuration.ConfigurationManager;
 
 import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
+import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.tools.gui.startup.StaticStartupTools;
 
@@ -220,6 +239,7 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
+import de.cismet.verdis.server.search.CsvExportSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 
@@ -279,6 +299,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         };
 
     private boolean loggedIn = false;
+
+    private DescriptionPane descriptionPane;
 
     private final Collection<String> veranlagungBezeichners = new ArrayList<String>();
     private final Collection<String> winterdienstBezeichners = new ArrayList<String>();
@@ -354,10 +376,51 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
 
+    private final QuerySearchResultsActionDialog abfrageDialog = new QuerySearchResultsActionDialog(
+            this,
+            false,
+            new QuerySearchResultsAction() {
+
+                @Override
+                public String getName() {
+                    return "nach CSV exportieren";
+                }
+
+                @Override
+                public void doAction() {
+                    final String title = getMetaClass().getName();
+
+                    if (DownloadManagerDialog.showAskingForUserTitle(Main.this)) {
+                        final List<String> header = new ArrayList<String>(getMaiNames().size());
+                        final List<String> fields = new ArrayList<String>(getMaiNames().size());
+                        for (final MemberAttributeInfo mai : getMaiNames().keySet()) {
+                            header.add(getMaiNames().get(mai));
+                            fields.add(mai.getFieldName());
+                        }
+                        final CsvExportSearchStatement search = new CsvExportSearchStatement(
+                                getMetaClass().getTableName(),
+                                fields,
+                                getWhereCause());
+                        DownloadManager.instance()
+                                    .add(
+                                        new CsvExportSearchDownload(
+                                            search,
+                                            title,
+                                            DownloadManagerDialog.getJobname(),
+                                            title,
+                                            header));
+                        final DownloadManagerDialog downloadManagerDialog = DownloadManagerDialog.instance(Main.this);
+                        downloadManagerDialog.pack();
+                        StaticSwingTools.showDialog(downloadManagerDialog);
+                    }
+                }
+            });
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdArbeitspakete;
+    private javax.swing.JButton cmdArbeitspakete1;
     private javax.swing.JButton cmdCancel;
     private javax.swing.JButton cmdCopy;
     private javax.swing.JButton cmdCut;
@@ -547,20 +610,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             initComponents();
             DefaultNavigatorExceptionHandler.getInstance().addListener(exceptionNotificationStatusPanel);
 
-            // dialog for alkis_landparcel
-            final DescriptionPane descriptionPane = new DescriptionPaneFS();
-            ComponentRegistry.registerComponents(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                descriptionPane);
+            // dialog for alkis_landparcel - muss vor initComponentRegistry erzeugt werden
+            initComponentRegistry(this);
+
             alkisRendererDialog = new JDialog(this, false);
             alkisRendererDialog.setTitle("Alkis Renderer");
             alkisRendererDialog.setContentPane(descriptionPane);
@@ -859,6 +911,97 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         addWindowListener(loadLayoutWhenOpenedAdapter);
 
         isInit = false;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   frame  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void initComponentRegistry(final JFrame frame) throws Exception {
+        PropertyManager.getManager().setEditable(true);
+
+        final SearchResultsTree searchResultsTree = new SearchResultsTree() {
+
+                @Override
+                public void setResultNodes(final Node[] nodes,
+                        final boolean append,
+                        final PropertyChangeListener listener,
+                        final boolean simpleSort,
+                        final boolean sortActive) {
+                    super.setResultNodes(nodes, append, listener, simpleSort, false);
+                }
+            };
+
+        descriptionPane = new DescriptionPaneFS();
+        final MutableToolBar toolBar = new MutableToolBar();
+        final MutableMenuBar menuBar = new MutableMenuBar();
+        final LayoutedContainer container = new LayoutedContainer(toolBar, menuBar, true);
+        final AttributeViewer attributeViewer = new AttributeViewer();
+        final AttributeEditor attributeEditor = new AttributeEditor();
+        final SearchDialog searchDialog = null;
+        final MutablePopupMenu popupMenu = new MutablePopupMenu();
+
+        final RootTreeNode rootTreeNode = new RootTreeNode(new Node[0]);
+        final MetaCatalogueTree metaCatalogueTree = new MetaCatalogueTree(
+                rootTreeNode,
+                PropertyManager.getManager().isEditable(),
+                true,
+                PropertyManager.getManager().getMaxConnections());
+
+        ComponentRegistry.registerComponents(
+            frame,
+            container,
+            menuBar,
+            toolBar,
+            popupMenu,
+            metaCatalogueTree,
+            searchResultsTree,
+            attributeViewer,
+            attributeEditor,
+            searchDialog,
+            descriptionPane);
+
+        searchResultsTree.addPropertyChangeListener("browse", new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    final List<Node> nodes = searchResultsTree.getResultNodes();
+                    if (nodes != null) {
+                        new SwingWorker<List<CidsBean>, Void>() {
+
+                            @Override
+                            protected List<CidsBean> doInBackground() throws Exception {
+                                final List<CidsBean> entities = new ArrayList<CidsBean>();
+                                for (final Node node : nodes) {
+                                    if ((node != null) && (node instanceof MetaObjectNode)) {
+                                        final MetaObjectNode moNode = (MetaObjectNode)node;
+                                        final MetaObject mo = moNode.getObject();
+                                        if (mo != null) {
+                                            final CidsBean bean = mo.getBean();
+                                            entities.add(bean);
+                                        }
+                                    }
+                                }
+                                return entities;
+                            }
+
+                            @Override
+                            protected void done() {
+                                List<CidsBean> results = null;
+                                try {
+                                    results = get();
+                                } catch (final Exception ex) {
+                                    LOG.warn("exeption whil building search result treeset", ex);
+                                }
+                                abfrageDialog.setSearchResults(results);
+                            }
+                        }.execute();
+                    }
+                }
+            });
     }
 
     /**
@@ -1672,6 +1815,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
         cmdArbeitspakete = new javax.swing.JButton();
+        cmdArbeitspakete1 = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2185,6 +2329,37 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdArbeitspakete);
+        try {
+            cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.arbeitspaketemanager.dialog") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            cmdArbeitspakete.setVisible(false);
+        }
+
+        cmdArbeitspakete1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/gui/table-export.png"))); // NOI18N
+        cmdArbeitspakete1.setToolTipText("Abfragen-Export (nach CSV)");
+        cmdArbeitspakete1.setFocusable(false);
+        cmdArbeitspakete1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdArbeitspakete1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdArbeitspakete1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdArbeitspakete1ActionPerformed(evt);
+                }
+            });
+        try {
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            cmdFortfuehrung.setVisible(false);
+        }
+        tobVerdis.add(cmdArbeitspakete1);
         try {
             cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(
                     SessionManager.getSession().getUser(),
@@ -3628,6 +3803,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         ArbeitspaketeManagerPanel.getInstance().loadArbeitspakete();
         StaticSwingTools.showDialog(ArbeitspaketeManagerPanel.getInstance().getDialog());
     }                                                                                    //GEN-LAST:event_cmdArbeitspaketeActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdArbeitspakete1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdArbeitspakete1ActionPerformed
+        StaticSwingTools.showDialog(abfrageDialog);
+    }                                                                                     //GEN-LAST:event_cmdArbeitspakete1ActionPerformed
 
     /**
      * DOCUMENT ME!
