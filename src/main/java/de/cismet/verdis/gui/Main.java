@@ -418,9 +418,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
+    private javax.swing.JButton cmdAbfrageeditor;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdArbeitspakete;
-    private javax.swing.JButton cmdArbeitspakete1;
     private javax.swing.JButton cmdCancel;
     private javax.swing.JButton cmdCopy;
     private javax.swing.JButton cmdCut;
@@ -1815,7 +1815,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
         cmdArbeitspakete = new javax.swing.JButton();
-        cmdArbeitspakete1 = new javax.swing.JButton();
+        cmdAbfrageeditor = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2338,17 +2338,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             cmdArbeitspakete.setVisible(false);
         }
 
-        cmdArbeitspakete1.setIcon(new javax.swing.ImageIcon(
+        cmdAbfrageeditor.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/gui/table-export.png"))); // NOI18N
-        cmdArbeitspakete1.setToolTipText("Abfragen-Export (nach CSV)");
-        cmdArbeitspakete1.setFocusable(false);
-        cmdArbeitspakete1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdArbeitspakete1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdArbeitspakete1.addActionListener(new java.awt.event.ActionListener() {
+        cmdAbfrageeditor.setToolTipText("Abfragen-Export (nach CSV)");
+        cmdAbfrageeditor.setFocusable(false);
+        cmdAbfrageeditor.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdAbfrageeditor.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdAbfrageeditor.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdArbeitspakete1ActionPerformed(evt);
+                    cmdAbfrageeditorActionPerformed(evt);
                 }
             });
         try {
@@ -2356,17 +2356,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     SessionManager.getSession().getUser(),
                     "grundis.fortfuehrungsanlaesse.dialog") != null);
         } catch (final Exception ex) {
-            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            LOG.error("error while checking for grundis.abfragennachcsv.dialog", ex);
             cmdFortfuehrung.setVisible(false);
         }
-        tobVerdis.add(cmdArbeitspakete1);
+        tobVerdis.add(cmdAbfrageeditor);
         try {
-            cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(
+            cmdAbfrageeditor.setVisible(SessionManager.getConnection().getConfigAttr(
                     SessionManager.getSession().getUser(),
                     "grundis.arbeitspaketemanager.dialog") != null);
         } catch (final Exception ex) {
-            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
-            cmdArbeitspakete.setVisible(false);
+            LOG.error("error while checking for grundis.abfragennachcsv.dialog", ex);
+            cmdAbfrageeditor.setVisible(false);
         }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3809,9 +3809,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdArbeitspakete1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdArbeitspakete1ActionPerformed
+    private void cmdAbfrageeditorActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAbfrageeditorActionPerformed
         StaticSwingTools.showDialog(abfrageDialog);
-    }                                                                                     //GEN-LAST:event_cmdArbeitspakete1ActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdAbfrageeditorActionPerformed
 
     /**
      * DOCUMENT ME!
