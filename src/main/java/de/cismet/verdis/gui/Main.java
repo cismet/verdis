@@ -393,8 +393,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     if (DownloadManagerDialog.showAskingForUserTitle(Main.this)) {
                         final List<String> header = new ArrayList<String>(getMaiNames().size());
                         final List<String> fields = new ArrayList<String>(getMaiNames().size());
-                        for (final MemberAttributeInfo mai : getMaiNames().keySet()) {
-                            header.add(getMaiNames().get(mai));
+                        for (final MemberAttributeInfo mai : getMais()) {
+                            header.add(getMaiNames().get(mai.getFieldName()));
                             fields.add(mai.getFieldName());
                         }
                         final CsvExportSearchStatement search = new CsvExportSearchStatement(
