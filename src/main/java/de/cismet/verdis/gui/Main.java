@@ -19,6 +19,7 @@ import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
+import Sirius.navigator.downloadmanager.CsvExportSearchDownload;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.search.dynamic.SearchDialog;
@@ -149,6 +150,8 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.search.QuerySearchResultsAction;
 import de.cismet.cids.search.QuerySearchResultsActionDialog;
 
+import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
+
 import de.cismet.cismap.commons.CidsLayerFactory;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.MappingModelEvent;
@@ -239,7 +242,6 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
-import de.cismet.verdis.server.search.CsvExportSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 
@@ -376,45 +378,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private CidsBean kassenzeichenBean;
     private JDialog alkisRendererDialog;
 
-    private final QuerySearchResultsActionDialog abfrageDialog = new QuerySearchResultsActionDialog(
-            this,
-            false,
-            new QuerySearchResultsAction() {
-
-                @Override
-                public String getName() {
-                    return "nach CSV exportieren";
-                }
-
-                @Override
-                public void doAction() {
-                    final String title = getMetaClass().getName();
-
-                    if (DownloadManagerDialog.showAskingForUserTitle(Main.this)) {
-                        final List<String> header = new ArrayList<String>(getMaiNames().size());
-                        final List<String> fields = new ArrayList<String>(getMaiNames().size());
-                        for (final MemberAttributeInfo mai : getMais()) {
-                            header.add(getMaiNames().get(mai.getFieldName()));
-                            fields.add(mai.getFieldName());
-                        }
-                        final CsvExportSearchStatement search = new CsvExportSearchStatement(
-                                getMetaClass().getTableName(),
-                                fields,
-                                getWhereCause());
-                        DownloadManager.instance()
-                                    .add(
-                                        new CsvExportSearchDownload(
-                                            search,
-                                            title,
-                                            DownloadManagerDialog.getJobname(),
-                                            title,
-                                            header));
-                        final DownloadManagerDialog downloadManagerDialog = DownloadManagerDialog.instance(Main.this);
-                        downloadManagerDialog.pack();
-                        StaticSwingTools.showDialog(downloadManagerDialog);
-                    }
-                }
-            });
+    private QuerySearchResultsActionDialog abfrageDialog;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
@@ -612,6 +576,50 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             // dialog for alkis_landparcel - muss vor initComponentRegistry erzeugt werden
             initComponentRegistry(this);
+
+            abfrageDialog = new QuerySearchResultsActionDialog(
+                    this,
+                    false,
+                    new QuerySearchResultsAction() {
+
+                        @Override
+                        public String getName() {
+                            return "nach CSV exportieren";
+                        }
+
+                        @Override
+                        public void doAction() {
+                            final String title = getMetaClass().getName();
+
+                            if (DownloadManagerDialog.showAskingForUserTitle(Main.this)) {
+                                final List<String> header = new ArrayList<String>(getMaiNames().size());
+                                final List<String> fields = new ArrayList<String>(getMaiNames().size());
+                                for (final MemberAttributeInfo mai : getMais()) {
+                                    header.add(getMaiNames().get(mai.getFieldName()));
+                                    fields.add(mai.getFieldName());
+                                }
+                                final CsvExportSearchStatement search = new CsvExportSearchStatement(
+                                        getMetaClass().getTableName(),
+                                        VerdisConstants.DOMAIN,
+                                        fields,
+                                        getWhereCause());
+                                search.setDateFormat("dd.MM.yyyy");
+                                search.setBooleanFormat(new String[] { "nein", "ja" });
+                                DownloadManager.instance()
+                                            .add(
+                                                new CsvExportSearchDownload(
+                                                    search,
+                                                    title,
+                                                    DownloadManagerDialog.getJobname(),
+                                                    title,
+                                                    header));
+                                final DownloadManagerDialog downloadManagerDialog = DownloadManagerDialog.instance(
+                                        Main.this);
+                                downloadManagerDialog.pack();
+                                StaticSwingTools.showDialog(downloadManagerDialog);
+                            }
+                        }
+                    });
 
             alkisRendererDialog = new JDialog(this, false);
             alkisRendererDialog.setTitle("Alkis Renderer");
@@ -963,45 +971,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             attributeEditor,
             searchDialog,
             descriptionPane);
-
-        searchResultsTree.addPropertyChangeListener("browse", new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    final List<Node> nodes = searchResultsTree.getResultNodes();
-                    if (nodes != null) {
-                        new SwingWorker<List<CidsBean>, Void>() {
-
-                            @Override
-                            protected List<CidsBean> doInBackground() throws Exception {
-                                final List<CidsBean> entities = new ArrayList<CidsBean>();
-                                for (final Node node : nodes) {
-                                    if ((node != null) && (node instanceof MetaObjectNode)) {
-                                        final MetaObjectNode moNode = (MetaObjectNode)node;
-                                        final MetaObject mo = moNode.getObject();
-                                        if (mo != null) {
-                                            final CidsBean bean = mo.getBean();
-                                            entities.add(bean);
-                                        }
-                                    }
-                                }
-                                return entities;
-                            }
-
-                            @Override
-                            protected void done() {
-                                List<CidsBean> results = null;
-                                try {
-                                    results = get();
-                                } catch (final Exception ex) {
-                                    LOG.warn("exeption whil building search result treeset", ex);
-                                }
-                                abfrageDialog.setSearchResults(results);
-                            }
-                        }.execute();
-                    }
-                }
-            });
     }
 
     /**
