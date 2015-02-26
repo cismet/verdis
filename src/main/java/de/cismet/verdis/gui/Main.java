@@ -623,6 +623,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         }
                     });
 
+            abfrageDialog.getQuerySearchResultsActionPanel().setDateFormat("dd.MM.yyyy");
+
             alkisRendererDialog = new JDialog(this, false);
             alkisRendererDialog.setTitle("Alkis Renderer");
             alkisRendererDialog.setContentPane(descriptionPane);
