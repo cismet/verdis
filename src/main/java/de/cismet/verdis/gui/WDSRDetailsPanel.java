@@ -1251,22 +1251,27 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      */
     public synchronized void updateCrossReferences() {
         if (frontBean != null) {
+            final CidsBean finalFrontBean = frontBean;
             new SwingWorker<String, Void>() {
 
                     @Override
                     protected String doInBackground() throws Exception {
-                        final Collection<CrossReference> crossReference = (Collection)CidsAppBackend.getInstance()
-                                    .getFrontenCrossReferencesForFrontid((Integer)frontBean.getProperty("id"));
+                        try {
+                            final Collection<CrossReference> crossReference = (Collection)CidsAppBackend.getInstance()
+                                        .getFrontenCrossReferencesForFrontid((Integer)finalFrontBean.getProperty("id"));
 
-                        if (crossReference != null) {
-                            String html = "<html><body><center>";
-                            for (final CrossReference crossreference : crossReference) {
-                                final String link = crossreference.getEntityToKassenzeichen() + ":"
-                                            + crossreference.getEntityToBezeichnung();
-                                html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
+                            if (crossReference != null) {
+                                String html = "<html><body><center>";
+                                for (final CrossReference crossreference : crossReference) {
+                                    final String link = crossreference.getEntityToKassenzeichen() + ":"
+                                                + crossreference.getEntityToBezeichnung();
+                                    html += "<a href=\"" + link + "\"><font size=\"-2\">" + link + "</font></a><br>";
+                                }
+                                html += "</center></body></html>";
+                                return html;
                             }
-                            html += "</center></body></html>";
-                            return html;
+                        } catch (final Exception ex) {
+                            LOG.info(ex, ex);
                         }
                         return null;
                     }
