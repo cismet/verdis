@@ -4409,11 +4409,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         if (CidsAppBackend.getInstance().getAppPreferences().isVeranlagungOnlyForChangedValues()) {
             changedVeranlagungSummeMap = new HashMap<String, Double>();
-            for (final String mapKey : veranlagungsnummern.keySet()) {
-                if ((newVeranlagungSummeMap.get(mapKey) - oldVeranlagungSummeMap.get(mapKey)) != 0.0d) {
-                    changedVeranlagungSummeMap.put(mapKey, newVeranlagungSummeMap.get(mapKey));
-                } else {
-                    changedVeranlagungSummeMap.put(mapKey, null);
+            for (final CidsBean veranlagungsgrundlage : veranlagungsgrundlageMap.values()) {
+                final String bezeichner = (String)veranlagungsgrundlage.getProperty("veranlagungsnummer.bezeichner");
+                if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
+                    changedVeranlagungSummeMap.put(bezeichner, newVeranlagungSummeMap.get(bezeichner));
+//                } else {
+//                    changedVeranlagungSummeMap.put(bezeichner, null);
                 }
             }
         } else {
@@ -4728,8 +4729,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             VeranlagungPropertyConstants.PROP__G999,
             changedVeranlagungSummeMap.get("999-Rest"));
 
-        veranlagungBean.persist();        
-        
+        veranlagungBean.persist();
+
         final CidsBean veranlagungseintragBean = veranlagungseintragMo.getBean();
         veranlagungseintragBean.setProperty(
             VeranlagungseintragPropertyConstants.PROP__KASSENZEICHEN,
@@ -5120,17 +5121,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final MetaObject[] veranlagungsgrundlageMos = CidsAppBackend.getInstance()
                     .getMetaObject(""
                         + "SELECT " + veranlagungsgrundlageMc.getId() + ", grundlage."
-                        + VeranlagungsgrundlagePropertyConstants.PROP__ID
+                        + VeranlagungsgrundlagePropertyConstants.PROP__ID + " "
                         + "FROM " + veranlagungsgrundlageMc.getTableName() + " AS grundlage, "
                         + veranlagungsnummerMc.getTableName() + " AS nummer "
                         + "WHERE grundlage." + VeranlagungsgrundlagePropertyConstants.PROP__VERANLAGUNGSNUMMER
                         + " = nummer." + VeranlagungsnummerPropertyConstants.PROP__ID + " "
-                        + "ORDER BY " + VeranlagungsnummerPropertyConstants.PROP__BEZEICHNER,
+                        + "ORDER BY nummer." + VeranlagungsnummerPropertyConstants.PROP__BEZEICHNER,
                         VerdisConstants.DOMAIN);
 
         final MetaObject[] veranlagungsnummerMos = CidsAppBackend.getInstance()
                     .getMetaObject("SELECT " + veranlagungsnummerMc.getId() + ", "
-                        + VeranlagungsnummerPropertyConstants.PROP__ID
+                        + VeranlagungsnummerPropertyConstants.PROP__ID + " "
                         + "FROM " + veranlagungsnummerMc.getTableName(),
                         VerdisConstants.DOMAIN);
 
@@ -5198,6 +5199,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             } catch (final Exception e) {
                 veranlagungsschluessel = 0;
             }
+
+            final String bezeichner = (String)veranlagungsgrundlageBean.getProperty("veranlagungsnummer.bezeichner");
 
             double groesse;
             if (anteil == null) {
