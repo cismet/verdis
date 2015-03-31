@@ -13,18 +13,11 @@ package de.cismet.verdis.gui;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
 import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
@@ -58,7 +51,7 @@ public class AssessmentDialog extends javax.swing.JDialog {
     private Collection<String> bezeichners;
     private Date datum = null;
     private Date veranlagungsdatum = null;
-    private boolean veranlagungOnlyForChangedValues;
+    private final boolean veranlagungOnlyForChangedValues;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdCancel;
