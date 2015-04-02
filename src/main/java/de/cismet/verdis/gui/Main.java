@@ -5217,8 +5217,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             final double groesseGewichtet = groesse * veranlagungsschluessel;
 
-            final double summeveranlagt = (veranlagungSummeMap.containsKey(mapKey)) ? veranlagungSummeMap.get(mapKey)
-                                                                                    : 0.0d;
+            final double summeveranlagt = (veranlagungSummeMap.containsKey(bezeichner))
+                ? veranlagungSummeMap.get(bezeichner) : 0.0d;
 
             if (groesseGewichtet > 0) {
                 veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesseGewichtet) * 1000) / 1000d);
