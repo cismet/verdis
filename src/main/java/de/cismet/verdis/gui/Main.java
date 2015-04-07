@@ -470,7 +470,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * DOCUMENT ME!
      */
     public void init() {
-        readonly = CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase().equals("readonly");
+        readonly = readonly
+                    || CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase()
+                    .equals("readonly");
 
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
@@ -5639,6 +5641,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     LOG.debug("authentication: tester = :" + tester);
                     LOG.debug("authentication: name = :" + name);
                 }
+                LOG.fatal(tester);
                 if (appPreferences.getRwGroups().contains(tester)) {
                     userString = name;
                     readOnly = false;
