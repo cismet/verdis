@@ -1,0 +1,443 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
+package de.cismet.verdis.gui;
+
+import Sirius.navigator.exception.ConnectionException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import de.cismet.cids.server.actions.DefaultScheduledServerAction;
+import de.cismet.cids.server.actions.ScheduledServerActionManager;
+
+import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.server.action.VeranlagungsdateiScheduledServerAction;
+import de.cismet.verdis.server.search.VeranlagungsdateiScheduledServerActionSearch;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @author   jruiz
+ * @version  $Revision$, $Date$
+ */
+public class VeranlagungsdateiSchedulePanel extends javax.swing.JPanel {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            VeranlagungsdateiSchedulePanel.class);
+
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static enum Status {
+
+        //~ Enum constants -----------------------------------------------------
+
+        RUNNING, FINISHED, ABORTED, EXCEPTION
+    }
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss");
+
+//    private final List<Object[]> serverActions = new ArrayList<Object[]>();
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private de.cismet.cids.editors.DefaultBindableTimestampChooser defaultBindableTimestampChooser1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form AbgabedateiSchedulePanel.
+     */
+    public VeranlagungsdateiSchedulePanel() {
+        initComponents();
+        defaultBindableTimestampChooser1.setTimestamp(new Date());
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void init() {
+//        serverActions.clear();
+        final List<List> coll = new ArrayList<List>();
+        try {
+            final Collection searchResults = CidsAppBackend.getInstance()
+                        .executeCustomServerSearch(new VeranlagungsdateiScheduledServerActionSearch());
+            coll.addAll(searchResults);
+        } catch (final Exception ex) {
+            CidsAppBackend.getInstance()
+                    .showError("Fehler", "Beim Abrufen des laufenden Plans kam es zu einem Fehler", ex);
+        }
+
+        if (coll.isEmpty()) {
+            jButton1.setEnabled(false);
+            jLabel2.setText("<html><i>kein Lauf geplant");
+            jLabel4.setText("<html><i>-");
+        } else {
+            final Date start = (Date)coll.get(0).get(7);
+            final String rule = (String)coll.get(0).get(8);
+            final Date execution;
+            try {
+                execution = ScheduledServerActionManager.calculateExecutionDate(start, rule);
+
+                final String ruleString;
+                if (rule == null) {
+                    ruleString = null;
+                } else if (rule.endsWith(" * * ?")) {
+                    ruleString = "täglich";
+                } else if (rule.endsWith(" * ?")) {
+                    ruleString = "monatlich";
+                } else {
+                    ruleString = "wöchentlich";
+                }
+
+                jButton1.setEnabled(true);
+                jLabel2.setText(format.format(execution));
+                jLabel4.setText(ruleString);
+            } catch (final ParseException ex) {
+                LOG.warn("could not parse rule", ex);
+                jButton1.setEnabled(false);
+                jLabel2.setText("<html><i>kein Lauf geplant");
+                jLabel4.setText("<html><i>-");
+            }
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        defaultBindableTimestampChooser1 = new de.cismet.cids.editors.DefaultBindableTimestampChooser();
+        jComboBox1 = new javax.swing.JComboBox();
+        jButton2 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel2,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jLabel2.text")); // NOI18N
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    jLabel2MouseClicked(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        jPanel2.add(jLabel2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        jPanel2.add(jLabel1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jButton1.text")); // NOI18N
+        jButton1.setPreferredSize(new java.awt.Dimension(80, 30));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel2.add(jButton1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel2.add(defaultBindableTimestampChooser1, gridBagConstraints);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "einmalig", "jede Woche" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel2.add(jComboBox1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        jPanel2.add(jButton2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel3,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
+        jPanel2.add(jLabel3, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel4,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiSchedulePanel.class,
+                "VeranlagungsdateiSchedulePanel.jLabel4.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        jPanel2.add(jLabel4, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 1.0;
+        jPanel2.add(jPanel3, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jPanel2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jPanel1, gridBagConstraints);
+    } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        try {
+            final VeranlagungsdateiScheduledServerAction scheduledServerActionImpl =
+                new VeranlagungsdateiScheduledServerAction();
+
+            final Object selRule = jComboBox1.getSelectedItem();
+
+            final Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            calendar.setTime(defaultBindableTimestampChooser1.getTimestamp());
+
+            final String rule;
+
+            final int sec = 0; // calendar.get(Calendar.SECOND);
+            final int min = calendar.get(Calendar.MINUTE);
+            final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//            final int day = calendar.get(Calendar.DAY_OF_MONTH);
+//            final int month = calendar.get(Calendar.MONTH);
+            final int dow = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+
+            final String[] dowString = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
+
+            if (selRule.equals("jede Woche")) {
+                rule = sec + " " + min + " " + hour + " ? * " + dowString[dow];
+            } else {
+                rule = null;
+            }
+
+//            if (selRule.equals("täglich")) {
+//                rule = sec + " " + min + " " + hour + " * * ?";
+//            } else if (selRule.equals("wöchentlich")) {
+//                rule = sec + " " + min + " " + hour + " ? * " + dowString[dow];
+//            } else if (selRule.equals("monatlich")) {
+//                rule = sec + " " + min + " " + hour + " " + day + " * ?";
+//            } else {
+//                rule = null;
+//            }
+
+            final Object executeTask = CidsAppBackend.getInstance()
+                        .executeServerAction(scheduledServerActionImpl.getTaskName(),
+                            "VERDIS_GRUNDIS",
+                            null,
+                            DefaultScheduledServerAction.createExecutionRuleSAP(rule), // "0 * * * * ?"
+                            DefaultScheduledServerAction.createStartTimeSAP(
+                                defaultBindableTimestampChooser1.getTimestamp()));
+        } catch (final ConnectionException ex) {
+            CidsAppBackend.getInstance().showError("Fehler", "Beim Ausführen des Plans kam es zu einem Fehler", ex);
+        }
+        init();
+//        ((MyTableModel)jTable1.getModel()).refresh();
+    }                 //GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            final VeranlagungsdateiScheduledServerAction scheduledServerActionImpl =
+                new VeranlagungsdateiScheduledServerAction();
+            final Object executeTask = CidsAppBackend.getInstance()
+                        .executeServerAction(scheduledServerActionImpl.getTaskName(),
+                            "VERDIS_GRUNDIS",
+                            null,
+                            DefaultScheduledServerAction.createAbortionSAP());
+        } catch (final ConnectionException ex) {
+            CidsAppBackend.getInstance()
+                    .showError("Fehler", "Beim Abbrechen des laufenden Plans kam es zu einem Fehler", ex);
+        }
+
+        init();
+//        ((MyTableModel)jTable1.getModel()).refresh();
+    } //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jLabel2MouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_jLabel2MouseClicked
+        if (evt.getClickCount() == 2) {
+            init();
+        }
+    }                                                                       //GEN-LAST:event_jLabel2MouseClicked
+
+//    /**
+//     * DOCUMENT ME!
+//     *
+//     * @version  $Revision$, $Date$
+//     */
+//    private class MyTableModel extends DefaultTableModel {
+//
+//        //~ Methods ------------------------------------------------------------
+//
+//        @Override
+//        public Class<?> getColumnClass(final int columnIndex) {
+//            if (columnIndex == 0) {
+//                return Date.class;
+//            } else if (columnIndex == 1) {
+//                return Status.class;
+//            } else if (columnIndex == 2) {
+//                return String.class;
+//            } else {
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        public String getColumnName(final int columnIndex) {
+//            if (columnIndex == 0) {
+//                return "Startdatum";
+//            } else if (columnIndex == 1) {
+//                return "Status";
+//            } else if (columnIndex == 2) {
+//                return "Download";
+//            } else {
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        public Object getValueAt(final int row, final int column) {
+//            final Object[] serverActionRow = serverActions.get(row);
+//            return serverActionRow[column];
+//        }
+//
+//        @Override
+//        public int getRowCount() {
+//            return serverActions.size();
+//        }
+//
+//        @Override
+//        public int getColumnCount() {
+//            return 3;
+//        }
+//
+//        /**
+//         * DOCUMENT ME!
+//         */
+//        public void refresh() {
+//            fireTableDataChanged();
+//        }
+//    }
+}

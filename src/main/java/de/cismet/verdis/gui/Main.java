@@ -409,6 +409,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdTest;
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
+    private javax.swing.JButton cmdVeranlagungsdatei;
     private javax.swing.JButton cmdWorkflow;
     private de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel exceptionNotificationStatusPanel;
     private javax.swing.JMenuBar jMenuBar1;
@@ -1792,6 +1793,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdGrundbuchblattSuche = new javax.swing.JButton();
         cmdArbeitspakete = new javax.swing.JButton();
         cmdAbfrageeditor = new javax.swing.JButton();
+        cmdVeranlagungsdatei = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2248,6 +2250,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         cmdFortfuehrung.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/fortfuehrung.png"))); // NOI18N
+        cmdFortfuehrung.setToolTipText("Fortfuehrung");
         cmdFortfuehrung.setFocusable(false);
         cmdFortfuehrung.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdFortfuehrung.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2286,6 +2289,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         cmdArbeitspakete.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/workdone.png"))); // NOI18N
+        cmdArbeitspakete.setToolTipText("Arbeitspakete verwalten");
         cmdArbeitspakete.setFocusable(false);
         cmdArbeitspakete.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdArbeitspakete.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2343,6 +2347,29 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.abfragennachcsv.dialog", ex);
             cmdAbfrageeditor.setVisible(false);
+        }
+
+        cmdVeranlagungsdatei.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/gui/reports-stack.png"))); // NOI18N
+        cmdVeranlagungsdatei.setToolTipText("Erzeugung Veranlagungsdatei planen");
+        cmdVeranlagungsdatei.setFocusable(false);
+        cmdVeranlagungsdatei.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdVeranlagungsdatei.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdVeranlagungsdatei.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdVeranlagungsdateiActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdVeranlagungsdatei);
+        try {
+            cmdVeranlagungsdatei.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "csa://veranlagungsdatei") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for csa://veranlagungsdatei", ex);
+            cmdVeranlagungsdatei.setVisible(false);
         }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3788,6 +3815,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void cmdAbfrageeditorActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAbfrageeditorActionPerformed
         StaticSwingTools.showDialog(abfrageDialog);
     }                                                                                    //GEN-LAST:event_cmdAbfrageeditorActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdVeranlagungsdateiActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdVeranlagungsdateiActionPerformed
+        VeranlagungsdateiScheduleDialog.getInstance().pack();
+        StaticSwingTools.showDialog(VeranlagungsdateiScheduleDialog.getInstance());
+    }                                                                                        //GEN-LAST:event_cmdVeranlagungsdateiActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -5641,7 +5678,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     LOG.debug("authentication: tester = :" + tester);
                     LOG.debug("authentication: name = :" + name);
                 }
-                LOG.fatal(tester);
                 if (appPreferences.getRwGroups().contains(tester)) {
                     userString = name;
                     readOnly = false;
