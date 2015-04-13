@@ -54,6 +54,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cismap.commons.features.Feature;
@@ -425,6 +426,23 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             throws ConnectionException {
         final Collection collection = getProxy().customServerSearch(getSession().getUser(), serverSearch);
         return collection;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname  DOCUMENT ME!
+     * @param   body      DOCUMENT ME!
+     * @param   params    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Object executeServerAction(final String taskname, final Object body, final ServerActionParameter... params)
+            throws ConnectionException {
+        final Object result = getProxy().executeTask(taskname, domain, body, params);
+        return result;
     }
 
     /**
