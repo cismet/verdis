@@ -77,6 +77,7 @@ public class FrontenReportBean extends EBReportBean {
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
         Collections.sort(this.fronten, new FrontenComparator());
         loadMap();
+        genBarcode();
     }
 
     //~ Methods ----------------------------------------------------------------

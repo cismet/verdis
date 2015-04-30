@@ -13,13 +13,19 @@ package de.cismet.cids.custom.reports.verdis;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.impl.code39.Code39Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.krysalis.barcode4j.tools.UnitConv;
+
 import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+
+import java.io.IOException;
 
 import java.text.NumberFormat;
 
@@ -56,6 +62,7 @@ public abstract class EBReportBean {
     private String kznr;
     private String scale;
     private Image mapImage = null;
+    private Image barcodeImage = null;
     private boolean mapError = false;
     private int mapWidth;
     private int mapHeight;
@@ -349,5 +356,42 @@ public abstract class EBReportBean {
         final double mapReportWidthInMeter = (mapWidth / ppi) * 0.0254d;
         final double mapBoundingBoxWidth = wishedScale * mapReportWidthInMeter;
         return mapBoundingBoxWidth * oldScale / realWorldWithInMeter;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Image getBarcodeImage() {
+        return barcodeImage;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void genBarcode() {
+        try {
+            final int dpi = 72;
+            final Code39Bean bean = new Code39Bean();
+            // BarcodeDimension dimension = bean.calcDimensions(getKznr());
+            bean.setModuleWidth(UnitConv.in2mm(1.0f / dpi)); // makes the narrow bar
+            // width exactly one pixel
+            bean.setWideFactor(3);
+            bean.setModuleWidth(1);
+            bean.setIntercharGapWidth(1);
+            bean.setFontSize(8);
+            bean.setBarHeight(22);
+            bean.setPattern("*________*");
+
+            final BitmapCanvasProvider provider = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+            bean.generateBarcode(provider, getKznr());
+
+            provider.finish();
+
+            barcodeImage = provider.getBufferedImage();
+        } catch (final IOException ex) {
+            LOG.error("error while generating Barcode", ex);
+        }
     }
 }

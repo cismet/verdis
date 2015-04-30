@@ -3,6 +3,7 @@
 	<field name="kznr" class="java.lang.String"/>
 	<field name="mapImage" class="java.lang.Object"/>
 	<field name="scale" class="java.lang.String"/>
+	<field name="barcodeImage" class="java.lang.Object"/>
 	<variable name="DATE" class="java.util.Date">
 		<variableExpression><![CDATA[new Date()]]></variableExpression>
 	</variable>
@@ -12,12 +13,16 @@
 	<pageHeader>
 		<band height="45">
 			<textField>
-				<reportElement x="2" y="0" width="1148" height="20"/>
-				<textElement textAlignment="Center">
+				<reportElement x="0" y="10" width="1013" height="20"/>
+				<textElement textAlignment="Left">
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Flächenerfassungsbogen zum Kassenzeichen "+ $F{kznr}]]></textFieldExpression>
 			</textField>
+			<image scaleImage="RetainShape">
+				<reportElement x="1013" y="0" width="137" height="30"/>
+				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{barcodeImage})]]></imageExpression>
+			</image>
 		</band>
 	</pageHeader>
 	<detail>

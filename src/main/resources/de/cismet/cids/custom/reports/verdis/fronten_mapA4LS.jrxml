@@ -3,6 +3,7 @@
 	<field name="kznr" class="java.lang.String"/>
 	<field name="mapImage" class="java.lang.Object"/>
 	<field name="scale" class="java.lang.String"/>
+	<field name="barcodeImage" class="java.lang.Object"/>
 	<variable name="DATE" class="java.util.Date">
 		<variableExpression><![CDATA[new Date()]]></variableExpression>
 	</variable>
@@ -12,12 +13,16 @@
 	<pageHeader>
 		<band height="45">
 			<textField>
-				<reportElement x="2" y="0" width="800" height="20"/>
-				<textElement textAlignment="Center">
+				<reportElement x="0" y="10" width="663" height="20"/>
+				<textElement textAlignment="Left">
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Frontenbogen zum Kassenzeichen "+ $F{kznr}]]></textFieldExpression>
 			</textField>
+			<image scaleImage="RetainShape">
+				<reportElement x="663" y="0" width="137" height="30"/>
+				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{barcodeImage})]]></imageExpression>
+			</image>
 		</band>
 	</pageHeader>
 	<detail>
@@ -36,9 +41,6 @@
 				<reportElement x="0" y="0" width="802" height="411"/>
 				<imageExpression class="java.awt.Image"><![CDATA[((java.awt.Image)$F{mapImage})]]></imageExpression>
 			</image>
-			<rectangle>
-				<reportElement mode="Transparent" x="47" y="-228" width="802" height="411"/>
-			</rectangle>
 			<rectangle>
 				<reportElement x="620" y="430" width="80" height="4" forecolor="#00B200" backcolor="#4ECDC4"/>
 			</rectangle>

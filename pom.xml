@@ -175,6 +175,11 @@
             <artifactId>filters</artifactId>
             <version>2.0.235</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.barcode4j</groupId>
+            <artifactId>barcode4j</artifactId>
+            <version>2.1</version>
+        </dependency>
     </dependencies>
     
     <build>
