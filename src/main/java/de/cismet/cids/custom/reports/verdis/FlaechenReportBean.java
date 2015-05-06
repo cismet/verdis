@@ -97,10 +97,11 @@ public class FlaechenReportBean extends EBReportBean {
             final String flaechenart = (String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                             + "."
                             + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
-                            + FlaechenartPropertyConstants.PROP__ART);
-            if (flaechenart.equals("Dachfläche") || flaechenart.equals("Gründach")) {
+                            + FlaechenartPropertyConstants.PROP__ART_ABKUERZUNG);
+            if (flaechenart.equals("DF") || flaechenart.equals("GDF")) {
                 dachflaechen.add(flaeche);
-            } else if (flaechenart.equals("versiegelte Fläche") || flaechenart.equals("Ökopflaster")) {
+            } else if (flaechenart.equals("VF") || flaechenart.equals("VFÖ") || flaechenart.equals("VFS")
+                        || flaechenart.equals("VSÖ")) {
                 versiegelteflaechen.add(flaeche);
             }
         }
