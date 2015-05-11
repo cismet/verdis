@@ -59,6 +59,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.SplittedNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 
@@ -457,16 +458,16 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         for (int displayedIndex = 0; displayedIndex < jxtOverview1.getRowCount(); ++displayedIndex) {
             final int modelIndex = jxtOverview1.convertRowIndexToModel(displayedIndex);
 
@@ -498,7 +499,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
             }
         }
         jDialog1.setVisible(false);
-    } //GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -751,6 +752,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         if (dialog.getReturnStatus() == NewFlaecheDialog.RET_OK) {
             final CidsBean flaechenartBean = dialog.getSelectedArt();
             Geometry geom = null;
+            boolean flaecheSplitted = false;
+            CidsBean anschlussgradBean = null;
             if ((VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                             != (Integer)flaechenartBean.getProperty(FlaechenartPropertyConstants.PROP__ID))
                         && dialog.isSoleNewChecked()) {
@@ -758,12 +761,30 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     geom = sole.getFeature().getGeometry();
                     // unzugeordnete Geometrie aus Karte entfernen
                     Main.getMappingComponent().getFeatureCollection().removeFeature(sole.getFeature());
+
+                    if (sole.getFeature() instanceof SplittedNewFeature) {
+                        flaecheSplitted = true;
+                        final SplittedNewFeature splittedFeature = (SplittedNewFeature)sole.getFeature();
+                        if (splittedFeature.splittedFromPFeature().getFeature() instanceof CidsFeature) {
+                            final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.splittedFromPFeature()
+                                            .getFeature()).getMetaObject().getBean();
+                            anschlussgradBean = (CidsBean)sourceFlaecheBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD);
+                        }
+                    }
                 }
             }
             final CidsBean flaecheBean = createNewFlaecheBean(
                     flaechenartBean,
                     getAllBeans(),
                     geom);
+            if (flaecheSplitted) {
+                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+                    anschlussgradBean);
+            }
 
             if (dialog.isQuerverweiseChecked()) {
                 if (crossreferences != null) {
