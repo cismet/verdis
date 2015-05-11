@@ -11,6 +11,8 @@ import Sirius.server.middleware.types.HistoryObject;
 
 import java.awt.Component;
 
+import java.text.DateFormat;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -40,6 +42,10 @@ public class HistoryComboBox extends JComboBox {
  */
 class HistoryComboBoxRenderer extends DefaultListCellRenderer {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM);
+
     //~ Methods ----------------------------------------------------------------
 
     @Override
@@ -52,7 +58,7 @@ class HistoryComboBoxRenderer extends DefaultListCellRenderer {
         if (value != null) {
             if (value instanceof HistoryObject) {
                 final HistoryObject ho = (HistoryObject)value;
-                setText(ho.getValidFrom().toString()); // NOI18N
+                setText(DATE_FORMAT.format(ho.getValidFrom())); // NOI18N
             }
         }
         return this;

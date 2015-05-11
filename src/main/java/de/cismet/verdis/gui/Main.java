@@ -372,6 +372,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final WDSRSummenPanel wdsrSummenPanel = new WDSRSummenPanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
     private final SAPClipboardListener sapClipboardListener = new SAPClipboardListener();
+    private final TimeRecoveryPanel timeRecoveryPanel = TimeRecoveryPanel.getInstance();
 
     private RMPlugin rmPlugin;
     private boolean fixMapExtent;
@@ -383,6 +384,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHistory;
+    private javax.swing.JButton btnTimeRecovery;
     private javax.swing.JButton cmdAbfrageeditor;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdArbeitspakete;
@@ -488,6 +490,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(regenFlaechenTabellenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kanaldatenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(regenSumPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(timeRecoveryPanel);
 
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenPanel);
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenListPanel);
@@ -498,6 +501,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
         CidsAppBackend.getInstance().addEditModeListener(dokPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
+        CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
 
         CidsAppBackend.getInstance().addAppModeListener(kartenPanel);
         CidsAppBackend.getInstance().addAppModeListener(this);
@@ -1788,6 +1792,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator8 = new javax.swing.JSeparator();
         cmdLagisCrossover = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
+        btnTimeRecovery = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
@@ -2238,6 +2243,22 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(btnHistory);
+
+        btnTimeRecovery.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/recovery.png"))); // NOI18N
+        btnTimeRecovery.setToolTipText("Kassenzeichen-Wiederherstellung");
+        btnTimeRecovery.setFocusPainted(false);
+        btnTimeRecovery.setFocusable(false);
+        btnTimeRecovery.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnTimeRecovery.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnTimeRecovery.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnTimeRecoveryActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(btnTimeRecovery);
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
         cmdDownloads.setIcon(new javax.swing.ImageIcon(
@@ -3828,6 +3849,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnTimeRecoveryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnTimeRecoveryActionPerformed
+        if (editMode) {
+            StaticSwingTools.showDialog(timeRecoveryPanel.getDialog());
+        }
+    }                                                                                   //GEN-LAST:event_btnTimeRecoveryActionPerformed
+
+    /**
+     * DOCUMENT ME!
      */
     public void renameKassenzeichen() {
         if (editMode) {
@@ -4377,6 +4409,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdNewKassenzeichen.setEnabled(!b && !readonly);
         cmdEditMode.setEnabled(!b && !readonly && (kassenzeichenBean != null));
 
+        btnTimeRecovery.setEnabled(b && !readonly && (kassenzeichenBean != null));
         cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         if (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
