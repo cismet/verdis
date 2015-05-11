@@ -2397,7 +2397,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         kassenzeichenBean = cidsBean;
 
-        refreshInMap((cidsBean != null) && !cidsBean.equals(oldCidsBean));
+        refreshInMap((cidsBean != null)
+                    && (!cidsBean.equals(oldCidsBean)
+                        || (TimeRecoveryPanel.getInstance().isLoading() && !mappingComp.isFixedMapExtent())));
     }
 
     /**

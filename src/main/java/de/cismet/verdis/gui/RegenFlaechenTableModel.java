@@ -25,6 +25,8 @@ package de.cismet.verdis.gui;
 
 import java.text.SimpleDateFormat;
 
+import java.util.Date;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -164,7 +166,12 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
             }
             case 6: {
                 // Änderungsdatum
-                return (String)DATE_FORMAT.format(cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG));
+                final Date datum_erfassung = (Date)cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG);
+                if (datum_erfassung == null) {
+                    return null;
+                } else {
+                    return (String)DATE_FORMAT.format(datum_erfassung);
+                }
             }
             default: {
                 return null;

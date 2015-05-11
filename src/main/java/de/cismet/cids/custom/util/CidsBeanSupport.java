@@ -29,6 +29,8 @@ import java.sql.Date;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -74,6 +76,21 @@ public class CidsBeanSupport {
      * @throws  Exception  DOCUMENT ME!
      */
     public static void deepcopyAllProperties(final CidsBean sourceBean, final CidsBean targetBean) throws Exception {
+        deepcopyAllProperties(sourceBean, targetBean, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceBean        DOCUMENT ME!
+     * @param   targetBean        DOCUMENT ME!
+     * @param   cleanCollections  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void deepcopyAllProperties(final CidsBean sourceBean,
+            final CidsBean targetBean,
+            final boolean cleanCollections) throws Exception {
         if ((sourceBean == null) || (targetBean == null)) {
             return;
         }
@@ -88,13 +105,41 @@ public class CidsBeanSupport {
             } else if (o instanceof CidsBean) {
                 targetBean.setProperty(propName, deepcloneCidsBean((CidsBean)o));
             } else if (o instanceof Collection) {
+                LOG.fatal(targetBean.getMOString());
                 final List<CidsBean> list = (List<CidsBean>)o;
-                final List<CidsBean> newList = new ArrayList<CidsBean>();
+                final List<CidsBean> targetList = targetBean.getBeanCollectionProperty(propName);
 
-                for (final CidsBean tmpBean : list) {
-                    newList.add(deepcloneCidsBean(tmpBean));
+                final List<CidsBean> toAdd = new ArrayList<CidsBean>(list);
+                toAdd.removeAll(targetList);
+
+                final List<CidsBean> toRemove = new ArrayList<CidsBean>(targetList);
+                toRemove.removeAll(list);
+
+//                targetList.retainAll(list);
+//                list.removeAll(targetList);
+
+                final HashMap<Integer, CidsBean> origTargetMap = new HashMap<Integer, CidsBean>();
+                final List<CidsBean> toUpdateTarget = new ArrayList<CidsBean>(targetList);
+                toUpdateTarget.retainAll(list);
+                for (final CidsBean cidsBean : toUpdateTarget) {
+                    origTargetMap.put(cidsBean.getMetaObject().getId(), cidsBean);
                 }
-                targetBean.setProperty(propName, newList);
+
+                final HashMap<Integer, CidsBean> origArrayMap = new HashMap<Integer, CidsBean>();
+                final List<CidsBean> toUpdateOrig = new ArrayList<CidsBean>(list);
+                toUpdateOrig.retainAll(targetList);
+                for (final CidsBean cidsBean : toUpdateOrig) {
+                    origArrayMap.put(cidsBean.getMetaObject().getId(), cidsBean);
+                }
+
+                for (final Integer id : origArrayMap.keySet()) {
+                    final CidsBean origArrayBean = origArrayMap.get(id);
+                    final CidsBean targetArrayBean = origTargetMap.get(id);
+                    deepcopyAllProperties(origArrayBean, targetArrayBean);
+                }
+
+                targetList.removeAll(toRemove);
+                targetList.addAll(toAdd);
             } else if (o instanceof Geometry) {
                 targetBean.setProperty(propName, ((Geometry)o).clone());
             } else if (o instanceof Float) {
