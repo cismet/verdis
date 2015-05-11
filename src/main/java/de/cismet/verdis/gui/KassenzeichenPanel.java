@@ -256,15 +256,9 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         sepTitle1 = new javax.swing.JSeparator();
         sepTitle2 = new javax.swing.JSeparator();
 
-        lblLastModification.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/goto.png"))); // NOI18N
+        lblLastModification.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/goto.png"))); // NOI18N
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.letzte_aenderung_von}"),
-                lblLastModification,
-                org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.letzte_aenderung_von}"), lblLastModification, org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
         bindingGroup.addBinding(binding);
 
         setLayout(new java.awt.GridBagLayout());
@@ -272,12 +266,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         panSearch.setLayout(new java.awt.GridBagLayout());
 
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    txtSearchActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -299,12 +291,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         btnSearch.setMnemonic('s');
         btnSearch.setText("suchen");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnSearchActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -355,13 +345,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panKZValues.add(lblSperre, gridBagConstraints);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.datum_erfassung}"),
-                txtErfassungsdatum,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.datum_erfassung}"), txtErfassungsdatum, org.jdesktop.beansbinding.BeanProperty.create("text"), KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG);
         binding.setConverter(new SqlDateToStringConverter());
         bindingGroup.addBinding(binding);
 
@@ -379,21 +363,14 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         chkSperre.setEnabled(false);
         chkSperre.setFocusPainted(false);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sperre}"),
-                chkSperre,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sperre}"), chkSperre, org.jdesktop.beansbinding.BeanProperty.create("selected"));
         bindingGroup.addBinding(binding);
 
         chkSperre.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkSperreActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSperreActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -410,13 +387,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         txtBemerkung.setRows(3);
         txtBemerkung.setMinimumSize(new java.awt.Dimension(0, 36));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung}"),
-                txtBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung}"), txtBemerkung, org.jdesktop.beansbinding.BeanProperty.create("text"), KassenzeichenPropertyConstants.PROP__BEMERKUNG);
         bindingGroup.addBinding(binding);
 
         scpBemerkung.setViewportView(txtBemerkung);
@@ -432,13 +403,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         txtKassenzeichen.setEditable(false);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"),
-                txtKassenzeichen,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"), txtKassenzeichen, org.jdesktop.beansbinding.BeanProperty.create("text"), KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -451,25 +416,14 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
         panKZValues.add(txtKassenzeichen, gridBagConstraints);
 
-        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setEditable(false);
+        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setForeground(java.awt.Color.red);
         txtSperreBemerkung.setBorder(null);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"),
-                txtSperreBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"), txtSperreBemerkung, org.jdesktop.beansbinding.BeanProperty.create("text"), KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE);
         bindingGroup.addBinding(binding);
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"),
-                txtSperreBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"), txtSperreBemerkung, org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -508,12 +462,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         togRegenMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togRegenMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         togRegenMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togRegenModeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                togRegenModeActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -526,12 +478,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         togWDSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togWDSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         togWDSRMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togWDSRModeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                togWDSRModeActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -546,12 +496,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         togInfoMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togInfoMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         togInfoMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togInfoModeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                togInfoModeActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -580,23 +528,23 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         add(sepTitle2, gridBagConstraints);
 
         bindingGroup.bind();
-    } // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hbBackActionPerformed
+    private void hbBackActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hbBackActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_hbBackActionPerformed
+    }//GEN-LAST:event_hbBackActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
+    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
         mainApp.refreshLeftTitleBarColor();
 
         final boolean sperre = chkSperre.isSelected();
@@ -611,23 +559,23 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         } else {
             txtSperreBemerkung.setText(null);
         }
-    } //GEN-LAST:event_chkSperreActionPerformed
+    }//GEN-LAST:event_chkSperreActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchActionPerformed
+    private void txtSearchActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         gotoTxtKassenzeichen();
-    }                                                                             //GEN-LAST:event_txtSearchActionPerformed
+    }//GEN-LAST:event_txtSearchActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togInfoModeActionPerformed
+    private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togInfoModeActionPerformed
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -645,14 +593,14 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_togInfoModeActionPerformed
+    }//GEN-LAST:event_togInfoModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togRegenModeActionPerformed
+    private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togRegenModeActionPerformed
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -670,14 +618,14 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_togRegenModeActionPerformed
+    }//GEN-LAST:event_togRegenModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togWDSRModeActionPerformed
+    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_togWDSRModeActionPerformed
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -695,16 +643,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_togWDSRModeActionPerformed
+    }//GEN-LAST:event_togWDSRModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchActionPerformed
+    private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         gotoTxtKassenzeichen();
-    }                                                                             //GEN-LAST:event_btnSearchActionPerformed
+    }//GEN-LAST:event_btnSearchActionPerformed
 
     @Override
     public void appModeChanged() {
