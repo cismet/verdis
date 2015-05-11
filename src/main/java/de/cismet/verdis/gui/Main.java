@@ -2259,6 +2259,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(btnTimeRecovery);
+        if (!StaticDebuggingTools.checkHomeForFile("cismetVerdisTimeMachineRecovery")) {
+            btnTimeRecovery.setVisible(false);
+        }
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
         cmdDownloads.setIcon(new javax.swing.ImageIcon(
