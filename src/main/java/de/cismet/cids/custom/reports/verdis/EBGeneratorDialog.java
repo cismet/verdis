@@ -45,6 +45,8 @@ import de.cismet.cismap.commons.gui.printing.BackgroundTaskDownload;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+
 /**
  * DOCUMENT ME!
  *
@@ -578,8 +580,11 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
         if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
             final String jobname = DownloadManagerDialog.getJobname();
 
+            final int nummer = (Integer)kassenzeichen.getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            final String fileName = (Mode.FLAECHEN.equals(mode)) ? ("FEB-" + nummer) : ("STR-" + nummer);
             DownloadManager.instance()
-                    .add(new BackgroundTaskDownload(swingWorkerBackgroundTask, "", jobname, "feb_report", ".pdf"));
+                    .add(new BackgroundTaskDownload(swingWorkerBackgroundTask, "", jobname, fileName, ".pdf"));
         }
     }
 }
