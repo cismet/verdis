@@ -59,6 +59,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.SplittedNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 
@@ -109,6 +110,8 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     //~ Instance fields --------------------------------------------------------
 
     private CidsBean cidsBean;
+
+    private Float lastSplitAnteil = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -521,6 +524,24 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                     + FlaecheninfoPropertyConstants.PROP__FLAECHENART
                                     + "."
                                     + FlaechenartPropertyConstants.PROP__ID))) {
+                    Float oldAnteil = null;
+                    double oldArea = 0;
+                    double ratio = 0;
+                    if (pf.getFeature() instanceof SplittedNewFeature) {
+                        final SplittedNewFeature splittedFeature = (SplittedNewFeature)pf.getFeature();
+                        if (splittedFeature.getSplittedFromPFeature().getFeature() instanceof CidsFeature) {
+                            final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
+                                            .getFeature()).getMetaObject().getBean();
+                            oldAnteil = (Float)sourceFlaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+                            oldArea = splittedFeature.getSplittedFromPFeature().getFeature().getGeometry().getArea();
+
+                            final double area = pf.getFeature().getGeometry().getArea();
+                            ratio = (oldArea != 0) ? (area / oldArea) : 0;
+
+                            lastSplitAnteil = oldAnteil;
+                        }
+                    }
+
                     final boolean hasGeometrie = getGeometry(selectedBean) != null;
                     final boolean isMarkedForDeletion = selectedBean.getMetaObject().getStatus()
                                 == MetaObject.TO_DELETE;
@@ -545,6 +566,11 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                             + "."
                                             + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
                                     groesse);
+                                if (oldAnteil != null) {
+                                    selectedBean.setProperty(
+                                        FlaechePropertyConstants.PROP__ANTEIL,
+                                        (float)Math.round(oldAnteil * ratio));
+                                }
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
                                 cidsFeature.setEditable(editable);
@@ -751,6 +777,11 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
         if (dialog.getReturnStatus() == NewFlaecheDialog.RET_OK) {
             final CidsBean flaechenartBean = dialog.getSelectedArt();
             Geometry geom = null;
+            boolean flaecheSplitted = false;
+            CidsBean anschlussgradBean = null;
+            Float oldAnteil = null;
+            double oldArea = 0;
+            double ratio = 0;
             if ((VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                             != (Integer)flaechenartBean.getProperty(FlaechenartPropertyConstants.PROP__ID))
                         && dialog.isSoleNewChecked()) {
@@ -758,12 +789,36 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                     geom = sole.getFeature().getGeometry();
                     // unzugeordnete Geometrie aus Karte entfernen
                     Main.getMappingComponent().getFeatureCollection().removeFeature(sole.getFeature());
+
+                    if (sole.getFeature() instanceof SplittedNewFeature) {
+                        flaecheSplitted = true;
+                        final SplittedNewFeature splittedFeature = (SplittedNewFeature)sole.getFeature();
+                        if (splittedFeature.getSplittedFromPFeature().getFeature() instanceof CidsFeature) {
+                            final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
+                                            .getFeature()).getMetaObject().getBean();
+                            anschlussgradBean = (CidsBean)sourceFlaecheBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD);
+                            oldAnteil = lastSplitAnteil;
+                            oldArea = splittedFeature.getSplittedFromPFeature().getFeature().getGeometry().getArea();
+                        }
+                    }
+                    final double area = geom.getArea();
+                    ratio = (oldArea != 0) ? (area / oldArea) : 0;
                 }
             }
+
             final CidsBean flaecheBean = createNewFlaecheBean(
                     flaechenartBean,
                     getAllBeans(),
                     geom);
+            if (flaecheSplitted) {
+                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+                    anschlussgradBean);
+                flaecheBean.setProperty(FlaechePropertyConstants.PROP__ANTEIL, (float)Math.round(oldAnteil * ratio));
+            }
 
             if (dialog.isQuerverweiseChecked()) {
                 if (crossreferences != null) {
