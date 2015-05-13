@@ -533,9 +533,10 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                             final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
                                             .getFeature()).getMetaObject().getBean();
                             oldAnteil = (Float)sourceFlaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
-                            oldArea = splittedFeature.getSplittedFromPFeature().getFeature().getGeometry().getArea();
+                            oldArea = (int)splittedFeature.getSplittedFromPFeature().getFeature().getGeometry()
+                                        .getArea();
 
-                            final double area = pf.getFeature().getGeometry().getArea();
+                            final double area = (int)pf.getFeature().getGeometry().getArea();
                             ratio = (oldArea != 0) ? (area / oldArea) : 0;
 
                             lastSplitAnteil = oldAnteil;
@@ -569,7 +570,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                 if (oldAnteil != null) {
                                     selectedBean.setProperty(
                                         FlaechePropertyConstants.PROP__ANTEIL,
-                                        (float)Math.round(oldAnteil * ratio));
+                                        (float)(int)(oldAnteil * ratio));
                                 }
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
@@ -801,10 +802,11 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                                             + "."
                                             + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD);
                             oldAnteil = lastSplitAnteil;
-                            oldArea = splittedFeature.getSplittedFromPFeature().getFeature().getGeometry().getArea();
+                            oldArea = (int)splittedFeature.getSplittedFromPFeature().getFeature().getGeometry()
+                                        .getArea();
                         }
                     }
-                    final double area = geom.getArea();
+                    final double area = (int)geom.getArea();
                     ratio = (oldArea != 0) ? (area / oldArea) : 0;
                 }
             }
@@ -817,7 +819,11 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
                 flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
                     anschlussgradBean);
-                flaecheBean.setProperty(FlaechePropertyConstants.PROP__ANTEIL, (float)Math.round(oldAnteil * ratio));
+                if (oldAnteil != null) {
+                    flaecheBean.setProperty(
+                        FlaechePropertyConstants.PROP__ANTEIL,
+                        (float)(int)(oldAnteil * ratio));
+                }
             }
 
             if (dialog.isQuerverweiseChecked()) {
