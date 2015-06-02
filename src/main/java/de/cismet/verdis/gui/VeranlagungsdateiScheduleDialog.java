@@ -54,19 +54,27 @@ public class VeranlagungsdateiScheduleDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         veranlagungsdateiSchedulePanel1 = new de.cismet.verdis.gui.VeranlagungsdateiSchedulePanel();
 
-        setTitle(org.openide.util.NbBundle.getMessage(VeranlagungsdateiScheduleDialog.class, "VeranlagungsdateiScheduleDialog.title")); // NOI18N
+        setTitle(org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiScheduleDialog.class,
+                "VeranlagungsdateiScheduleDialog.title")); // NOI18N
         setResizable(false);
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(VeranlagungsdateiScheduleDialog.class, "VeranlagungsdateiScheduleDialog.jButton1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(
+                VeranlagungsdateiScheduleDialog.class,
+                "VeranlagungsdateiScheduleDialog.jButton1.text")); // NOI18N
         jButton1.setMaximumSize(new java.awt.Dimension(98, 28));
         jButton1.setMinimumSize(new java.awt.Dimension(98, 28));
         jButton1.setPreferredSize(new java.awt.Dimension(98, 28));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -80,7 +88,7 @@ public class VeranlagungsdateiScheduleDialog extends javax.swing.JDialog {
         getContentPane().add(veranlagungsdateiSchedulePanel1, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -100,7 +108,7 @@ public class VeranlagungsdateiScheduleDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 }

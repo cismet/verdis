@@ -8,6 +8,7 @@
 package de.cismet.verdis.gui;
 
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -253,11 +254,11 @@ public class WaitDialog extends javax.swing.JDialog {
                 });
         } else {
             if (max == 1) {
-                jProgressBar1.setString("Kassenzeichen wird geöffnet...");
+                jProgressBar1.setString("Kassenzeichen wird geladen...");
                 jProgressBar1.setMaximum(0);
                 jProgressBar1.setIndeterminate(true);
             } else {
-                jProgressBar1.setString("Kassenzeichen werden geöffnet...");
+                jProgressBar1.setString("Kassenzeichen werden geladen...");
                 jProgressBar1.setMaximum(max);
                 jProgressBar1.setIndeterminate(false);
             }
@@ -368,29 +369,34 @@ public class WaitDialog extends javax.swing.JDialog {
 
     @Override
     public void dispose() {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    setVisible(false);
-                }
-            });
+                    @Override
+                    public void run() {
+                        dispose();
+                    }
+                });
+        } else {
+            setVisible(false);
+        }
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showDialog() {
-        SwingUtilities.invokeLater(new Runnable() {
+        jProgressBar1.setString("bitte warten");
+        jProgressBar1.setMaximum(0);
+        jProgressBar1.setIndeterminate(true);
+        jProgressBar1.setValue(0);
+        new SwingWorker<Void, Void>() {
 
                 @Override
-                public void run() {
-                    jProgressBar1.setString("bitte warten");
-                    jProgressBar1.setMaximum(0);
-                    jProgressBar1.setIndeterminate(true);
-                    jProgressBar1.setValue(0);
+                protected Void doInBackground() throws Exception {
                     StaticSwingTools.showDialog(WaitDialog.getInstance());
+                    return null;
                 }
-            });
+            }.execute();
     }
 }

@@ -1202,6 +1202,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             GrundbuchblattSucheDialog.getInstance().setEnabled(false);
             Main.getInstance().getKassenzeichenPanel().setSearchField(kassenzeichen);
 
+            WaitDialog.getInstance().showDialog();
+            WaitDialog.getInstance().startLoadingKassenzeichen(1);
+
             new SwingWorker<CidsBean, Void>() {
 
                     @Override
@@ -1234,8 +1237,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                         Main.getInstance().getKassenzeichenPanel().setSearchFinished();
                         GrundbuchblattSucheDialog.getInstance().setEnabled(true);
                         Main.getInstance().refreshKassenzeichenButtons();
+
+                        WaitDialog.getInstance().progressLoadingKassenzeichen(1);
                         if (edit) {
-                            WaitDialog.getInstance().showDialog();
                             new SwingWorker<Boolean, Void>() {
 
                                     @Override
@@ -1260,6 +1264,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                                         }
                                     }
                                 }.execute();
+                        } else {
+                            WaitDialog.getInstance().dispose();
                         }
                     }
                 }.execute();
