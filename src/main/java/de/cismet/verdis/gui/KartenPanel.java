@@ -50,10 +50,13 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import javax.swing.tree.TreePath;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.cismap.commons.RetrievalServiceLayer;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.gui.MappingComponent;
@@ -63,6 +66,7 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.actions.CustomAction;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.memento.MementoInterface;
+import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 
@@ -289,6 +293,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdPan;
     private javax.swing.JToggleButton cmdRaisePolygon;
     private javax.swing.JButton cmdRedo;
+    private javax.swing.JButton cmdRefreshSingleLayer;
     private javax.swing.JToggleButton cmdRemoveHandle;
     private javax.swing.JToggleButton cmdRemovePolygon;
     private javax.swing.JToggleButton cmdRotatePolygon;
@@ -455,6 +460,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         togFixMapExtent = new javax.swing.JToggleButton();
         cmdBack = new JHistoryButton();
         cmdForward = new JHistoryButton();
+        cmdRefreshSingleLayer = new javax.swing.JButton();
         jSeparator5 = new javax.swing.JSeparator();
         cmdWmsBackground = new javax.swing.JToggleButton();
         cmdForeground = new javax.swing.JButton();
@@ -493,14 +499,14 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         popMenSearch.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
 
                 @Override
-                public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent evt) {
+                public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) {
+                    popMenSearchPopupMenuWillBecomeVisible(evt);
                 }
                 @Override
                 public void popupMenuWillBecomeInvisible(final javax.swing.event.PopupMenuEvent evt) {
                 }
                 @Override
-                public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent evt) {
-                    popMenSearchPopupMenuWillBecomeVisible(evt);
+                public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent evt) {
                 }
             });
 
@@ -695,6 +701,23 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdForward.setFocusPainted(false);
         cmdForward.setFocusable(false);
         tobVerdis.add(cmdForward);
+
+        cmdRefreshSingleLayer.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/layerwidget/res/refresh.png"))); // NOI18N
+        cmdRefreshSingleLayer.setToolTipText("Kartenhintergründe neuladen");
+        cmdRefreshSingleLayer.setBorderPainted(false);
+        cmdRefreshSingleLayer.setFocusable(false);
+        cmdRefreshSingleLayer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdRefreshSingleLayer.setMargin(new java.awt.Insets(2, 1, 2, 1));
+        cmdRefreshSingleLayer.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdRefreshSingleLayer.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdRefreshSingleLayerActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdRefreshSingleLayer);
 
         jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator5.setMaximumSize(new java.awt.Dimension(2, 32767));
@@ -1628,6 +1651,31 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
     } //GEN-LAST:event_cmdSelect1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdRefreshSingleLayerActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshSingleLayerActionPerformed
+        final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    final TreeMap<Integer, MapService> rs = mappingComp.getMappingModel().getRasterServices();
+                    for (final Integer key : rs.keySet()) {
+                        final MapService value = rs.get(key);
+                        if (value instanceof RetrievalServiceLayer) {
+//                            value.setBoundingBox(mappingComp.getCurrentBoundingBoxFromCamera());
+                            ((RetrievalServiceLayer)value).retrieve(true);
+                        }
+                    }
+                    return null;
+                }
+            };
+
+        worker.execute();
+    } //GEN-LAST:event_cmdRefreshSingleLayerActionPerformed
 
     /**
      * DOCUMENT ME!
