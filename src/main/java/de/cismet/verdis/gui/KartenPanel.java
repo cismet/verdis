@@ -1665,7 +1665,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     final TreeMap<Integer, MapService> rs = mappingComp.getMappingModel().getRasterServices();
                     for (final Integer key : rs.keySet()) {
                         final MapService value = rs.get(key);
-                        if (value instanceof RetrievalServiceLayer) {
+                        if ((value instanceof RetrievalServiceLayer) && ((RetrievalServiceLayer)value).isEnabled()) {
 //                            value.setBoundingBox(mappingComp.getCurrentBoundingBoxFromCamera());
                             ((RetrievalServiceLayer)value).retrieve(true);
                         }
