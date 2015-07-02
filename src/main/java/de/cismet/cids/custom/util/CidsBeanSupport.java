@@ -26,11 +26,11 @@ package de.cismet.cids.custom.util;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -105,7 +105,6 @@ public class CidsBeanSupport {
             } else if (o instanceof CidsBean) {
                 targetBean.setProperty(propName, deepcloneCidsBean((CidsBean)o));
             } else if (o instanceof Collection) {
-                LOG.fatal(targetBean.getMOString());
                 final List<CidsBean> list = (List<CidsBean>)o;
                 final List<CidsBean> targetList = targetBean.getBeanCollectionProperty(propName);
 
@@ -156,6 +155,8 @@ public class CidsBeanSupport {
                 targetBean.setProperty(propName, ((Date)o).clone());
             } else if (o instanceof String) {
                 targetBean.setProperty(propName, o);
+            } else if (o instanceof Timestamp) {
+                targetBean.setProperty(propName, ((Timestamp)o).clone());
             } else {
                 if (o != null) {
                     LOG.error("unknown property type: " + o.getClass().getName());

@@ -771,7 +771,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnTimeRecoveryActionPerformed"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="if (!StaticDebuggingTools.checkHomeForFile(&quot;cismetVerdisTimeMachineRecovery&quot;)) {&#xa;    btnTimeRecovery.setVisible(false);&#xa;}"/>
+                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="try {&#xa;    btnTimeRecovery.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), &quot;grundis.timerecovery.dialog&quot;) != null);&#xa;} catch (final Exception ex) {&#xa;    LOG.error(&quot;error while checking for grundis.timerecovery.dialog&quot;, ex);&#xa;    btnTimeRecovery.setVisible(false);&#xa;}"/>
               </AuxValues>
             </Component>
             <Component class="javax.swing.JButton" name="cmdDownloads">
