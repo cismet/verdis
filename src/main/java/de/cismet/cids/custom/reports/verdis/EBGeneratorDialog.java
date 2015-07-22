@@ -558,7 +558,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                                     jasperReport,
                                     parameters,
                                     dataSource);
-                            jasperPrint.setOrientation(jasperReport.getOrientation());
+                            jasperPrint.setOrientation(jasperReport.getOrientationValue());
 
                             final ByteArrayOutputStream outTmp = new ByteArrayOutputStream();
                             JasperExportManager.exportReportToPdfStream(jasperPrint, outTmp);
