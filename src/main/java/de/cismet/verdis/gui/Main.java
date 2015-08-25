@@ -39,7 +39,6 @@ import Sirius.navigator.ui.tree.SearchResultsTree;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -402,6 +401,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdNewKassenzeichen;
     private javax.swing.JButton cmdNextKassenzeichenWithoutGeom;
     private javax.swing.JButton cmdOk;
+    private javax.swing.JButton cmdOpenInD3;
     private javax.swing.JButton cmdPaste;
     private javax.swing.JButton cmdPdf;
     private javax.swing.JButton cmdRecalculateArea;
@@ -1799,6 +1799,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdArbeitspakete = new javax.swing.JButton();
         cmdAbfrageeditor = new javax.swing.JButton();
         cmdVeranlagungsdatei = new javax.swing.JButton();
+        cmdOpenInD3 = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2401,6 +2402,22 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             cmdVeranlagungsdatei.setVisible(false);
         }
 
+        cmdOpenInD3.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/d.3.png"))); // NOI18N
+        cmdOpenInD3.setToolTipText("in d.3 öffnen");
+        cmdOpenInD3.setFocusPainted(false);
+        cmdOpenInD3.setFocusable(false);
+        cmdOpenInD3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdOpenInD3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdOpenInD3.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdOpenInD3ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdOpenInD3);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -2717,7 +2734,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         setJMenuBar(jMenuBar1);
 
-        setSize(new java.awt.Dimension(1024, 868));
+        setSize(new java.awt.Dimension(1261, 868));
         setLocationRelativeTo(null);
     } // </editor-fold>//GEN-END:initComponents
 
@@ -3865,6 +3882,30 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             StaticSwingTools.showDialog(timeRecoveryPanel.getDialog());
         }
     }                                                                                   //GEN-LAST:event_btnTimeRecoveryActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdOpenInD3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOpenInD3ActionPerformed
+        if (kassenzeichenBean != null) {
+            final String kz = getCidsBean().getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER).toString();
+            try {
+                final Runtime rt = Runtime.getRuntime();
+                final Process pr = rt.exec("clink.exe verdis " + kz);
+            } catch (Exception e) {
+                CidsAppBackend.getInstance()
+                        .showError(
+                            "Fehler beim Öffnen von d.3",
+                            "Beim Öffnen der Dokumente zu Kassenzeichen "
+                            + kz
+                            + " ist ein Fehler aufgetreten.",
+                            e);
+            }
+        }
+    }                                                                               //GEN-LAST:event_cmdOpenInD3ActionPerformed
 
     /**
      * DOCUMENT ME!
