@@ -664,16 +664,16 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnRefreshAnlaesseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshAnlaesseActionPerformed
+    private void btnRefreshAnlaesseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnRefreshAnlaesseActionPerformed
         refreshFortfuehrungsList();
-    }//GEN-LAST:event_btnRefreshAnlaesseActionPerformed
+    }                                                                                      //GEN-LAST:event_btnRefreshAnlaesseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnThisWeekActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThisWeekActionPerformed
+    private void btnThisWeekActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnThisWeekActionPerformed
         final Calendar calendar = Calendar.getInstance();
 
         final Date toDate = calendar.getTime();
@@ -691,14 +691,14 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         periodChanged();
         refreshFortfuehrungsList();
-    }//GEN-LAST:event_btnThisWeekActionPerformed
+    } //GEN-LAST:event_btnThisWeekActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnLastWeekActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastWeekActionPerformed
+    private void btnLastWeekActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnLastWeekActionPerformed
         final Calendar calendar = Calendar.getInstance();
 
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -717,14 +717,14 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         periodChanged();
         refreshFortfuehrungsList();
-    }//GEN-LAST:event_btnLastWeekActionPerformed
+    } //GEN-LAST:event_btnLastWeekActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnThisMonthActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThisMonthActionPerformed
+    private void btnThisMonthActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnThisMonthActionPerformed
         final Calendar calendar = Calendar.getInstance();
 
         final Date toDate = calendar.getTime();
@@ -742,14 +742,14 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         periodChanged();
         refreshFortfuehrungsList();
-    }//GEN-LAST:event_btnThisMonthActionPerformed
+    } //GEN-LAST:event_btnThisMonthActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnLastMonthActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastMonthActionPerformed
+    private void btnLastMonthActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnLastMonthActionPerformed
         final Calendar calendar = Calendar.getInstance();
 
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -768,90 +768,90 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
 
         periodChanged();
         refreshFortfuehrungsList();
-    }//GEN-LAST:event_btnLastMonthActionPerformed
+    } //GEN-LAST:event_btnLastMonthActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void dpiFromPropertyChange(final java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dpiFromPropertyChange
+    private void dpiFromPropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_dpiFromPropertyChange
         if (!lockDateButtons) {
             manualPeriodChangePerformed();
         }
-    }//GEN-LAST:event_dpiFromPropertyChange
+    }                                                                              //GEN-LAST:event_dpiFromPropertyChange
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void dpiToPropertyChange(final java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dpiToPropertyChange
+    private void dpiToPropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_dpiToPropertyChange
         if (!lockDateButtons) {
             manualPeriodChangePerformed();
         }
-    }//GEN-LAST:event_dpiToPropertyChange
+    }                                                                            //GEN-LAST:event_dpiToPropertyChange
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseDialogActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseDialogActionPerformed
+    private void btnCloseDialogActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseDialogActionPerformed
         dispose();
-    }//GEN-LAST:event_btnCloseDialogActionPerformed
+    }                                                                                  //GEN-LAST:event_btnCloseDialogActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstKassenzeichenValueChanged
+    private void lstKassenzeichenValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_lstKassenzeichenValueChanged
         jButton1.setEnabled(!lstKassenzeichen.getSelectionModel().isSelectionEmpty());
-    }//GEN-LAST:event_lstKassenzeichenValueChanged
+    }                                                                                           //GEN-LAST:event_lstKassenzeichenValueChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         gotoSelectedKassenzeichen();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstKassenzeichenMouseClicked
+    private void lstKassenzeichenMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lstKassenzeichenMouseClicked
         if (evt.getClickCount() == 2) {
             if (lstKassenzeichen.getSelectedValue() != null) {
                 gotoSelectedKassenzeichen();
             }
         }
-    }//GEN-LAST:event_lstKassenzeichenMouseClicked
+    }                                                                                //GEN-LAST:event_lstKassenzeichenMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void lblDokumentLinkMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDokumentLinkMouseClicked
+    private void lblDokumentLinkMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_lblDokumentLinkMouseClicked
         final String url = lblDokumentLink.getToolTipText();
         try {
             BrowserLauncher.openURL(url);
         } catch (Exception ex) {
             LOG.error("fehler beim öffnen der url", ex);
         }
-    }//GEN-LAST:event_lblDokumentLinkMouseClicked
+    }                                                                               //GEN-LAST:event_lblDokumentLinkMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cbxAbgearbeitetActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxAbgearbeitetActionPerformed
+    private void cbxAbgearbeitetActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cbxAbgearbeitetActionPerformed
         try {
             final int displayedIndex = jXTable1.getSelectedRow();
             final int modelIndex = jXTable1.convertRowIndexToModel(displayedIndex);
@@ -865,7 +865,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
         } catch (Exception ex) {
             LOG.error("fehler beim setzen von ist_abgearbeitet", ex);
         }
-    }//GEN-LAST:event_cbxAbgearbeitetActionPerformed
+    } //GEN-LAST:event_cbxAbgearbeitetActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -955,7 +955,8 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                             cal.setTime(selectedFortfuehrungItem.getBeginn());
                             final int year = cal.get(Calendar.YEAR);
 
-                            final String urlString = "\\\\stadt\\102\\102\\ALKIS-Dokumente\\Fortführungsnachweise\\" + year
+                            final String urlString = "\\\\stadt\\102\\102\\ALKIS-Dokumente\\Fortführungsnachweise\\"
+                                        + year
                                         + "\\FN_"
                                         + year + "_" + ffn.substring(2, 6) + "_" + ffn.substring(6, 11) + ".pdf";
                             setDokumentLink(urlString);
