@@ -50,7 +50,6 @@ import de.cismet.layout.FadingCardLayout;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
@@ -677,10 +676,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
                 final List<Geometry> geoms = new ArrayList<Geometry>();
                 for (final CidsBean kgeom : kgeoms) {
-                    geoms.add((Geometry)kgeom.getProperty(
-                            KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
-                                    + "."
-                                    + GeomPropertyConstants.PROP__GEO_FIELD));
+                    geoms.add((Geometry)kgeom.getProperty(KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE));
                 }
 
                 if (!geoms.isEmpty()) {
