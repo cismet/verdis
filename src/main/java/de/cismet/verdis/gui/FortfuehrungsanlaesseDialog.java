@@ -9,6 +9,8 @@ package de.cismet.verdis.gui;
 
 import Sirius.navigator.connection.SessionManager;
 
+import Sirius.server.middleware.types.MetaClass;
+
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -26,6 +28,8 @@ import org.openide.util.Exceptions;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Frame;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,6 +50,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.cismap.commons.CrsTransformer;
 
 import de.cismet.tools.BrowserLauncher;
@@ -53,6 +59,10 @@ import de.cismet.tools.BrowserLauncher;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
+import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.server.search.FortfuehrungItemSearch;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -852,19 +862,56 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      * @param  evt  DOCUMENT ME!
      */
     private void cbxAbgearbeitetActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cbxAbgearbeitetActionPerformed
-        try {
-            final int displayedIndex = jXTable1.getSelectedRow();
-            final int modelIndex = jXTable1.convertRowIndexToModel(displayedIndex);
-            // final CidsBean selectedFortfuehrungBean = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(
-            // modelIndex).getBean();
-            // selectedFortfuehrungBean.setProperty(
-            // FortfuehrungPropertyConstants.PROP__IST_ABGEARBEITET,
-            // cbxAbgearbeitet.isSelected());
-            // selectedFortfuehrungBean.persist();
-            jXTable1.repaint();
-        } catch (Exception ex) {
-            LOG.error("fehler beim setzen von ist_abgearbeitet", ex);
-        }
+        final int displayedIndex = jXTable1.getSelectedRow();
+        final int modelIndex = jXTable1.convertRowIndexToModel(displayedIndex);
+        final FortfuehrungItem selectedFortfuehrung = ((FortfuehrungenTableModel)jXTable1.getModel()).getItem(
+                modelIndex);
+
+        final boolean istAbgearbeitet = cbxAbgearbeitet.isSelected();
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    try {
+                        if (istAbgearbeitet) {
+                            final CidsBean fortfuehrungBean = CidsBean.createNewCidsBeanFromTableName(
+                                    VerdisConstants.DOMAIN,
+                                    VerdisMetaClassConstants.MC_FORTFUEHRUNG);
+                            fortfuehrungBean.setProperty(
+                                FortfuehrungPropertyConstants.PROP__ALKIS_FFN_ID,
+                                selectedFortfuehrung.getAnlassId());
+                            fortfuehrungBean.setProperty(
+                                FortfuehrungPropertyConstants.PROP__FLURSTUECK_ID,
+                                selectedFortfuehrung.getFlurstueck_id());
+                            fortfuehrungBean.setProperty(
+                                FortfuehrungPropertyConstants.PROP__ABGEARBEITET_AM,
+                                new Timestamp(new Date().getTime()));
+                            fortfuehrungBean.setProperty(
+                                FortfuehrungPropertyConstants.PROP__ABGEARBEITET_VON,
+                                SessionManager.getSession().getUser().getName());
+                            final CidsBean persisted = fortfuehrungBean.persist();
+                            selectedFortfuehrung.setFortfuehrung_id(persisted.getMetaObject().getId());
+                        } else {
+                            final MetaClass mc = CidsAppBackend.getInstance()
+                                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_FORTFUEHRUNG);
+                            final CidsBean fortfuehrungBean = CidsAppBackend.getInstance()
+                                        .getVerdisMetaObject(selectedFortfuehrung.getFortfuehrung_id(), mc.getId())
+                                        .getBean();
+                            fortfuehrungBean.delete();
+                            fortfuehrungBean.persist();
+                            selectedFortfuehrung.setFortfuehrung_id(null);
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("fehler beim setzen von ist_abgearbeitet", ex);
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    jXTable1.repaint();
+                }
+            }.execute();
     } //GEN-LAST:event_cbxAbgearbeitetActionPerformed
 
     /**
@@ -965,7 +1012,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                             LOG.fatal("", ex);
                         }
                         lstKassenzeichen.setEnabled(true);
-//                        cbxAbgearbeitet.setEnabled(true);
+                        cbxAbgearbeitet.setEnabled(true);
                         jProgressBar1.setVisible(false);
                     }
                 }.execute();
@@ -1022,17 +1069,19 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                                 .customServerSearch(SessionManager.getSession().getUser(), itemSearch);
                     final Map<Integer, FortfuehrungItem> ffnMap = new HashMap<Integer, FortfuehrungItem>();
                     for (final Object[] rawItem : rawItems) {
-                        final int id = (Integer)rawItem[0];
+                        final int id = (Integer)rawItem[FortfuehrungItemSearch.FIELD_ID];
                         if (!ffnMap.containsKey(id)) {
                             ffnMap.put(
                                 id,
                                 new FortfuehrungItem(
                                     id,
-                                    (String)rawItem[1],
-                                    (String)rawItem[2],
-                                    (Date)rawItem[3],
-                                    (String)rawItem[4],
-                                    (String)rawItem[5]));
+                                    (String)rawItem[FortfuehrungItemSearch.FIELD_FFN],
+                                    (String)rawItem[FortfuehrungItemSearch.FIELD_ANLASSNAME],
+                                    (Date)rawItem[FortfuehrungItemSearch.FIELD_BEGINN],
+                                    (Integer)rawItem[FortfuehrungItemSearch.FIELD_FLURSTUECK_ID],
+                                    (String)rawItem[FortfuehrungItemSearch.FIELD_FS_ALT],
+                                    (String)rawItem[FortfuehrungItemSearch.FIELD_FS_NEU],
+                                    (Integer)rawItem[FortfuehrungItemSearch.FIELD_FORTFUEHRUNG_ID]));
                         }
                         final Geometry geom = wktreader.read((String)rawItem[6]);
                         geom.setSRID(25832);
@@ -1060,7 +1109,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                         jXTable1.getSelectionModel().clearSelection();
                         ((FortfuehrungenTableModel)jXTable1.getModel()).setItems(items.toArray(
                                 new FortfuehrungItem[0]));
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         LOG.error("error while loading fortfuehrung items", ex);
                     }
                     btnRefreshAnlaesse.setEnabled(true);
@@ -1085,7 +1134,7 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
      */
     private void setDetailEnabled(final boolean enabled) {
         lstKassenzeichen.setEnabled(enabled);
-//        cbxAbgearbeitet.setEnabled(enabled);
+        cbxAbgearbeitet.setEnabled(enabled);
         lblDokumentLink.setEnabled(enabled);
     }
 
