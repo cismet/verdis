@@ -1975,7 +1975,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 lblMeasurement.setText("Fl\u00E4che: " + StaticDecimalTools.round(areadd) + "  Umfang: "
                             + StaticDecimalTools.round(umfangdd));
             }
-        } else if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ESW)) {
+        } else if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR)) {
             double length = 0.0;
             for (final Feature f : cf) {
                 if ((f != null) && (f.getGeometry() != null)) {
@@ -2312,7 +2312,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     featureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
                 }
                 break;
-                case ESW: {
+                case SR: {
                     featureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
                 }
                 break;
@@ -2341,7 +2341,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
                         }
                     }
-                    if (CidsAppBackend.Mode.ESW.equals(mode) || isMapExtentFixed) {
+                    if (CidsAppBackend.Mode.SR.equals(mode) || isMapExtentFixed) {
                         zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
                         if (zoomingFeatureCollection.getFeatureCount() == 0) {
                             zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
@@ -2473,7 +2473,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final SimpleMoveListener simpleMoveListener = (SimpleMoveListener)mappingComp.getInputListener(
                 MappingComponent.MOTION);
-        if (mode.equals(mode.ESW)) {
+        if (mode.equals(mode.SR)) {
             simpleMoveListener.setUnderlyingObjectHalo(0.0010d);
         } else {
             simpleMoveListener.setUnderlyingObjectHalo(0.0d);
@@ -2534,8 +2534,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 geomSearch.setScaleDenominator(CismapBroker.getInstance().getMappingComponent().getScaleDenominator());
                 geomSearch.setFlaecheFilter(CidsAppBackend.getInstance().getMode().equals(
                         CidsAppBackend.Mode.REGEN));
-                geomSearch.setFrontFilter(CidsAppBackend.getInstance().getMode().equals(
-                        CidsAppBackend.Mode.ESW));
+                geomSearch.setFrontFilter(CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR));
                 geomSearch.setAllgemeinFilter(CidsAppBackend.getInstance().getMode().equals(
                         CidsAppBackend.Mode.ALLGEMEIN));
 

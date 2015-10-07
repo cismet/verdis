@@ -81,12 +81,12 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBeanStore {
+public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements CidsBeanStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            WDSRTabellenPanel.class);
+            SRFrontenTabellenPanel.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -102,8 +102,8 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     /**
      * Creates new form TabellenPanel.
      */
-    public WDSRTabellenPanel() {
-        super(CidsAppBackend.Mode.ESW, new WDSRTableModel());
+    public SRFrontenTabellenPanel() {
+        super(CidsAppBackend.Mode.SR, new SRFrontenTableModel());
 
         initComponents();
         jxtOverview.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -166,18 +166,17 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                     final Validator validator;
 
                     if (modelColumnIndex == 0) {
-                        validator = WDSRDetailsPanel.getValidatorNummer(frontBean);
+                        validator = SRFrontenDetailsPanel.getValidatorNummer(frontBean);
                     } else if (modelColumnIndex == 1) {
                         final AggregatedValidator aggVal = new AggregatedValidator();
-                        aggVal.add(WDSRDetailsPanel.getValidatorLaengeGrafik(frontBean));
-                        aggVal.add(WDSRDetailsPanel.getValidatorLaengeKorrektur(frontBean));
+                        aggVal.add(SRFrontenDetailsPanel.getValidatorLaengeGrafik(frontBean));
+                        aggVal.add(SRFrontenDetailsPanel.getValidatorLaengeKorrektur(frontBean));
                         aggVal.validate();
                         validator = aggVal;
                     } else {
                         final AggregatedValidator aggVal = new AggregatedValidator();
-                        aggVal.add(WDSRDetailsPanel.getValidatorDatumErfassung(frontBean));
-                        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungWD(frontBean));
-                        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungSR(frontBean));
+                        aggVal.add(SRFrontenDetailsPanel.getValidatorDatumErfassung(frontBean));
+                        aggVal.add(SRFrontenDetailsPanel.getValidatorVeranlagungSR(frontBean));
                         aggVal.validate();
                         validator = aggVal;
                     }
@@ -199,12 +198,11 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     @Override
     public Validator getItemValidator(final CidsBean frontBean) {
         final AggregatedValidator aggVal = new AggregatedValidator();
-        aggVal.add(WDSRDetailsPanel.getValidatorNummer(frontBean));
-        aggVal.add(WDSRDetailsPanel.getValidatorLaengeGrafik(frontBean));
-        aggVal.add(WDSRDetailsPanel.getValidatorLaengeKorrektur(frontBean));
-        aggVal.add(WDSRDetailsPanel.getValidatorDatumErfassung(frontBean));
-        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungWD(frontBean));
-        aggVal.add(WDSRDetailsPanel.getValidatorVeranlagungSR(frontBean));
+        aggVal.add(SRFrontenDetailsPanel.getValidatorNummer(frontBean));
+        aggVal.add(SRFrontenDetailsPanel.getValidatorLaengeGrafik(frontBean));
+        aggVal.add(SRFrontenDetailsPanel.getValidatorLaengeKorrektur(frontBean));
+        aggVal.add(SRFrontenDetailsPanel.getValidatorDatumErfassung(frontBean));
+        aggVal.add(SRFrontenDetailsPanel.getValidatorVeranlagungSR(frontBean));
         aggVal.validate();
         return aggVal;
     }
@@ -287,13 +285,9 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
     public CidsBean createNewBean() throws Exception {
         final MetaClass srMC = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG);
-        final MetaClass wdMC = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_WINTERDIENST);
 
         final String srQuery = "SELECT " + srMC.getID() + ", " + srMC.getPrimaryKey() + " FROM " + srMC.getTableName()
                     + " WHERE schluessel = -100;";
-        final String wdQuery = "SELECT " + wdMC.getID() + ", " + wdMC.getPrimaryKey() + " FROM " + wdMC.getTableName()
-                    + " WHERE schluessel = -200;";
 
         final CidsBean frontBean = CidsAppBackend.getInstance()
                     .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
@@ -308,7 +302,6 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
                     .getEmptyInstance()
                     .getBean();
         final CidsBean strassenreinigungBean = CidsAppBackend.getInstance().getVerdisMetaObject(srQuery)[0].getBean();
-        final CidsBean winterdienstBean = CidsAppBackend.getInstance().getVerdisMetaObject(wdQuery)[0].getBean();
 
         final int newId = getNextNewBeanId();
         frontBean.setProperty(FrontinfoPropertyConstants.PROP__ID,
@@ -323,9 +316,6 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                     + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
             strassenreinigungBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            winterdienstBean);
         frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
             VerdisUtils.getValidNummer(getAllBeans()));
         frontBean.setProperty(
@@ -335,7 +325,7 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
         frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
                     + "."
                     + FrontinfoPropertyConstants.PROP__STRASSE,
-            Main.getInstance().getWdsrFrontenDetailsPanel().getLastStrasseBean());
+            Main.getInstance().getSRFrontenDetailsPanel().getLastStrasseBean());
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
         if ((sole != null) && (sole.getFeature().getGeometry() instanceof LineString)) {
@@ -404,11 +394,11 @@ public class WDSRTabellenPanel extends AbstractCidsBeanTable implements CidsBean
 
     @Override
     public void setGeometry(final Geometry geometry, final CidsBean cidsBean) throws Exception {
-        WDSRDetailsPanel.setGeometry(geometry, cidsBean);
+        SRFrontenDetailsPanel.setGeometry(geometry, cidsBean);
     }
 
     @Override
     public Geometry getGeometry(final CidsBean cidsBean) {
-        return WDSRDetailsPanel.getGeometry(cidsBean);
+        return SRFrontenDetailsPanel.getGeometry(cidsBean);
     }
 }

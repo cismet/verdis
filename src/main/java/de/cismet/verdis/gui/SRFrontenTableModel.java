@@ -23,8 +23,6 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.server.middleware.types.MetaObject;
-
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -32,7 +30,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
-import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -40,33 +37,31 @@ import de.cismet.verdis.commons.constants.WinterdienstPropertyConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRTableModel extends CidsBeanTableModel {
+public class SRFrontenTableModel extends CidsBeanTableModel {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final String[] COLUMN_NAMES = {
             "Nummer",
             "Länge",
-            "Straßenreinigung",
-            "Winterdienst"
+            "Straßenreinigung"
         };
     private static final Class[] COLUMN_CLASSES = {
             Integer.class,
             Float.class,
-            String.class,
             String.class
         };
 
     //~ Instance fields --------------------------------------------------------
 
-    private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WDSRTableModel.class);
+    private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(SRFrontenTableModel.class);
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new WDSRTableModel object.
+     * Creates a new SRFrontenTableModel object.
      */
-    public WDSRTableModel() {
+    public SRFrontenTableModel() {
         super(COLUMN_NAMES, COLUMN_CLASSES);
     }
 
@@ -117,26 +112,8 @@ public class WDSRTableModel extends CidsBeanTableModel {
                 LOG.warn("exception in tablemodel", e);
                 return "";
             }
-        } else {
-            try {
-                final CidsBean satzung_winterdienst = (CidsBean)frontBean.getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
-                                + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_WD);
-                final String wdKey;
-                if (satzung_winterdienst == null) {
-                    wdKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR + "."
-                                    + WinterdienstPropertyConstants.PROP__KEY);
-                } else {
-                    wdKey = (String)satzung_winterdienst.getProperty("wd_prio.key");
-                }
-                return (wdKey == null) ? "" : wdKey;
-            } catch (Exception e) {
-                LOG.warn("exception in tablemodel", e);
-                return "";
-            }
         }
+        return null;
     }
 
     @Override

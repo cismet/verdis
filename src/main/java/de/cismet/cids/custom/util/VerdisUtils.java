@@ -158,12 +158,6 @@ public class VerdisUtils {
                             + FrontinfoPropertyConstants.PROP__STRASSE,
                     frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
                 pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-                    frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG,
-                    frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG));
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
                     frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
                 pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
@@ -365,14 +359,6 @@ public class VerdisUtils {
         deepclone.setProperty(
             FrontPropertyConstants.PROP__FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
                     + FrontinfoPropertyConstants.PROP__STRASSE,
             cidsBean.getProperty(
                 FrontPropertyConstants.PROP__FRONTINFO
@@ -386,13 +372,6 @@ public class VerdisUtils {
                         + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
         if (sr_klasse != null) {
             sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-
-        final CidsBean wd_prio = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__WD_PRIO_OR);
-        if (wd_prio != null) {
-            wd_prio.getMetaObject().forceStatus(MetaObject.NO_STATUS);
         }
 
         final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
