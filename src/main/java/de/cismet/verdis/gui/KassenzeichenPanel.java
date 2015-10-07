@@ -87,7 +87,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private javax.swing.JSeparator sepTitle2;
     private javax.swing.JToggleButton togInfoMode;
     private javax.swing.JToggleButton togRegenMode;
-    private javax.swing.JToggleButton togWDSRMode;
+    private javax.swing.JToggleButton togSRMode;
     private javax.swing.JTextArea txtBemerkung;
     private javax.swing.JTextField txtErfassungsdatum;
     private javax.swing.JTextField txtKassenzeichen;
@@ -251,7 +251,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         togRegenMode = new javax.swing.JToggleButton();
-        togWDSRMode = new javax.swing.JToggleButton();
+        togSRMode = new javax.swing.JToggleButton();
         togInfoMode = new javax.swing.JToggleButton();
         sepTitle1 = new javax.swing.JSeparator();
         sepTitle2 = new javax.swing.JSeparator();
@@ -519,24 +519,24 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gridBagConstraints.gridy = 0;
         jPanel2.add(togRegenMode, gridBagConstraints);
 
-        btgMode.add(togWDSRMode);
-        togWDSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
-        togWDSRMode.setToolTipText("ESW");
-        togWDSRMode.setFocusable(false);
-        togWDSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        togWDSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        togWDSRMode.addActionListener(new java.awt.event.ActionListener() {
+        btgMode.add(togSRMode);
+        togSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
+        togSRMode.setToolTipText("ESW");
+        togSRMode.setFocusable(false);
+        togSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togSRMode.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togWDSRModeActionPerformed(evt);
+                    togSRModeActionPerformed(evt);
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
-        jPanel2.add(togWDSRMode, gridBagConstraints);
+        jPanel2.add(togSRMode, gridBagConstraints);
 
         btgMode.add(togInfoMode);
         togInfoMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/info_gr.png"))); // NOI18N
@@ -677,7 +677,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togWDSRModeActionPerformed
+    private void togSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togSRModeActionPerformed
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -688,14 +688,14 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 @Override
                 protected void done() {
                     try {
-                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ESW);
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.SR);
                         mainApp.refreshLeftTitleBarColor();
                     } catch (Exception e) {
                         LOG.error("Exception in Background Thread", e);
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_togWDSRModeActionPerformed
+    } //GEN-LAST:event_togSRModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -713,9 +713,9 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
             if (!togInfoMode.isSelected()) {
                 togInfoMode.setSelected(true);
             }
-        } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
-            if (!togWDSRMode.isSelected()) {
-                togWDSRMode.setSelected(true);
+        } else if (mode.equals(CidsAppBackend.Mode.SR)) {
+            if (!togSRMode.isSelected()) {
+                togSRMode.setSelected(true);
             }
         } else {
             if (!togRegenMode.isSelected()) {

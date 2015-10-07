@@ -21,11 +21,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * ZusammenfassungWinterdienstPanel.java
- *
- * Created on 04.12.2010, 10:30:26
- */
 package de.cismet.verdis.gui;
 
 import java.awt.Component;
@@ -51,7 +46,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore {
+public class SRFrontenSummenPanel extends javax.swing.JPanel implements CidsBeanStore {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -67,9 +62,9 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates new form ZusammenfassungWinterdienstPanel.
+     * Creates new form FrontenSummenPanel.
      */
-    public WDSRSummenPanel() {
+    public SRFrontenSummenPanel() {
         initComponents();
         tblSumStrasse.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 
@@ -122,8 +117,8 @@ public class WDSRSummenPanel extends javax.swing.JPanel implements CidsBeanStore
 
         lblStrasse.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblStrasse.setText(org.openide.util.NbBundle.getMessage(
-                WDSRSummenPanel.class,
-                "WDSRSummenPanel.lblStrasse.text")); // NOI18N
+                SRFrontenSummenPanel.class,
+                "SRFrontenSummenPanel.lblStrasse.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;

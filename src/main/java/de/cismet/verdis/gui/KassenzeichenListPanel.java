@@ -54,8 +54,8 @@ import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import static de.cismet.verdis.CidsAppBackend.Mode.ALLGEMEIN;
-import static de.cismet.verdis.CidsAppBackend.Mode.ESW;
 import static de.cismet.verdis.CidsAppBackend.Mode.REGEN;
+import static de.cismet.verdis.CidsAppBackend.Mode.SR;
 
 /**
  * DOCUMENT ME!
@@ -736,7 +736,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                     jCheckBox2.isSelected());
                         }
                         break;
-                        case ESW: {
+                        case SR: {
                             targetCollection = kassenzeichen.getBeanCollectionProperty(
                                     KassenzeichenPropertyConstants.PROP__FRONTEN);
                             newBean = VerdisUtils.createPastedFrontBean(
@@ -1332,7 +1332,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                                             FlaechePropertyConstants.PROP__FLAECHENINFO));
                                                 }
                                                 break;
-                                                case ESW: {
+                                                case SR: {
                                                     infoBeans.add((CidsBean)entity.getProperty(
                                                             FrontPropertyConstants.PROP__FRONTINFO));
                                                 }
@@ -1354,7 +1354,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                                 }
                                             }
                                             break;
-                                            case ESW: {
+                                            case SR: {
                                                 for (final CidsBean front
                                                             : kassenzeichenBean.getBeanCollectionProperty(
                                                                 KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
