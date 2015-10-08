@@ -48,6 +48,7 @@ import java.sql.Date;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -59,16 +60,20 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.SplittedNewFeature;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.validation.Validator;
 
 import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.CrossReference;
 
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
@@ -336,8 +341,57 @@ public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements Cid
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.YES_OPTION) {
+                final Integer lastSplitFrontId = CidsAppBackend.getInstance().getLastSplitFrontId();
+                if (lastSplitFrontId != null) {
+                    final Collection<CrossReference> crossreferences = CidsAppBackend.getInstance()
+                                .getFrontenCrossReferencesForFrontid(lastSplitFrontId);
+
+                    if ((crossreferences != null) && !crossreferences.isEmpty()) {
+                        final NewFrontDialog dialog = new NewFrontDialog();
+                        StaticSwingTools.showDialog(dialog);
+
+                        if (NewFrontDialog.RET_OK == dialog.getReturnStatus()) {
+                            if (dialog.isQuerverweiseChecked()) {
+                                for (final CrossReference crossreference : crossreferences) {
+                                    final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
+                                    CidsAppBackend.getInstance()
+                                            .getFrontToKassenzeichenQuerverweisMap()
+                                            .put(frontBean, kassenzeichenNummer);
+                                }
+                            }
+                        } else {
+                            return null;
+                        }
+                    }
+                }
+
+                CidsBean strasse = null;
+                CidsBean lage = null;
+                CidsBean reinigung = null;
+
                 try {
                     final Geometry geom = sole.getFeature().getGeometry();
+
+                    if (sole.getFeature() instanceof SplittedNewFeature) {
+                        final SplittedNewFeature splittedFeature = (SplittedNewFeature)sole.getFeature();
+                        if (splittedFeature.getSplittedFromPFeature().getFeature() instanceof CidsFeature) {
+                            final CidsBean sourceFrontBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
+                                            .getFeature()).getMetaObject().getBean();
+                            strasse = (CidsBean)sourceFrontBean.getProperty(
+                                    FrontPropertyConstants.PROP__FRONTINFO
+                                            + "."
+                                            + FrontinfoPropertyConstants.PROP__STRASSE);
+                            lage = (CidsBean)sourceFrontBean.getProperty(
+                                    FrontPropertyConstants.PROP__FRONTINFO
+                                            + "."
+                                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                            reinigung = (CidsBean)sourceFrontBean.getProperty(
+                                    FrontPropertyConstants.PROP__FRONTINFO
+                                            + "."
+                                            + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                        }
+                    }
+
                     // größe berechnen und zuweisen
                     final double abs_laenge = Math.abs(geom.getLength());
                     // round to second decimal place
@@ -348,6 +402,16 @@ public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements Cid
                     frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                 + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
                         laenge);
+                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__STRASSE,
+                        strasse);
+                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__LAGE_SR,
+                        lage);
+                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+                        reinigung);
+
                     setGeometry(geom, frontBean);
                     frontBean.setProperty(
                         FrontPropertyConstants.PROP__NUMMER,

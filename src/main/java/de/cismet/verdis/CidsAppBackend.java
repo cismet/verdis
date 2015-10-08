@@ -152,7 +152,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private Frame frameToDisplayDialogs = null;
     private MappingComponent mainMap = null;
     private Mode mode = null;
-    private int lastSplitFlaecheId = -1;
+    private Integer lastSplitFlaecheId;
+    private Integer lastSplitFrontId;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -1118,7 +1119,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public int getLastSplitFlaecheId() {
+    public Integer getLastSplitFlaecheId() {
         return lastSplitFlaecheId;
     }
 
@@ -1127,8 +1128,26 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @param  lastSplitFlaecheId  DOCUMENT ME!
      */
-    public void setLastSplitFlaecheId(final int lastSplitFlaecheId) {
+    public void setLastSplitFlaecheId(final Integer lastSplitFlaecheId) {
         this.lastSplitFlaecheId = lastSplitFlaecheId;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Integer getLastSplitFrontId() {
+        return lastSplitFrontId;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  lastSplitFrontId  DOCUMENT ME!
+     */
+    public void setLastSplitFrontId(final Integer lastSplitFrontId) {
+        this.lastSplitFrontId = lastSplitFrontId;
     }
 
     /**

@@ -2591,7 +2591,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  notification  DOCUMENT ME!
      */
     public void splitPolygon(final PNotification notification) {
-        if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.REGEN)) {
+        if (true) {
             final Object o = notification.getObject();
             if (o instanceof SplitPolygonListener) {
                 final SplitPolygonListener l = (SplitPolygonListener)o;
@@ -2602,18 +2602,28 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     }
                     final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
-                    try {
-                        cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
-                            null);
-                    } catch (Exception ex) {
-                        LOG.error("error while removing geometry", ex);
-                    }
+                    if (VerdisMetaClassConstants.MC_FLAECHE.equalsIgnoreCase(
+                                    cb.getMetaObject().getMetaClass().getTableName())) {
+                        try {
+                            cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                                null);
+                        } catch (Exception ex) {
+                            LOG.error("error while removing geometry", ex);
+                        }
 
-                    try {
                         CidsAppBackend.getInstance().setLastSplitFlaecheId(cb.getMetaObject().getId());
-                    } catch (final Exception ex) {
-                        LOG.error("error while saving last FlaecheQuerverweise", ex);
+                    } else if (VerdisMetaClassConstants.MC_FRONT.equalsIgnoreCase(
+                                    cb.getMetaObject().getMetaClass().getTableName())) {
+                        try {
+                            cb.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                        + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+                                null);
+                        } catch (Exception ex) {
+                            LOG.error("error while removing geometry", ex);
+                        }
+
+                        CidsAppBackend.getInstance().setLastSplitFrontId(cb.getMetaObject().getId());
                     }
                 }
                 final Feature[] f_arr = pf.split();
