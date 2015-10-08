@@ -427,6 +427,71 @@ public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements Cid
         return frontBean;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   strasseBean        DOCUMENT ME!
+     * @param   lageBean           DOCUMENT ME!
+     * @param   reinigungBean      DOCUMENT ME!
+     * @param   otherFrontenBeans  DOCUMENT ME!
+     * @param   geom               DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createNewFrontBean(final CidsBean strasseBean,
+            final CidsBean lageBean,
+            final CidsBean reinigungBean,
+            final Collection<CidsBean> otherFrontenBeans,
+            final Geometry geom) throws Exception {
+        final CidsBean frontBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean frontinfoBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO)
+                    .getEmptyInstance()
+                    .getBean();
+        final CidsBean geomBean = CidsAppBackend.getInstance()
+                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getEmptyInstance()
+                    .getBean();
+
+        final int newId = getNextNewBeanId();
+        frontBean.setProperty(FrontPropertyConstants.PROP__ID, newId);
+        frontBean.getMetaObject().setID(newId);
+
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+            geomBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__STRASSE,
+            strasseBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__LAGE_SR,
+            lageBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+            reinigungBean);
+        frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER, VerdisUtils.getValidNummer(otherFrontenBeans));
+
+        if (geom != null) {
+            try {
+                final int laenge = (int)(geom.getLength());
+                frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                    laenge);
+                frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                    laenge);
+                SRFrontenDetailsPanel.setGeometry(geom, frontBean);
+            } catch (Exception ex) {
+                LOG.error("error while assigning feature to new front", ex);
+            }
+        }
+
+        return frontBean;
+    }
+
     @Override
     public void removeBean(final CidsBean cidsBean) {
         if (cidsBean != null) {
