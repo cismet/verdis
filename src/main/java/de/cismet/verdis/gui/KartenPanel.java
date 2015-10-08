@@ -30,6 +30,7 @@ package de.cismet.verdis.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
@@ -51,7 +52,6 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import javax.swing.tree.TreePath;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -86,6 +86,7 @@ import de.cismet.tools.gui.historybutton.JHistoryButton;
 
 import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.CrossReference;
 import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.*;
@@ -356,7 +357,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 //
 //        };
         // mappingComp.addInputListener("TIM_EASY_CREATOR",)
-
         // TIM Easy
         cmdNewPoint.setVisible(true);
 
@@ -397,7 +397,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 //        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
 //            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
 //        }
-
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -2045,11 +2044,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  notification  DOCUMENT ME!
      */
     public void joinPolygons(final PNotification notification) {
-        if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.REGEN)) {
+        if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.REGEN)
+                    || CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR)) {
             PFeature one;
             PFeature two;
             one = mappingComp.getSelectedNode();
-            two = null;
 
             final Object o = notification.getObject();
 
@@ -2076,144 +2075,259 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                 final Geometry newGeom = one.getFeature()
                                             .getGeometry()
                                             .union(two.getFeature().getGeometry());
-                                if (newGeom.getGeometryType().equalsIgnoreCase("Multipolygon")) {
-                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                        "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.",
-                                        "Zusammenfassung nicht m\u00F6glich",
-                                        JOptionPane.WARNING_MESSAGE,
-                                        null);
-                                    return;
-                                }
-                                if (newGeom.getGeometryType().equalsIgnoreCase("Polygon")
-                                            && (((Polygon)newGeom).getNumInteriorRing() > 0)) {
-                                    JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                        "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.",
-                                        "Zusammenfassung nicht m\u00F6glich",
-                                        JOptionPane.WARNING_MESSAGE,
-                                        null);
-                                    return;
-                                }
-                                if ((one != null) && (two != null) && (one.getFeature() instanceof CidsFeature)
+
+                                if ((one.getFeature() instanceof CidsFeature)
                                             && (two.getFeature() instanceof CidsFeature)) {
                                     final CidsFeature cfOne = (CidsFeature)one.getFeature();
                                     final CidsFeature cfTwo = (CidsFeature)two.getFeature();
                                     final CidsBean cbOne = cfOne.getMetaObject().getBean();
                                     final CidsBean cbTwo = cfTwo.getMetaObject().getBean();
 
-                                    final int artOne = (Integer)cbOne.getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                                    + "."
-                                                    + FlaechenartPropertyConstants.PROP__ID);
-                                    final int artTwo = (Integer)cbTwo.getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
-                                                    + "."
-                                                    + FlaechenartPropertyConstants.PROP__ID);
+                                    if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.REGEN)) {
+                                        if (newGeom.getGeometryType().equalsIgnoreCase("Multipolygon")) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Es k\u00F6nnen nur Polygone zusammengefasst werden, die aneinander angrenzen oder sich \u00FCberlappen.",
+                                                "Zusammenfassung nicht m\u00F6glich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+                                        if (newGeom.getGeometryType().equalsIgnoreCase("Polygon")
+                                                    && (((Polygon)newGeom).getNumInteriorRing() > 0)) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Polygone k\u00F6nnen nur dann zusammengefasst werden, wenn dadurch kein Loch entsteht.",
+                                                "Zusammenfassung nicht m\u00F6glich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+                                        final int artOne = (Integer)cbOne.getProperty(
+                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                        + "."
+                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                        final int artTwo = (Integer)cbTwo.getProperty(
+                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                        + "."
+                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID);
 
-                                    final int gradOne = (Integer)cbOne.getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        final int gradOne = (Integer)cbOne.getProperty(
+                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                        + "."
+                                                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                        final int gradTwo = (Integer)cbTwo.getProperty(
+                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                        + "."
+                                                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+
+                                        if ((artOne != artTwo) || (gradOne != gradTwo)) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.",
+                                                "Zusammenfassung nicht m\u00F6glich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+
+                                        final Integer anteilOne = (Integer)cbOne.getProperty(
+                                                FlaechePropertyConstants.PROP__ANTEIL);
+                                        final Integer anteilTwo = (Integer)cbTwo.getProperty(
+                                                FlaechePropertyConstants.PROP__ANTEIL);
+
+                                        // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
+                                        if ((anteilOne != null) || (anteilTwo != null)) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.",
+                                                "Zusammenfassung nicht m\u00F6glich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+
+                                        Main.getInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
+
+                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                                                     + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
-                                                    + "."
-                                                    + AnschlussgradPropertyConstants.PROP__ID);
-                                    final int gradTwo = (Integer)cbTwo.getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
-                                                    + "."
-                                                    + AnschlussgradPropertyConstants.PROP__ID);
+                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                            (int)(newGeom.getArea()));
 
-                                    if ((artOne != artTwo) || (gradOne != gradTwo)) {
-                                        JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                            "Fl\u00E4chen k\u00F6nnen nur zusammengefasst werden, wenn Fl\u00E4chenart und Anschlussgrad gleich sind.",
-                                            "Zusammenfassung nicht m\u00F6glich",
-                                            JOptionPane.WARNING_MESSAGE,
-                                            null);
-                                        return;
-                                    }
+                                        final String bemerkungOne = (String)cbOne.getProperty(
+                                                FlaechePropertyConstants.PROP__BEMERKUNG);
 
-                                    final Integer anteilOne = (Integer)cbOne.getProperty(
-                                            FlaechePropertyConstants.PROP__ANTEIL);
-                                    final Integer anteilTwo = (Integer)cbTwo.getProperty(
-                                            FlaechePropertyConstants.PROP__ANTEIL);
-
-                                    // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
-                                    if ((anteilOne != null) || (anteilTwo != null)) {
-                                        JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
-                                            "Fl\u00E4chen die von Teileigentum betroffen sind k\u00F6nnen nicht zusammengefasst werden.",
-                                            "Zusammenfassung nicht m\u00F6glich",
-                                            JOptionPane.WARNING_MESSAGE,
-                                            null);
-                                        return;
-                                    }
-
-                                    Main.getInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
-
-                                    cbOne.setProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                + "."
-                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                        new Integer((int)(newGeom.getArea())));
-
-                                    final String bemerkungOne = (String)cbOne.getProperty(
-                                            FlaechePropertyConstants.PROP__BEMERKUNG);
-
-                                    if ((bemerkungOne != null) && (bemerkungOne.trim().length() > 0)) {
+                                        if ((bemerkungOne != null) && (bemerkungOne.trim().length() > 0)) {
+                                            cbOne.setProperty(
+                                                FlaechePropertyConstants.PROP__BEMERKUNG,
+                                                bemerkungOne
+                                                        + "\n");
+                                        }
                                         cbOne.setProperty(
                                             FlaechePropertyConstants.PROP__BEMERKUNG,
-                                            bemerkungOne
-                                                    + "\n");
-                                    }
-                                    cbOne.setProperty(
-                                        FlaechePropertyConstants.PROP__BEMERKUNG,
-                                        getJoinBackupString(cbTwo));
+                                            getFlaecheJoinBackupString(cbTwo));
 
-                                    final boolean sperreOne = (cbOne.getProperty(
-                                                FlaechePropertyConstants.PROP__SPERRE) != null)
-                                                && (Boolean)cbOne.getProperty(
-                                                    FlaechePropertyConstants.PROP__SPERRE);
-                                    final boolean sperreTwo = (cbTwo.getProperty(
-                                                FlaechePropertyConstants.PROP__SPERRE) != null)
-                                                && (Boolean)cbTwo.getProperty(
-                                                    FlaechePropertyConstants.PROP__SPERRE);
+                                        final boolean sperreOne = (cbOne.getProperty(
+                                                    FlaechePropertyConstants.PROP__SPERRE) != null)
+                                                    && (Boolean)cbOne.getProperty(
+                                                        FlaechePropertyConstants.PROP__SPERRE);
+                                        final boolean sperreTwo = (cbTwo.getProperty(
+                                                    FlaechePropertyConstants.PROP__SPERRE) != null)
+                                                    && (Boolean)cbTwo.getProperty(
+                                                        FlaechePropertyConstants.PROP__SPERRE);
 
-                                    if (!sperreOne && sperreTwo) {
-                                        cbOne.setProperty(FlaechePropertyConstants.PROP__SPERRE, true);
+                                        if (!sperreOne && sperreTwo) {
+                                            cbOne.setProperty(FlaechePropertyConstants.PROP__SPERRE, true);
+                                            cbOne.setProperty(
+                                                FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                                "JOIN::"
+                                                        + cbTwo.getProperty(
+                                                            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE));
+                                        }
+                                        // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
+                                        RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
                                         cbOne.setProperty(
-                                            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
-                                            "JOIN::"
-                                                    + cbTwo.getProperty(
-                                                        FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE));
-                                    }
-                                }
-                                if (one.getFeature() instanceof CidsFeature) {
-                                    final CidsFeature cfOne = (CidsFeature)one.getFeature();
-                                    final CidsBean cbOne = cfOne.getMetaObject().getBean();
+                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                    + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                            (int)newGeom.getArea());
+                                        if (LOG.isDebugEnabled()) {
+                                            LOG.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
+                                        }
+                                    } else if (CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR)) {
+                                        final LineMerger lm = new LineMerger();
+                                        lm.add(one.getFeature().getGeometry());
+                                        lm.add(two.getFeature().getGeometry());
 
-                                    // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
-                                    RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
-                                    cbOne.setProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                + "."
-                                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                        (int)newGeom.getArea());
+                                        final Collection<Geometry> resLs = lm.getMergedLineStrings();
+                                        if (resLs.size() > 1) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Es können nur Fronten zusammengefasst werden,\n"
+                                                        + "die sich berühren oder sich überlappen.",
+                                                "Zusammenfassung nicht m\u00F6glich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+
+                                        final Collection<CrossReference> oneCrossRefs = CidsAppBackend.getInstance()
+                                                    .getFrontenCrossReferencesForFrontid((Integer)cbOne.getProperty(
+                                                            FrontPropertyConstants.PROP__ID));
+                                        final Collection<CrossReference> twoCrossRefs = CidsAppBackend.getInstance()
+                                                    .getFrontenCrossReferencesForFrontid((Integer)cbTwo.getProperty(
+                                                            FrontPropertyConstants.PROP__ID));
+
+                                        final Collection<Integer> oneCrossRefkassenzeichenList =
+                                            new ArrayList<Integer>();
+                                        if (oneCrossRefs != null) {
+                                            for (final CrossReference crossRef : oneCrossRefs) {
+                                                oneCrossRefkassenzeichenList.add(crossRef.getEntityToKassenzeichen());
+                                            }
+                                        }
+                                        final Collection<Integer> twoCrossRefkassenzeichenList =
+                                            new ArrayList<Integer>();
+                                        if (twoCrossRefs != null) {
+                                            for (final CrossReference crossRef : twoCrossRefs) {
+                                                twoCrossRefkassenzeichenList.add(crossRef.getEntityToKassenzeichen());
+                                            }
+                                        }
+                                        final boolean sameCrossRefs = (oneCrossRefkassenzeichenList.size()
+                                                        == twoCrossRefkassenzeichenList.size())
+                                                    && oneCrossRefkassenzeichenList.containsAll(
+                                                        twoCrossRefkassenzeichenList);
+                                        if (!sameCrossRefs) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Fronten können nur zusammengefasst werden, wenn die\n"
+                                                        + "Querverweise auf das selbe Kassenzeichen verweisen.",
+                                                "Zusammenfassung nicht möglich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+
+                                        final Integer lageOne = (Integer)cbOne.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__LAGE_SR
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                        final Integer lageTwo = (Integer)cbTwo.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__LAGE_SR
+                                                        + "."
+                                                        + FlaechenartPropertyConstants.PROP__ID);
+
+                                        final Integer strasseOne = (Integer)cbOne.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__STRASSE
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                        final Integer strasseTwo = (Integer)cbTwo.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__STRASSE
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                        final Integer reinigungOne = (Integer)cbOne.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                        final Integer reinigungTwo = (Integer)cbTwo.getProperty(
+                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                        + "."
+                                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR
+                                                        + "."
+                                                        + AnschlussgradPropertyConstants.PROP__ID);
+
+                                        final boolean sameLage = Integer.compare((lageOne != null) ? lageOne : -1,
+                                                (lageTwo != null) ? lageTwo : -1) == 0;
+                                        final boolean sameStrasse = Integer.compare((strasseOne != null) ? strasseOne
+                                                                                                         : -1,
+                                                (strasseTwo != null) ? strasseTwo : -1) == 0;
+                                        final boolean sameReinigung = Integer.compare((reinigungOne != null)
+                                                    ? reinigungOne : -1,
+                                                (reinigungTwo != null) ? reinigungTwo : -1) == 0;
+                                        if (!sameLage || !sameStrasse || !sameReinigung) {
+                                            JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
+                                                "Fronten können nur zusammengefasst werden, wenn Straße, Lage und Straßenreinigung gleich sind.",
+                                                "Zusammenfassung nicht möglich",
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null);
+                                            return;
+                                        }
+
+                                        Main.getInstance().getSRFrontenTabellenPanel().removeBean(cbTwo);
+
+                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                            (int)(newGeom.getArea()));
+
+                                        // Eine vorhandene Front und eine neuangelegt wurden gejoint
+                                        SRFrontenDetailsPanel.setGeometry(newGeom, cbOne);
+                                        cbOne.setProperty(
+                                            FrontPropertyConstants.PROP__FRONTINFO
+                                                    + "."
+                                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                            (int)newGeom.getLength());
+                                    }
+                                    one.getFeature().setGeometry(newGeom);
+                                    if (!(one.getFeature().getGeometry().equals(backup))) {
+                                        two.removeFromParent();
+                                        two = null;
+                                    }
+                                    one.visualize();
                                 }
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
-                                }
-                                one.getFeature().setGeometry(newGeom);
-                                if (!(one.getFeature().getGeometry().equals(backup))) {
-                                    two.removeFromParent();
-                                    two = null;
-                                }
-                                one.visualize();
                             } catch (Exception e) {
                                 LOG.error("one: " + one + "\n two: " + two, e);
                             }
-                            return;
                         }
                     } else {
                         final PFeature pf = joinCandidate;
@@ -2240,7 +2354,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @return  DOCUMENT ME!
      */
-    private static String getJoinBackupString(final CidsBean flaecheBean) {
+    private static String getFlaecheJoinBackupString(final CidsBean flaecheBean) {
         final String bezeichnung = (String)flaecheBean.getProperty(
                 FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
         final String gr_grafik = Integer.toString((Integer)flaecheBean.getProperty(
