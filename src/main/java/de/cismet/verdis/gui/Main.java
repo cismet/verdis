@@ -340,7 +340,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private View vKassenzeichenList;
     private View vKanaldaten;
     private View vSummen;
-    private View vDokumente;
     private View vKarte;
     private View vTabelleSR;
     private View vDetailsSR;
@@ -355,7 +354,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
-    private final DokumentenPanel dokPanel = new DokumentenPanel();
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
 
     private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
@@ -435,7 +433,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenu menWindows;
     private javax.swing.JMenuItem mniClose;
     private javax.swing.JMenuItem mniDetails;
-    private javax.swing.JMenuItem mniDokumente;
     private javax.swing.JMenuItem mniKanalanschluss;
     private javax.swing.JMenuItem mniKarte;
     private javax.swing.JMenuItem mniKassenzeichen;
@@ -482,7 +479,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(srFrontenTabellenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(dokPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenGeometrienPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(allgInfosPanel);
 //        CidsAppBackend.getInstance().addCidsBeanStore(historyPanel);
@@ -498,7 +494,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
         CidsAppBackend.getInstance().addEditModeListener(regenFlaechenDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
-        CidsAppBackend.getInstance().addEditModeListener(dokPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
         CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
 
@@ -745,9 +740,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             vKanaldaten = new View("Kanalanschluss", Static2DTools.borderIcon(icoKanal, 0, 3, 0, 1), kanaldatenPanel);
             viewMap.addView("Kanalanschluss", vKanaldaten);
-
-            vDokumente = new View("Dokumente", Static2DTools.borderIcon(icoDokumente, 0, 3, 0, 1), dokPanel);
-            viewMap.addView("Dokumente", vDokumente);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
             viewMap.addView("Karte", vKarte);
@@ -1563,10 +1555,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(
                                     true,
                                     0.6f,
-                                    new SplitWindow(true, 0.3f,
-                                        vSummen,
-                                        vKanaldaten),
-                                    vDokumente)),
+                                    vSummen,
+                                    vKanaldaten)),
                             new SplitWindow(
                                 true,
                                 0.66f,
@@ -1600,9 +1590,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(true, 0.62f,
                                     vKassenzeichen,
                                     vKassenzeichenList),
-                                new SplitWindow(true, 0.6f,
-                                    vZusammenfassungSR,
-                                    vDokumente)),
+                                vZusammenfassungSR),
                             new SplitWindow(
                                 true,
                                 0.66f,
@@ -1637,9 +1625,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(true, 0.62f,
                                     vKassenzeichen,
                                     vKassenzeichenList),
-                                new SplitWindow(true, 0.6f,
-                                    vInfoAllgemein,
-                                    vDokumente)),
+                                vInfoAllgemein),
                             new SplitWindow(true, 0.66f,
                                 vKarte,
                                 vDetailsAllgemein)));
@@ -1822,7 +1808,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mniKassenzeichen1 = new javax.swing.JMenuItem();
         mniSummen = new javax.swing.JMenuItem();
         mniKanalanschluss = new javax.swing.JMenuItem();
-        mniDokumente = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         mniKarte = new javax.swing.JMenuItem();
         mniTabelle = new javax.swing.JMenuItem();
@@ -2627,22 +2612,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         menWindows.add(mniKanalanschluss);
-
-        mniDokumente.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_5,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniDokumente.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/docs.png"))); // NOI18N
-        mniDokumente.setMnemonic('a');
-        mniDokumente.setText("Dokumente");
-        mniDokumente.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniDokumenteActionPerformed(evt);
-                }
-            });
-        menWindows.add(mniDokumente);
         menWindows.add(jSeparator11);
 
         mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
@@ -2755,15 +2724,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
     }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDokumenteActionPerformed
-        showOrHideView(vDokumente);
-    }                                                                                //GEN-LAST:event_mniDokumenteActionPerformed
 
     /**
      * DOCUMENT ME!
