@@ -38,8 +38,6 @@ public class AppPreferences {
     private String domainserver;
     private int kassenzeichenClassId;
     private int geomClassId;
-    private int dmsUrlBaseClassId;
-    private int dmsUrlClassId;
     private String kassenzeichenSuche;
     private Vector usergroups = new Vector();
     private Vector rwGroups = new Vector();
@@ -138,8 +136,6 @@ public class AppPreferences {
             domainserver = root.getChild("general").getAttribute("domainserver").getValue();
             kassenzeichenClassId = root.getChild("general").getAttribute("kassenzeichenClassId").getIntValue();
             geomClassId = root.getChild("general").getAttribute("geomClassId").getIntValue();
-            dmsUrlBaseClassId = root.getChild("general").getAttribute("dmsUrlBaseClassId").getIntValue();
-            dmsUrlClassId = root.getChild("general").getAttribute("dmsUrlClassId").getIntValue();
             kassenzeichenSuche = root.getChild("general").getAttribute("kassenzeichenSuche").getValue();
             standaloneDomainname = root.getChild("standalone").getAttribute("userdomainname").getValue();
             standaloneCallServerHost = root.getChild("standalone").getAttribute("callserverhost").getValue();
@@ -432,42 +428,6 @@ public class AppPreferences {
      */
     public void setGeomClassId(final int geomClassId) {
         this.geomClassId = geomClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getDmsUrlBaseClassId() {
-        return dmsUrlBaseClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dmsUrlBaseClassId  DOCUMENT ME!
-     */
-    public void setDmsUrlBaseClassId(final int dmsUrlBaseClassId) {
-        this.dmsUrlBaseClassId = dmsUrlBaseClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getDmsUrlClassId() {
-        return dmsUrlClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dmsUrlClassId  DOCUMENT ME!
-     */
-    public void setDmsUrlClassId(final int dmsUrlClassId) {
-        this.dmsUrlClassId = dmsUrlClassId;
     }
 
     /**
