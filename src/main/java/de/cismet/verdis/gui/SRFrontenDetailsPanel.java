@@ -87,12 +87,12 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WDSRDetailsPanel extends AbstractDetailsPanel {
+public class SRFrontenDetailsPanel extends AbstractDetailsPanel {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            WDSRDetailsPanel.class);
+            SRFrontenDetailsPanel.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -101,44 +101,43 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     private CidsBean lastStrasseBean = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanWdsrDetails;
+    private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanSrDetails;
+    private javax.swing.JCheckBox cbAnteil;
+    private javax.swing.JCheckBox cbBaulasten;
+    private javax.swing.JCheckBox cbGarageStellplatz;
+    private javax.swing.JCheckBox cbGrunddienstbarkeit;
+    private javax.swing.JCheckBox cbQuadratwurzel;
     private javax.swing.JComboBox cboLageSR;
-    private javax.swing.JComboBox cboLageWD;
     private javax.swing.JComboBox cboSR;
     private javax.swing.JComboBox cboStrasse;
-    private javax.swing.JComboBox cboWD;
     private javax.swing.JEditorPane edtQuer;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JLabel labLageSR;
-    private javax.swing.JLabel labLageWD;
     private javax.swing.JLabel lblBemSR;
-    private javax.swing.JLabel lblBemWD;
     private javax.swing.JLabel lblErfassungsdatumDesc;
-    private javax.swing.JLabel lblErfassungsdatumDesc1;
     private javax.swing.JLabel lblLaengeGR;
     private javax.swing.JLabel lblLaengeKorr;
     private javax.swing.JLabel lblLastEditorDescr;
     private javax.swing.JLabel lblNummer;
     private javax.swing.JLabel lblQuerverweise;
-    private javax.swing.JLabel lblVeranlagungWD;
+    private javax.swing.JLabel lblStrasse;
+    private javax.swing.JLabel lblStrassenreinigung;
+    private javax.swing.JLabel lblVeranlagungSR;
+    private javax.swing.JLabel lblWinkel;
     private javax.swing.JScrollPane scpBemSR;
-    private javax.swing.JScrollPane scpBemWD;
     private javax.swing.JScrollPane scpQuer;
     private javax.swing.JTextField txtBearbeitetDurch;
     private javax.swing.JTextArea txtBemSR;
-    private javax.swing.JTextArea txtBemWD;
     private javax.swing.JTextField txtErfassungsdatum;
     private javax.swing.JTextField txtLaengeGrafik;
     private javax.swing.JTextField txtLaengeKorrektur;
     private javax.swing.JTextField txtNummer;
     private javax.swing.JTextField txtVeranlagungSR;
-    private javax.swing.JTextField txtVeranlagungWD;
+    private javax.swing.JFormattedTextField txtWinkel;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -147,15 +146,13 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
     /**
      * Creates new form DetailPanel.
      */
-    public WDSRDetailsPanel() {
+    public SRFrontenDetailsPanel() {
         initComponents();
 
         ((DefaultBindableReferenceCombo)cboStrasse).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisMetaClassConstants.MC_STRASSE));
         ((DefaultBindableReferenceCombo)cboSR).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisMetaClassConstants.MC_STRASSENREINIGUNG));
-        ((DefaultBindableReferenceCombo)cboWD).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_WINTERDIENST));
 
         cboLageSR.setRenderer(new DefaultListCellRenderer() {
 
@@ -173,27 +170,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                         final String strasse = (String)bean.getProperty("strasse.name");
                         final String bem = (String)bean.getProperty("sr_bem");
                         final String key = (String)bean.getProperty("sr_klasse.key");
-                        setText(((bem == null) ? strasse : bem) + " (" + key + ")");
-                    }
-                    return this;
-                }
-            });
-        cboLageWD.setRenderer(new DefaultListCellRenderer() {
-
-                @Override
-                public Component getListCellRendererComponent(final JList list,
-                        final Object value,
-                        final int index,
-                        final boolean isSelected,
-                        final boolean cellHasFocus) {
-                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    if (value == null) {
-                        setText("manuelle Auswahl des Winterdienstes");
-                    } else if (value instanceof CidsBean) {
-                        final CidsBean bean = (CidsBean)value;
-                        final String strasse = (String)bean.getProperty("strasse.name");
-                        final String bem = (String)bean.getProperty("wd_bem");
-                        final String key = (String)bean.getProperty("wd_prio.key");
                         setText(((bem == null) ? strasse : bem) + " (" + key + ")");
                     }
                     return this;
@@ -270,30 +246,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                     + "."
                     + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG,
             getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            cboLageWD,
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__LAGE_WD,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            cboWD,
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            txtBemWD,
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__WD_BEM,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            txtVeranlagungWD,
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG,
-            getMultiBeanHelper());
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
     }
@@ -326,9 +278,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtErfassungsdatum);
         getValidatorDatumErfassung(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
                 txtErfassungsdatum));
-        ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungWD);
-        getValidatorVeranlagungWD(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
-                txtVeranlagungWD));
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungSR);
         getValidatorVeranlagungSR(frontBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
                 txtVeranlagungSR));
@@ -344,59 +293,102 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         java.awt.GridBagConstraints gridBagConstraints;
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        bpanWdsrDetails = new de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel();
+        bpanSrDetails = new de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel();
         lblNummer = new javax.swing.JLabel();
-        txtNummer = new javax.swing.JTextField();
         lblLaengeGR = new javax.swing.JLabel();
-        txtLaengeGrafik = new javax.swing.JTextField();
         lblLaengeKorr = new javax.swing.JLabel();
-        txtLaengeKorrektur = new javax.swing.JTextField();
         lblLastEditorDescr = new javax.swing.JLabel();
-        cboStrasse = new DefaultBindableReferenceCombo(true);
-        cboSR = new DefaultBindableReferenceCombo();
         lblErfassungsdatumDesc = new javax.swing.JLabel();
-        scpBemSR = new javax.swing.JScrollPane();
-        txtBemSR = new javax.swing.JTextArea();
-        lblBemSR = new javax.swing.JLabel();
-        lblBemWD = new javax.swing.JLabel();
-        scpBemWD = new javax.swing.JScrollPane();
-        txtBemWD = new javax.swing.JTextArea();
-        cboWD = new DefaultBindableReferenceCombo();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
+        lblStrasse = new javax.swing.JLabel();
+        txtNummer = new javax.swing.JTextField();
+        txtLaengeGrafik = new javax.swing.JTextField();
+        txtLaengeKorrektur = new javax.swing.JTextField();
         txtBearbeitetDurch = new javax.swing.JTextField();
         txtErfassungsdatum = new javax.swing.JTextField();
-        lblErfassungsdatumDesc1 = new javax.swing.JLabel();
-        txtVeranlagungSR = new javax.swing.JTextField();
-        lblVeranlagungWD = new javax.swing.JLabel();
-        txtVeranlagungWD = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        cboStrasse = new DefaultBindableReferenceCombo(true);
+        jSeparator1 = new javax.swing.JSeparator();
         labLageSR = new javax.swing.JLabel();
-        cboLageWD = new javax.swing.JComboBox();
+        lblStrassenreinigung = new javax.swing.JLabel();
+        lblBemSR = new javax.swing.JLabel();
+        lblVeranlagungSR = new javax.swing.JLabel();
         cboLageSR = new javax.swing.JComboBox();
-        labLageWD = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        cboSR = new DefaultBindableReferenceCombo();
+        scpBemSR = new javax.swing.JScrollPane();
+        txtBemSR = new javax.swing.JTextArea();
+        txtVeranlagungSR = new javax.swing.JTextField();
+        jSeparator3 = new javax.swing.JSeparator();
+        jPanel2 = new javax.swing.JPanel();
+        cbGarageStellplatz = new javax.swing.JCheckBox();
+        cbBaulasten = new javax.swing.JCheckBox();
+        cbGrunddienstbarkeit = new javax.swing.JCheckBox();
+        cbAnteil = new javax.swing.JCheckBox();
+        cbQuadratwurzel = new javax.swing.JCheckBox();
+        lblWinkel = new javax.swing.JLabel();
+        txtWinkel = new javax.swing.JFormattedTextField();
+        jSeparator4 = new javax.swing.JSeparator();
         lblQuerverweise = new javax.swing.JLabel();
         scpQuer = new javax.swing.JScrollPane();
         edtQuer = new javax.swing.JEditorPane();
-        jSeparator3 = new javax.swing.JSeparator();
         jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        bpanWdsrDetails.setOpaque(false);
-        bpanWdsrDetails.setLayout(new java.awt.GridBagLayout());
+        bpanSrDetails.setOpaque(false);
+        bpanSrDetails.setLayout(new java.awt.GridBagLayout());
 
         lblNummer.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblNummer.text")); // NOI18N
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblNummer.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblNummer, gridBagConstraints);
+        bpanSrDetails.add(lblNummer, gridBagConstraints);
+
+        lblLaengeGR.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblLaengeGR.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblLaengeGR, gridBagConstraints);
+
+        lblLaengeKorr.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblLaengeKorr.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblLaengeKorr, gridBagConstraints);
+
+        lblLastEditorDescr.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblLastEditorDescr.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblLastEditorDescr, gridBagConstraints);
+
+        lblErfassungsdatumDesc.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblErfassungsdatumDesc.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblErfassungsdatumDesc, gridBagConstraints);
+
+        lblStrasse.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblStrasse.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblStrasse, gridBagConstraints);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -411,21 +403,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtNummer, gridBagConstraints);
-
-        lblLaengeGR.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblLaengeGR.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblLaengeGR, gridBagConstraints);
+        bpanSrDetails.add(txtNummer, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -442,21 +423,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtLaengeGrafik, gridBagConstraints);
-
-        lblLaengeKorr.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblLaengeKorr.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblLaengeKorr, gridBagConstraints);
+        bpanSrDetails.add(txtLaengeGrafik, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -473,21 +443,47 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtLaengeKorrektur, gridBagConstraints);
+        bpanSrDetails.add(txtLaengeKorrektur, gridBagConstraints);
 
-        lblLastEditorDescr.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblLastEditorDescr.text")); // NOI18N
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bearbeitet_durch}"),
+                txtBearbeitetDurch,
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                FrontPropertyConstants.PROP__BEARBEITET_DURCH);
+        binding.setSourceNullValue("");
+        binding.setSourceUnreadableValue("");
+        bindingGroup.addBinding(binding);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblLastEditorDescr, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanSrDetails.add(txtBearbeitetDurch, gridBagConstraints);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.erfassungsdatum}"),
+                txtErfassungsdatum,
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                FrontPropertyConstants.PROP__ERFASSUNGSDATUM);
+        binding.setSourceNullValue("");
+        binding.setSourceUnreadableValue("");
+        binding.setConverter(new SqlDateToStringConverter());
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanSrDetails.add(txtErfassungsdatum, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -509,15 +505,75 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(cboStrasse, gridBagConstraints);
+        bpanSrDetails.add(cboStrasse, gridBagConstraints);
+
+        jSeparator1.setMinimumSize(new java.awt.Dimension(0, 10));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanSrDetails.add(jSeparator1, gridBagConstraints);
+
+        labLageSR.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.labLageSR.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(labLageSR, gridBagConstraints);
+
+        lblStrassenreinigung.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblStrassenreinigung.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblStrassenreinigung, gridBagConstraints);
+
+        lblBemSR.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblBemSR.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblBemSR, gridBagConstraints);
+
+        lblVeranlagungSR.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblVeranlagungSR.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblVeranlagungSR, gridBagConstraints);
+
+        cboLageSR.setToolTipText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cboLageSR.toolTipText")); // NOI18N
+        cboLageSR.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cboLageSRActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanSrDetails.add(cboLageSR, gridBagConstraints);
 
         cboSR.setToolTipText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.cboSR.toolTipText")); // NOI18N
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cboSR.toolTipText")); // NOI18N
         cboSR.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -527,21 +583,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(cboSR, gridBagConstraints);
-
-        lblErfassungsdatumDesc.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblErfassungsdatumDesc.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblErfassungsdatumDesc, gridBagConstraints);
+        bpanSrDetails.add(cboSR, gridBagConstraints);
 
         txtBemSR.setColumns(20);
         txtBemSR.setLineWrap(true);
@@ -564,147 +609,11 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(scpBemSR, gridBagConstraints);
-
-        lblBemSR.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblBemSR.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblBemSR, gridBagConstraints);
-
-        lblBemWD.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblBemWD.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblBemWD, gridBagConstraints);
-
-        txtBemWD.setColumns(20);
-        txtBemWD.setLineWrap(true);
-        txtBemWD.setRows(2);
-        txtBemWD.setMinimumSize(new java.awt.Dimension(240, 200));
-        txtBemWD.setPreferredSize(new java.awt.Dimension(21, 756));
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_bem}"),
-                txtBemWD,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                "frontinfo.wd_bem");
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        scpBemWD.setViewportView(txtBemWD);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(scpBemWD, gridBagConstraints);
-
-        cboWD.setToolTipText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.cboWD.toolTipText")); // NOI18N
-        cboWD.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboWDActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(cboWD, gridBagConstraints);
-
-        jSeparator1.setMinimumSize(new java.awt.Dimension(0, 10));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(jSeparator1, gridBagConstraints);
-
-        jSeparator2.setMinimumSize(new java.awt.Dimension(0, 10));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(jSeparator2, gridBagConstraints);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bearbeitet_durch}"),
-                txtBearbeitetDurch,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__BEARBEITET_DURCH);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtBearbeitetDurch, gridBagConstraints);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.erfassungsdatum}"),
-                txtErfassungsdatum,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__ERFASSUNGSDATUM);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        binding.setConverter(new SqlDateToStringConverter());
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtErfassungsdatum, gridBagConstraints);
-
-        lblErfassungsdatumDesc1.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblErfassungsdatumDesc1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblErfassungsdatumDesc1, gridBagConstraints);
+        bpanSrDetails.add(scpBemSR, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -719,180 +628,185 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtVeranlagungSR, gridBagConstraints);
+        bpanSrDetails.add(txtVeranlagungSR, gridBagConstraints);
 
-        lblVeranlagungWD.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblVeranlagungWD.text")); // NOI18N
+        jSeparator3.setMinimumSize(new java.awt.Dimension(0, 10));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 15;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(lblVeranlagungWD, gridBagConstraints);
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanSrDetails.add(jSeparator3, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridLayout(0, 2));
+
+        cbGarageStellplatz.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cbGarageStellplatz.text")); // NOI18N
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.wd_veranlagung}"),
-                txtVeranlagungWD,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.garage_stellplatz}"),
+                cbGarageStellplatz,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"),
+                FrontinfoPropertyConstants.PROP__GARAGE_STELLPLATZ);
+        binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 15;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(txtVeranlagungWD, gridBagConstraints);
+        jPanel2.add(cbGarageStellplatz);
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(WDSRDetailsPanel.class, "WDSRDetailsPanel.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(jLabel1, gridBagConstraints);
-
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(WDSRDetailsPanel.class, "WDSRDetailsPanel.jLabel2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(jLabel2, gridBagConstraints);
-
-        labLageSR.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.labLageSR.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(labLageSR, gridBagConstraints);
-
-        cboLageWD.setToolTipText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.cboLageWD.toolTipText")); // NOI18N
+        cbBaulasten.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cbBaulasten.text")); // NOI18N
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.lage_wd}"),
-                cboLageWD,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"),
-                "frontinfo.lage_wd");
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.baulasten}"),
+                cbBaulasten,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"),
+                FrontinfoPropertyConstants.PROP__BAULASTEN);
+        binding.setSourceNullValue(false);
+        bindingGroup.addBinding(binding);
+
+        jPanel2.add(cbBaulasten);
+
+        cbGrunddienstbarkeit.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cbGrunddienstbarkeit.text")); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.grunddienstbarkeit}"),
+                cbGrunddienstbarkeit,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"),
+                FrontinfoPropertyConstants.PROP__GRUNDDIENSTBARKEIT);
+        binding.setSourceNullValue(false);
+        bindingGroup.addBinding(binding);
+
+        jPanel2.add(cbGrunddienstbarkeit);
+
+        cbAnteil.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cbAnteil.text")); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.anteil}"),
+                cbAnteil,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"),
+                FrontinfoPropertyConstants.PROP__ANTEIL);
+        binding.setSourceNullValue(false);
+        bindingGroup.addBinding(binding);
+
+        jPanel2.add(cbAnteil);
+
+        cbQuadratwurzel.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.cbQuadratwurzel.text")); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.quadratwurzel}"),
+                cbQuadratwurzel,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"),
+                FrontinfoPropertyConstants.PROP__QUADRATWURZEL);
+        binding.setSourceNullValue(false);
+        bindingGroup.addBinding(binding);
+
+        jPanel2.add(cbQuadratwurzel);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 3);
+        bpanSrDetails.add(jPanel2, gridBagConstraints);
+
+        lblWinkel.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblWinkel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
+        bpanSrDetails.add(lblWinkel, gridBagConstraints);
+
+        txtWinkel.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.0"))));
+        txtWinkel.setText(org.openide.util.NbBundle.getMessage(
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.txtWinkel.text")); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.winkel}"),
+                txtWinkel,
+                org.jdesktop.beansbinding.BeanProperty.create("value"),
+                FrontinfoPropertyConstants.PROP__WINKEL);
         binding.setSourceNullValue(null);
         binding.setSourceUnreadableValue(null);
+        binding.setConverter(new de.cismet.verdis.gui.DoubleToNumberConverter());
         bindingGroup.addBinding(binding);
 
-        cboLageWD.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboLageWDActionPerformed(evt);
-                }
-            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 12;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(cboLageWD, gridBagConstraints);
+        bpanSrDetails.add(txtWinkel, gridBagConstraints);
 
-        cboLageSR.setToolTipText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.cboLageSR.toolTipText")); // NOI18N
-        cboLageSR.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cboLageSRActionPerformed(evt);
-                }
-            });
+        jSeparator4.setMinimumSize(new java.awt.Dimension(0, 10));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(cboLageSR, gridBagConstraints);
-
-        labLageWD.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.labLageWD.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(labLageWD, gridBagConstraints);
-
-        jLabel5.setText(org.openide.util.NbBundle.getMessage(WDSRDetailsPanel.class, "WDSRDetailsPanel.jLabel5.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 2, 2);
-        bpanWdsrDetails.add(jLabel5, gridBagConstraints);
+        bpanSrDetails.add(jSeparator4, gridBagConstraints);
 
         lblQuerverweise.setText(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.lblQuerverweise.text")); // NOI18N
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.lblQuerverweise.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
-        bpanWdsrDetails.add(lblQuerverweise, gridBagConstraints);
+        bpanSrDetails.add(lblQuerverweise, gridBagConstraints);
 
         scpQuer.setOpaque(false);
 
         edtQuer.setEditable(false);
         edtQuer.setContentType(org.openide.util.NbBundle.getMessage(
-                WDSRDetailsPanel.class,
-                "WDSRDetailsPanel.edtQuer.contentType")); // NOI18N
+                SRFrontenDetailsPanel.class,
+                "SRFrontenDetailsPanel.edtQuer.contentType")); // NOI18N
         edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 17;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
-        bpanWdsrDetails.add(scpQuer, gridBagConstraints);
-
-        jSeparator3.setMinimumSize(new java.awt.Dimension(0, 10));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        bpanWdsrDetails.add(jSeparator3, gridBagConstraints);
+        bpanSrDetails.add(scpQuer, gridBagConstraints);
 
         jPanel1.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 0.01;
-        bpanWdsrDetails.add(jPanel1, gridBagConstraints);
+        bpanSrDetails.add(jPanel1, gridBagConstraints);
 
-        add(bpanWdsrDetails, java.awt.BorderLayout.CENTER);
+        add(bpanSrDetails, java.awt.BorderLayout.CENTER);
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
@@ -912,13 +826,11 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
             final int strasseId = (Integer)strasseBean.getProperty(StrassePropertyConstants.PROP__ID);
 
             final String tabSatzung = VerdisMetaClassConstants.MC_SATZUNG;
-            final String tabWinterdienst = VerdisMetaClassConstants.MC_WINTERDIENST;
             final String tabStrassenreinigung = VerdisMetaClassConstants.MC_STRASSENREINIGUNG;
             final String tabStrasse = VerdisMetaClassConstants.MC_STRASSE;
             final String fldId = FrontinfoPropertyConstants.PROP__ID;
             final String fldStrasse = "strasse";
             final String fldSrKlasse = "sr_klasse";
-            final String fldWdPrio = "wd_prio";
 
             CismetThreadPool.execute(new SatzungsComboModelWorker(
                     cboLageSR,
@@ -961,54 +873,10 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                         FrontPropertyConstants.PROP__FRONTINFO
                                 + "."
                                 + FrontinfoPropertyConstants.PROP__LAGE_SR)));
-            CismetThreadPool.execute(new SatzungsComboModelWorker(
-                    cboLageWD,
-                    "SELECT "
-                            + CidsAppBackend.getInstance().getVerdisMetaClass(tabSatzung).getId()
-                            + ", "
-                            + tabSatzung
-                            + ".id "
-                            + "FROM "
-                            + tabStrasse
-                            + ", "
-                            + tabSatzung
-                            + ", "
-                            + tabWinterdienst
-                            + " "
-                            + "WHERE "
-                            + tabStrasse
-                            + "."
-                            + fldId
-                            + " = "
-                            + strasseId
-                            + " AND "
-                            + tabSatzung
-                            + "."
-                            + fldStrasse
-                            + " = "
-                            + tabStrasse
-                            + "."
-                            + fldId
-                            + " AND "
-                            + tabWinterdienst
-                            + "."
-                            + fldId
-                            + " = "
-                            + tabSatzung
-                            + "."
-                            + fldWdPrio
-                            + ";",
-                    (CidsBean)getCidsBean().getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
-                                + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_WD)));
         } else {
             final DefaultComboBoxModel dcmSR = new DefaultComboBoxModel();
             dcmSR.addElement(null);
             cboLageSR.setModel(dcmSR);
-            final DefaultComboBoxModel dcmWD = new DefaultComboBoxModel();
-            dcmWD.addElement(null);
-            cboLageSR.setModel(dcmWD);
         }
     } //GEN-LAST:event_cboStrasseActionPerformed
 
@@ -1051,38 +919,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageWDActionPerformed
-        try {
-            final CidsBean oldLageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
-            final CidsBean newLageWDBean = (CidsBean)cboLageWD.getSelectedItem();
-
-            if (((oldLageWDBean != null) && !oldLageWDBean.equals(newLageWDBean))
-                        || ((newLageWDBean != null) && !newLageWDBean.equals(oldLageWDBean))) {
-                getCidsBean().setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD,
-                    cboLageWD.getSelectedItem());
-            }
-            if ((oldLageWDBean != null) && (newLageWDBean == null)) {
-                for (int index = 0; index < cboWD.getItemCount(); index++) {
-                    final CidsBean wd = (CidsBean)cboWD.getItemAt(index);
-                    if ((wd != null) && (wd.getProperty("key") == null)) {
-                        cboWD.setSelectedItem(wd);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            LOG.warn(ex, ex);
-        }
-        updateLageWdCbo();
-    } //GEN-LAST:event_cboLageWDActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
     private void cboSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboSRActionPerformed
         if (getCidsBean() != null) {
             try {
@@ -1102,31 +938,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
             updateLageSrCbo();
         }
     }                                                                         //GEN-LAST:event_cboSRActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cboWDActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboWDActionPerformed
-        if (getCidsBean() != null) {
-            try {
-                final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                                + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_WD);
-                if (lageWDBean == null) {
-                    getCidsBean().setProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
-                                + "."
-                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR,
-                        cboWD.getSelectedItem());
-                }
-            } catch (Exception ex) {
-                LOG.warn(ex, ex);
-            }
-            updateLageWdCbo();
-        }
-    }                                                                         //GEN-LAST:event_cboWDActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1220,9 +1031,9 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                                 FrontPropertyConstants.PROP__FRONTINFO
                                 + "."
                                 + FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-                bpanWdsrDetails.setBackgroundEnabled(true);
+                bpanSrDetails.setBackgroundEnabled(true);
             } else {
-                bpanWdsrDetails.setBackgroundEnabled(false);
+                bpanSrDetails.setBackgroundEnabled(false);
             }
             if ((cidsBean == null)
                         || (getMultiBeanHelper().isValuesAllEquals(
@@ -1234,14 +1045,12 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                                     + "."
                                     + FrontinfoPropertyConstants.PROP__STRASSE) == null))) {
                 cboLageSR.setSelectedItem(null);
-                cboLageWD.setSelectedItem(null);
             }
         } catch (Exception e) {
             LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
-            bpanWdsrDetails.setBackgroundEnabled(false);
+            bpanSrDetails.setBackgroundEnabled(false);
         }
         updateLageSrCbo();
-        updateLageWdCbo();
         updateCrossReferences();
         attachBeanValidators();
     }
@@ -1330,29 +1139,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
-    private void updateLageWdCbo() {
-        if (getCidsBean() != null) {
-            final CidsBean lageWDBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD);
-            if (lageWDBean != null) {
-                cboWD.setSelectedItem(lageWDBean.getProperty("wd_prio"));
-            } else {
-                cboWD.setSelectedItem((CidsBean)getCidsBean().getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
-                                + "."
-                                + FrontinfoPropertyConstants.PROP__WD_PRIO_OR));
-            }
-            cboWD.setEnabled(isEnabled() && (lageWDBean == null)
-                        && getMultiBeanHelper().isValuesAllEquals(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_WD));
-        }
-    }
-
     @Override
     public void editModeChanged() {
         setEnabled(CidsAppBackend.getInstance().isEditable() && (getCidsBean() != null));
@@ -1363,32 +1149,24 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         super.setEnabled(bln);
         txtBearbeitetDurch.setEditable(bln);
         txtBemSR.setEditable(bln);
-        txtBemWD.setEditable(bln);
         txtErfassungsdatum.setEditable(bln);
         txtLaengeGrafik.setEditable(bln);
         txtLaengeKorrektur.setEditable(bln);
         txtNummer.setEditable(bln);
         txtVeranlagungSR.setEditable(bln);
-        txtVeranlagungWD.setEditable(bln);
         cboSR.setEnabled(bln);
         cboStrasse.setEnabled(bln);
-        cboWD.setEnabled(bln);
-        cboLageWD.setEnabled(bln);
         cboLageSR.setEnabled(bln);
 
         txtBearbeitetDurch.setOpaque(bln);
         txtBemSR.setOpaque(bln);
-        txtBemWD.setOpaque(bln);
         txtErfassungsdatum.setOpaque(bln);
         txtLaengeGrafik.setOpaque(bln);
         txtLaengeKorrektur.setOpaque(bln);
         txtNummer.setOpaque(bln);
         txtVeranlagungSR.setOpaque(bln);
-        txtVeranlagungWD.setOpaque(bln);
         cboSR.setOpaque(bln);
         cboStrasse.setOpaque(bln);
-        cboWD.setOpaque(bln);
-        cboLageWD.setOpaque(bln);
         cboLageSR.setOpaque(bln);
     }
 
@@ -1399,7 +1177,7 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
      */
     public void setBackgroundPCanvas(final PCanvas pCanvas) {
         pCanvas.setBackground(getBackground());
-        bpanWdsrDetails.setPCanvas(pCanvas);
+        bpanSrDetails.setPCanvas(pCanvas);
     }
 
     /**
@@ -1510,13 +1288,13 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                             FrontPropertyConstants.PROP__FRONTINFO
                                     + "."
                                     + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
-                    final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+                    final Geometry geom = SRFrontenDetailsPanel.getGeometry(cidsBean);
                     final Action action = new AbstractAction() {
 
                             @Override
                             public void actionPerformed(final ActionEvent event) {
                                 final CidsBean cidsBean = getCidsBean();
-                                final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+                                final Geometry geom = SRFrontenDetailsPanel.getGeometry(cidsBean);
 
                                 if (Main.getInstance().isInEditMode()) {
                                     if (geom != null) {
@@ -1600,7 +1378,7 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                             @Override
                             public void actionPerformed(final ActionEvent event) {
                                 final CidsBean cidsBean = getCidsBean();
-                                final Geometry geom = WDSRDetailsPanel.getGeometry(cidsBean);
+                                final Geometry geom = SRFrontenDetailsPanel.getGeometry(cidsBean);
 
                                 if (Main.getInstance().isInEditMode()) {
                                     if (geom != null) {
@@ -1698,47 +1476,6 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
                             FrontPropertyConstants.PROP__FRONTINFO
                                     + "."
                                     + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
-
-                    if (veranlagungsdatum != null) {
-                        final boolean matches = Pattern.matches(
-                                "\\d\\d/(01|02|03|04|05|06|07|08|09|10|11|12)",
-                                veranlagungsdatum);
-                        if (!matches) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
-                        }
-                    }
-                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
-                }
-            };
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   frontBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static Validator getValidatorVeranlagungWD(final CidsBean frontBean) {
-        return new CidsBeanValidator(
-                frontBean,
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG) {
-
-                @Override
-                public ValidatorState performValidation() {
-                    final CidsBean cidsBean = getCidsBean();
-                    if (cidsBean == null) {
-                        return null;
-                    }
-
-                    final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                                    + "."
-                                    + FrontinfoPropertyConstants.PROP__WD_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(

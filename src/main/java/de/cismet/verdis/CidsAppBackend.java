@@ -116,7 +116,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                 return "REGEN";
             }
         },
-        ESW {
+        SR {
 
             @Override
             public String toString() {
@@ -489,7 +489,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     frontenCrossReferences.put(crossReference.getEntityFromId(), crossReference);
                 }
                 // TODO inform via listener
-                Main.getInstance().getWdsrFrontenDetailsPanel().updateCrossReferences();
+                Main.getInstance().getSRFrontenDetailsPanel().updateCrossReferences();
             } catch (ConnectionException ex) {
                 LOG.error("error during retrieval of object", ex);
             }
@@ -1227,9 +1227,11 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                                     historyModel.addToHistory(kassenzeichen);
                                 }
                             } else {
+                                setCidsBean(null);
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
                             }
                         } catch (final Exception ex) {
+                            setCidsBean(null);
                             LOG.error("Exception in Background Thread", ex);
                             Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
                             showError("Fehler beim Laden", "Kassenzeichen konnte nicht geladen werden", ex);
@@ -1286,7 +1288,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private void selectCidsBeanByIdentifier(final String identifier) {
         if (mode.equals(CidsAppBackend.Mode.REGEN)) {
             selectFlaecheByBezeichner(identifier);
-        } else if (mode.equals(CidsAppBackend.Mode.ESW)) {
+        } else if (mode.equals(CidsAppBackend.Mode.SR)) {
             selectFrontByNummer(identifier);
         } else if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             // do nothing
@@ -1325,7 +1327,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         for (final CidsBean front
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)) {
             if (((Integer)front.getProperty(FrontPropertyConstants.PROP__NUMMER)).equals(nummerAsInt)) {
-                Main.getInstance().getWdsrFrontenTabellenPanel().selectCidsBean(front);
+                Main.getInstance().getSRFrontenTabellenPanel().selectCidsBean(front);
                 return;
             }
         }
