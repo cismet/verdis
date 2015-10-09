@@ -14,10 +14,13 @@ package de.cismet.verdis.gui;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -28,6 +31,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
 
 import de.cismet.validation.*;
@@ -60,13 +64,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
     //~ Instance fields --------------------------------------------------------
 
-    private boolean editmode = false;
     private Main mainApp;
     private JHistoryButton hbBack;
     private JHistoryButton hbFwd;
     private CidsBean kassenzeichenBean;
     private final Validator bindingValidator;
     private final AggregatedValidator aggVal = new AggregatedValidator();
+    private MultiBemerkung multi;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
@@ -74,6 +78,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel lblBemerkung;
     private javax.swing.JLabel lblErfassungsdatum;
     private javax.swing.JLabel lblKassenzeichen;
@@ -88,7 +93,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private javax.swing.JToggleButton togInfoMode;
     private javax.swing.JToggleButton togRegenMode;
     private javax.swing.JToggleButton togSRMode;
-    private javax.swing.JTextArea txtBemerkung;
     private javax.swing.JTextField txtErfassungsdatum;
     private javax.swing.JTextField txtKassenzeichen;
     private javax.swing.JTextField txtSearch;
@@ -103,6 +107,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
      */
     public KassenzeichenPanel() {
         initComponents();
+
+        jTextPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
 
@@ -130,10 +136,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         if (cidsBean == null) {
             txtErfassungsdatum.setText("");
             txtKassenzeichen.setText("");
-            txtBemerkung.setText("");
             txtSperreBemerkung.setText("");
             chkSperre.setSelected(false);
+            multi = null;
+        } else {
+            final String asJson = (String)cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG);
+            multi = CidsAppBackend.transformMultiBemerkungFromJson(asJson);
+            CidsAppBackend.cleanupMultiBemerkung(multi);
         }
+        jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
 
         aggVal.clear();
         aggVal.add(bindingValidator);
@@ -161,15 +172,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
     @Override
     public final void setEnabled(final boolean b) {
+        super.setEnabled(b);
         txtErfassungsdatum.setEditable(b);
-        txtBemerkung.setEditable(b);
         chkSperre.setEnabled(b);
         txtSearch.setEnabled(!b);
         btnSearch.setEnabled(!b);
         if (b) {
-            txtBemerkung.setBackground(java.awt.Color.white);
+            jTextPane1.setBackground(java.awt.Color.white);
         } else {
-            txtBemerkung.setBackground(this.getBackground());
+            jTextPane1.setBackground(this.getBackground());
         }
     }
 
@@ -245,7 +256,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         txtErfassungsdatum = new javax.swing.JTextField();
         chkSperre = new javax.swing.JCheckBox();
         scpBemerkung = new javax.swing.JScrollPane();
-        txtBemerkung = new javax.swing.JTextArea();
+        jTextPane1 = new javax.swing.JTextPane();
         txtKassenzeichen = new javax.swing.JTextField();
         txtSperreBemerkung = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
@@ -405,21 +416,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         scpBemerkung.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         scpBemerkung.setMinimumSize(new java.awt.Dimension(6, 36));
 
-        txtBemerkung.setColumns(3);
-        txtBemerkung.setLineWrap(true);
-        txtBemerkung.setRows(3);
-        txtBemerkung.setMinimumSize(new java.awt.Dimension(0, 36));
+        jTextPane1.setEditable(false);
+        jTextPane1.setContentType("text/html"); // NOI18N
+        jTextPane1.addMouseListener(new java.awt.event.MouseAdapter() {
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung}"),
-                txtBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG);
-        bindingGroup.addBinding(binding);
-
-        scpBemerkung.setViewportView(txtBemerkung);
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    jTextPane1MouseClicked(evt);
+                }
+            });
+        scpBemerkung.setViewportView(jTextPane1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -706,6 +712,27 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gotoTxtKassenzeichen();
     }                                                                             //GEN-LAST:event_btnSearchActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jTextPane1MouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_jTextPane1MouseClicked
+        final MultiTempBemerkungsDialog dialog = MultiTempBemerkungsDialog.getInstance();
+        dialog.setMultiBemerkung(multi);
+        dialog.setEditable(isEnabled());
+        StaticSwingTools.showDialog(dialog);
+        try {
+            getCidsBean().setProperty(
+                KassenzeichenPropertyConstants.PROP__BEMERKUNG,
+                CidsAppBackend.transformMultiBemerkungToJson(multi));
+            jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+            jTextPane1.setText(ex.getLocalizedMessage());
+        }
+    }                                                                          //GEN-LAST:event_jTextPane1MouseClicked
+
     @Override
     public void appModeChanged() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
@@ -805,7 +832,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
      * @return  DOCUMENT ME!
      */
     public String getShownBemerkung() {
-        return txtBemerkung.getText();
+        return jTextPane1.getText();
     }
 
     /**
@@ -816,37 +843,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
             LOG.debug("gotoTxtKassenzeichen");
         }
         CidsAppBackend.getInstance().gotoKassenzeichen(txtSearch.getText());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  b  DOCUMENT ME!
-     */
-    public void enableEditing(final boolean b) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("enableEditing(" + b + ")");
-        }
-        this.setEnabled(b);
-        editmode = b;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isEditmode() {
-        return editmode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  editmode  DOCUMENT ME!
-     */
-    public void setEditmode(final boolean editmode) {
-        this.editmode = editmode;
     }
 
     /**

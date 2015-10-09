@@ -588,6 +588,9 @@ public class SRFrontenDetailsPanel extends AbstractDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanSrDetails.add(cboSR, gridBagConstraints);
 
+        scpBemSR.setMinimumSize(new java.awt.Dimension(23, 75));
+        scpBemSR.setPreferredSize(new java.awt.Dimension(279, 100));
+
         txtBemSR.setColumns(20);
         txtBemSR.setLineWrap(true);
         txtBemSR.setRows(2);

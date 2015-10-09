@@ -35,11 +35,16 @@ import Sirius.server.newuser.User;
 
 import Sirius.util.collections.MultiMap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
 import java.awt.Color;
 import java.awt.Frame;
+
+import java.io.IOException;
 
 import java.util.*;
 
@@ -76,7 +81,9 @@ import de.cismet.verdis.gui.AlreadyLockedObjectsPanel;
 import de.cismet.verdis.gui.GrundbuchblattSucheDialog;
 import de.cismet.verdis.gui.LockAlreadyExistsException;
 import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.gui.MultiBemerkung;
 import de.cismet.verdis.gui.RegenFlaechenDetailsPanel;
+import de.cismet.verdis.gui.SingleBemerkung;
 import de.cismet.verdis.gui.WaitDialog;
 
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
@@ -97,6 +104,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             CidsAppBackend.class);
     private static CidsAppBackend INSTANCE = null;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     //~ Enums ------------------------------------------------------------------
 
@@ -493,6 +501,87 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                 Main.getInstance().getSRFrontenDetailsPanel().updateCrossReferences();
             } catch (ConnectionException ex) {
                 LOG.error("error during retrieval of object", ex);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   multiBemerkung  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static String transformMultiBemerkungToJson(final MultiBemerkung multiBemerkung) {
+        try {
+            return MAPPER.writeValueAsString(multiBemerkung);
+        } catch (final JsonProcessingException ex) {
+            LOG.warn(ex, ex);
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   bemerkung  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static MultiBemerkung transformMultiBemerkungFromJson(final String bemerkung) {
+        try {
+            return MAPPER.readValue(bemerkung, MultiBemerkung.class);
+        } catch (final IOException ex) {
+            LOG.warn(ex, ex);
+            final MultiBemerkung multiBemerkung = new MultiBemerkung(new ArrayList<SingleBemerkung>());
+            if ((bemerkung != null) && !bemerkung.trim().isEmpty()) {
+                multiBemerkung.getBemerkungen().add(new SingleBemerkung(null, "-import-", bemerkung, null));
+            }
+            return multiBemerkung;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   multiBemerkung  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static String transformMultiBemerkungToHtml(final MultiBemerkung multiBemerkung) {
+        if (multiBemerkung == null) {
+            return "<html></html>";
+        } else {
+            final StringBuffer htmlBuffer = new StringBuffer("<html>");
+            if (multiBemerkung.getBemerkungen() != null) {
+                for (int index = 0; index < multiBemerkung.getBemerkungen().size(); index++) {
+                    if (index > 0) {
+                        htmlBuffer.append("<hr/>");
+                    }
+                    final SingleBemerkung single = multiBemerkung.getBemerkungen().get(index);
+                    htmlBuffer.append(single.getBemerkung().replaceAll("\n", "<br/>"));
+                }
+            }
+            htmlBuffer.append("</html>");
+            return htmlBuffer.toString();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  multiBemerkung  DOCUMENT ME!
+     */
+    public static void cleanupMultiBemerkung(final MultiBemerkung multiBemerkung) {
+        if (multiBemerkung != null) {
+            final List<SingleBemerkung> orig = multiBemerkung.getBemerkungen();
+            final List<SingleBemerkung> copy = new ArrayList<SingleBemerkung>(orig);
+            for (int index = 0; index < orig.size(); index++) {
+                final SingleBemerkung single = copy.get(index);
+                final Date verfallsDatum = single.getVerfallsDatum();
+                if ((verfallsDatum != null) && (new Date().getTime() > verfallsDatum.getTime())) {
+                    orig.remove(single);
+                }
             }
         }
     }
