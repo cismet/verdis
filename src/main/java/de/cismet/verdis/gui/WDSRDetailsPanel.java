@@ -1375,6 +1375,12 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         cboWD.setEnabled(bln);
         cboLageWD.setEnabled(bln);
         cboLageSR.setEnabled(bln);
+        cbAnteil.setEnabled(bln);
+        cbBaulasten.setEnabled(bln);
+        cbGarageStellplatz.setEnabled(bln);
+        cbGrunddienstbarkeit.setEnabled(bln);
+        cbQuadratwurzel.setEnabled(bln);
+        txtWinkel.setEnabled(bln);
 
         txtBearbeitetDurch.setOpaque(bln);
         txtBemSR.setOpaque(bln);
@@ -1390,6 +1396,7 @@ public class WDSRDetailsPanel extends AbstractDetailsPanel {
         cboWD.setOpaque(bln);
         cboLageWD.setOpaque(bln);
         cboLageSR.setOpaque(bln);
+        txtWinkel.setOpaque(bln);
     }
 
     /**
