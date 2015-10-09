@@ -340,7 +340,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private View vKassenzeichenList;
     private View vKanaldaten;
     private View vSummen;
-    private View vDokumente;
     private View vKarte;
     private View vTabelleSR;
     private View vDetailsSR;
@@ -355,7 +354,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final ActiveLayerModel mappingModel = new ActiveLayerModel();
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
-    private final DokumentenPanel dokPanel = new DokumentenPanel();
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
 
     private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
@@ -435,7 +433,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenu menWindows;
     private javax.swing.JMenuItem mniClose;
     private javax.swing.JMenuItem mniDetails;
-    private javax.swing.JMenuItem mniDokumente;
     private javax.swing.JMenuItem mniKanalanschluss;
     private javax.swing.JMenuItem mniKarte;
     private javax.swing.JMenuItem mniKassenzeichen;
@@ -482,7 +479,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(srFrontenTabellenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(dokPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenGeometrienPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(allgInfosPanel);
 //        CidsAppBackend.getInstance().addCidsBeanStore(historyPanel);
@@ -498,7 +494,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
         CidsAppBackend.getInstance().addEditModeListener(regenFlaechenDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
-        CidsAppBackend.getInstance().addEditModeListener(dokPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
         CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
 
@@ -745,9 +740,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             vKanaldaten = new View("Kanalanschluss", Static2DTools.borderIcon(icoKanal, 0, 3, 0, 1), kanaldatenPanel);
             viewMap.addView("Kanalanschluss", vKanaldaten);
-
-            vDokumente = new View("Dokumente", Static2DTools.borderIcon(icoDokumente, 0, 3, 0, 1), dokPanel);
-            viewMap.addView("Dokumente", vDokumente);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
             viewMap.addView("Karte", vKarte);
@@ -1563,10 +1555,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(
                                     true,
                                     0.6f,
-                                    new SplitWindow(true, 0.3f,
-                                        vSummen,
-                                        vKanaldaten),
-                                    vDokumente)),
+                                    vSummen,
+                                    vKanaldaten)),
                             new SplitWindow(
                                 true,
                                 0.66f,
@@ -1600,9 +1590,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(true, 0.62f,
                                     vKassenzeichen,
                                     vKassenzeichenList),
-                                new SplitWindow(true, 0.6f,
-                                    vZusammenfassungSR,
-                                    vDokumente)),
+                                vZusammenfassungSR),
                             new SplitWindow(
                                 true,
                                 0.66f,
@@ -1637,9 +1625,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 new SplitWindow(true, 0.62f,
                                     vKassenzeichen,
                                     vKassenzeichenList),
-                                new SplitWindow(true, 0.6f,
-                                    vInfoAllgemein,
-                                    vDokumente)),
+                                vInfoAllgemein),
                             new SplitWindow(true, 0.66f,
                                 vKarte,
                                 vDetailsAllgemein)));
@@ -1822,7 +1808,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mniKassenzeichen1 = new javax.swing.JMenuItem();
         mniSummen = new javax.swing.JMenuItem();
         mniKanalanschluss = new javax.swing.JMenuItem();
-        mniDokumente = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         mniKarte = new javax.swing.JMenuItem();
         mniTabelle = new javax.swing.JMenuItem();
@@ -2627,22 +2612,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         menWindows.add(mniKanalanschluss);
-
-        mniDokumente.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_5,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniDokumente.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/docs.png"))); // NOI18N
-        mniDokumente.setMnemonic('a');
-        mniDokumente.setText("Dokumente");
-        mniDokumente.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniDokumenteActionPerformed(evt);
-                }
-            });
-        menWindows.add(mniDokumente);
         menWindows.add(jSeparator11);
 
         mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
@@ -2755,15 +2724,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
     }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void mniDokumenteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDokumenteActionPerformed
-        showOrHideView(vDokumente);
-    }                                                                                //GEN-LAST:event_mniDokumenteActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -4574,24 +4534,22 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
-     * @param   flaecheToKassenzeichenQuerverweisMap  DOCUMENT ME!
+     * @param   zielKassenzeichennummern  kassenzeichennummerToBeanQuerverweisMap DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private Map<Integer, CidsBean> loadCrosslinkKassenzeichenBeanMap(
-            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap) throws Exception {
+    private Map<Integer, CidsBean> loadKassenzeichennummerToBeanMap(final Collection<Integer> zielKassenzeichennummern)
+            throws Exception {
         // Map wird verwendet, damit identische kassenzeichen nicht unnötigerweise
         // doppelt geladen und  gespeichert werden
         final Map<Integer, CidsBean> kassenzeichenNummerToKassenzeichenMap = new HashMap();
 
-        final List<Integer> zielKassenzeichennummern = new ArrayList<Integer>(
-                flaecheToKassenzeichenQuerverweisMap.values());
         WaitDialog.getInstance().startLoadingKassenzeichen(zielKassenzeichennummern.size());
-        for (int index = 0; index < zielKassenzeichennummern.size(); index++) {
+        int index = 0;
+        for (final Integer zielKassenzeichennummer : zielKassenzeichennummern) {
             WaitDialog.getInstance().progressLoadingKassenzeichen(index);
-            final Integer zielKassenzeichennummer = zielKassenzeichennummern.get(index);
             if (!kassenzeichenNummerToKassenzeichenMap.containsKey(zielKassenzeichennummer)) {
                 final CidsBean querverweisZielKassenzeichen = CidsAppBackend.getInstance()
                             .loadKassenzeichenByNummer(zielKassenzeichennummer);
@@ -4599,6 +4557,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     zielKassenzeichennummer,
                     querverweisZielKassenzeichen);
             }
+            index++;
         }
         WaitDialog.getInstance().progressLoadingKassenzeichen(zielKassenzeichennummern.size());
 
@@ -4612,12 +4571,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param   bezeichnungToKassenzeichennummerMap  DOCUMENT ME!
      * @param   crosslinkKassenzeichenBeanMap        DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     *
      * @throws  Exception  DOCUMENT ME!
      */
-    private List<CidsBean> createCrosslinkFlaechen(final CidsBean kassenzeichenBean,
-            final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap,
+    private void createFlaecheCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
+            final Map<String, Integer> bezeichnungToKassenzeichennummerMap,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedFlaechen = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -4663,8 +4620,74 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
         WaitDialog.getInstance().progressCreateCrossLinks(savedFlaechen.size());
+    }
 
-        return new ArrayList<CidsBean>(crosslinkKassenzeichenBeanMap.values());
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean               DOCUMENT ME!
+     * @param   nummerToKassenzeichennummerMap  DOCUMENT ME!
+     * @param   crosslinkKassenzeichenBeanMap   DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void createFrontenCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
+            final Map<Integer, Integer> nummerToKassenzeichennummerMap,
+            final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
+        final List<CidsBean> savedFronten = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FRONTEN);
+        WaitDialog.getInstance().startCreateCrossLinks(savedFronten.size());
+        for (int index = 0; index < savedFronten.size(); index++) {
+            WaitDialog.getInstance().progressCreateCrossLinks(index);
+            final CidsBean savedFront = savedFronten.get(index);
+            final Integer frontNummer = (Integer)savedFront.getProperty(
+                    FrontPropertyConstants.PROP__NUMMER);
+
+            // in der Map schauen ob für die abgespeicherte Front ein Querverweis erzeugt werden soll
+            if (nummerToKassenzeichennummerMap.containsKey(frontNummer)) {
+                final int zielKassenzeichennummer = nummerToKassenzeichennummerMap.get(
+                        frontNummer);
+
+                // in welches Kassenzeichen soll der Querverweis erzeugt werden
+                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
+                        zielKassenzeichennummer);
+                if (querverweisKassenzeichenBean != null) {
+                    final Collection<CidsBean> frontenOfQuerverweisKassenzeichen =
+                        querverweisKassenzeichenBean.getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__FRONTEN);
+
+                    // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
+                    final CidsBean strasseBean = (CidsBean)savedFront.getProperty(
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__STRASSE);
+                    final CidsBean lageBean = (CidsBean)savedFront.getProperty(
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                    final CidsBean reinigungBean = (CidsBean)savedFront.getProperty(
+                            FrontPropertyConstants.PROP__FRONTINFO
+                                    + "."
+                                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                    final CidsBean querverweisFrontBean = SRFrontenTabellenPanel.createNewFrontBean(
+                            strasseBean,
+                            lageBean,
+                            reinigungBean,
+                            frontenOfQuerverweisKassenzeichen,
+                            null);
+
+                    // Überschreiben der FrontInfo zum Erzeugen des Querverweises auf der neuen Front.
+                    querverweisFrontBean.setProperty(
+                        FrontPropertyConstants.PROP__FRONTINFO,
+                        savedFront.getProperty(FrontPropertyConstants.PROP__FRONTINFO));
+
+                    frontenOfQuerverweisKassenzeichen.add(querverweisFrontBean);
+                } else {
+                    LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                }
+            }
+        }
+        WaitDialog.getInstance().progressCreateCrossLinks(savedFronten.size());
     }
 
     /**
@@ -4691,35 +4714,56 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
 
-        final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = CidsAppBackend.getInstance()
+        final Map<CidsBean, Integer> flaecheToCrosslinknummerMap = CidsAppBackend.getInstance()
                     .getFlaecheToKassenzeichenQuerverweisMap();
+        final Map<String, Integer> flaechebezeichnungToKassenzeichennummerMap =
+            createFlaechebezeichnungToKassenzeichennummerMap(flaecheToCrosslinknummerMap);
 
-        // Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x
-        // soll einen Querverweis im Kassenzeichen y anlegen
-        // MUSS VOR PERSIST GESCHEHEN
-        final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
-        for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
-            final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
-                    unsavedFlaecheBean);
-            bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
-        }
+        final Map<CidsBean, Integer> frontToCrosslinknummerMap = CidsAppBackend.getInstance()
+                    .getFrontToKassenzeichenQuerverweisMap();
+        final Map<Integer, Integer> frontNummerToKassenzeichennummerMap = createFrontnummerToKassenzeichennummerMap(
+                frontToCrosslinknummerMap);
 
         final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
 
-        final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap = loadCrosslinkKassenzeichenBeanMap(
-                flaecheToKassenzeichenQuerverweisMap);
+        final Collection<Integer> kassenzeichennummern = new ArrayList<Integer>();
+        kassenzeichennummern.addAll(flaecheToCrosslinknummerMap.values());
+        kassenzeichennummern.addAll(frontToCrosslinknummerMap.values());
 
-        final List<CidsBean> crosslinkKassenzeichenBeans = createCrosslinkFlaechen(
-                persistedKassenzeichenBean,
-                bezeichnungToKassenzeichennummerMap,
-                crosslinkKassenzeichenBeanMap);
+        final Map<Integer, CidsBean> kassenzeichennummerToBeanMap = loadKassenzeichennummerToBeanMap(
+                kassenzeichennummern);
 
+        createFlaecheCrosslinkKassenzeichenBeans(
+            persistedKassenzeichenBean,
+            flaechebezeichnungToKassenzeichennummerMap,
+            kassenzeichennummerToBeanMap);
+
+        createFrontenCrosslinkKassenzeichenBeans(
+            persistedKassenzeichenBean,
+            frontNummerToKassenzeichennummerMap,
+            kassenzeichennummerToBeanMap);
+
+        saveCrosslinkKassenzeichenBeans(kassenzeichennummerToBeanMap.values());
+
+        // querverweise wurden angelegt, map muss leer gemacht werden
+        // damit beim nächsten Speichern nicht nochmal die selben
+        // Querverweise angelegt werden
+        flaecheToCrosslinknummerMap.clear();
+        frontToCrosslinknummerMap.clear();
+
+        return persistedKassenzeichenBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  crosslinkKassenzeichenBeans  DOCUMENT ME!
+     */
+    private void saveCrosslinkKassenzeichenBeans(final Collection<CidsBean> crosslinkKassenzeichenBeans) {
         // Kassenzeichen speichern in denen neue Querverweise erzeugt wurden
         WaitDialog.getInstance().startSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
-        for (int index = 0; index < crosslinkKassenzeichenBeans.size(); index++) {
-            final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeans.get(index);
+        final int index = 0;
+        for (final CidsBean querverweisKassenzeichenBean : crosslinkKassenzeichenBeans) {
             WaitDialog.getInstance().progressSavingKassenzeichen(index);
             try {
                 persistKassenzeichen(querverweisKassenzeichenBean);
@@ -4734,12 +4778,46 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
         WaitDialog.getInstance().progressSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
-        // querverweise wurden angelegt, map muss leer gemacht werden
-        // damit beim nächsten Speichern nicht nochmal die selben
-        // Querverweise angelegt werden
-        flaecheToKassenzeichenQuerverweisMap.clear();
+    }
+    /**
+     * Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x soll einen Querverweis im Kassenzeichen y anlegen
+     * MUSS VOR PERSIST GESCHEHEN
+     *
+     * @param   flaecheToKassenzeichenQuerverweisMap  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static HashMap<String, Integer> createFlaechebezeichnungToKassenzeichennummerMap(
+            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap) {
+        final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
+        for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
+            final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
+                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+            final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
+                    unsavedFlaecheBean);
+            bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
+        }
+        return bezeichnungToKassenzeichennummerMap;
+    }
 
-        return persistedKassenzeichenBean;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   frontToKassenzeichenQuerverweisMap  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static HashMap<Integer, Integer> createFrontnummerToKassenzeichennummerMap(
+            final Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap) {
+        final HashMap<Integer, Integer> nummerToKassenzeichennummerMap = new HashMap<Integer, Integer>();
+        for (final CidsBean unsavedFrontBean : frontToKassenzeichenQuerverweisMap.keySet()) {
+            final Integer frontNummer = (Integer)unsavedFrontBean.getProperty(
+                    FrontPropertyConstants.PROP__NUMMER);
+            final Integer querverweisKassenzeichenNummer = frontToKassenzeichenQuerverweisMap.get(
+                    unsavedFrontBean);
+            nummerToKassenzeichennummerMap.put(frontNummer, querverweisKassenzeichenNummer);
+        }
+        return nummerToKassenzeichennummerMap;
     }
 
     /**
