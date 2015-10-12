@@ -1160,6 +1160,12 @@ public class SRFrontenDetailsPanel extends AbstractDetailsPanel {
         cboSR.setEnabled(bln);
         cboStrasse.setEnabled(bln);
         cboLageSR.setEnabled(bln);
+        cbAnteil.setEnabled(bln);
+        cbBaulasten.setEnabled(bln);
+        cbGarageStellplatz.setEnabled(bln);
+        cbGrunddienstbarkeit.setEnabled(bln);
+        cbQuadratwurzel.setEnabled(bln);
+        txtWinkel.setEnabled(bln);
 
         txtBearbeitetDurch.setOpaque(bln);
         txtBemSR.setOpaque(bln);
@@ -1171,6 +1177,7 @@ public class SRFrontenDetailsPanel extends AbstractDetailsPanel {
         cboSR.setOpaque(bln);
         cboStrasse.setOpaque(bln);
         cboLageSR.setOpaque(bln);
+        txtWinkel.setOpaque(bln);
     }
 
     /**
