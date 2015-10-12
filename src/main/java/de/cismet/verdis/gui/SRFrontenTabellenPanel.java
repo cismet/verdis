@@ -365,7 +365,7 @@ public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements Cid
                     }
                 }
 
-                CidsBean strasse = null;
+                CidsBean strasse = Main.getInstance().getSRFrontenDetailsPanel().getLastStrasseBean();
                 CidsBean lage = null;
                 CidsBean reinigung = null;
 
