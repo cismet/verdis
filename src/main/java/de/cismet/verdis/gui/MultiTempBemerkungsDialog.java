@@ -77,7 +77,7 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
             null,
             50,
             100,
-            400
+            365
         };
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
