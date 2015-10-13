@@ -529,18 +529,20 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @return  DOCUMENT ME!
      */
     public static MultiBemerkung transformMultiBemerkungFromJson(final String bemerkung) {
+        final String bemerkungNeverNull = (bemerkung != null) ? bemerkung : "";
+        
         try {
-            return MAPPER.readValue(bemerkung, MultiBemerkung.class);
-        } catch (final IOException ex) {
+            return MAPPER.readValue(bemerkungNeverNull, MultiBemerkung.class);
+        } catch (final Exception ex) {
             LOG.warn(ex, ex);
             final MultiBemerkung multiBemerkung = new MultiBemerkung(new ArrayList<SingleBemerkung>());
-            if ((bemerkung != null) && !bemerkung.trim().isEmpty()) {
-                multiBemerkung.getBemerkungen().add(new SingleBemerkung(null, "-import-", bemerkung, null));
+            if (!bemerkungNeverNull.trim().isEmpty()) {
+                multiBemerkung.getBemerkungen().add(new SingleBemerkung(null, "-import-", bemerkungNeverNull, null));
             }
             return multiBemerkung;
         }
     }
-
+    
     /**
      * DOCUMENT ME!
      *
