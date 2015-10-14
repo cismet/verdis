@@ -243,6 +243,7 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
+import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 
@@ -3840,8 +3841,74 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void btnTimeRecoveryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnTimeRecoveryActionPerformed
         if (editMode) {
             StaticSwingTools.showDialog(timeRecoveryPanel.getDialog());
+        } else {
+            final int value = JOptionPane.showConfirmDialog(
+                    this,
+                    "Dieser Vorgang kann eine Weile dauern.\n"
+                            + "Möchten Sie dennoch fortfahren ?",
+                    "Gelöschtes Kassenzeichen suchen",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (value == JOptionPane.YES_OPTION) {
+                final int kassenzeichenNummer = Integer.parseInt(kassenzeichenPanel.getSearchField());
+
+                final DeletedKassenzeichenIdSearchStatement search = new DeletedKassenzeichenIdSearchStatement(
+                        kassenzeichenNummer);
+
+                WaitDialog.getInstance().showDialog();
+                new SwingWorker<List<Integer>, Void>() {
+
+                        @Override
+                        protected List<Integer> doInBackground() throws Exception {
+                            WaitDialog.getInstance().startSearchDeletedKassenzeichenFromHistory();
+                            final List<Integer> tmpList = new ArrayList<Integer>();
+                            final Collection coll = CidsAppBackend.getInstance().executeCustomServerSearch(search);
+                            tmpList.addAll(coll);
+                            return tmpList;
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                final List<Integer> list = get();
+
+                                if (!list.isEmpty()) {
+                                    final Integer kassenzeichenId = list.get(0);
+
+                                    final CidsBean dummyKassenzeichenBean = CidsBean.createNewCidsBeanFromTableName(
+                                            VerdisConstants.DOMAIN,
+                                            VerdisMetaClassConstants.MC_KASSENZEICHEN,
+                                            new HashMap<String, Object>() {
+
+                                                {
+                                                    put(KassenzeichenPropertyConstants.PROP__ID, kassenzeichenId);
+                                                    put(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
+                                                        kassenzeichenNummer);
+                                                }
+                                            });
+                                    dummyKassenzeichenBean.getMetaObject().forceStatus(MetaObject.NEW);
+                                    CidsAppBackend.getInstance().setCidsBean(dummyKassenzeichenBean);
+                                    setEditMode(true);
+                                    StaticSwingTools.showDialog(timeRecoveryPanel.getDialog());
+                                } else {
+                                    JOptionPane.showMessageDialog(
+                                        Main.this,
+                                        "Es konnte für dieses Kassenzeichen keine Historie gefunden werden.",
+                                        "Nicht gefunden",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            } catch (final Exception ex) {
+                                CidsAppBackend.getInstance()
+                                        .showError("Fehler", "Fehler bei der Suche nach gelöschten Kassenzeichen", ex);
+                                LOG.warn(ex, ex);
+                            } finally {
+                                WaitDialog.getInstance().dispose();
+                            }
+                        }
+                    }.execute();
+            }
         }
-    }                                                                                   //GEN-LAST:event_btnTimeRecoveryActionPerformed
+    } //GEN-LAST:event_btnTimeRecoveryActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -4294,7 +4361,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         if ((kassenzeichenBean == null) || !editMode) {
             return false;
         }
-        return kassenzeichenBean.getMetaObject().getStatus() == MetaObject.MODIFIED;
+        return (kassenzeichenBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
+                    || ((kassenzeichenBean.getMetaObject().getStatus() == MetaObject.NEW)
+                        || kassenzeichenBean.hasArtificialChangeFlag());
     }
 
     /**
@@ -4418,7 +4487,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdNewKassenzeichen.setEnabled(!b && !readonly);
         cmdEditMode.setEnabled(!b && !readonly && (kassenzeichenBean != null));
 
-        btnTimeRecovery.setEnabled(b && !readonly && (kassenzeichenBean != null));
+        if (b) {
+            btnTimeRecovery.setEnabled(!readonly && (kassenzeichenBean != null));
+        } else {
+            btnTimeRecovery.setEnabled(!readonly && (kassenzeichenBean == null)
+                        && (kassenzeichenPanel.getSearchField() != null)
+                        && !kassenzeichenPanel.getSearchField().isEmpty());
+        }
         cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         if (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {

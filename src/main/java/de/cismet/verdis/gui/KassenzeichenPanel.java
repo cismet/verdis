@@ -14,8 +14,6 @@ package de.cismet.verdis.gui;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -396,6 +394,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sperre}"),
                 chkSperre,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
         bindingGroup.addBinding(binding);
 
         chkSperre.addActionListener(new java.awt.event.ActionListener() {
@@ -774,6 +774,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
      */
     public void setSearchField(final String kassenzeichen) {
         this.txtSearch.setText(kassenzeichen);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getSearchField() {
+        return this.txtSearch.getText();
     }
 
     /**

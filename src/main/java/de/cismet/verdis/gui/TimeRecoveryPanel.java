@@ -29,11 +29,16 @@
 package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.HistoryObject;
+import Sirius.server.middleware.types.MetaObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -48,6 +53,8 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -259,7 +266,49 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                             final CidsBean kassenzeichenFromHistory = CidsBean.createNewCidsBeanFromJSON(
                                     true,
                                     left.getJsonData());
-                            CidsBeanSupport.deepcopyAllProperties(kassenzeichenFromHistory, kassenzeichenBean, true);
+                            final Collection<String> arrayPropertiesColl = Arrays.asList(
+                                    KassenzeichenPropertyConstants.PROP__FLAECHEN,
+                                    KassenzeichenPropertyConstants.PROP__FRONTEN,
+                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN,
+                                    KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS
+                                            + ".befreiungenunderlaubnisse");
+
+                            final Map<String, Map> propertyToMapMap = new HashMap<String, Map>();
+                            for (final String arrayProperty : arrayPropertiesColl) {
+                                final Map<Integer, CidsBean> idToBeanMap = new HashMap<Integer, CidsBean>();
+                                final Collection<CidsBean> cidsBeans = kassenzeichenBean.getBeanCollectionProperty(
+                                        arrayProperty);
+                                if (cidsBeans != null) {
+                                    for (final CidsBean cidsBean : cidsBeans) {
+                                        idToBeanMap.put(cidsBean.getMetaObject().getId(), cidsBean);
+                                    }
+                                }
+                                propertyToMapMap.put(arrayProperty, idToBeanMap);
+                            }
+
+                            final int moStatus = kassenzeichenBean.getMetaObject().getStatus();
+                            CidsBeanSupport.deepcopyAllProperties(kassenzeichenFromHistory, kassenzeichenBean);
+                            kassenzeichenBean.getMetaObject().forceStatus(moStatus);
+
+                            for (final String arrayProperty : arrayPropertiesColl) {
+                                final Collection<CidsBean> cidsBeans = kassenzeichenBean.getBeanCollectionProperty(
+                                        arrayProperty);
+                                final Map<Integer, CidsBean> idToBeanMap = new HashMap<Integer, CidsBean>();
+
+                                if (cidsBeans != null) {
+                                    for (final CidsBean cidsBean : cidsBeans) {
+                                        idToBeanMap.put(cidsBean.getMetaObject().getId(), cidsBean);
+                                    }
+                                }
+
+                                // only new ones
+                                final Collection<Integer> ids = idToBeanMap.keySet();
+                                ids.removeAll(propertyToMapMap.get(arrayProperty).keySet());
+
+                                for (final Integer id : ids) {
+                                    idToBeanMap.get(id).getMetaObject().forceStatus(MetaObject.NEW);
+                                }
+                            }
                             CidsAppBackend.getInstance().setCidsBean(kassenzeichenBean);
                         } catch (Exception ex) {
                             LOG.fatal(ex, ex);
@@ -302,18 +351,20 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                     protected HistoryObject[] doInBackground() {
                         try {
                             final HistoryObject[] historyObjs = CidsAppBackend.getInstance()
-                                        .getHistory(kassenzeichenId, 15);
+                                        .getHistory(kassenzeichenId, 99);
 
                             final SortedMap<Date, HistoryObject> sMap = new TreeMap<Date, HistoryObject>();
                             for (final HistoryObject historyObj : historyObjs) {
-                                sMap.put(historyObj.getValidFrom(), historyObj);
+                                if (!"{ DELETED }".equalsIgnoreCase(historyObj.getJsonData())) {
+                                    sMap.put(historyObj.getValidFrom(), historyObj);
+                                }
                             }
 
                             Date lastDate = null;
                             for (final Date date : new ArrayList<Date>(sMap.keySet())) {
                                 if (lastDate != null) {
                                     final long diff = Math.abs(lastDate.getTime() - date.getTime());
-                                    if (diff < 1000) {
+                                    if (diff < 5000) {
                                         sMap.remove(lastDate);
                                     }
                                 }
@@ -350,7 +401,7 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                                     JOptionPane.ERROR_MESSAGE);
                             }
                             jDialog1.pack();
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             LOG.error("Exception in Background Thread", e);
                         }
                     }
