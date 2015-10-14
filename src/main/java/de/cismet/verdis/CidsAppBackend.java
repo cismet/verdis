@@ -530,7 +530,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public static MultiBemerkung transformMultiBemerkungFromJson(final String bemerkung) {
         final String bemerkungNeverNull = (bemerkung != null) ? bemerkung : "";
-        
+
         try {
             return MAPPER.readValue(bemerkungNeverNull, MultiBemerkung.class);
         } catch (final Exception ex) {
@@ -542,7 +542,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             return multiBemerkung;
         }
     }
-    
+
     /**
      * DOCUMENT ME!
      *

@@ -150,7 +150,10 @@
             <Property name="focusPainted" type="boolean" value="false"/>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selected" source="Form" sourcePath="${cidsBean.sperre}" target="chkSperre" targetPath="selected" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selected" source="Form" sourcePath="${cidsBean.sperre}" target="chkSperre" targetPath="selected" updateStrategy="0" immediately="false">
+              <Property name="nullValue" type="boolean" value="false"/>
+              <Property name="incompletePathValue" type="boolean" value="false"/>
+            </BindingProperty>
           </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSperreActionPerformed"/>

@@ -306,6 +306,25 @@ public class WaitDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      */
+    public void startSearchDeletedKassenzeichenFromHistory() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        startSearchDeletedKassenzeichenFromHistory();
+                    }
+                });
+        } else {
+            jProgressBar1.setString("Gelöschtes Kassenzeichen wird gesucht...");
+            jProgressBar1.setMaximum(0);
+            jProgressBar1.setIndeterminate(true);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     public void startCheckLocks() {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
