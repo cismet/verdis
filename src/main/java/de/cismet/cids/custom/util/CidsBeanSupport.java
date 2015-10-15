@@ -28,7 +28,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!

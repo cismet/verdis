@@ -178,9 +178,4 @@ public class RegenFlaechenTableModel extends CidsBeanTableModel {
             }
         }
     }
-
-    @Override
-    public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-        return VerdisUtils.deepcloneFlaecheBean(cidsBean);
-    }
 }

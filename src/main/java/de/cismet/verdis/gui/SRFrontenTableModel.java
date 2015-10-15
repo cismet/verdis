@@ -115,9 +115,4 @@ public class SRFrontenTableModel extends CidsBeanTableModel {
         }
         return null;
     }
-
-    @Override
-    public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-        return VerdisUtils.deepcloneFrontBean(cidsBean);
-    }
 }

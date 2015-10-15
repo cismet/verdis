@@ -1191,11 +1191,6 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         //~ Methods ------------------------------------------------------------
 
         @Override
-        public CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception {
-            throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-        }
-
-        @Override
         public Object getValueAt(final int rowIndex, final int columnIndex) {
             final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
             if (cidsBean == null) {

@@ -14,7 +14,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 
-import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.SRFrontenTabellenPanel;
 
 /**
@@ -56,9 +55,6 @@ public class FrontenClipboard extends AbstractClipboard {
                 table.getAllBeans(),
                 true);
 
-        final int id = AbstractCidsBeanTable.getNextNewBeanId();
-        pasteBean.setProperty(FrontPropertyConstants.PROP__ID, id);
-        pasteBean.getMetaObject().setID(id);
         return pasteBean;
     }
 
