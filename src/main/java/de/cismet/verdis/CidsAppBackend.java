@@ -618,8 +618,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public Collection<CrossReference> getFlaechenCrossReferencesForFlaecheid(final int flaecheId) {
-        return (Collection<CrossReference>)flaechenidToCrossReferences.get(flaecheId);
+    public Collection<CrossReference> getFlaechenCrossReferencesForFlaecheid(final Integer flaecheId) {
+        if (flaecheId != null) {
+            return (Collection<CrossReference>)flaechenidToCrossReferences.get(flaecheId);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -629,8 +633,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public Collection<CrossReference> getFrontenCrossReferencesForFrontid(final int frontId) {
-        return (Collection<CrossReference>)frontenCrossReferences.get(frontId);
+    public Collection<CrossReference> getFrontenCrossReferencesForFrontid(final Integer frontId) {
+        if (frontId != null) {
+            return (Collection<CrossReference>)frontenCrossReferences.get(frontId);
+        } else {
+            return null;
+        }
     }
 
     /**

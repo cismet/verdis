@@ -765,7 +765,7 @@ public class RegenFlaechenTabellenPanel extends AbstractCidsBeanTable implements
     public CidsBean createNewBean() throws Exception {
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
 
-        final int lastSplitFlaecheId = CidsAppBackend.getInstance().getLastSplitFlaecheId();
+        final Integer lastSplitFlaecheId = CidsAppBackend.getInstance().getLastSplitFlaecheId();
         final Collection<CrossReference> crossreferences = CidsAppBackend.getInstance()
                     .getFlaechenCrossReferencesForFlaecheid(lastSplitFlaecheId);
 

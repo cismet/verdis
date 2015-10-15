@@ -342,26 +342,24 @@ public class SRFrontenTabellenPanel extends AbstractCidsBeanTable implements Cid
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.YES_OPTION) {
                 final Integer lastSplitFrontId = CidsAppBackend.getInstance().getLastSplitFrontId();
-                if (lastSplitFrontId != null) {
-                    final Collection<CrossReference> crossreferences = CidsAppBackend.getInstance()
-                                .getFrontenCrossReferencesForFrontid(lastSplitFrontId);
+                final Collection<CrossReference> crossreferences = CidsAppBackend.getInstance()
+                            .getFrontenCrossReferencesForFrontid(lastSplitFrontId);
 
-                    if ((crossreferences != null) && !crossreferences.isEmpty()) {
-                        final NewFrontDialog dialog = new NewFrontDialog();
-                        StaticSwingTools.showDialog(dialog);
+                if ((crossreferences != null) && !crossreferences.isEmpty()) {
+                    final NewFrontDialog dialog = new NewFrontDialog();
+                    StaticSwingTools.showDialog(dialog);
 
-                        if (NewFrontDialog.RET_OK == dialog.getReturnStatus()) {
-                            if (dialog.isQuerverweiseChecked()) {
-                                for (final CrossReference crossreference : crossreferences) {
-                                    final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
-                                    CidsAppBackend.getInstance()
-                                            .getFrontToKassenzeichenQuerverweisMap()
-                                            .put(frontBean, kassenzeichenNummer);
-                                }
+                    if (NewFrontDialog.RET_OK == dialog.getReturnStatus()) {
+                        if (dialog.isQuerverweiseChecked()) {
+                            for (final CrossReference crossreference : crossreferences) {
+                                final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
+                                CidsAppBackend.getInstance()
+                                        .getFrontToKassenzeichenQuerverweisMap()
+                                        .put(frontBean, kassenzeichenNummer);
                             }
-                        } else {
-                            return null;
                         }
+                    } else {
+                        return null;
                     }
                 }
 
