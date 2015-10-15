@@ -75,9 +75,6 @@ public class FlaechenClipboard extends AbstractClipboard {
                 table.getAllBeans(),
                 true);
 
-        final int id = table.getTableHelper().getNextNewBeanId();
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
-        pasteBean.getMetaObject().setID(id);
         return pasteBean;
     }
 

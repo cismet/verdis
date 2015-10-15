@@ -200,15 +200,4 @@ public abstract class CidsBeanTableModel extends AbstractTableModel {
     public List<CidsBean> getRemovedCidsBeans() {
         return new ArrayList<CidsBean>(removedCidsBeans);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   cidsBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public abstract CidsBean deepcloneBean(final CidsBean cidsBean) throws Exception;
 }

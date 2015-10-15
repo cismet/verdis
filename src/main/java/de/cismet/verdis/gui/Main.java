@@ -5273,12 +5273,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         if (getKassenzeichenPanel() != null) {
             final String kassenzeichen = getKassenzeichenPanel().getShownKassenzeichen();
-            final String bemerkung = getKassenzeichenPanel().getShownBemerkung();
             if ((kassenzeichen != null) && (kassenzeichen.length() > 1)) {
                 zusatz += " " + kassenzeichen;
-                if ((bemerkung != null) && (bemerkung.length() > 1)) {
-                    zusatz += " - " + bemerkung.replace('\n', ' ');
-                }
             }
         }
         setTitle("verdis" + zusatz);

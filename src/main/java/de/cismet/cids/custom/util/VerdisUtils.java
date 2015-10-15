@@ -11,9 +11,7 @@
  */
 package de.cismet.cids.custom.util;
 
-import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.newuser.User;
 
 import org.apache.log4j.Logger;
 
@@ -26,15 +24,16 @@ import java.util.Collection;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.CidsAppBackend;
-
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+
+import de.cismet.verdis.gui.AbstractCidsBeanTable;
+import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
+import de.cismet.verdis.gui.SRFrontenTabellenPanel;
 
 /**
  * DOCUMENT ME!
@@ -72,31 +71,20 @@ public class VerdisUtils {
     public static CidsBean createPastedFlaecheBean(final CidsBean clipboardBean,
             final Collection<CidsBean> targetBeansCollection,
             final boolean crossreference) throws Exception {
-        final CidsBean pasteBean = deepcloneFlaecheBean(clipboardBean);
-        if (clipboardBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO) != null) {
-            final int flaecheninfoId = (Integer)clipboardBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__ID);
-            final CidsBean flaecheninfoBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaObject(
-                                flaecheninfoId,
-                                CidsBean.getMetaClassFromTableName(
-                                    VerdisConstants.DOMAIN,
-                                    VerdisMetaClassConstants.MC_FLAECHENINFO).getId())
-                        .getBean();
-            if (crossreference) {
-                pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
-            } else {
-                pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
-                    flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD));
-                pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
-                    flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__FLAECHENART));
-                pasteBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG,
-                    flaecheninfoBean.getProperty(FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG));
+        final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
+        if (!crossreference) {
+            final CidsBean flaecheInfo = (CidsBean)pasteBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO);
+            if (flaecheInfo != null) {
+                flaecheInfo.setProperty("id", -1);
+                flaecheInfo.getMetaObject().setID(-1);
+                flaecheInfo.getMetaObject().forceStatus(MetaObject.NEW);
+                final CidsBean geomBean = (CidsBean)flaecheInfo.getProperty(
+                        FlaecheninfoPropertyConstants.PROP__GEOMETRIE);
+                if (geomBean != null) {
+                    geomBean.setProperty("id", -1);
+                    geomBean.getMetaObject().setID(-1);
+                    geomBean.getMetaObject().forceStatus(MetaObject.NEW);
+                }
             }
         }
 
@@ -115,6 +103,15 @@ public class VerdisUtils {
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
         pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
+        pasteBean.setProperty(
+            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+            new java.sql.Date(Calendar.getInstance().getTime().getTime()));
+
+        final int id = RegenFlaechenTabellenPanel.getNextNewBeanId();
+        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
+        pasteBean.getMetaObject().setID(id);
+        pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
+
         return pasteBean;
     }
 
@@ -132,7 +129,7 @@ public class VerdisUtils {
     public static CidsBean createPastedFrontBean(final CidsBean clipboardBean,
             final Collection<CidsBean> targetBeansCollection,
             final boolean crossreference) throws Exception {
-        final CidsBean pasteBean = deepcloneFrontBean(clipboardBean);
+        final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
 
         final int newNummer = getValidNummer(targetBeansCollection);
         pasteBean.setProperty(FrontPropertyConstants.PROP__NUMMER, newNummer);
@@ -140,34 +137,31 @@ public class VerdisUtils {
         pasteBean.setProperty(FrontPropertyConstants.PROP__BEARBEITET_DURCH, null);
 
         if (clipboardBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO) != null) {
-            final int frontinfoId = (Integer)clipboardBean.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
-                            + "."
-                            + FrontinfoPropertyConstants.PROP__ID);
-            final CidsBean frontinfoBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaObject(
-                                frontinfoId,
-                                CidsBean.getMetaClassFromTableName(
-                                    VerdisConstants.DOMAIN,
-                                    VerdisMetaClassConstants.MC_FRONTINFO).getId())
-                        .getBean();
-            if (crossreference) {
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
-            } else {
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__STRASSE,
-                    frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__STRASSE));
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
-                    frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
-                pasteBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG,
-                    frontinfoBean.getProperty(FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG));
+            if (!crossreference) {
+                final CidsBean frontInfo = (CidsBean)pasteBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO);
+                if (frontInfo != null) {
+                    frontInfo.setProperty("id", -1);
+                    frontInfo.getMetaObject().setID(-1);
+                    frontInfo.getMetaObject().forceStatus(MetaObject.NEW);
+                    final CidsBean geomBean = (CidsBean)frontInfo.getProperty(
+                            FrontinfoPropertyConstants.PROP__GEOMETRIE);
+                    if (geomBean != null) {
+                        geomBean.setProperty("id", -1);
+                        geomBean.getMetaObject().setID(-1);
+                        geomBean.getMetaObject().forceStatus(MetaObject.NEW);
+                    }
+                }
             }
         }
 
         final Calendar cal = Calendar.getInstance();
         pasteBean.setProperty(FrontPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
+
+        final int id = SRFrontenTabellenPanel.getNextNewBeanId();
+        pasteBean.setProperty(FrontPropertyConstants.PROP__ID, id);
+        pasteBean.getMetaObject().setID(id);
+        pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
+
         return pasteBean;
     }
 
@@ -181,7 +175,21 @@ public class VerdisUtils {
      * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean createPastedInfoBean(final CidsBean clipboardBean) throws Exception {
-        final CidsBean pasteBean = deepcloneFrontBean(clipboardBean);
+        final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
+
+        final CidsBean geomBean = (CidsBean)pasteBean.getProperty(
+                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE);
+        if (geomBean != null) {
+            geomBean.setProperty("id", -1);
+            geomBean.getMetaObject().setID(-1);
+            geomBean.getMetaObject().forceStatus(MetaObject.NEW);
+        }
+
+        final int id = AbstractCidsBeanTable.getNextNewBeanId();
+        pasteBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, id);
+        pasteBean.getMetaObject().setID(id);
+        pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
+
         return pasteBean;
     }
 
@@ -301,86 +309,6 @@ public class VerdisUtils {
             }
         }
         return "A";
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   cidsBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public static CidsBean deepcloneFlaecheBean(final CidsBean cidsBean) throws Exception {
-        final CidsBean deepclone = CidsBeanSupport.deepcloneCidsBean(cidsBean);
-        final CidsBean origFlaecheninfo = (CidsBean)cidsBean.getProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO);
-        if (origFlaecheninfo != null) {
-            deepclone.setProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO
-                        + "."
-                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
-                cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD));
-            deepclone.setProperty(
-                FlaechePropertyConstants.PROP__FLAECHENINFO
-                        + "."
-                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
-                cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
-                            + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART));
-        }
-        return deepclone;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   cidsBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public static CidsBean deepcloneFrontBean(final CidsBean cidsBean) throws Exception {
-        final CidsBean deepclone = CidsBeanSupport.deepcloneCidsBean(cidsBean);
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
-        deepclone.setProperty(
-            FrontPropertyConstants.PROP__FRONTINFO
-                    + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE,
-            cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__STRASSE));
-        // deepclone.setProperty(FrontinfoPropertyConstants.PROP__SATZUNG,
-        // cidsBean.getProperty(FrontinfoPropertyConstants.PROP__SATZUNG));
-
-        final CidsBean sr_klasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
-        if (sr_klasse != null) {
-            sr_klasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-
-        final CidsBean strasse = (CidsBean)deepclone.getProperty(FrontPropertyConstants.PROP__FRONTINFO
-                        + "."
-                        + FrontinfoPropertyConstants.PROP__STRASSE);
-        if (strasse != null) {
-            strasse.getMetaObject().forceStatus(MetaObject.NO_STATUS);
-        }
-        return deepclone;
     }
 
     /**

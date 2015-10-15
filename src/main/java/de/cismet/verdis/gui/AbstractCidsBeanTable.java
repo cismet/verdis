@@ -158,9 +158,7 @@ public abstract class AbstractCidsBeanTable extends JPanel implements CidsBeanTa
      */
     public void backupBean(final CidsBean cidsBean) {
         try {
-            final int id = (Integer)cidsBean.getProperty("id");
-            final CidsBean backupBean = model.deepcloneBean(cidsBean);
-            beanBackups.put(id, backupBean);
+            beanBackups.put((Integer)cidsBean.getProperty("id"), CidsBeanSupport.deepcloneCidsBean(cidsBean));
         } catch (Exception ex) {
             LOG.error("error while making backup of bean", ex);
         }

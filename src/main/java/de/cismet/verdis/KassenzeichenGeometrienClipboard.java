@@ -49,10 +49,6 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
         final CidsBean pasteBean = VerdisUtils.createPastedInfoBean(
                 clipboardBean);
-
-        final int id = getNextNewBeanId();
-        pasteBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, id);
-        pasteBean.getMetaObject().setID(id);
         return pasteBean;
     }
 
