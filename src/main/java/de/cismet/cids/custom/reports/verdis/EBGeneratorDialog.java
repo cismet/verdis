@@ -406,27 +406,27 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_rbA3ActionPerformed
-    }                                                                        //GEN-LAST:event_rbA3ActionPerformed
+    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbA3ActionPerformed
+    }//GEN-LAST:event_rbA3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
+    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         generateReport(taHinweise.getText());
         this.setVisible(false);
-    }                                                                            //GEN-LAST:event_btnPrintActionPerformed
+    }//GEN-LAST:event_btnPrintActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.setVisible(false);
-    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -577,8 +577,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                 }
             };
 
-        if (DownloadManagerDialog.showAskingForUserTitle(parent)) {
-            final String jobname = DownloadManagerDialog.getJobname();
+        if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(parent)) {
+            final String jobname = DownloadManagerDialog.getInstance().getJobName();
 
             final int nummer = (Integer)kassenzeichen.getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
