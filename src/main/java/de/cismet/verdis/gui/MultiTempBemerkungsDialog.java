@@ -360,6 +360,8 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jDialog1.getContentPane().add(jPanel1, gridBagConstraints);
 
+        jDialog1.getRootPane().setDefaultButton(jButton4);
+
         setTitle(org.openide.util.NbBundle.getMessage(
                 MultiTempBemerkungsDialog.class,
                 "MultiTempBemerkungsDialog.title")); // NOI18N
@@ -488,6 +490,7 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         jTextArea1.setText(null);
         jComboBox1.setSelectedIndex(0);
+        jTextArea1.requestFocus();
         StaticSwingTools.showDialog(jDialog1);
     }                                                                            //GEN-LAST:event_jButton5ActionPerformed
 
