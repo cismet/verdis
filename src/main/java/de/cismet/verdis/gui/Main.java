@@ -39,6 +39,7 @@ import Sirius.navigator.ui.tree.SearchResultsTree;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -68,6 +69,7 @@ import net.infonode.util.Direction;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.JXLoginPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
@@ -133,9 +135,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.filechooser.FileFilter;
 
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
@@ -149,6 +155,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.search.QuerySearchResultsAction;
 import de.cismet.cids.search.QuerySearchResultsActionDialog;
 
+import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
 
 import de.cismet.cismap.commons.CidsLayerFactory;
@@ -241,6 +248,7 @@ import de.cismet.verdis.interfaces.CidsBeanTable;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
+import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
@@ -449,7 +457,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuItem mnuHelp;
     private javax.swing.JMenuItem mnuInfo;
     private javax.swing.JMenuItem mnuNewKassenzeichen;
-    private javax.swing.JMenuItem mnuRenameKZ;
+    private javax.swing.JMenuItem mnuRenameAnyKZ;
+    private javax.swing.JMenuItem mnuRenameCurrentKZ;
     private javax.swing.JPanel panMain;
     private javax.swing.JPopupMenu.Separator sepOptions;
     private de.cismet.cids.navigator.utils.SimpleMemoryMonitoringToolbarWidget simpleMemoryMonitoringToolbarWidget1;
@@ -646,7 +655,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             configurationManager.configure(OptionsClient.getInstance());
 
             // Anwendungslogik
-
             LOG.info("Einstellungen der Karte vornehmen");
             setEditMode(false);
             if (LOG.isDebugEnabled()) {
@@ -819,7 +827,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             new Color(236, 233, 216)));
 
             // Inserting Docking Window functionalty (Sebastian) 24.07.07
-
             // TODO UGLY PERHAPS CENTRAL HANDLer FOR THE CREATION OF CONFIGURATION
             final File verdisDir = new File(DIRECTORYPATH_VERDIS);
             if (!verdisDir.exists()) {
@@ -987,12 +994,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void showRenderer(final String domain, final String className, final int id) {
         try {
             final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-            descPane.clearBreadCrumb();
-            descPane.clear();
-            descPane.gotoMetaObject(
-                ClassCacheMultiple.getMetaClass(domain, className),
-                id,
-                "");
+            descPane.gotoMetaObjectNode(new MetaObjectNode(
+                    domain,
+                    id,
+                    ClassCacheMultiple.getMetaClass(domain, className).getID(),
+                    ""));
             if (!alkisRendererDialog.isVisible()) {
                 StaticSwingTools.showDialog(alkisRendererDialog);
             }
@@ -1027,10 +1033,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void showRenderer(final MetaObject[] metaObjects) {
         try {
+            final List<MetaObjectNode> mons = new ArrayList<MetaObjectNode>();
+            for (final MetaObject metaObject : metaObjects) {
+                final CidsBean bean = metaObject.getBean();
+                mons.add(new MetaObjectNode(
+                        metaObject.getDomain(),
+                        metaObject.getId(),
+                        metaObject.getClassID(),
+                        "bla bli blubb"));
+            }
             final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-            descPane.clearBreadCrumb();
-            descPane.clear();
-            descPane.gotoMetaObjects(metaObjects, "");
+            descPane.gotoMetaObjectNodes(mons.toArray(new MetaObjectNode[0]));
             if (!alkisRendererDialog.isVisible()) {
                 StaticSwingTools.showDialog(alkisRendererDialog);
             }
@@ -1057,9 +1070,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void showRenderer(final MetaObject metaObject) {
         try {
             final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-            descPane.clearBreadCrumb();
-            descPane.clear();
-            descPane.gotoMetaObject(metaObject, "");
+            descPane.gotoMetaObjectNode(new MetaObjectNode(metaObject.getBean()));
             if (!alkisRendererDialog.isVisible()) {
                 StaticSwingTools.showDialog(alkisRendererDialog);
             }
@@ -1704,12 +1715,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void refreshLeftTitleBarColor() {
         if (editMode) {
             setLeftTitleBarColor(Color.red);
+        } else if (kassenzeichenPanel.isLocked()) {
+            setLeftTitleBarColor(Color.orange);
         } else {
-            if (kassenzeichenPanel.isLocked()) {
-                setLeftTitleBarColor(Color.orange);
-            } else {
-                setLeftTitleBarColor(myBlue);
-            }
+            setLeftTitleBarColor(myBlue);
         }
     }
 
@@ -1797,7 +1806,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menEdit = new javax.swing.JMenu();
         mnuEditMode = new javax.swing.JMenuItem();
         mnuNewKassenzeichen = new javax.swing.JMenuItem();
-        mnuRenameKZ = new javax.swing.JMenuItem();
+        mnuRenameCurrentKZ = new javax.swing.JMenuItem();
+        mnuRenameAnyKZ = new javax.swing.JMenuItem();
         menExtras = new javax.swing.JMenu();
         mniOptions = new javax.swing.JMenuItem();
         sepOptions = new javax.swing.JPopupMenu.Separator();
@@ -1849,20 +1859,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         addWindowListener(new java.awt.event.WindowAdapter() {
 
                 @Override
-                public void windowClosed(final java.awt.event.WindowEvent evt) {
-                    formWindowClosed(evt);
+                public void windowOpened(final java.awt.event.WindowEvent evt) {
+                    formWindowOpened(evt);
                 }
                 @Override
                 public void windowClosing(final java.awt.event.WindowEvent evt) {
                     formWindowClosing(evt);
                 }
                 @Override
-                public void windowOpened(final java.awt.event.WindowEvent evt) {
-                    formWindowOpened(evt);
+                public void windowClosed(final java.awt.event.WindowEvent evt) {
+                    formWindowClosed(evt);
                 }
             });
         addKeyListener(new java.awt.event.KeyAdapter() {
 
+                @Override
+                public void keyTyped(final java.awt.event.KeyEvent evt) {
+                    formKeyTyped(evt);
+                }
                 @Override
                 public void keyPressed(final java.awt.event.KeyEvent evt) {
                     formKeyPressed(evt);
@@ -1870,10 +1884,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 @Override
                 public void keyReleased(final java.awt.event.KeyEvent evt) {
                     formKeyReleased(evt);
-                }
-                @Override
-                public void keyTyped(final java.awt.event.KeyEvent evt) {
-                    formKeyTyped(evt);
                 }
             });
 
@@ -2488,16 +2498,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         menEdit.add(mnuNewKassenzeichen);
 
-        mnuRenameKZ.setText("Kassenzeichen umbenennen");
-        mnuRenameKZ.setEnabled(false);
-        mnuRenameKZ.addActionListener(new java.awt.event.ActionListener() {
+        mnuRenameCurrentKZ.setText("geladenes Kassenzeichen umbenennen");
+        mnuRenameCurrentKZ.setEnabled(false);
+        mnuRenameCurrentKZ.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuRenameKZActionPerformed(evt);
+                    mnuRenameCurrentKZActionPerformed(evt);
                 }
             });
-        menEdit.add(mnuRenameKZ);
+        menEdit.add(mnuRenameCurrentKZ);
+
+        mnuRenameAnyKZ.setText("beliebiges Kassenzeichen umbenennen");
+        mnuRenameAnyKZ.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mnuRenameAnyKZActionPerformed(evt);
+                }
+            });
+        menEdit.add(mnuRenameAnyKZ);
 
         jMenuBar1.add(menEdit);
 
@@ -2712,52 +2732,52 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menWindowsActionPerformed
+    private void menWindowsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_menWindowsActionPerformed
 // TODO add your handling code here:
-    }//GEN-LAST:event_menWindowsActionPerformed
+    } //GEN-LAST:event_menWindowsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniResetWindowLayoutActionPerformed
+    private void mniResetWindowLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniResetWindowLayoutActionPerformed
         setupDefaultLayout();
-    }//GEN-LAST:event_mniResetWindowLayoutActionPerformed
+    }                                                                                        //GEN-LAST:event_mniResetWindowLayoutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKanalanschlussActionPerformed
+    private void mniKanalanschlussActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKanalanschlussActionPerformed
         showOrHideView(vKanaldaten);
-    }//GEN-LAST:event_mniKanalanschlussActionPerformed
+    }                                                                                     //GEN-LAST:event_mniKanalanschlussActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSummenActionPerformed
+    private void mniSummenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSummenActionPerformed
         showOrHideView(vSummen);
-    }//GEN-LAST:event_mniSummenActionPerformed
+    }                                                                             //GEN-LAST:event_mniSummenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichenActionPerformed
+    private void mniKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichenActionPerformed
         showOrHideView(vKassenzeichen);
-    }//GEN-LAST:event_mniKassenzeichenActionPerformed
+    }                                                                                    //GEN-LAST:event_mniKassenzeichenActionPerformed
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniLoadLayoutActionPerformed
+    private void mniLoadLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniLoadLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2793,14 +2813,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.error("error while loading layout", ex);
             }
         }
-    }//GEN-LAST:event_mniLoadLayoutActionPerformed
+    } //GEN-LAST:event_mniLoadLayoutActionPerformed
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSaveLayoutActionPerformed
+    private void mniSaveLayoutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniSaveLayoutActionPerformed
         final JFileChooser fc = new JFileChooser(DIRECTORYPATH_VERDIS);
         fc.setFileFilter(new FileFilter() {
 
@@ -2832,7 +2852,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 saveLayout(name + ".layout");
             }
         }
-    }//GEN-LAST:event_mniSaveLayoutActionPerformed
+    } //GEN-LAST:event_mniSaveLayoutActionPerformed
 
     /**
      * TODO Bundle Inserting Docking Window functionalty (Sebastian) 24.07.07.
@@ -2894,10 +2914,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         verdisDir.mkdir();
                     }
                     layoutFile.createNewFile();
-                } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Saving Layout.. File does exit");
-                    }
+                } else if (LOG.isDebugEnabled()) {
+                    LOG.debug("Saving Layout.. File does exit");
                 }
                 final FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
                 final ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
@@ -2993,44 +3011,44 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuChangeUserActionPerformed
+    private void mnuChangeUserActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuChangeUserActionPerformed
         formWindowOpened(null);
-    }//GEN-LAST:event_mnuChangeUserActionPerformed
+    }                                                                                 //GEN-LAST:event_mnuChangeUserActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
+    private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
         cmdNewKassenzeichenActionPerformed(null);
-    }//GEN-LAST:event_mnuNewKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_mnuNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditModeActionPerformed
+    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
         cmdEditModeActionPerformed(null);
-    }//GEN-LAST:event_mnuEditModeActionPerformed
+    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExitActionPerformed
+    private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuExitActionPerformed
         dispose();
-    }//GEN-LAST:event_mnuExitActionPerformed
+    }                                                                           //GEN-LAST:event_mnuExitActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowOpened(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-    }//GEN-LAST:event_formWindowOpened
+    private void formWindowOpened(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowOpened
+    }                                                                     //GEN-LAST:event_formWindowOpened
 
     /**
      * DOCUMENT ME!
@@ -3113,16 +3131,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
+    private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
         regenFlaechenTabellenPanel.reEnumerateFlaechen();
-    }//GEN-LAST:event_cmdRefreshEnumerationActionPerformed
+    }                                                                                         //GEN-LAST:event_cmdRefreshEnumerationActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPdfActionPerformed
+    private void cmdPdfActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPdfActionPerformed
         if (kassenzeichenBean != null) {
             final EBGeneratorDialog.Mode ebMode;
             if (CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())) {
@@ -3140,29 +3158,29 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 });
         }
-    }//GEN-LAST:event_cmdPdfActionPerformed
+    } //GEN-LAST:event_cmdPdfActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
+    private void cmdDeleteKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteKassenzeichenActionPerformed
         deleteKassenzeichen();
-    }//GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdDeleteKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPasteActionPerformed
+    private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteActionPerformed
         final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.storeToFile();
             clipboard.paste();
         }
-    }//GEN-LAST:event_cmdPasteActionPerformed
+    }                                                                            //GEN-LAST:event_cmdPasteActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3178,19 +3196,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCutActionPerformed
+    private void cmdCutActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCutActionPerformed
         final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
             clipboard.cut();
         }
-    }//GEN-LAST:event_cmdCutActionPerformed
+    }                                                                          //GEN-LAST:event_cmdCutActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdInfoActionPerformed
+    private void cmdInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdInfoActionPerformed
 //        String info="Verdis Plugin\n"
 //                + "cismet GmbH\n\n"
 //                + de.cismet.verdis.Version.getVersion()+"\n"
@@ -3203,9 +3221,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             // JLabel infoLabel=new JLabel(Version.getVersion()+"\n"+
             // de.cismet.cismap.commons.Version.getVersion());
-
             // d.add(infoLabel,BorderLayout.SOUTH);
-
             final JLabel image = new JLabel(new ImageIcon(getBannerImage()));
             d.add(image, BorderLayout.CENTER);
             final JLabel version = new JLabel(Version.getVersion());
@@ -3216,60 +3232,60 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             about = d;
         }
         StaticSwingTools.showDialog(about);
-    }//GEN-LAST:event_cmdInfoActionPerformed
+    } //GEN-LAST:event_cmdInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoActionPerformed
+    private void mnuInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuInfoActionPerformed
         cmdInfoActionPerformed(null);
-    }//GEN-LAST:event_mnuInfoActionPerformed
+    }                                                                           //GEN-LAST:event_mnuInfoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
+    private void formKeyReleased(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyReleased
         // TODO add your handling code here:
-    }//GEN-LAST:event_formKeyReleased
+    } //GEN-LAST:event_formKeyReleased
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyPressed(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+    private void formKeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyPressed
 
         if ((evt.getKeyCode() == KeyEvent.VK_F1) && evt.isControlDown()) {
         }
         // TODO add your handling code here:
-    }//GEN-LAST:event_formKeyPressed
+    } //GEN-LAST:event_formKeyPressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formKeyTyped(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
-    }//GEN-LAST:event_formKeyTyped
+    private void formKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_formKeyTyped
+    }                                                              //GEN-LAST:event_formKeyTyped
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdWorkflowActionPerformed
-    }//GEN-LAST:event_cmdWorkflowActionPerformed
+    private void cmdWorkflowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdWorkflowActionPerformed
+    }                                                                               //GEN-LAST:event_cmdWorkflowActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         LOG.info("formWindowClosing");
         if (editMode && !kassenzeichenPanel.isEmpty()) {
             if (changesPending()) {
@@ -3288,7 +3304,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
         closeAllConnections();
-    }//GEN-LAST:event_formWindowClosing
+    }                                                                      //GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
@@ -3305,15 +3321,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosed(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-    }//GEN-LAST:event_formWindowClosed
+    private void formWindowClosed(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosed
+    }                                                                     //GEN-LAST:event_formWindowClosed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
+    private void cmdNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNewKassenzeichenActionPerformed
         if (!readonly) {
             if (changesPending()) {
                 final int answer = JOptionPane.showConfirmDialog(
@@ -3331,25 +3347,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 newKassenzeichen();
             }
         }
-    }//GEN-LAST:event_cmdNewKassenzeichenActionPerformed
+    }                                                                                       //GEN-LAST:event_cmdNewKassenzeichenActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOkActionPerformed
+    private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
         if (changesPending()) {
             saveKassenzeichenAndAssessement();
         }
-    }//GEN-LAST:event_cmdOkActionPerformed
+    }                                                                         //GEN-LAST:event_cmdOkActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
+    private void cmdCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCancelActionPerformed
         if (changesPending()) {
             final int answer = JOptionPane.showConfirmDialog(
                     this,
@@ -3379,14 +3395,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     kassenzeichenPanel.refresh();
                 }
             }.execute();
-    }//GEN-LAST:event_cmdCancelActionPerformed
+    } //GEN-LAST:event_cmdCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditModeActionPerformed
+    private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
             WaitDialog.getInstance().showDialog();
             new SwingWorker<Boolean, Void>() {
@@ -3422,7 +3438,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 }.execute();
         }
-    }//GEN-LAST:event_cmdEditModeActionPerformed
+    } //GEN-LAST:event_cmdEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3449,36 +3465,36 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCopyActionPerformed
+    private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCopyActionPerformed
         final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
         if (clipboard != null) {
             clipboard.storeToFile();
             clipboard.copy();
         }
-    }//GEN-LAST:event_cmdCopyActionPerformed
+    }                                                                           //GEN-LAST:event_cmdCopyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestActionPerformed
-    }//GEN-LAST:event_cmdTestActionPerformed
+    private void cmdTestActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTestActionPerformed
+    }                                                                           //GEN-LAST:event_cmdTestActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTest2ActionPerformed
-    }//GEN-LAST:event_cmdTest2ActionPerformed
+    private void cmdTest2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdTest2ActionPerformed
+    }                                                                            //GEN-LAST:event_cmdTest2ActionPerformed
 
     /**
      * ToDo Threading and Progressbar.
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossoverActionPerformed
+    private void cmdLagisCrossoverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossoverActionPerformed
         try {
             final JDialog dialog = new JDialog(this, "", true);
             final PopupLagisCrossoverPanel lcp = new PopupLagisCrossoverPanel(CidsAppBackend.getInstance()
@@ -3494,35 +3510,54 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             LOG.error("Crossover: Fehler im LagIS Crossover", ex);
             // ToDo Meldung an Benutzer
         }
-    }//GEN-LAST:event_cmdLagisCrossoverActionPerformed
+    }                                                                                     //GEN-LAST:event_cmdLagisCrossoverActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuRenameKZActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRenameKZActionPerformed
+    private void mnuRenameCurrentKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameCurrentKZActionPerformed
         if (!readonly) {
-            if (changesPending()) {
-                final int answer = JOptionPane.showConfirmDialog(
-                        this,
-                        "Wollen Sie die gemachten \u00C4nderungen zuerst speichern?",
-                        "Kassenzeichen umbenennen",
-                        JOptionPane.YES_NO_CANCEL_OPTION);
-                if (answer == JOptionPane.YES_OPTION) {
-                    saveKassenzeichenAndAssessement();
-                    renameKassenzeichen();
-                } else if (answer == JOptionPane.NO_OPTION) {
-                    releaseLocks();
-                    kassenzeichenPanel.refresh();
-                    renameKassenzeichen();
+            if (editMode) {
+                if (changesPending()) {
+                    final int answer = JOptionPane.showConfirmDialog(
+                            this,
+                            "Wollen Sie die gemachten \u00C4nderungen zuerst speichern?",
+                            "Kassenzeichen umbenennen",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        saveKassenzeichenAndAssessement();
+                        renameCurrentKassenzeichen();
+                    } else if (answer == JOptionPane.NO_OPTION) {
+                        releaseLocks();
+                        kassenzeichenPanel.refresh();
+                        renameCurrentKassenzeichen();
+                    }
+                } else {
+                    WaitDialog.getInstance().showDialog();
+                    new SwingWorker<Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                releaseLocks();
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                WaitDialog.getInstance().dispose();
+                                setEditMode(false);
+                                kassenzeichenPanel.refresh();
+                                renameCurrentKassenzeichen();
+                            }
+                        }.execute();
                 }
             } else {
-                releaseLocks();
-                renameKassenzeichen();
+                renameCurrentKassenzeichen();
             }
         }
-    }//GEN-LAST:event_mnuRenameKZActionPerformed
+    } //GEN-LAST:event_mnuRenameCurrentKZActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3545,16 +3580,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKarteActionPerformed
+    private void mniKarteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKarteActionPerformed
         showOrHideView(vKarte);
-    }//GEN-LAST:event_mniKarteActionPerformed
+    }                                                                            //GEN-LAST:event_mniKarteActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniTabelleActionPerformed
+    private void mniTabelleActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniTabelleActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vTabelleRegen);
@@ -3565,14 +3600,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             break;
         }
-    }//GEN-LAST:event_mniTabelleActionPerformed
+    }                                                                              //GEN-LAST:event_mniTabelleActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniDetailsActionPerformed
+    private void mniDetailsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniDetailsActionPerformed
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
                 showOrHideView(vDetailsRegen);
@@ -3586,23 +3621,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             break;
         }
-    }//GEN-LAST:event_mniDetailsActionPerformed
+    }                                                                              //GEN-LAST:event_mniDetailsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jMenuItem1ActionPerformed
         DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }                                                                              //GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
+    private void btnHistoryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnHistoryActionPerformed
         final HistoryPanel historyPan = new HistoryPanel();
         historyPan.setCidsBean(kassenzeichenBean);
 
@@ -3611,7 +3646,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         dial.setContentPane(historyPan);
         dial.setSize(800, 600);
         StaticSwingTools.showDialog(dial);
-    }//GEN-LAST:event_btnHistoryActionPerformed
+    } //GEN-LAST:event_btnHistoryActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -3672,66 +3707,66 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         if (!CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
             if (cidsBeanTable != null) {
                 cidsBeanTable.addNewBean();
             }
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                          //GEN-LAST:event_cmdAddActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveActionPerformed
+    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
         if (!CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.ALLGEMEIN)) {
             final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
             if (cidsBeanTable != null) {
                 cidsBeanTable.removeSelectedBeans();
             }
         }
-    }//GEN-LAST:event_cmdRemoveActionPerformed
+    }                                                                             //GEN-LAST:event_cmdRemoveActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUndoActionPerformed
+    private void cmdUndoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdUndoActionPerformed
         final CidsBeanTable cidsBeanTable = getCurrentCidsbeanTable();
         if (cidsBeanTable != null) {
             cidsBeanTable.restoreSelectedBeans();
         }
-    }//GEN-LAST:event_cmdUndoActionPerformed
+    }                                                                           //GEN-LAST:event_cmdUndoActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniOptionsActionPerformed
+    private void mniOptionsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniOptionsActionPerformed
         final OptionsDialog od = new OptionsDialog(this, true);
         StaticSwingTools.showDialog(od);
-    }//GEN-LAST:event_mniOptionsActionPerformed
+    }                                                                              //GEN-LAST:event_mniOptionsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCMENT ME!
      */
-    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdFortfuehrungActionPerformed
+    private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
         StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
-    }//GEN-LAST:event_cmdFortfuehrungActionPerformed
+    }                                                                                   //GEN-LAST:event_cmdFortfuehrungActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DCUMENT ME!
      */
-    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    private void cmdNextKassenzeichenWithoutGeomActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
         final Integer kassenzeichennummer8;
         if (getCidsBean() != null) {
             kassenzeichennummer8 = (Integer)getCidsBean().getProperty(
@@ -3752,92 +3787,92 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (final ConnectionException ex) {
             LOG.error("error while executing next kassenzeichensearch", ex);
         }
-    }//GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
+    } //GEN-LAST:event_cmdNextKassenzeichenWithoutGeomActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdGrundbuchblattSucheActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdGrundbuchblattSucheActionPerformed
+    private void cmdGrundbuchblattSucheActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdGrundbuchblattSucheActionPerformed
         StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
-    }//GEN-LAST:event_cmdGrundbuchblattSucheActionPerformed
+    }                                                                                          //GEN-LAST:event_cmdGrundbuchblattSucheActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniKassenzeichen1ActionPerformed
+    private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichen1ActionPerformed
         showOrHideView(vKassenzeichenList);
-    }//GEN-LAST:event_mniKassenzeichen1ActionPerformed
+    }                                                                                     //GEN-LAST:event_mniKassenzeichen1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSAPCheckActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSAPCheckActionPerformed
+    private void cmdSAPCheckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSAPCheckActionPerformed
         if (cmdSAPCheck.isSelected()) {
             sapClipboardListener.gainOwnership();
         }
-    }//GEN-LAST:event_cmdSAPCheckActionPerformed
+    }                                                                               //GEN-LAST:event_cmdSAPCheckActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdMemoryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMemoryActionPerformed
+    private void cmdMemoryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdMemoryActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_cmdMemoryActionPerformed
+    } //GEN-LAST:event_cmdMemoryActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRecalculateAreaActionPerformed
+    private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRecalculateAreaActionPerformed
         if (isInEditMode()) {
             regenFlaechenTabellenPanel.recalculateAreaOfFlaechen();
         }
-    }//GEN-LAST:event_cmdRecalculateAreaActionPerformed
+    }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdArbeitspaketeActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdArbeitspaketeActionPerformed
+    private void cmdArbeitspaketeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdArbeitspaketeActionPerformed
         ArbeitspaketeManagerPanel.getInstance().loadArbeitspakete();
         StaticSwingTools.showDialog(ArbeitspaketeManagerPanel.getInstance().getDialog());
-    }//GEN-LAST:event_cmdArbeitspaketeActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdArbeitspaketeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAbfrageeditorActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAbfrageeditorActionPerformed
+    private void cmdAbfrageeditorActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAbfrageeditorActionPerformed
         StaticSwingTools.showDialog(abfrageDialog);
-    }//GEN-LAST:event_cmdAbfrageeditorActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdAbfrageeditorActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdVeranlagungsdateiActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdVeranlagungsdateiActionPerformed
+    private void cmdVeranlagungsdateiActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdVeranlagungsdateiActionPerformed
         VeranlagungsdateiScheduleDialog.getInstance().pack();
         StaticSwingTools.showDialog(VeranlagungsdateiScheduleDialog.getInstance());
-    }//GEN-LAST:event_cmdVeranlagungsdateiActionPerformed
+    }                                                                                        //GEN-LAST:event_cmdVeranlagungsdateiActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnTimeRecoveryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTimeRecoveryActionPerformed
+    private void btnTimeRecoveryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnTimeRecoveryActionPerformed
         if (editMode) {
             StaticSwingTools.showDialog(timeRecoveryPanel.getDialog());
         } else {
@@ -3907,14 +3942,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }.execute();
             }
         }
-    }//GEN-LAST:event_btnTimeRecoveryActionPerformed
+    } //GEN-LAST:event_btnTimeRecoveryActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdOpenInD3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdOpenInD3ActionPerformed
+    private void cmdOpenInD3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOpenInD3ActionPerformed
         if (kassenzeichenBean != null) {
             final String kz = getCidsBean().getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER).toString();
@@ -3931,91 +3966,196 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             e);
             }
         }
-    }//GEN-LAST:event_cmdOpenInD3ActionPerformed
+    }                                                                               //GEN-LAST:event_cmdOpenInD3ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  current  evt DOCUMENT ME!
+     */
+    private void showRenameFailed(final boolean current) {
+        final String[] options = new String[] {
+                "Ja, wiederholen",
+                "Nein, abbrechen"
+            };
+        final int option = JOptionPane.showOptionDialog(
+                Main.this,
+                "<html>Möchten Sie es erneut versuchen?",
+                "Umbenennen wiederholen?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (JOptionPane.YES_OPTION == option) {
+            showRenameKassenzeichen(current);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  current  DOCUMENT ME!
+     */
+    private void showRenameKassenzeichen(final boolean current) {
+        final String oldKassenzeichen;
+        if (current) {
+            oldKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+        } else {
+            final JPanel panel = new JPanel();
+            final JTextField textField = new JTextField(8);
+            panel.add(new JLabel("<html>Geben Sie das <b>alte</b> Kassenzeichen ein: "));
+            panel.add(textField);
+
+            final String[] oldOptions = new String[] {
+                    "Weiter",
+                    "Abbrechen"
+                };
+            if (JOptionPane.YES_OPTION
+                        == JOptionPane.showOptionDialog(
+                            this,
+                            panel,
+                            "Kassenzeichen umbenennen.",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            oldOptions,
+                            null)) {
+                oldKassenzeichen = textField.getText();
+            } else {
+                oldKassenzeichen = null;
+            }
+        }
+        if (oldKassenzeichen != null) {
+            final JPanel panel = new JPanel();
+            final JTextField textField = new JTextField(8);
+            panel.add(new JLabel("<html>Geben Sie das <b>neue</b> Kassenzeichen ein: "));
+            panel.add(textField);
+
+            final String newKassenzeichen;
+            final String[] oldOptions = new String[] {
+                    "Umbenennen",
+                    "Abbrechen"
+                };
+            if (JOptionPane.YES_OPTION
+                        == JOptionPane.showOptionDialog(
+                            this,
+                            panel,
+                            "Kassenzeichen umbenennen.",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            oldOptions,
+                            null)) {
+                newKassenzeichen = textField.getText();
+            } else {
+                newKassenzeichen = null;
+            }
+
+            if (newKassenzeichen != null) {
+                final int newKassenzeichenNummer;
+                final int oldKassenzeichenNummer;
+                try {
+                    newKassenzeichenNummer = new Integer(newKassenzeichen);
+                    oldKassenzeichenNummer = new Integer(oldKassenzeichen);
+                } catch (final NumberFormatException e) {
+                    CidsAppBackend.getInstance()
+                            .showError("Fehler beim Umbenennen.", "Das Kassenzeichen muss eine Zahl sein.", null);
+                    showRenameFailed(current);
+                    return;
+                }
+
+                disableKassenzeichenCmds();
+                new SwingWorker<Object, Void>() {
+
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            return CidsAppBackend.getInstance()
+                                        .executeServerAction(
+                                            RenameKassenzeichenServerAction.TASKNAME,
+                                            null,
+                                            new ServerActionParameter<Integer>(
+                                                RenameKassenzeichenServerAction.ParameterType.KASSENZEICHENNUMMER_OLD
+                                                    .toString(),
+                                                oldKassenzeichenNummer),
+                                            new ServerActionParameter<Integer>(
+                                                RenameKassenzeichenServerAction.ParameterType.KASSENZEICHENNUMMER_NEW
+                                                    .toString(),
+                                                newKassenzeichenNummer));
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                final Object result = get();
+                                if (result instanceof Exception) {
+                                    final Exception ex = (Exception)result;
+
+                                    CidsAppBackend.getInstance()
+                                            .showError("Fehler beim Umbenennen", ex.getMessage(), ex);
+
+                                    showRenameFailed(current);
+                                } else if (current) {
+                                    CidsAppBackend.getInstance().gotoKassenzeichen(newKassenzeichen);
+                                } else {
+                                    final String[] options = new String[] {
+                                            "Umbenennen",
+                                            "Laden",
+                                            "Abbrechen"
+                                        };
+                                    final int option = JOptionPane.showOptionDialog(
+                                            Main.this,
+                                            "<html>Das Kassenzeichen wurde erfolgreich umbenannt.<br/><br/>Wie möchten Sie fortfahren?<br/>"
+                                                    + "<ul>"
+                                                    + "<li><b>"
+                                                    + options[0]
+                                                    + "</b>: ein weiteres Kassenzeichen umbennenen.</li>"
+                                                    + "<li><b>"
+                                                    + options[1]
+                                                    + "</b>: das umbenannte Kassenzeichen laden.</li>",
+                                            "Kassenzeichen erfolgreich umbenannt.",
+                                            JOptionPane.YES_NO_CANCEL_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            null,
+                                            options,
+                                            options[0]);
+                                    if (JOptionPane.YES_OPTION == option) {
+                                        showRenameKassenzeichen(current);
+                                    } else if (JOptionPane.NO_OPTION == option) {
+                                        CidsAppBackend.getInstance().gotoKassenzeichen(newKassenzeichen);
+                                    }
+                                }
+                            } catch (final Exception ex) {
+                                LOG.error("error while loading kassenzeichen " + newKassenzeichenNummer, ex);
+                                CidsAppBackend.getInstance()
+                                        .showError(
+                                            "Fehler beim Umbenennen",
+                                            "<html>Das Kassenzeichen konnte nicht umbenannt werden.",
+                                            ex);
+                            } finally {
+                                refreshKassenzeichenButtons();
+                            }
+                        }
+                    }.execute();
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mnuRenameAnyKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameAnyKZActionPerformed
+        showRenameKassenzeichen(false);
+    }                                                                                  //GEN-LAST:event_mnuRenameAnyKZActionPerformed
 
     /**
      * DOCUMENT ME!
      */
-    public void renameKassenzeichen() {
-        if (editMode) {
-            final String newKassenzeichen = JOptionPane.showInputDialog(
-                    this,
-                    "Geben Sie das neue Kassenzeichens ein:",
-                    "Kassenzeichen umbenennen",
-                    JOptionPane.QUESTION_MESSAGE);
-
-            if (newKassenzeichen != null) {
-                try {
-                    final int newKassenzeichenNummer = new Integer(newKassenzeichen);
-
-                    // prüfen ob kassenzeichen bereits existiert
-                    new SwingWorker<CidsBean, Void>() {
-
-                            @Override
-                            protected CidsBean doInBackground() throws Exception {
-                                return CidsAppBackend.getInstance().loadKassenzeichenByNummer(newKassenzeichenNummer);
-                            }
-
-                            @Override
-                            protected void done() {
-                                try {
-                                    final CidsBean newBean = get();
-                                    if (newBean != null) {
-                                        JOptionPane.showMessageDialog(
-                                            Main.this,
-                                            "Dieses Kassenzeichen existiert bereits.",
-                                            "Fehler",
-                                            JOptionPane.ERROR_MESSAGE);
-                                        return;
-                                    }
-
-                                    disableKassenzeichenCmds();
-                                    new SwingWorker<CidsBean, Void>() {
-
-                                            @Override
-                                            protected CidsBean doInBackground() throws Exception {
-                                                releaseLocks();
-                                                try {
-                                                    kassenzeichenBean.setProperty(
-                                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
-                                                        newKassenzeichenNummer);
-                                                } catch (Exception ex) {
-                                                    LOG.error("error while setting kassenzeichennummer", ex);
-                                                }
-                                                return persistKassenzeichen(
-                                                        kassenzeichenBean);
-                                            }
-
-                                            @Override
-                                            protected void done() {
-                                                try {
-                                                    final CidsBean persistedKassenzeichenBean = get();
-                                                    setEditMode(false);
-                                                    reloadKassenzeichen(persistedKassenzeichenBean);
-                                                } catch (final Exception ex) {
-                                                    LOG.error(ex, ex);
-                                                }
-                                            }
-                                        }.execute();
-                                } catch (final Exception ex) {
-                                    LOG.error("error while loading kassenzeichen " + newKassenzeichenNummer, ex);
-                                    CidsAppBackend.getInstance()
-                                            .showError(
-                                                "Fehler beim Überprüfen",
-                                                "<html>Beim Überprüfen ob das Kassenzeichen schon<br/>existiert ist ein Fehler aufgetreten.",
-                                                ex);
-                                }
-                            }
-                        }.execute();
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Kassenzeichen muss eine Zahl sein.",
-                        "Fehler",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
+    public void renameCurrentKassenzeichen() {
+        showRenameKassenzeichen(true);
     }
 
     /**
@@ -4523,7 +4663,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             refreshItemButtons();
 
             cmdSAPCheck.setEnabled(!editMode);
-            mnuRenameKZ.setEnabled(editMode);
             kartenPanel.setEnabled(editMode);
 
 //            final Iterator it = stores.iterator();
@@ -4853,6 +4992,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
         WaitDialog.getInstance().progressSavingKassenzeichen(crosslinkKassenzeichenBeans.size());
     }
+
     /**
      * Map merkt sich: Die gespeicherte Flaeche mit der Bezeichnung x soll einen Querverweis im Kassenzeichen y anlegen
      * MUSS VOR PERSIST GESCHEHEN
@@ -5375,6 +5515,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         if (cidsBean != null) {
             fillVeranlagungMaps(veranlagungSummeMap);
         }
+        mnuRenameCurrentKZ.setEnabled(cidsBean != null);
 
         aggValidator.validate();
     }

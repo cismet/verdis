@@ -45,8 +45,7 @@ public class GoToKassenzeichenRemoteMethod extends AbstractRESTRemoteControlMeth
 
     //~ Instance fields --------------------------------------------------------
 
-    @Context
-    private UriInfo context;
+    @Context private UriInfo context;
 
     //~ Constructors -----------------------------------------------------------
 
