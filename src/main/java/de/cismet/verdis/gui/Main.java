@@ -2498,7 +2498,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         menEdit.add(mnuNewKassenzeichen);
 
-        mnuRenameCurrentKZ.setText("geladenes Kassenzeichen umbenennen");
+        mnuRenameCurrentKZ.setText("Aktuelles Kassenzeichen umbenennen");
         mnuRenameCurrentKZ.setEnabled(false);
         mnuRenameCurrentKZ.addActionListener(new java.awt.event.ActionListener() {
 
@@ -2509,7 +2509,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         menEdit.add(mnuRenameCurrentKZ);
 
-        mnuRenameAnyKZ.setText("beliebiges Kassenzeichen umbenennen");
+        mnuRenameAnyKZ.setText("Beliebiges Kassenzeichen umbenennen");
         mnuRenameAnyKZ.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -4003,56 +4003,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             oldKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
                         KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
         } else {
-            final JPanel panel = new JPanel();
-            final JTextField textField = new JTextField(8);
-            panel.add(new JLabel("<html>Geben Sie das <b>alte</b> Kassenzeichen ein: "));
-            panel.add(textField);
-
-            final String[] oldOptions = new String[] {
-                    "Weiter",
-                    "Abbrechen"
-                };
-            if (JOptionPane.YES_OPTION
-                        == JOptionPane.showOptionDialog(
-                            this,
-                            panel,
-                            "Kassenzeichen umbenennen.",
-                            JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.PLAIN_MESSAGE,
-                            null,
-                            oldOptions,
-                            null)) {
-                oldKassenzeichen = textField.getText();
-            } else {
-                oldKassenzeichen = null;
-            }
+            oldKassenzeichen = JOptionPane.showInputDialog(
+                    this,
+                    "<html>Geben Sie das <b>alte</b> Kassenzeichen ein: ",
+                    "Kassenzeichen wählen.",
+                    JOptionPane.PLAIN_MESSAGE);
         }
         if (oldKassenzeichen != null) {
-            final JPanel panel = new JPanel();
-            final JTextField textField = new JTextField(8);
-            panel.add(new JLabel("<html>Geben Sie das <b>neue</b> Kassenzeichen ein: "));
-            panel.add(textField);
-
-            final String newKassenzeichen;
-            final String[] oldOptions = new String[] {
-                    "Umbenennen",
-                    "Abbrechen"
-                };
-            if (JOptionPane.YES_OPTION
-                        == JOptionPane.showOptionDialog(
-                            this,
-                            panel,
-                            "Kassenzeichen umbenennen.",
-                            JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.PLAIN_MESSAGE,
-                            null,
-                            oldOptions,
-                            null)) {
-                newKassenzeichen = textField.getText();
-            } else {
-                newKassenzeichen = null;
-            }
-
+            final String newKassenzeichen = JOptionPane.showInputDialog(
+                    this,
+                    "<html>Geben Sie das <b>neue</b> Kassenzeichen ein: ",
+                    "Kassenzeichen Umbenennen.",
+                    JOptionPane.PLAIN_MESSAGE);
             if (newKassenzeichen != null) {
                 final int newKassenzeichenNummer;
                 final int oldKassenzeichenNummer;
