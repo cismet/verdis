@@ -103,13 +103,21 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuNewKassenzeichenActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="mnuRenameKZ">
+            <MenuItem class="javax.swing.JMenuItem" name="mnuRenameCurrentKZ">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Kassenzeichen umbenennen"/>
+                <Property name="text" type="java.lang.String" value="Aktuelles Kassenzeichen umbenennen"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRenameKZActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRenameCurrentKZActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuRenameAnyKZ">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Beliebiges Kassenzeichen umbenennen"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRenameAnyKZActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
