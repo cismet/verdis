@@ -4018,6 +4018,28 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (newKassenzeichen != null) {
                 final int newKassenzeichenNummer;
                 final int oldKassenzeichenNummer;
+
+                if (newKassenzeichen.toCharArray()[0] != oldKassenzeichen.toCharArray()[0]) {
+                    final String[] options = new String[] {
+                            "Ja, umbenennen",
+                            "Nein, neue Eingabe"
+                        };
+                    final int option = JOptionPane.showOptionDialog(
+                            Main.this,
+                            "<html>Das neue Kassenzeichen beginnt mit einer<br/>"
+                                    + "anderen Ziffer als das alte Kassenzeichen.</br><br/><br/>"
+                                    + "Möchten Sie das Kassenzeichen dennoch umbenennen?",
+                            "Umbenennen wiederholen?",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[0]);
+                    if (JOptionPane.YES_OPTION != option) {
+                        showRenameKassenzeichen(current);
+                        return;
+                    }
+                }
                 try {
                     newKassenzeichenNummer = new Integer(newKassenzeichen);
                     oldKassenzeichenNummer = new Integer(oldKassenzeichen);
