@@ -932,9 +932,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         addWindowListener(loadLayoutWhenOpenedAdapter);
 
-        if (StaticDebuggingTools.checkHomeForFile("grundisMotdEnabled")) {
-            initCidsServerMessageNotifier();
-        }
+        initCidsServerMessageNotifier();
 
         final TestSetMotdAction testSetMotdAction = new TestSetMotdAction();
         if (testSetMotdAction.isVisible()) {
