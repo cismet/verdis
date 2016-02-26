@@ -13,6 +13,7 @@
 package de.cismet.verdis.gui;
 
 import Sirius.navigator.DefaultNavigatorExceptionHandler;
+import Sirius.navigator.Navigator;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -77,6 +78,8 @@ import org.jdesktop.swingx.auth.LoginService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
+import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -203,6 +206,7 @@ import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
+import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.StaticSwingTools;
@@ -932,7 +936,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         addWindowListener(loadLayoutWhenOpenedAdapter);
 
-        initCidsServerMessageNotifier();
+        initStartupHooks();
 
         final TestSetMotdAction testSetMotdAction = new TestSetMotdAction();
         if (testSetMotdAction.isVisible()) {
@@ -944,20 +948,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    private void initCidsServerMessageNotifier() {
-        CidsServerMessageNotifier.getInstance()
-                .subscribe(MotdDialog.getInstance(), MotdWundaStartupHook.MOTD_MESSAGE_MOTD);
-        CidsServerMessageNotifier.getInstance()
-                .subscribe(new CidsServerMessageNotifierListener() {
+    private void initStartupHooks() {
+        final Collection<? extends StartupHook> hooks = Lookup.getDefault().lookupAll(StartupHook.class);
 
-                        @Override
-                        public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
-                            totd = (String)event.getMessage().getMessage();
-                            refreshTitle();
-                        }
-                    }, MotdWundaStartupHook.MOTD_MESSAGE_TOTD);
-
-        CidsServerMessageNotifier.getInstance().start();
+        for (final StartupHook hook : hooks) {
+            hook.applicationStarted();
+        }
     }
 
     /**
