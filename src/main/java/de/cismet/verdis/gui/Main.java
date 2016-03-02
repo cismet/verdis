@@ -23,7 +23,6 @@ import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.downloadmanager.CsvExportSearchDownload;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.resource.PropertyManager;
-import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
@@ -984,7 +983,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final LayoutedContainer container = new LayoutedContainer(toolBar, menuBar, true);
         final AttributeViewer attributeViewer = new AttributeViewer();
         final AttributeEditor attributeEditor = new AttributeEditor();
-        final SearchDialog searchDialog = null;
         final MutablePopupMenu popupMenu = new MutablePopupMenu();
 
         final RootTreeNode rootTreeNode = new RootTreeNode(new Node[0]);
@@ -1005,7 +1003,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             null,
             attributeViewer,
             attributeEditor,
-            searchDialog,
             descriptionPane);
     }
 
@@ -1023,7 +1020,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     domain,
                     id,
                     ClassCacheMultiple.getMetaClass(domain, className).getID(),
-                    ""));
+                    "",
+                    null,
+                    null));
             if (!alkisRendererDialog.isVisible()) {
                 StaticSwingTools.showDialog(alkisRendererDialog);
             }
@@ -1065,7 +1064,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         metaObject.getDomain(),
                         metaObject.getId(),
                         metaObject.getClassID(),
-                        "bla bli blubb"));
+                        "bla bli blubb",
+                        null,
+                        null));
             }
             final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
             descPane.gotoMetaObjectNodes(mons.toArray(new MetaObjectNode[0]));
