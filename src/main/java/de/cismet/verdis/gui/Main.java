@@ -1818,8 +1818,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jPanel1 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         cmdMemory = new javax.swing.JButton();
-        exceptionNotificationStatusPanel =
-            new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
+        exceptionNotificationStatusPanel = new de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel();
         tobVerdis = new javax.swing.JToolBar();
         cmdEditMode = new javax.swing.JButton();
         cmdCancel = new javax.swing.JButton();
@@ -1894,59 +1893,47 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdTest.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdTest.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdTest.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdTestActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTestActionPerformed(evt);
+            }
+        });
 
         cmdTest2.setText("Test Clipboard Load");
         cmdTest2.setFocusable(false);
         cmdTest2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdTest2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdTest2.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdTest2ActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTest2ActionPerformed(evt);
+            }
+        });
 
         simpleMemoryMonitoringToolbarWidget1.startTimer();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(getTitle());
         addWindowListener(new java.awt.event.WindowAdapter() {
-
-                @Override
-                public void windowOpened(final java.awt.event.WindowEvent evt) {
-                    formWindowOpened(evt);
-                }
-                @Override
-                public void windowClosing(final java.awt.event.WindowEvent evt) {
-                    formWindowClosing(evt);
-                }
-                @Override
-                public void windowClosed(final java.awt.event.WindowEvent evt) {
-                    formWindowClosed(evt);
-                }
-            });
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         addKeyListener(new java.awt.event.KeyAdapter() {
-
-                @Override
-                public void keyTyped(final java.awt.event.KeyEvent evt) {
-                    formKeyTyped(evt);
-                }
-                @Override
-                public void keyPressed(final java.awt.event.KeyEvent evt) {
-                    formKeyPressed(evt);
-                }
-                @Override
-                public void keyReleased(final java.awt.event.KeyEvent evt) {
-                    formKeyReleased(evt);
-                }
-            });
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                formKeyTyped(evt);
+            }
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                formKeyReleased(evt);
+            }
+        });
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -1958,12 +1945,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdMemory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdMemory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdMemory.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdMemoryActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdMemoryActionPerformed(evt);
+            }
+        });
         jToolBar1.add(cmdMemory);
 
         exceptionNotificationStatusPanel.setMaximumSize(new java.awt.Dimension(34, 34));
@@ -1984,184 +1969,147 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         tobVerdis.setMinimumSize(new java.awt.Dimension(667, 33));
         tobVerdis.setPreferredSize(new java.awt.Dimension(691, 35));
 
-        cmdEditMode.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/editmode.png"))); // NOI18N
+        cmdEditMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/editmode.png"))); // NOI18N
         cmdEditMode.setToolTipText("Editormodus");
         cmdEditMode.setEnabled(false);
         cmdEditMode.setFocusPainted(false);
         cmdEditMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdEditModeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdEditModeActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdEditMode);
 
-        cmdCancel.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png"))); // NOI18N
+        cmdCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cancel.png"))); // NOI18N
         cmdCancel.setToolTipText("Änderungen abbrechen");
         cmdCancel.setFocusPainted(false);
         cmdCancel.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCancelActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCancelActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdCancel);
 
         cmdOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/ok.png"))); // NOI18N
         cmdOk.setToolTipText("Änderungen annehmen");
         cmdOk.setFocusPainted(false);
         cmdOk.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdOkActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdOkActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdOk);
 
-        cmdDeleteKassenzeichen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/deleteKassenzeichen.png"))); // NOI18N
+        cmdDeleteKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/deleteKassenzeichen.png"))); // NOI18N
         cmdDeleteKassenzeichen.setToolTipText("Kassenzeichen löschen");
         cmdDeleteKassenzeichen.setEnabled(false);
         cmdDeleteKassenzeichen.setFocusPainted(false);
         cmdDeleteKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdDeleteKassenzeichenActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdDeleteKassenzeichenActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdDeleteKassenzeichen);
 
-        cmdNewKassenzeichen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/newKassenzeichen.png"))); // NOI18N
+        cmdNewKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/newKassenzeichen.png"))); // NOI18N
         cmdNewKassenzeichen.setToolTipText("Neues Kassenzeichen");
         cmdNewKassenzeichen.setFocusPainted(false);
         cmdNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdNewKassenzeichenActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdNewKassenzeichenActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdNewKassenzeichen);
 
-        cmdNextKassenzeichenWithoutGeom.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource(
-                    "/de/cismet/verdis/res/images/toolbar/next_kassenzeichen_without_geometries.png"))); // NOI18N
+        cmdNextKassenzeichenWithoutGeom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/next_kassenzeichen_without_geometries.png"))); // NOI18N
         cmdNextKassenzeichenWithoutGeom.setToolTipText("Nächstes Kassenzeichen ohne allgemeine Geometrien");
         cmdNextKassenzeichenWithoutGeom.setFocusable(false);
         cmdNextKassenzeichenWithoutGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdNextKassenzeichenWithoutGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdNextKassenzeichenWithoutGeom.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdNextKassenzeichenWithoutGeomActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdNextKassenzeichenWithoutGeom);
 
-        cmdSAPCheck.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap.png")));          // NOI18N
+        cmdSAPCheck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap.png"))); // NOI18N
         cmdSAPCheck.setToolTipText("SAP Check");
         cmdSAPCheck.setContentAreaFilled(false);
         cmdSAPCheck.setFocusable(false);
         cmdSAPCheck.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSAPCheck.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap_selected.png"))); // NOI18N
+        cmdSAPCheck.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap_selected.png"))); // NOI18N
         cmdSAPCheck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSAPCheck.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSAPCheckActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdSAPCheckActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdSAPCheck);
 
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator6);
 
-        cmdCut.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
+        cmdCut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
         cmdCut.setToolTipText("Fläche ausschneiden");
         cmdCut.setEnabled(false);
         cmdCut.setFocusPainted(false);
         cmdCut.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCutActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCutActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdCut);
 
-        cmdCopy.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
+        cmdCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/copyFl.png"))); // NOI18N
         cmdCopy.setToolTipText("Fläche kopieren (Teileigentum erzeugen)");
         cmdCopy.setEnabled(false);
         cmdCopy.setFocusPainted(false);
         cmdCopy.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCopyActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCopyActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdCopy);
 
-        cmdPaste.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
+        cmdPaste.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/pasteFl.png"))); // NOI18N
         cmdPaste.setToolTipText("Fläche einfügen");
         cmdPaste.setEnabled(false);
         cmdPaste.setFocusPainted(false);
         cmdPaste.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdPasteActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdPasteActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdPaste);
 
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator4.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator4);
 
-        cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
+        cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
         cmdRefreshEnumeration.setToolTipText("Alle Flächen neu nummerieren");
         cmdRefreshEnumeration.setEnabled(false);
         cmdRefreshEnumeration.setFocusPainted(false);
         cmdRefreshEnumeration.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdRefreshEnumerationActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdRefreshEnumerationActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdRefreshEnumeration);
 
-        cmdRecalculateArea.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/recalculateArea.png"))); // NOI18N
+        cmdRecalculateArea.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/recalculateArea.png"))); // NOI18N
         cmdRecalculateArea.setToolTipText("Neuberechnung der Flächen");
         cmdRecalculateArea.setFocusPainted(false);
         cmdRecalculateArea.setFocusable(false);
         cmdRecalculateArea.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdRecalculateArea.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRecalculateArea.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdRecalculateAreaActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdRecalculateAreaActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdRecalculateArea);
         tobVerdis.add(jSeparator12);
 
@@ -2169,309 +2117,246 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator7.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator7);
 
-        cmdAdd.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));  // NOI18N
+        cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
         cmdAdd.setEnabled(false);
         cmdAdd.setFocusable(false);
         cmdAdd.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add2.png"))); // NOI18N
+        cmdAdd.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add2.png"))); // NOI18N
         cmdAdd.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdAddActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdAddActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdAdd);
 
-        cmdRemove.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png")));  // NOI18N
+        cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
         cmdRemove.setEnabled(false);
         cmdRemove.setFocusable(false);
         cmdRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdRemove.setRolloverIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove2.png"))); // NOI18N
+        cmdRemove.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove2.png"))); // NOI18N
         cmdRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRemove.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdRemoveActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdRemoveActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdRemove);
 
-        cmdUndo.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo.png")));  // NOI18N
+        cmdUndo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo.png"))); // NOI18N
         cmdUndo.setEnabled(false);
         cmdUndo.setFocusable(false);
         cmdUndo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdUndo.setRolloverIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo2.png"))); // NOI18N
+        cmdUndo.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/undo2.png"))); // NOI18N
         cmdUndo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdUndo.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdUndoActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdUndoActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdUndo);
         tobVerdis.add(jSeparator13);
 
-        cmdPdf.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
+        cmdPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
         cmdPdf.setToolTipText("Drucken");
         cmdPdf.setFocusPainted(false);
         cmdPdf.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdPdfActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdPdfActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdPdf);
 
-        cmdWorkflow.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/workflow.png"))); // NOI18N
+        cmdWorkflow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/workflow.png"))); // NOI18N
         cmdWorkflow.setToolTipText("Workflow");
         cmdWorkflow.setEnabled(false);
         cmdWorkflow.setFocusPainted(false);
         cmdWorkflow.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdWorkflowActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdWorkflowActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdWorkflow);
 
         jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator3.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator3);
 
-        cmdInfo.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
+        cmdInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
         cmdInfo.setToolTipText("Versionsanzeige");
         cmdInfo.setFocusPainted(false);
         cmdInfo.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdInfoActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdInfoActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdInfo);
 
         jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator8);
 
-        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
+        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
         cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
         cmdLagisCrossover.setFocusPainted(false);
         cmdLagisCrossover.setFocusable(false);
         cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdLagisCrossoverActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdLagisCrossoverActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdLagisCrossover);
 
-        btnHistory.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
+        btnHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
         btnHistory.setToolTipText("öffne Kassenzeichen-Verlauf");
         btnHistory.setFocusPainted(false);
         btnHistory.setFocusable(false);
         btnHistory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnHistory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnHistory.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnHistoryActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistoryActionPerformed(evt);
+            }
+        });
         tobVerdis.add(btnHistory);
 
-        btnTimeRecovery.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/recovery.png"))); // NOI18N
+        btnTimeRecovery.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/recovery.png"))); // NOI18N
         btnTimeRecovery.setToolTipText("Kassenzeichen-Wiederherstellung");
         btnTimeRecovery.setFocusPainted(false);
         btnTimeRecovery.setFocusable(false);
         btnTimeRecovery.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnTimeRecovery.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnTimeRecovery.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnTimeRecoveryActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTimeRecoveryActionPerformed(evt);
+            }
+        });
         tobVerdis.add(btnTimeRecovery);
         try {
-            btnTimeRecovery.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.timerecovery.dialog") != null);
+            btnTimeRecovery.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.timerecovery.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.timerecovery.dialog", ex);
             btnTimeRecovery.setVisible(false);
         }
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
-        cmdDownloads.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/download.png"))); // NOI18N
+        cmdDownloads.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/download.png"))); // NOI18N
         cmdDownloads.setFocusPainted(false);
         cmdDownloads.setFocusable(false);
         cmdDownloads.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdDownloads.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         tobVerdis.add(cmdDownloads);
 
-        cmdFortfuehrung.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fortfuehrung.png"))); // NOI18N
-        cmdFortfuehrung.setToolTipText("Fortfuehrung");
+        cmdFortfuehrung.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/fortfuehrung.png"))); // NOI18N
+        cmdFortfuehrung.setToolTipText("Fortführung");
         cmdFortfuehrung.setFocusable(false);
         cmdFortfuehrung.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdFortfuehrung.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdFortfuehrung.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdFortfuehrungActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdFortfuehrungActionPerformed(evt);
+            }
+        });
         try {
-            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.fortfuehrungsanlaesse.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdFortfuehrung);
 
-        cmdGrundbuchblattSuche.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
+        cmdGrundbuchblattSuche.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/BPlan.png"))); // NOI18N
         cmdGrundbuchblattSuche.setToolTipText("Kassenzeichensuche über Buchungsblatt");
         cmdGrundbuchblattSuche.setFocusPainted(false);
         cmdGrundbuchblattSuche.setFocusable(false);
         cmdGrundbuchblattSuche.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdGrundbuchblattSuche.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdGrundbuchblattSuche.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdGrundbuchblattSucheActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdGrundbuchblattSucheActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdGrundbuchblattSuche);
 
-        cmdArbeitspakete.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/workdone.png"))); // NOI18N
+        cmdArbeitspakete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/workdone.png"))); // NOI18N
         cmdArbeitspakete.setToolTipText("Arbeitspakete verwalten");
         cmdArbeitspakete.setFocusable(false);
         cmdArbeitspakete.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdArbeitspakete.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdArbeitspakete.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdArbeitspaketeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdArbeitspaketeActionPerformed(evt);
+            }
+        });
         try {
-            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.fortfuehrungsanlaesse.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdArbeitspakete);
         try {
-            cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.arbeitspaketemanager.dialog") != null);
+            cmdArbeitspakete.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.arbeitspaketemanager.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
             cmdArbeitspakete.setVisible(false);
         }
 
-        cmdAbfrageeditor.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/gui/table-export.png"))); // NOI18N
+        cmdAbfrageeditor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/gui/table-export.png"))); // NOI18N
         cmdAbfrageeditor.setToolTipText("Abfragen-Export (nach CSV)");
         cmdAbfrageeditor.setFocusable(false);
         cmdAbfrageeditor.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdAbfrageeditor.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdAbfrageeditor.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdAbfrageeditorActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdAbfrageeditorActionPerformed(evt);
+            }
+        });
         try {
-            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.fortfuehrungsanlaesse.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.abfragennachcsv.dialog", ex);
             cmdFortfuehrung.setVisible(false);
         }
         tobVerdis.add(cmdAbfrageeditor);
         try {
-            cmdAbfrageeditor.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "grundis.arbeitspaketemanager.dialog") != null);
+            cmdAbfrageeditor.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "grundis.arbeitspaketemanager.dialog") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for grundis.abfragennachcsv.dialog", ex);
             cmdAbfrageeditor.setVisible(false);
         }
 
-        cmdVeranlagungsdatei.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/gui/reports-stack.png"))); // NOI18N
+        cmdVeranlagungsdatei.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/gui/reports-stack.png"))); // NOI18N
         cmdVeranlagungsdatei.setToolTipText("Erzeugung Veranlagungsdatei planen");
         cmdVeranlagungsdatei.setFocusable(false);
         cmdVeranlagungsdatei.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdVeranlagungsdatei.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdVeranlagungsdatei.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdVeranlagungsdateiActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdVeranlagungsdateiActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdVeranlagungsdatei);
         try {
-            cmdVeranlagungsdatei.setVisible(SessionManager.getConnection().getConfigAttr(
-                    SessionManager.getSession().getUser(),
-                    "csa://veranlagungsdatei") != null);
+            cmdVeranlagungsdatei.setVisible(SessionManager.getConnection().getConfigAttr(SessionManager.getSession().getUser(), "csa://veranlagungsdatei") != null);
         } catch (final Exception ex) {
             LOG.error("error while checking for csa://veranlagungsdatei", ex);
             cmdVeranlagungsdatei.setVisible(false);
         }
 
-        cmdOpenInD3.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/d.3.png"))); // NOI18N
+        cmdOpenInD3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/toolbar/d.3.png"))); // NOI18N
         cmdOpenInD3.setToolTipText("in d.3 öffnen");
         cmdOpenInD3.setFocusPainted(false);
         cmdOpenInD3.setFocusable(false);
         cmdOpenInD3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdOpenInD3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdOpenInD3.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdOpenInD3ActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdOpenInD3ActionPerformed(evt);
+            }
+        });
         tobVerdis.add(cmdOpenInD3);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2491,48 +2376,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menFile.setText("Datei");
         menFile.add(jSeparator9);
 
-        mniSaveLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_S,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniSaveLayout.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniSaveLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        mniSaveLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniSaveLayout.setText("Aktuelles Layout speichern");
         mniSaveLayout.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniSaveLayoutActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniSaveLayoutActionPerformed(evt);
+            }
+        });
         menFile.add(mniSaveLayout);
 
-        mniLoadLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_O,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniLoadLayout.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniLoadLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        mniLoadLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniLoadLayout.setText("Layout laden");
         mniLoadLayout.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniLoadLayoutActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniLoadLayoutActionPerformed(evt);
+            }
+        });
         menFile.add(mniLoadLayout);
         menFile.add(jSeparator10);
 
-        mniClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_F4,
-                java.awt.event.InputEvent.ALT_MASK));
+        mniClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         mniClose.setText("Beenden");
         mniClose.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuExitActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuExitActionPerformed(evt);
+            }
+        });
         menFile.add(mniClose);
 
         jMenuBar1.add(menFile);
@@ -2541,43 +2412,35 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         mnuEditMode.setText("In den Editormodus wechseln");
         mnuEditMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuEditModeActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEditModeActionPerformed(evt);
+            }
+        });
         menEdit.add(mnuEditMode);
 
         mnuNewKassenzeichen.setText("Neues Kassenzeichen");
         mnuNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuNewKassenzeichenActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNewKassenzeichenActionPerformed(evt);
+            }
+        });
         menEdit.add(mnuNewKassenzeichen);
 
         mnuRenameCurrentKZ.setText("Aktuelles Kassenzeichen umbenennen");
         mnuRenameCurrentKZ.setEnabled(false);
         mnuRenameCurrentKZ.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuRenameCurrentKZActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRenameCurrentKZActionPerformed(evt);
+            }
+        });
         menEdit.add(mnuRenameCurrentKZ);
 
         mnuRenameAnyKZ.setText("Beliebiges Kassenzeichen umbenennen");
         mnuRenameAnyKZ.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuRenameAnyKZActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRenameAnyKZActionPerformed(evt);
+            }
+        });
         menEdit.add(mnuRenameAnyKZ);
 
         jMenuBar1.add(menEdit);
@@ -2585,37 +2448,30 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menExtras.setMnemonic('E');
         menExtras.setText("Extras");
 
-        mniOptions.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/tooloptions.png"))); // NOI18N
+        mniOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/tooloptions.png"))); // NOI18N
         mniOptions.setText("Optionen");
         mniOptions.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniOptionsActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniOptionsActionPerformed(evt);
+            }
+        });
         menExtras.add(mniOptions);
         menExtras.add(sepOptions);
 
         mnuChangeUser.setText("User wechseln");
         mnuChangeUser.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuChangeUserActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuChangeUserActionPerformed(evt);
+            }
+        });
         menExtras.add(mnuChangeUser);
 
         jMenuItem1.setText("WindowManagementTool");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jMenuItem1ActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         menExtras.add(jMenuItem1);
 
         jMenuBar1.add(menExtras);
@@ -2623,140 +2479,98 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         menWindows.setMnemonic('F');
         menWindows.setText("Fenster");
         menWindows.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menWindowsActionPerformed(evt);
+            }
+        });
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    menWindowsActionPerformed(evt);
-                }
-            });
-
-        mniKassenzeichen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_1,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniKassenzeichen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniKassenzeichen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
+        mniKassenzeichen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
         mniKassenzeichen.setMnemonic('L');
         mniKassenzeichen.setText("Kassenzeichen");
         mniKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniKassenzeichenActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniKassenzeichenActionPerformed(evt);
+            }
+        });
         menWindows.add(mniKassenzeichen);
 
-        mniKassenzeichen1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_2,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniKassenzeichen1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
+        mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
         mniKassenzeichen1.setMnemonic('L');
         mniKassenzeichen1.setText("Kassenzeichen-Liste");
         mniKassenzeichen1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniKassenzeichen1ActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniKassenzeichen1ActionPerformed(evt);
+            }
+        });
         menWindows.add(mniKassenzeichen1);
 
-        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_3,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniSummen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
+        mniSummen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_3, java.awt.event.InputEvent.CTRL_MASK));
+        mniSummen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
         mniSummen.setMnemonic('C');
         mniSummen.setText("Summen");
         mniSummen.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniSummenActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniSummenActionPerformed(evt);
+            }
+        });
         menWindows.add(mniSummen);
 
-        mniKanalanschluss.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_4,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniKanalanschluss.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
+        mniKanalanschluss.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_4, java.awt.event.InputEvent.CTRL_MASK));
+        mniKanalanschluss.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
         mniKanalanschluss.setMnemonic('F');
         mniKanalanschluss.setText("Kanalanschluss");
         mniKanalanschluss.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniKanalanschlussActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniKanalanschlussActionPerformed(evt);
+            }
+        });
         menWindows.add(mniKanalanschluss);
         menWindows.add(jSeparator11);
 
-        mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_7,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniKarte.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_7, java.awt.event.InputEvent.CTRL_MASK));
+        mniKarte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniKarte.setMnemonic('S');
         mniKarte.setText("Karte");
         mniKarte.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniKarteActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniKarteActionPerformed(evt);
+            }
+        });
         menWindows.add(mniKarte);
 
-        mniTabelle.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_8,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniTabelle.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniTabelle.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
+        mniTabelle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniTabelle.setMnemonic('T');
         mniTabelle.setText("Tabellenansicht");
         mniTabelle.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniTabelleActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniTabelleActionPerformed(evt);
+            }
+        });
         menWindows.add(mniTabelle);
 
-        mniDetails.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_9,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniDetails.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniDetails.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
+        mniDetails.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
         mniDetails.setMnemonic('D');
         mniDetails.setText("Details");
         mniDetails.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniDetailsActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniDetailsActionPerformed(evt);
+            }
+        });
         menWindows.add(mniDetails);
 
-        mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_R,
-                java.awt.event.InputEvent.CTRL_MASK));
-        mniResetWindowLayout.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
+        mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        mniResetWindowLayout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/layout.png"))); // NOI18N
         mniResetWindowLayout.setText("Fensteranordnung zurücksetzen");
         mniResetWindowLayout.setToolTipText("Standard Fensteranordnung wiederherstellen");
         mniResetWindowLayout.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mniResetWindowLayoutActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniResetWindowLayoutActionPerformed(evt);
+            }
+        });
         menWindows.add(mniResetWindowLayout);
 
         jMenuBar1.add(menWindows);
@@ -2772,12 +2586,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mnuInfo.setMnemonic('I');
         mnuInfo.setText("Info");
         mnuInfo.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuInfoActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuInfoActionPerformed(evt);
+            }
+        });
         menHelp.add(mnuInfo);
 
         jMenuBar1.add(menHelp);
@@ -2786,7 +2598,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         setSize(new java.awt.Dimension(1261, 868));
         setLocationRelativeTo(null);
-    } // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * Inserting Docking Window functionalty (Sebastian) 24.07.07.

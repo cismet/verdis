@@ -1069,7 +1069,6 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                     btnRefreshAnlaesse.setEnabled(false);
                     jProgressBar1.setVisible(true);
                     jXTable1.setEnabled(false);
-                    final CidsAppBackend be = CidsAppBackend.getInstance();
 
                     final FortfuehrungItemSearch itemSearch = new FortfuehrungItemSearch(dpiFrom.getDate(),
                             dpiTo.getDate());
@@ -1090,6 +1089,11 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                                     (String)rawItem[FortfuehrungItemSearch.FIELD_FS_ALT],
                                     (String)rawItem[FortfuehrungItemSearch.FIELD_FS_NEU],
                                     (Integer)rawItem[FortfuehrungItemSearch.FIELD_FORTFUEHRUNG_ID]));
+                        } else {
+                            final FortfuehrungItem ffn = ffnMap.get(id);
+                            if (ffn.getFortfuehrung_id() == null) {
+                                ffn.setFortfuehrung_id((Integer)rawItem[FortfuehrungItemSearch.FIELD_FORTFUEHRUNG_ID]);
+                            }
                         }
                         final Geometry geom = wktreader.read((String)rawItem[6]);
                         geom.setSRID(25832);
