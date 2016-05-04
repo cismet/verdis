@@ -23,6 +23,7 @@ import org.openide.util.NbBundle;
 import java.awt.Color;
 import java.awt.Font;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,7 +34,9 @@ import de.cismet.cids.custom.featurerenderer.verdis_grundis.FrontFeatureRenderer
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
+import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 
@@ -93,7 +96,8 @@ public class FrontenReportBean extends EBReportBean {
     }
 
     @Override
-    protected void loadFeaturesInMap(final MappingComponent map) {
+    protected Collection<Feature> createFeatures() {
+        final Collection<Feature> features = new ArrayList<Feature>();
         final FrontFeatureRenderer fr = new FrontFeatureRenderer();
         final Collection<CidsBean> fronten = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
@@ -123,15 +127,16 @@ public class FrontenReportBean extends EBReportBean {
                 final Color c2;
                 c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FRONT_TRANSPARENCY);
                 dsf.setLinePaint(c2);
-                final CustomFixedWidthStroke ls2 = new CustomFixedWidthStroke(25, map);
+                final CustomFixedWidthStroke ls2 = new CustomFixedWidthStroke(25);
                 dsf.setLineSytle(ls2);
                 dsf.setPrimaryAnnotation(Integer.toString(frontNummer));
                 dsf.setPrimaryAnnotationPaint(Color.RED);
                 dsf.setAutoScale(true);
                 dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, fontSize));
-                map.getFeatureCollection().addFeature(dsf);
+                features.add(dsf);
             }
         }
+        return features;
     }
 
     /**

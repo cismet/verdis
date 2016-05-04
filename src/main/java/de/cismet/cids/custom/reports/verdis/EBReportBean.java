@@ -11,6 +11,14 @@
  */
 package de.cismet.cids.custom.reports.verdis;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PBounds;
+
 import org.apache.log4j.Logger;
 
 import org.krysalis.barcode4j.BarcodeDimension;
@@ -29,11 +37,18 @@ import java.io.IOException;
 
 import java.text.NumberFormat;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.Crs;
+import de.cismet.cismap.commons.CrsTransformer;
+import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.XBoundingBox;
+import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
@@ -198,135 +213,103 @@ public abstract class EBReportBean {
     /**
      * DOCUMENT ME!
      *
-     * @param  map  DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
-    protected abstract void loadFeaturesInMap(final MappingComponent map);
+    protected abstract Collection<Feature> createFeatures();
 
     /**
      * DOCUMENT ME!
      */
     protected void loadMap() {
-        final SimpleWMS s = new SimpleWMS(new SimpleWmsGetMapUrl(
+        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(
 
                     // "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
                     "http://S102w484:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default"));
-        final MappingComponent map = new MappingComponent(false);
+        final HeadlessMapProvider mapProvider = new HeadlessMapProvider();
+        mapProvider.setCenterMapOnResize(true);
+        final String crsString = "EPSG:31466";
+        final Crs crs = new Crs(crsString, "", "", true, true);
+        mapProvider.setCrs(crs);
+        mapProvider.addLayer(simpleWms);
 
-        final ActiveLayerModel mappingModel = new ActiveLayerModel();
-        s.addRetrievalListener(new RetrievalListener() {
+        final Collection<Feature> features = createFeatures();
+        int srid = CrsTransformer.extractSridFromCrs(crsString);
+        boolean first = true;
+        final List<Geometry> geomList = new ArrayList<Geometry>(features.size());
+        for (final Feature feature : features) {
+            Geometry geometry = feature.getGeometry();
 
-                @Override
-                public void retrievalStarted(final RetrievalEvent e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("start map retrieval for feb report");
+            if (geometry != null) {
+                geometry = geometry.getEnvelope();
+
+                if (first) {
+                    srid = geometry.getSRID();
+                    first = false;
+                } else {
+                    if (geometry.getSRID() != srid) {
+                        geometry = CrsTransformer.transformToGivenCrs(geometry, crsString);
                     }
                 }
 
-                @Override
-                public void retrievalProgress(final RetrievalEvent e) {
+                geomList.add(geometry);
+            }
+            mapProvider.addFeature(feature);
+            if (mapProvider.getMappingComponent().getPFeatureHM().get(feature) != null) {
+                final PNode annotationNode = mapProvider.getMappingComponent()
+                            .getPFeatureHM()
+                            .get(feature)
+                            .getPrimaryAnnotationNode();
+                if (annotationNode != null) {
+                    final PBounds bounds = annotationNode.getBounds();
+                    bounds.x = -bounds.width / 2;
+                    bounds.y = -bounds.height / 2;
+                    annotationNode.setBounds(bounds);
                 }
+            }
+        }
 
-                @Override
-                public void retrievalComplete(final RetrievalEvent e) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("map retrieval for feb report complete");
-                    }
-                    new Thread() {
+        final GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), srid);
+        Geometry union = factory.buildGeometry(geomList);
+        if (union instanceof GeometryCollection) {
+            union = ((GeometryCollection)union).union();
+        }
+        final XBoundingBox boundingBox = new XBoundingBox(union);
 
-                        @Override
-                        public void run() {
-                            try {
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException ex) {
-                                }
-                                final java.awt.Image img = map.getCamera()
-                                            .toImage(map.getWidth(), map.getHeight(), new Color(255, 255, 255, 0));
-                                final BufferedImage bi = new BufferedImage(
-                                        img.getWidth(null),
-                                        img.getHeight(null),
-                                        BufferedImage.TYPE_INT_RGB);
-                                final Graphics2D g2 = bi.createGraphics();
-                                // Draw img into bi so we can write it to file.
-                                g2.drawImage(img, 0, 0, null);
-                                g2.dispose();
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("bi size (h/w): " + bi.getHeight() + "/" + bi.getWidth());
-                                }
-                                mapImage = bi;
-                            } catch (Exception ex) {
-                                LOG.error("error while creating mapImage", ex);
-                            }
-                        }
-                    }.start();
-                }
+        final double oldWidth = boundingBox.getWidth();
+        final double oldHeight = boundingBox.getHeight();
+        final double centerX = boundingBox.getX1() + (oldWidth / 2);
+        final double centerY = boundingBox.getY1() + (oldHeight / 2);
 
-                @Override
-                public void retrievalAborted(final RetrievalEvent e) {
-                    LOG.fatal(
-                        "map retrieval for feb report aborted: "
-                                + e.getErrorType() // NOI18N
-                                + " Errors: "      // NOI18N
-                                + e.getErrors()
-                                + " Cause: "
-                                + e.getRetrievedObject()); // NOI18N
-//                    mapError = true;
-                }
-
-                @Override
-                public void retrievalError(final RetrievalEvent e) {
-                    LOG.fatal("map retrieval error for feb report: " + e.getErrorType() + " " + e.toString());
-                    mapError = true;
-                }
-            });
-        // disable internal layer widget
-        map.setInternalLayerWidgetAvailable(false);
-        mappingModel.setSrs(new Crs("EPSG:31466", "", "", true, true));
-        mappingModel.addHome(new XBoundingBox(
-                579146.311157169,
-                5679930.726695932,
-                2579645.8713909937,
-                5680274.612347874,
-                "EPSG:31466",
-                true));
-        // set the model
-        map.setMappingModel(mappingModel);
-        final int mapDPI = Integer.parseInt(NbBundle.getMessage(
-                    EBReportBean.class,
-                    "FEBReportBean.mapDPI"));
-        final int factor = mapDPI / 72;
-        map.setSize(mapWidth * factor, mapHeight * factor);
-        // initial positioning of the map
-        map.setAnimationDuration(0);
-        map.gotoInitialBoundingBox();
-
-        map.unlock();
-
-        loadFeaturesInMap(map);
-
-        final double oldScale = map.getScaleDenominator();
-        final BoundingBox bbox = map.getBoundingBoxFromScale(oldScale);
-        final double realWorldWidthInMeter = bbox.getWidth();
-
-        map.zoomToFeatureCollection();
+        final double oldScale = getReportScaleDenom(oldWidth);
         final double newScale;
-
         if (scaleDenominator != null) {
             newScale = scaleDenominator;
         } else {
-            final double roundScale = getReportScaleDenom(map.getBoundingBoxFromScale(map.getScaleDenominator())
-                            .getWidth());
-            newScale = Math.round((roundScale / 100) + 0.5d) * 100;
+            newScale = Math.round((oldScale / 100) + 0.5d) * 100;
         }
-        map.gotoBoundingBoxWithHistory(map.getBoundingBoxFromScale(
-                getMapScaleDenom(newScale, oldScale, realWorldWidthInMeter)));
 
-        // lets calculate the correct scale for the printed report
-        final double so = getReportScaleDenom(map.getBoundingBoxFromScale(map.getScaleDenominator()).getWidth());
-        scale = "1:" + NumberFormat.getIntegerInstance().format(so);
+        final double newWidth = oldWidth * newScale / oldScale;
+        final double newHeight = newWidth * newScale / oldScale;
 
-        map.setInteractionMode(MappingComponent.SELECT);
-        mappingModel.addLayer(s);
+        boundingBox.setX1(centerX - (newWidth / 2));
+        boundingBox.setX2(centerX + (newWidth / 2));
+        boundingBox.setY1(centerY - (newHeight / 2));
+        boundingBox.setY2(centerY + (newHeight / 2));
+
+        mapProvider.setBoundingBox(boundingBox);
+
+        final int mapDPI = Integer.parseInt(NbBundle.getMessage(
+                    EBReportBean.class,
+                    "FEBReportBean.mapDPI"));
+
+        mapProvider.setFeatureResolutionFactor(mapDPI);
+        try {
+            mapImage = mapProvider.getImageAndWait(72, mapDPI, mapWidth, mapHeight);
+        } catch (final Exception ex) {
+            LOG.error("error while creating mapImage", ex);
+        }
+        scale = "1:"
+                    + (NumberFormat.getIntegerInstance().format(newScale));
     }
 
     /**

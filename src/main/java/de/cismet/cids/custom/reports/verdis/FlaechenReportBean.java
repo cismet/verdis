@@ -29,6 +29,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -41,7 +43,9 @@ import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRender
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
+import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
@@ -179,7 +183,8 @@ public class FlaechenReportBean extends EBReportBean {
     }
 
     @Override
-    protected void loadFeaturesInMap(final MappingComponent map) {
+    protected Collection<Feature> createFeatures() {
+        final Collection<Feature> features = new ArrayList<Feature>();
         final List<CidsBean> flaechen = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
@@ -194,20 +199,19 @@ public class FlaechenReportBean extends EBReportBean {
             }
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
-            final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
             final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
                     null,
                     "",
                     "",
                     null,
-                    new CustomFixedWidthStroke(2f, map));
+                    new CustomFixedWidthStroke(2f));
             dsf.setGeometry(g);
             final Color c = (Color)fr.getFillingStyle();
             final Color c2;
             c2 = new Color(c.getRed(), c.getGreen(), c.getBlue(), FLAECHE_TRANSPARENCY);
             dsf.setFillingPaint(c2);
             dsf.setLinePaint(Color.RED);
-            map.getFeatureCollection().addFeature(dsf);
+            features.add(dsf);
         }
         for (final CidsBean b : flaechen) {
             try {
@@ -226,31 +230,24 @@ public class FlaechenReportBean extends EBReportBean {
                         "",
                         "",
                         null,
-                        new CustomFixedWidthStroke(2f, map));
+                        new CustomFixedWidthStroke(2f));
                 dsf.setGeometry(xg);
+                dsf.setAutoScale(true);
                 dsf.setPrimaryAnnotation(flaechenbez);
-                dsf.setPrimaryAnnotationJustification(JLabel.RIGHT_ALIGNMENT);
+                dsf.setPrimaryAnnotationJustification(JLabel.CENTER_ALIGNMENT);
                 dsf.setPrimaryAnnotationPaint(Color.decode("#1a008b"));
+                dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 0.5) + 0.5)));
+
                 final BufferedImage bi = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-                // final Graphics2D graphics = (Graphics2D)bi.getGraphics();
-                // graphics.setColor(Color.orange);
-                // graphics.fillOval(0, 0, 10, 10);
                 final FeatureAnnotationSymbol symb = new FeatureAnnotationSymbol(bi);
                 symb.setSweetSpotX(0.5);
                 symb.setSweetSpotY(0.5);
                 dsf.setIconImage(new ImageIcon(bi));
-                dsf.setAutoScale(true);
-                dsf.setPrimaryAnnotationFont(new Font("SansSerif", Font.PLAIN, (int)((fontSize * 1.5) + 0.5)));
                 dsf.setFeatureAnnotationSymbol(symb);
-                map.getFeatureCollection().addFeature(dsf);
-
-                final PNode annotationNode = map.getPFeatureHM().get(dsf).getPrimaryAnnotationNode();
-                final PBounds bounds = annotationNode.getBounds();
-                bounds.x = -20;
-                bounds.y = -20;
-                annotationNode.setBounds(bounds);
+                features.add(dsf);
             }
         }
+        return features;
     }
 
     //~ Inner Classes ----------------------------------------------------------
