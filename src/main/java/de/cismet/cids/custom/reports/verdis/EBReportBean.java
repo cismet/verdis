@@ -280,7 +280,7 @@ public abstract class EBReportBean {
         final double centerX = boundingBox.getX1() + (oldWidth / 2);
         final double centerY = boundingBox.getY1() + (oldHeight / 2);
 
-        final double oldScale = getReportScaleDenom(oldWidth);
+        final double oldScale = getReportScaleDenom(oldWidth, oldHeight);
         final double newScale;
         if (scaleDenominator != null) {
             newScale = scaleDenominator;
@@ -289,7 +289,7 @@ public abstract class EBReportBean {
         }
 
         final double newWidth = oldWidth * newScale / oldScale;
-        final double newHeight = newWidth * newScale / oldScale;
+        final double newHeight = oldHeight * newScale / oldScale;
 
         boundingBox.setX1(centerX - (newWidth / 2));
         boundingBox.setX2(centerX + (newWidth / 2));
@@ -315,13 +315,18 @@ public abstract class EBReportBean {
     /**
      * DOCUMENT ME!
      *
-     * @param   realWorldWidthInMeter  DOCUMENT ME!
+     * @param   worldWith    DOCUMENT ME!
+     * @param   worldHeight  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private double getReportScaleDenom(final double realWorldWidthInMeter) {
-        final double mapReportWidthInMeter = (mapWidth / ppi) * 0.0254d;
-        return realWorldWidthInMeter / mapReportWidthInMeter;
+    private double getReportScaleDenom(final double worldWith, final double worldHeight) {
+        final double ratio = mapWidth / mapHeight;
+        final double mapReportWidthOrHeightInMeter =
+            ((((worldWith * ratio) > worldHeight) ? mapWidth : mapHeight) / ppi)
+                    * 0.0254d;
+        return (((worldWith * ratio) > worldHeight) ? worldWith : worldHeight)
+                    / mapReportWidthOrHeightInMeter;
     }
 
     /**
@@ -336,9 +341,13 @@ public abstract class EBReportBean {
     private double getMapScaleDenom(final double wishedScale,
             final double oldScale,
             final double realWorldWithInMeter) {
-        final double mapReportWidthInMeter = (mapWidth / ppi) * 0.0254d;
-        final double mapBoundingBoxWidth = wishedScale * mapReportWidthInMeter;
-        return mapBoundingBoxWidth * oldScale / realWorldWithInMeter;
+        final double mapReportWidthInMeter = (mapWidth / ppi)
+                    * 0.0254d;
+        final double mapBoundingBoxWidth = wishedScale
+                    * mapReportWidthInMeter;
+        return mapBoundingBoxWidth
+                    * oldScale
+                    / realWorldWithInMeter;
     }
 
     /**
