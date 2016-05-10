@@ -21,15 +21,12 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 import org.apache.log4j.Logger;
 
-import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.tools.UnitConv;
 
 import org.openide.util.NbBundle;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
@@ -43,18 +40,13 @@ import java.util.List;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.Crs;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.gui.MappingComponent;
-import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
-import de.cismet.cismap.commons.retrieval.RetrievalEvent;
-import de.cismet.cismap.commons.retrieval.RetrievalListener;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
@@ -69,7 +61,8 @@ public abstract class EBReportBean {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(EBReportBean.class);
-    private static final double ppi = 72.156d;
+    private static final double PPI = 72.156d;
+    private static final double METERS_TO_INCH_FACTOR = 0.0254d;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -78,10 +71,9 @@ public abstract class EBReportBean {
     private String scale;
     private Image mapImage = null;
     private Image barcodeImage = null;
-    private boolean mapError = false;
-    private int mapWidth;
-    private int mapHeight;
-    private Double scaleDenominator;
+    private final int mapWidth;
+    private final int mapHeight;
+    private final Double scaleDenominator;
     private boolean fillAbflusswirksamkeit = false;
 
     //~ Constructors -----------------------------------------------------------
@@ -207,7 +199,7 @@ public abstract class EBReportBean {
      * @return  DOCUMENT ME!
      */
     public boolean isReadyToProceed() {
-        return ((mapImage != null) || mapError) && (kassenzeichen != null);
+        return (mapImage != null) && (kassenzeichen != null);
     }
 
     /**
@@ -280,7 +272,7 @@ public abstract class EBReportBean {
         final double centerX = boundingBox.getX1() + (oldWidth / 2);
         final double centerY = boundingBox.getY1() + (oldHeight / 2);
 
-        final double oldScale = getReportScaleDenom(oldWidth, oldHeight);
+        final double oldScale = getScaleDenom(oldWidth, oldHeight);
         final double newScale;
         if (scaleDenominator != null) {
             newScale = scaleDenominator;
@@ -320,13 +312,11 @@ public abstract class EBReportBean {
      *
      * @return  DOCUMENT ME!
      */
-    private double getReportScaleDenom(final double worldWith, final double worldHeight) {
-        final double ratio = mapWidth / mapHeight;
-        final double mapReportWidthOrHeightInMeter =
-            ((((worldWith * ratio) > worldHeight) ? mapWidth : mapHeight) / ppi)
-                    * 0.0254d;
-        return (((worldWith * ratio) > worldHeight) ? worldWith : worldHeight)
-                    / mapReportWidthOrHeightInMeter;
+    private double getScaleDenom(final double worldWith, final double worldHeight) {
+        final double ratio = mapWidth / (double)mapHeight;
+        final double mapWidthOrHeightInMeter = ((((worldWith * ratio) > worldHeight) ? mapWidth : mapHeight) / PPI)
+                    * METERS_TO_INCH_FACTOR;
+        return (((worldWith * ratio) > worldHeight) ? worldWith : worldHeight) / mapWidthOrHeightInMeter;
     }
 
     /**
@@ -341,7 +331,7 @@ public abstract class EBReportBean {
     private double getMapScaleDenom(final double wishedScale,
             final double oldScale,
             final double realWorldWithInMeter) {
-        final double mapReportWidthInMeter = (mapWidth / ppi)
+        final double mapReportWidthInMeter = (mapWidth / PPI)
                     * 0.0254d;
         final double mapBoundingBoxWidth = wishedScale
                     * mapReportWidthInMeter;
