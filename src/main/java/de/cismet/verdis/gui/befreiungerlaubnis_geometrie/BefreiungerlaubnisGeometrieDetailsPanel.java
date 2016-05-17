@@ -23,7 +23,6 @@
  */
 package de.cismet.verdis.gui.befreiungerlaubnis_geometrie;
 
-import Sirius.server.middleware.types.DefaultMetaObject;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -631,7 +630,6 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
                 "gewaessername");
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
-        binding.setConverter(new SqlDateToStringConverter());
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

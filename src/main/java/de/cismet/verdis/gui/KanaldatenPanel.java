@@ -279,7 +279,7 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
                     if (log.isDebugEnabled()) {
                         log.debug("selectedBefreiung: " + selectedBefreiung);
                     }
-                    selectedBefreiung.delete();
+                    getBefreiungerlaubnisTablePanel().getTable().removeBean(selectedBefreiung);
                 } catch (Exception ex) {
                     log.error("Fehler beim Löschen einer Befreiung", ex);
                 }

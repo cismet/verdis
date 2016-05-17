@@ -391,9 +391,6 @@
                   <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
-                  <Property name="converter" type="org.jdesktop.beansbinding.Converter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="new SqlDateToStringConverter()" type="code"/>
-                  </Property>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                     <Connection code="&quot;gewaessername&quot;" type="code"/>
                   </Property>
