@@ -17,9 +17,8 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.gui.CidsBeanComponent;
 import de.cismet.verdis.gui.Main;
-
-import de.cismet.verdis.interfaces.CidsBeanComponent;
 
 /**
  * DOCUMENT ME!

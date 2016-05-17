@@ -93,13 +93,16 @@ public abstract class AbstractValidator implements Validator {
     }
 
     @Override
-    public void attachDisplay(final ValidatorDisplay display) {
+    public Validator attachDisplay(final ValidatorDisplay display) {
         display.addValidator(this);
+        return this;
     }
 
     @Override
-    public void validate() {
-        setState(performValidation());
+    public ValidatorState validate() {
+        final ValidatorState state = performValidation();
+        setState(state);
+        return getState();
     }
 
     /**

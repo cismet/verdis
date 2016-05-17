@@ -229,7 +229,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 public void valueChanged(final ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
                         final int selectedRow = jTable1.getSelectedRow();
-                        final CidsBean selectedBean = (CidsBean)((CidsBeanTableModel)jTable1.getModel())
+                        final CidsBean selectedBean = (CidsBean)((AbstractCidsBeanTableModel)jTable1.getModel())
                                     .getCidsBeanByIndex(jTable1.convertRowIndexToModel(selectedRow));
                         setSelectedPaket(selectedBean);
                     }
@@ -1177,7 +1177,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
      *
      * @version  $Revision$, $Date$
      */
-    class ArbeitspaketeTableModel extends CidsBeanTableModel {
+    class ArbeitspaketeTableModel extends AbstractCidsBeanTableModel {
 
         //~ Constructors -------------------------------------------------------
 

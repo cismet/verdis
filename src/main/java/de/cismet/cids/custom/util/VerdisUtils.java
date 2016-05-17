@@ -24,6 +24,8 @@ import java.util.Collection;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
@@ -32,8 +34,10 @@ import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
-import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
-import de.cismet.verdis.gui.SRFrontenTabellenPanel;
+import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
+import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTable;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
+import de.cismet.verdis.gui.srfronten.SRFrontenTable;
 
 /**
  * DOCUMENT ME!
@@ -107,7 +111,7 @@ public class VerdisUtils {
             FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
             new java.sql.Date(Calendar.getInstance().getTime().getTime()));
 
-        final int id = RegenFlaechenTabellenPanel.getNextNewBeanId();
+        final int id = RegenFlaechenTable.getNextNewBeanId();
         pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
         pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
@@ -157,10 +161,37 @@ public class VerdisUtils {
         final Calendar cal = Calendar.getInstance();
         pasteBean.setProperty(FrontPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
 
-        final int id = SRFrontenTabellenPanel.getNextNewBeanId();
+        final int id = SRFrontenTable.getNextNewBeanId();
         pasteBean.setProperty(FrontPropertyConstants.PROP__ID, id);
         pasteBean.getMetaObject().setID(id);
         pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
+
+        return pasteBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   clipboardBean          DOCUMENT ME!
+     * @param   targetBeansCollection  DOCUMENT ME!
+     * @param   crossreference         DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createPastedBefreiungerlaubnisGeometrieBean(final CidsBean clipboardBean,
+            final Collection<CidsBean> targetBeansCollection,
+            final boolean crossreference) throws Exception {
+        final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
+
+        if (!crossreference) {
+            final CidsBean befreiungerlaubnisBean = pasteBean;
+            final int id = BefreiungerlaubnisGeometrieTable.getNextNewBeanId();
+            befreiungerlaubnisBean.setProperty("id", id);
+            befreiungerlaubnisBean.getMetaObject().setID(-id);
+            befreiungerlaubnisBean.getMetaObject().forceStatus(MetaObject.NEW);
+        }
 
         return pasteBean;
     }

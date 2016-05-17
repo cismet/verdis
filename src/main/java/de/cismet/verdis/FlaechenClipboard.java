@@ -30,7 +30,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 
-import de.cismet.verdis.gui.RegenFlaechenTabellenPanel;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
 
 /**
  * DOCUMENT ME!
@@ -51,7 +51,7 @@ public class FlaechenClipboard extends AbstractClipboard {
      *
      * @param  table  DOCUMENT ME!
      */
-    public FlaechenClipboard(final RegenFlaechenTabellenPanel table) {
+    public FlaechenClipboard(final RegenFlaechenTable table) {
         super(table);
     }
 
@@ -68,7 +68,7 @@ public class FlaechenClipboard extends AbstractClipboard {
      */
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final RegenFlaechenTabellenPanel table = (RegenFlaechenTabellenPanel)getComponent();
+        final RegenFlaechenTable table = (RegenFlaechenTable)getComponent();
 
         final CidsBean pasteBean = VerdisUtils.createPastedFlaecheBean(
                 clipboardBean,

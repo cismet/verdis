@@ -54,7 +54,11 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+
+import de.cismet.verdis.gui.history.HistoryComboBox;
+import de.cismet.verdis.gui.history.HistoryComboBoxModel;
 
 /**
  * DOCUMENT ME!
@@ -271,7 +275,8 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                                     KassenzeichenPropertyConstants.PROP__FRONTEN,
                                     KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN,
                                     KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS
-                                            + ".befreiungenunderlaubnisse");
+                                            + "."
+                                            + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
 
                             final Map<String, Map> propertyToMapMap = new HashMap<String, Map>();
                             for (final String arrayProperty : arrayPropertiesColl) {

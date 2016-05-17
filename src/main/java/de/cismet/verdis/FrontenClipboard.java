@@ -14,7 +14,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
 
-import de.cismet.verdis.gui.SRFrontenTabellenPanel;
+import de.cismet.verdis.gui.srfronten.SRFrontenTable;
 
 /**
  * DOCUMENT ME!
@@ -31,7 +31,7 @@ public class FrontenClipboard extends AbstractClipboard {
      *
      * @param  table  DOCUMENT ME!
      */
-    public FrontenClipboard(final SRFrontenTabellenPanel table) {
+    public FrontenClipboard(final SRFrontenTable table) {
         super(table);
     }
 
@@ -48,7 +48,7 @@ public class FrontenClipboard extends AbstractClipboard {
      */
     @Override
     public CidsBean createPastedBean(final CidsBean clipboardBean) throws Exception {
-        final SRFrontenTabellenPanel table = (SRFrontenTabellenPanel)getComponent();
+        final SRFrontenTable table = (SRFrontenTable)getComponent();
 
         final CidsBean pasteBean = VerdisUtils.createPastedFrontBean(
                 clipboardBean,
