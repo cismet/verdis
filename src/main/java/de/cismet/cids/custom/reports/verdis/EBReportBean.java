@@ -272,21 +272,23 @@ public abstract class EBReportBean {
         final double centerX = boundingBox.getX1() + (oldWidth / 2);
         final double centerY = boundingBox.getY1() + (oldHeight / 2);
 
-        final double oldScale = getScaleDenom(oldWidth, oldHeight);
-        final double newScale;
+        final double newScaleDenominator;
         if (scaleDenominator != null) {
-            newScale = scaleDenominator;
+            newScaleDenominator = scaleDenominator;
         } else {
-            newScale = Math.round((oldScale / 100) + 0.5d) * 100;
+            final double oldScaleDenominator = getScaleDenom(oldWidth, oldHeight);
+            newScaleDenominator = Math.round((oldScaleDenominator / 100) + 0.5d) * 100;
         }
 
-        final double newWidth = oldWidth * newScale / oldScale;
-        final double newHeight = oldHeight * newScale / oldScale;
+        final double mapWidthInMeter = (mapWidth / PPI) * METERS_TO_INCH_FACTOR;
+        final double mapHeightInMeter = (mapHeight / PPI) * METERS_TO_INCH_FACTOR;
+        final double worldWidthInPx = mapWidthInMeter * newScaleDenominator;
+        final double worldHeightInPx = mapHeightInMeter * newScaleDenominator;
 
-        boundingBox.setX1(centerX - (newWidth / 2));
-        boundingBox.setX2(centerX + (newWidth / 2));
-        boundingBox.setY1(centerY - (newHeight / 2));
-        boundingBox.setY2(centerY + (newHeight / 2));
+        boundingBox.setX1(centerX - (worldWidthInPx / 2d));
+        boundingBox.setX2(centerX + (worldWidthInPx / 2d));
+        boundingBox.setY1(centerY - (worldHeightInPx / 2d));
+        boundingBox.setY2(centerY + (worldHeightInPx / 2d));
 
         mapProvider.setBoundingBox(boundingBox);
 
@@ -301,7 +303,7 @@ public abstract class EBReportBean {
             LOG.error("error while creating mapImage", ex);
         }
         scale = "1:"
-                    + (NumberFormat.getIntegerInstance().format(newScale));
+                    + (NumberFormat.getIntegerInstance().format(newScaleDenominator));
     }
 
     /**
@@ -314,9 +316,11 @@ public abstract class EBReportBean {
      */
     private double getScaleDenom(final double worldWith, final double worldHeight) {
         final double ratio = mapWidth / (double)mapHeight;
-        final double mapWidthOrHeightInMeter = ((((worldWith * ratio) > worldHeight) ? mapWidth : mapHeight) / PPI)
-                    * METERS_TO_INCH_FACTOR;
-        return (((worldWith * ratio) > worldHeight) ? worldWith : worldHeight) / mapWidthOrHeightInMeter;
+        final double mapWithOrHeightInPx = ((worldWith * ratio) > worldHeight) ? mapWidth : mapHeight;
+        final double mapWidthOrHeightInMeter = (mapWithOrHeightInPx / PPI) * METERS_TO_INCH_FACTOR;
+        final double worldWidthOrHeightInMeter = ((worldWith * ratio) > worldHeight) ? worldWith : worldHeight;
+        return worldWidthOrHeightInMeter / mapWidthOrHeightInMeter; // x meter abgebildet auf y meter ergibt maßstab
+                                                                    // von z
     }
 
     /**
