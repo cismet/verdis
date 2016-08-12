@@ -300,6 +300,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdRotatePolygon;
     private javax.swing.JToggleButton cmdSearchAlkisLandparcel;
     private javax.swing.JButton cmdSearchKassenzeichen;
+    private javax.swing.JToggleButton cmdSearchVermessungRiss;
+    private javax.swing.JToggleButton cmdSearchVermessungRiss1;
     private javax.swing.JToggleButton cmdSelect;
     private javax.swing.JToggleButton cmdSelect1;
     private javax.swing.JToggleButton cmdSnap;
@@ -476,6 +478,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdOrthogonalRectangle = new javax.swing.JToggleButton();
         cmdSelect1 = new javax.swing.JToggleButton();
         cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
+        cmdSearchVermessungRiss = new javax.swing.JToggleButton();
+        cmdSearchVermessungRiss1 = new javax.swing.JToggleButton();
         cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(
                 Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER,
                 mappingComp,
@@ -987,7 +991,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         mainGroup.add(cmdSearchAlkisLandparcel);
         cmdSearchAlkisLandparcel.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
-        cmdSearchAlkisLandparcel.setToolTipText("Alkis Renderer");
+        cmdSearchAlkisLandparcel.setToolTipText("Flurstücke suchen");
         cmdSearchAlkisLandparcel.setBorderPainted(false);
         cmdSearchAlkisLandparcel.setContentAreaFilled(false);
         cmdSearchAlkisLandparcel.setFocusPainted(false);
@@ -1006,6 +1010,52 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdSearchAlkisLandparcel);
+
+        mainGroup.add(cmdSearchVermessungRiss);
+        cmdSearchVermessungRiss.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
+        cmdSearchVermessungRiss.setToolTipText("Vermessungsrisse suchen");
+        cmdSearchVermessungRiss.setBorderPainted(false);
+        cmdSearchVermessungRiss.setContentAreaFilled(false);
+        cmdSearchVermessungRiss.setFocusPainted(false);
+        cmdSearchVermessungRiss.setFocusable(false);
+        cmdSearchVermessungRiss.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchVermessungRiss.setMaximumSize(new java.awt.Dimension(28, 20));
+        cmdSearchVermessungRiss.setPreferredSize(new java.awt.Dimension(28, 20));
+        cmdSearchVermessungRiss.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+        cmdSearchVermessungRiss.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchVermessungRiss.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchVermessungRissActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchVermessungRiss);
+
+        mainGroup.add(cmdSearchVermessungRiss1);
+        cmdSearchVermessungRiss1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
+        cmdSearchVermessungRiss1.setToolTipText("Baulasten suchen");
+        cmdSearchVermessungRiss1.setBorderPainted(false);
+        cmdSearchVermessungRiss1.setContentAreaFilled(false);
+        cmdSearchVermessungRiss1.setFocusPainted(false);
+        cmdSearchVermessungRiss1.setFocusable(false);
+        cmdSearchVermessungRiss1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchVermessungRiss1.setMaximumSize(new java.awt.Dimension(28, 20));
+        cmdSearchVermessungRiss1.setPreferredSize(new java.awt.Dimension(28, 20));
+        cmdSearchVermessungRiss1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+        cmdSearchVermessungRiss1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchVermessungRiss1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchVermessungRiss1ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchVermessungRiss1);
 
         cmdSearchKassenzeichen.setAction(searchAction);
         cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(
@@ -1675,6 +1725,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         worker.execute();
     } //GEN-LAST:event_cmdRefreshSingleLayerActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchVermessungRissActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchVermessungRissActionPerformed
+        mappingComp.setInteractionMode(Main.VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER);
+    }                                                                                           //GEN-LAST:event_cmdSearchVermessungRissActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchVermessungRiss1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchVermessungRiss1ActionPerformed
+        mappingComp.setInteractionMode(Main.ALB_BAULAST_SEARCH_GEOMETRY_LISTENER);
+    }                                                                                            //GEN-LAST:event_cmdSearchVermessungRiss1ActionPerformed
 
     /**
      * DOCUMENT ME!

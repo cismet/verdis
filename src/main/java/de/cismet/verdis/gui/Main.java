@@ -20,6 +20,7 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.downloadmanager.CsvExportSearchDownload;
+import Sirius.navigator.event.CatalogueSelectionListener;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -33,6 +34,7 @@ import Sirius.navigator.ui.MutableToolBar;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.ResultNodeListener;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
@@ -76,8 +78,6 @@ import org.jdesktop.swingx.auth.LoginService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-
-import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -143,6 +143,7 @@ import javax.swing.filechooser.FileFilter;
 import de.cismet.cids.custom.navigatorstartuphooks.MotdStartUpHook;
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
 import de.cismet.cids.custom.util.VerdisUtils;
+import de.cismet.cids.custom.wunda_blau.search.BaulastCreateSearchGeometryListener;
 import de.cismet.cids.custom.wunda_blau.startuphooks.MotdWundaStartupHook;
 import de.cismet.cids.custom.wunda_blau.toolbaritem.TestSetMotdAction;
 
@@ -206,7 +207,6 @@ import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
-import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.StaticSwingTools;
@@ -252,10 +252,11 @@ import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.CidsBeanTable;
 
+import de.cismet.verdis.search.FlurstueckNodesSearchCreateSearchGeometryListener;
+import de.cismet.verdis.search.RissNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
-import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -278,6 +279,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public static double INITIAL_WMS_BB_Y2 = 5688416.22;
     public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
     public static final String ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER = "ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER";
+    public static final String VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER = "VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER";
+    public static final String ALB_BAULAST_SEARCH_GEOMETRY_LISTENER = "ALB_BAULAST_SEARCH_GEOMETRY_LISTENER";
     public static final String KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER =
         "KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER";
     private static final String DIRECTORYPATH_HOME = System.getProperty("user.home");
@@ -319,6 +322,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private boolean loggedIn = false;
 
     private DescriptionPane descriptionPane;
+    private SearchResultsTree searchResultsTree;
 
     private final Map<String, CidsBean> veranlagungsnummern = new HashMap<String, CidsBean>();
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<String, CidsBean>();
@@ -389,7 +393,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private boolean fixMapExtent;
     private boolean isInit = true;
     private CidsBean kassenzeichenBean;
-    private JDialog alkisRendererDialog;
+    private ObjectRendererDialog alkisRendererDialog;
 
     private QuerySearchResultsActionDialog abfrageDialog;
 
@@ -422,6 +426,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdRefreshEnumeration;
     private javax.swing.JButton cmdRemove;
     private javax.swing.JToggleButton cmdSAPCheck;
+    private javax.swing.JButton cmdSearchBaulasten;
+    private javax.swing.JButton cmdSearchRisse;
     private javax.swing.JButton cmdTest;
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
@@ -644,9 +650,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             abfrageDialog.getQuerySearchResultsActionPanel().setDateFormat("dd.MM.yyyy");
 
-            alkisRendererDialog = new JDialog(this, false);
-            alkisRendererDialog.setTitle("Alkis Renderer");
-            alkisRendererDialog.setContentPane(descriptionPane);
+            alkisRendererDialog = new ObjectRendererDialog(this, false, descriptionPane);
             alkisRendererDialog.setSize(1000, 800);
 
             configurationManager.setFileName("configuration.xml");
@@ -1000,7 +1004,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void initComponentRegistry(final JFrame frame) throws Exception {
         PropertyManager.getManager().setEditable(true);
 
-        final SearchResultsTree searchResultsTree = new SearchResultsTree() {
+        searchResultsTree = new SearchResultsTree() {
 
                 @Override
                 public void setResultNodes(final Node[] nodes,
@@ -1027,6 +1031,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 true,
                 PropertyManager.getManager().getMaxConnections());
 
+        final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
+                attributeViewer,
+                descriptionPane);
+        searchResultsTree.addTreeSelectionListener(catalogueSelectionListener);
+
         ComponentRegistry.registerComponents(
             frame,
             container,
@@ -1044,23 +1053,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
-     * @param  domain     DOCUMENT ME!
-     * @param  className  DOCUMENT ME!
-     * @param  id         DOCUMENT ME!
+     * @param  nodes  DOCUMENT ME!
      */
-    public void showRenderer(final String domain, final String className, final int id) {
+    public void showRenderer(final Node[] nodes) {
         try {
-            final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-            descPane.gotoMetaObjectNode(new MetaObjectNode(
-                    domain,
-                    id,
-                    ClassCacheMultiple.getMetaClass(domain, className).getID(),
-                    "",
-                    null,
-                    null));
-            if (!alkisRendererDialog.isVisible()) {
-                StaticSwingTools.showDialog(alkisRendererDialog);
-            }
+            alkisRendererDialog.setNodes(nodes);
         } catch (Exception ex) {
             // TODO fehlerdialog
             LOG.error("error while loading renderer", ex);
@@ -1174,44 +1171,57 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
 
-        final ServerSearchCreateSearchGeometryListener alkisLandparcelSearchGeometryListener =
-            new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
-                new AlkisLandparcelSearch());
+        ComponentRegistry.getRegistry().getSearchResultsTree().addResultNodeListener(new ResultNodeListener() {
+
+                @Override
+                public void resultNodesChanged() {
+                    if (!alkisRendererDialog.isVisible()) {
+                        StaticSwingTools.showDialog(alkisRendererDialog);
+                    }
+                }
+
+                @Override
+                public void resultNodesCleared() {
+                }
+
+                @Override
+                public void resultNodesFiltered() {
+                }
+            });
+
+        final FlurstueckNodesSearchCreateSearchGeometryListener flurstueckCreateSearchGeomListener =
+            new FlurstueckNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(
                     ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER,
-                    alkisLandparcelSearchGeometryListener);
+                    flurstueckCreateSearchGeomListener);
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .putCursor(ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
-        alkisLandparcelSearchGeometryListener.setMode(CreateGeometryListener.POINT);
-        alkisLandparcelSearchGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+        flurstueckCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    final String propName = evt.getPropertyName();
+        final RissNodesSearchCreateSearchGeometryListener rissCreateSearchGeomListener =
+            new RissNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .addCustomInputListener(VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER,
+                    rissCreateSearchGeomListener);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .putCursor(VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
+        rissCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
-                    if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(propName)) {
-                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(propName)) {
-                        final Collection<Integer> ids = (Collection<Integer>)evt.getNewValue();
-                        if ((ids == null) || ids.isEmpty()) {
-                            JOptionPane.showMessageDialog(
-                                Main.this,
-                                "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
-                                "Keine FLurstücke gefunden.",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        } else {
-                            final Integer id = ids.iterator().next();
-                            if (id != null) {
-                                showRenderer("WUNDA_BLAU", "alkis_landparcel", id);
-                            }
-                        }
-                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
-                        LOG.error("error while searching alkis landparcel", (Exception)evt.getNewValue());
-                    }
-                }
-            });
+        final BaulastCreateSearchGeometryListener baulastCreateSearchGeomListener =
+            new BaulastCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(), null);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .addCustomInputListener(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER,
+                    baulastCreateSearchGeomListener);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .putCursor(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
+        baulastCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
         final AssignLandparcelGeomSearch assignLandparcelGeomSearch = new AssignLandparcelGeomSearch();
         final String assignLandparcelGeomCrs = assignLandparcelGeomSearch.getCrs();
@@ -1846,6 +1856,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator3 = new javax.swing.JSeparator();
         cmdInfo = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JSeparator();
+        cmdSearchRisse = new javax.swing.JButton();
+        cmdSearchBaulasten = new javax.swing.JButton();
         cmdLagisCrossover = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         btnTimeRecovery = new javax.swing.JButton();
@@ -2268,6 +2280,38 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
         tobVerdis.add(jSeparator8);
+
+        cmdSearchRisse.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
+        cmdSearchRisse.setToolTipText("Vermessungsriss-Suche");
+        cmdSearchRisse.setFocusPainted(false);
+        cmdSearchRisse.setFocusable(false);
+        cmdSearchRisse.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchRisse.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchRisse.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchRisseActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchRisse);
+
+        cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
+        cmdSearchBaulasten.setToolTipText("Baulast-Suche");
+        cmdSearchBaulasten.setFocusPainted(false);
+        cmdSearchBaulasten.setFocusable(false);
+        cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchBaulastenActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchBaulasten);
 
         cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
@@ -4195,6 +4239,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mnuRenameAnyKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameAnyKZActionPerformed
         showRenameKassenzeichen(false);
     }                                                                                  //GEN-LAST:event_mnuRenameAnyKZActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchRisseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchRisseActionPerformed
+        StaticSwingTools.showDialog(new VermessungsrissSuchDialog(this, false));
+    }                                                                                  //GEN-LAST:event_cmdSearchRisseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchBaulastenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchBaulastenActionPerformed
+        StaticSwingTools.showDialog(new BaulastSuchDialog(this, false));
+    }                                                                                      //GEN-LAST:event_cmdSearchBaulastenActionPerformed
 
     /**
      * DOCUMENT ME!
