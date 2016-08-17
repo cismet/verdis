@@ -51,6 +51,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -310,10 +311,29 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdWmsBackground;
     private javax.swing.JToggleButton cmdZoom;
     private javax.swing.ButtonGroup handleGroup;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JSeparator jSeparator10;
+    private javax.swing.JSeparator jSeparator11;
+    private javax.swing.JSeparator jSeparator12;
+    private javax.swing.JSeparator jSeparator13;
+    private javax.swing.JSeparator jSeparator14;
+    private javax.swing.JSeparator jSeparator15;
+    private javax.swing.JSeparator jSeparator16;
+    private javax.swing.JSeparator jSeparator17;
+    private javax.swing.JSeparator jSeparator18;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JSeparator jSeparator9;
     private javax.swing.JLabel lblCoord;
     private javax.swing.JLabel lblInfo;
     private javax.swing.JLabel lblMeasurement;
@@ -329,9 +349,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JPopupMenu pomScale;
     private javax.swing.JPopupMenu popMenSearch;
     private javax.swing.ButtonGroup searchGroup;
-    private javax.swing.JSeparator sep2;
-    private javax.swing.JSeparator sep3;
-    private javax.swing.JSeparator sep4;
     private javax.swing.JToolBar tobVerdis;
     private javax.swing.JToggleButton togFixMapExtent;
     // End of variables declaration//GEN-END:variables
@@ -345,7 +362,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         initComponents();
 
         ((JPopupMenuButton)cmdSearchKassenzeichen).setPopupMenu(popMenSearch);
-
         CidsAppBackend.getInstance().setMainMap(mappingComp);
         CismapBroker.getInstance().setMappingComponent(mappingComp);
 
@@ -450,11 +466,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdAdd = new javax.swing.JButton();
         lblInfo = new javax.swing.JLabel();
         lblCoord = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         lblWaiting = new javax.swing.JLabel();
         lblMeasurement = new javax.swing.JLabel();
         lblScale = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
         tobVerdis = new javax.swing.JToolBar();
         cmdFullPoly = new javax.swing.JButton();
         cmdFullPoly1 = new javax.swing.JButton();
@@ -462,40 +478,56 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdBack = new JHistoryButton();
         cmdForward = new JHistoryButton();
         cmdRefreshSingleLayer = new javax.swing.JButton();
-        jSeparator5 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
+        jSeparator9 = new javax.swing.JSeparator();
         cmdWmsBackground = new javax.swing.JToggleButton();
         cmdForeground = new javax.swing.JButton();
         cmdSnap = new javax.swing.JToggleButton();
-        cmdAngleMeasurement = new javax.swing.JButton();
-        sep2 = new javax.swing.JSeparator();
+        jPanel3 = new javax.swing.JPanel();
+        jSeparator10 = new javax.swing.JSeparator();
         cmdZoom = new javax.swing.JToggleButton();
         cmdPan = new javax.swing.JToggleButton();
         cmdSelect = new javax.swing.JToggleButton();
         cmdMovePolygon = new javax.swing.JToggleButton();
+        jPanel9 = new javax.swing.JPanel();
+        jSeparator16 = new javax.swing.JSeparator();
         cmdNewPolygon = new javax.swing.JToggleButton();
         cmdNewLinestring = new javax.swing.JToggleButton();
         cmdNewPoint = new javax.swing.JToggleButton();
+        jPanel4 = new javax.swing.JPanel();
+        jSeparator11 = new javax.swing.JSeparator();
+        cmdAngleMeasurement = new javax.swing.JButton();
         cmdOrthogonalRectangle = new javax.swing.JToggleButton();
         cmdSelect1 = new javax.swing.JToggleButton();
-        cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
-        cmdSearchVermessungRiss = new javax.swing.JToggleButton();
-        cmdSearchVermessungRiss1 = new javax.swing.JToggleButton();
+        jPanel11 = new javax.swing.JPanel();
+        jSeparator18 = new javax.swing.JSeparator();
+        cmdCreateLandparcelGeom = new javax.swing.JToggleButton();
+        jPanel5 = new javax.swing.JPanel();
+        jSeparator12 = new javax.swing.JSeparator();
         cmdSearchKassenzeichen = new CidsBeanDropJPopupMenuButton(
                 Main.KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER,
                 mappingComp,
                 null);
+        jPanel10 = new javax.swing.JPanel();
+        jSeparator17 = new javax.swing.JSeparator();
+        cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
+        cmdSearchVermessungRiss = new javax.swing.JToggleButton();
+        cmdSearchVermessungRiss1 = new javax.swing.JToggleButton();
+        jPanel6 = new javax.swing.JPanel();
+        jSeparator13 = new javax.swing.JSeparator();
         cmdRaisePolygon = new javax.swing.JToggleButton();
         cmdRemovePolygon = new javax.swing.JToggleButton();
         cmdAttachPolyToAlphadata = new javax.swing.JToggleButton();
         cmdJoinPoly = new javax.swing.JToggleButton();
-        cmdCreateLandparcelGeom = new javax.swing.JToggleButton();
         cmdSplitPoly = new javax.swing.JToggleButton();
-        sep3 = new javax.swing.JSeparator();
+        jPanel7 = new javax.swing.JPanel();
+        jSeparator14 = new javax.swing.JSeparator();
         cmdMoveHandle = new javax.swing.JToggleButton();
         cmdAddHandle = new javax.swing.JToggleButton();
         cmdRemoveHandle = new javax.swing.JToggleButton();
         cmdRotatePolygon = new javax.swing.JToggleButton();
-        sep4 = new javax.swing.JSeparator();
+        jPanel8 = new javax.swing.JPanel();
+        jSeparator15 = new javax.swing.JSeparator();
         cmdUndo = new javax.swing.JButton();
         cmdRedo = new javax.swing.JButton();
 
@@ -582,15 +614,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         panStatus.add(lblCoord, gridBagConstraints);
-
-        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        panStatus.add(jSeparator1, gridBagConstraints);
+        panStatus.add(jSeparator1);
 
         lblWaiting.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/exec.png"))); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -616,15 +640,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         panStatus.add(lblScale, gridBagConstraints);
-
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        panStatus.add(jSeparator2, gridBagConstraints);
+        panStatus.add(jSeparator2);
 
         jPanel2.add(panStatus, java.awt.BorderLayout.SOUTH);
 
@@ -632,6 +648,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         tobVerdis.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         tobVerdis.setFloatable(false);
+        tobVerdis.setMinimumSize(new java.awt.Dimension(1005, 30));
+        tobVerdis.setPreferredSize(new java.awt.Dimension(1005, 30));
 
         cmdFullPoly.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/fullPoly.png"))); // NOI18N
@@ -712,6 +730,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdRefreshSingleLayer.setFocusable(false);
         cmdRefreshSingleLayer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdRefreshSingleLayer.setMargin(new java.awt.Insets(2, 1, 2, 1));
+        cmdRefreshSingleLayer.setMaximumSize(new java.awt.Dimension(28, 28));
+        cmdRefreshSingleLayer.setMinimumSize(new java.awt.Dimension(28, 28));
+        cmdRefreshSingleLayer.setPreferredSize(new java.awt.Dimension(28, 28));
         cmdRefreshSingleLayer.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdRefreshSingleLayer.addActionListener(new java.awt.event.ActionListener() {
 
@@ -722,9 +743,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdRefreshSingleLayer);
 
-        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator5.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator5);
+        jPanel1.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel1.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel1.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jSeparator9.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel1.add(jSeparator9, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel1);
 
         cmdWmsBackground.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/map.png")));    // NOI18N
@@ -753,6 +780,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdForeground.setFocusPainted(false);
         cmdForeground.setFocusable(false);
         cmdForeground.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdForeground.setMaximumSize(new java.awt.Dimension(28, 28));
+        cmdForeground.setMinimumSize(new java.awt.Dimension(28, 28));
+        cmdForeground.setPreferredSize(new java.awt.Dimension(28, 28));
         cmdForeground.setSelected(true);
         cmdForeground.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/foreground_on.png"))); // NOI18N
@@ -785,27 +815,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdSnap);
 
-        cmdAngleMeasurement.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cismap/commons/gui/piccolo/Angle-Thingy-icon.png")));
-        cmdAngleMeasurement.setBorderPainted(false);
-        cmdAngleMeasurement.setFocusable(false);
-        cmdAngleMeasurement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdAngleMeasurement.setMaximumSize(new java.awt.Dimension(28, 28));
-        cmdAngleMeasurement.setMinimumSize(new java.awt.Dimension(28, 28));
-        cmdAngleMeasurement.setPreferredSize(new java.awt.Dimension(28, 28));
-        cmdAngleMeasurement.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdAngleMeasurement.addActionListener(new java.awt.event.ActionListener() {
+        jPanel3.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel3.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel3.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel3.setLayout(new java.awt.BorderLayout());
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdAngleMeasurementActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdAngleMeasurement);
+        jSeparator10.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel3.add(jSeparator10, java.awt.BorderLayout.CENTER);
 
-        sep2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        sep2.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(sep2);
+        tobVerdis.add(jPanel3);
 
         mainGroup.add(cmdZoom);
         cmdZoom.setIcon(new javax.swing.ImageIcon(
@@ -885,6 +903,16 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdMovePolygon);
 
+        jPanel9.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel9.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel9.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jSeparator16.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel9.add(jSeparator16, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel9);
+
         mainGroup.add(cmdNewPolygon);
         cmdNewPolygon.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/newPoly.png")));          // NOI18N
@@ -944,6 +972,34 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdNewPoint);
 
+        jPanel4.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel4.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel4.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jSeparator11.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel4.add(jSeparator11, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel4);
+
+        cmdAngleMeasurement.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/piccolo/Angle-Thingy-icon.png")));
+        cmdAngleMeasurement.setBorderPainted(false);
+        cmdAngleMeasurement.setFocusable(false);
+        cmdAngleMeasurement.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdAngleMeasurement.setMaximumSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setMinimumSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setPreferredSize(new java.awt.Dimension(28, 28));
+        cmdAngleMeasurement.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdAngleMeasurement.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAngleMeasurementActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdAngleMeasurement);
+
         mainGroup.add(cmdOrthogonalRectangle);
         cmdOrthogonalRectangle.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck.png")));          // NOI18N
@@ -953,8 +1009,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdOrthogonalRectangle.setFocusPainted(false);
         cmdOrthogonalRectangle.setFocusable(false);
         cmdOrthogonalRectangle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdOrthogonalRectangle.setMaximumSize(new java.awt.Dimension(28, 20));
-        cmdOrthogonalRectangle.setPreferredSize(new java.awt.Dimension(28, 20));
         cmdOrthogonalRectangle.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/rechtwDreieck_selected.png"))); // NOI18N
         cmdOrthogonalRectangle.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -988,6 +1042,79 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdSelect1);
 
+        jPanel11.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel11.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel11.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jSeparator18.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel11.add(jSeparator18, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel11);
+
+        mainGroup.add(cmdCreateLandparcelGeom);
+        cmdCreateLandparcelGeom.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/new_kassenzeichen_geometry.png"))); // NOI18N
+        cmdCreateLandparcelGeom.setToolTipText("Kassenzeichen-Geometrie aus Flurstück erzeugen");
+        cmdCreateLandparcelGeom.setBorderPainted(false);
+        cmdCreateLandparcelGeom.setFocusable(false);
+        cmdCreateLandparcelGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdCreateLandparcelGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdCreateLandparcelGeom.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdCreateLandparcelGeomActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdCreateLandparcelGeom);
+
+        jPanel5.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel5.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel5.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jSeparator12.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel5.add(jSeparator12, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel5);
+
+        cmdSearchKassenzeichen.setAction(searchAction);
+        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
+        cmdSearchKassenzeichen.setToolTipText("Kassenzeichen-Suche");
+        cmdSearchKassenzeichen.setBorderPainted(false);
+        mainGroup.add(cmdSearchKassenzeichen);
+        cmdSearchKassenzeichen.setContentAreaFilled(false);
+        cmdSearchKassenzeichen.setFocusPainted(false);
+        cmdSearchKassenzeichen.setFocusable(false);
+        cmdSearchKassenzeichen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchKassenzeichen.setMaximumSize(new java.awt.Dimension(38, 28));
+        cmdSearchKassenzeichen.setMinimumSize(new java.awt.Dimension(38, 28));
+        cmdSearchKassenzeichen.setPreferredSize(new java.awt.Dimension(38, 28));
+        cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource(
+                    "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png")));           // NOI18N
+        cmdSearchKassenzeichen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchKassenzeichenActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchKassenzeichen);
+
+        jPanel10.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel10.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel10.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel10.setLayout(new java.awt.BorderLayout());
+
+        jSeparator17.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel10.add(jSeparator17, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel10);
+
         mainGroup.add(cmdSearchAlkisLandparcel);
         cmdSearchAlkisLandparcel.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
@@ -997,8 +1124,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchAlkisLandparcel.setFocusPainted(false);
         cmdSearchAlkisLandparcel.setFocusable(false);
         cmdSearchAlkisLandparcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchAlkisLandparcel.setMaximumSize(new java.awt.Dimension(28, 20));
-        cmdSearchAlkisLandparcel.setPreferredSize(new java.awt.Dimension(28, 20));
         cmdSearchAlkisLandparcel.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
         cmdSearchAlkisLandparcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -1013,17 +1138,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         mainGroup.add(cmdSearchVermessungRiss);
         cmdSearchVermessungRiss.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsriss.png")));          // NOI18N
         cmdSearchVermessungRiss.setToolTipText("Vermessungsrisse suchen");
         cmdSearchVermessungRiss.setBorderPainted(false);
         cmdSearchVermessungRiss.setContentAreaFilled(false);
         cmdSearchVermessungRiss.setFocusPainted(false);
         cmdSearchVermessungRiss.setFocusable(false);
         cmdSearchVermessungRiss.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchVermessungRiss.setMaximumSize(new java.awt.Dimension(28, 20));
-        cmdSearchVermessungRiss.setPreferredSize(new java.awt.Dimension(28, 20));
         cmdSearchVermessungRiss.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsriss_selected.png"))); // NOI18N
         cmdSearchVermessungRiss.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchVermessungRiss.addActionListener(new java.awt.event.ActionListener() {
 
@@ -1036,17 +1159,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         mainGroup.add(cmdSearchVermessungRiss1);
         cmdSearchVermessungRiss1.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast.png")));          // NOI18N
         cmdSearchVermessungRiss1.setToolTipText("Baulasten suchen");
         cmdSearchVermessungRiss1.setBorderPainted(false);
         cmdSearchVermessungRiss1.setContentAreaFilled(false);
         cmdSearchVermessungRiss1.setFocusPainted(false);
         cmdSearchVermessungRiss1.setFocusable(false);
         cmdSearchVermessungRiss1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchVermessungRiss1.setMaximumSize(new java.awt.Dimension(28, 20));
-        cmdSearchVermessungRiss1.setPreferredSize(new java.awt.Dimension(28, 20));
         cmdSearchVermessungRiss1.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast_selected.png"))); // NOI18N
         cmdSearchVermessungRiss1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchVermessungRiss1.addActionListener(new java.awt.event.ActionListener() {
 
@@ -1057,28 +1178,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdSearchVermessungRiss1);
 
-        cmdSearchKassenzeichen.setAction(searchAction);
-        cmdSearchKassenzeichen.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle.png"))); // NOI18N
-        cmdSearchKassenzeichen.setToolTipText("Kassenzeichen-Suche");
-        cmdSearchKassenzeichen.setBorderPainted(false);
-        mainGroup.add(cmdSearchKassenzeichen);
-        cmdSearchKassenzeichen.setContentAreaFilled(false);
-        cmdSearchKassenzeichen.setFocusPainted(false);
-        cmdSearchKassenzeichen.setFocusable(false);
-        cmdSearchKassenzeichen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchKassenzeichen.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource(
-                    "/de/cismet/verdis/res/images/toolbar/kassenzeichenSearchRectangle_selected.png")));           // NOI18N
-        cmdSearchKassenzeichen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSearchKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
+        jPanel6.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel6.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel6.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel6.setLayout(new java.awt.BorderLayout());
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSearchKassenzeichenActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdSearchKassenzeichen);
+        jSeparator13.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel6.add(jSeparator13, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel6);
 
         mainGroup.add(cmdRaisePolygon);
         cmdRaisePolygon.setIcon(new javax.swing.ImageIcon(
@@ -1156,23 +1264,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdJoinPoly);
 
-        mainGroup.add(cmdCreateLandparcelGeom);
-        cmdCreateLandparcelGeom.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/new_kassenzeichen_geometry.png"))); // NOI18N
-        cmdCreateLandparcelGeom.setToolTipText("Kassenzeichen-Geometrie aus Flurstück erzeugen");
-        cmdCreateLandparcelGeom.setBorderPainted(false);
-        cmdCreateLandparcelGeom.setFocusable(false);
-        cmdCreateLandparcelGeom.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdCreateLandparcelGeom.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdCreateLandparcelGeom.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdCreateLandparcelGeomActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdCreateLandparcelGeom);
-
         mainGroup.add(cmdSplitPoly);
         cmdSplitPoly.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/splitPoly.png")));          // NOI18N
@@ -1192,9 +1283,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdSplitPoly);
 
-        sep3.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        sep3.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(sep3);
+        jPanel7.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel7.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel7.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jSeparator14.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel7.add(jSeparator14, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel7);
 
         handleGroup.add(cmdMoveHandle);
         cmdMoveHandle.setIcon(new javax.swing.ImageIcon(
@@ -1273,9 +1370,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             });
         tobVerdis.add(cmdRotatePolygon);
 
-        sep4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        sep4.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(sep4);
+        jPanel8.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel8.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel8.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jSeparator15.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel8.add(jSeparator15, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel8);
 
         cmdUndo.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/undo.png"))); // NOI18N
@@ -2004,18 +2107,20 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void setEnabled(final boolean b) {
-        this.cmdMovePolygon.setVisible(b);
-        this.cmdRemovePolygon.setVisible(b);
-        this.cmdAttachPolyToAlphadata.setVisible(b);
-        this.cmdCreateLandparcelGeom.setVisible(b);
-        this.cmdJoinPoly.setVisible(b);
-        this.sep3.setVisible(b);
-        this.cmdMoveHandle.setVisible(b);
-        this.cmdAddHandle.setVisible(b);
-        this.cmdRemoveHandle.setVisible(b);
-        this.cmdSplitPoly.setVisible(b);
-        this.cmdRaisePolygon.setVisible(b);
-        this.sep4.setVisible(b);
+        cmdMovePolygon.setVisible(b);
+        cmdRemovePolygon.setVisible(b);
+        cmdAttachPolyToAlphadata.setVisible(b);
+        cmdCreateLandparcelGeom.setVisible(b);
+        jPanel5.setVisible(b);
+        cmdJoinPoly.setVisible(b);
+        jPanel6.setVisible(b);
+        cmdMoveHandle.setVisible(b);
+        cmdAddHandle.setVisible(b);
+        cmdRemoveHandle.setVisible(b);
+        cmdRotatePolygon.setVisible(b);
+        cmdSplitPoly.setVisible(b);
+        cmdRaisePolygon.setVisible(b);
+        jPanel7.setVisible(b);
     }
 
     /**

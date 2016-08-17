@@ -9,7 +9,6 @@ package de.cismet.verdis.gui;
 
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
-import Sirius.navigator.ui.tree.ResultNodeListener;
 
 import Sirius.server.middleware.types.Node;
 
@@ -104,6 +103,8 @@ public class ObjectRendererDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(ObjectRendererDialog.class, "ObjectRendererDialog.title")); // NOI18N
+
+        jSplitPane1.setDividerLocation(250);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 

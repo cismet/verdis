@@ -143,14 +143,11 @@ import javax.swing.filechooser.FileFilter;
 import de.cismet.cids.custom.navigatorstartuphooks.MotdStartUpHook;
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
 import de.cismet.cids.custom.util.VerdisUtils;
-import de.cismet.cids.custom.wunda_blau.search.BaulastCreateSearchGeometryListener;
 import de.cismet.cids.custom.wunda_blau.startuphooks.MotdWundaStartupHook;
 import de.cismet.cids.custom.wunda_blau.toolbaritem.TestSetMotdAction;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-
-import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.navigatorstartuphooks.CidsServerMessageStartUpHook;
 
@@ -252,6 +249,7 @@ import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.CidsBeanTable;
 
+import de.cismet.verdis.search.BaulastblattNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.FlurstueckNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.RissNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
@@ -437,16 +435,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
-    private javax.swing.JToolBar.Separator jSeparator12;
-    private javax.swing.JToolBar.Separator jSeparator13;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator14;
+    private javax.swing.JSeparator jSeparator15;
+    private javax.swing.JSeparator jSeparator16;
+    private javax.swing.JSeparator jSeparator17;
+    private javax.swing.JSeparator jSeparator18;
+    private javax.swing.JSeparator jSeparator19;
+    private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator6;
-    private javax.swing.JSeparator jSeparator7;
-    private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenu menEdit;
@@ -1212,16 +1219,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 .putCursor(VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
         rissCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
-        final BaulastCreateSearchGeometryListener baulastCreateSearchGeomListener =
-            new BaulastCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(), null);
+        final BaulastblattNodesSearchCreateSearchGeometryListener baulastblattCreateSearchGeomListener =
+            new BaulastblattNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER,
-                    baulastCreateSearchGeomListener);
+                    baulastblattCreateSearchGeomListener);
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .putCursor(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
-        baulastCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
+        baulastblattCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
         final AssignLandparcelGeomSearch assignLandparcelGeomSearch = new AssignLandparcelGeomSearch();
         final String assignLandparcelGeomCrs = assignLandparcelGeomSearch.getCrs();
@@ -1838,29 +1845,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdNewKassenzeichen = new javax.swing.JButton();
         cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
         cmdSAPCheck = new javax.swing.JToggleButton();
+        jPanel2 = new javax.swing.JPanel();
         jSeparator6 = new javax.swing.JSeparator();
         cmdCut = new javax.swing.JButton();
         cmdCopy = new javax.swing.JButton();
         cmdPaste = new javax.swing.JButton();
-        jSeparator4 = new javax.swing.JSeparator();
+        jPanel3 = new javax.swing.JPanel();
+        jSeparator14 = new javax.swing.JSeparator();
         cmdRefreshEnumeration = new javax.swing.JButton();
         cmdRecalculateArea = new javax.swing.JButton();
-        jSeparator12 = new javax.swing.JToolBar.Separator();
-        jSeparator7 = new javax.swing.JSeparator();
+        jPanel4 = new javax.swing.JPanel();
+        jSeparator15 = new javax.swing.JSeparator();
         cmdAdd = new javax.swing.JButton();
         cmdRemove = new javax.swing.JButton();
         cmdUndo = new javax.swing.JButton();
-        jSeparator13 = new javax.swing.JToolBar.Separator();
+        jPanel5 = new javax.swing.JPanel();
+        jSeparator16 = new javax.swing.JSeparator();
         cmdPdf = new javax.swing.JButton();
         cmdWorkflow = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JSeparator();
+        jPanel6 = new javax.swing.JPanel();
+        jSeparator17 = new javax.swing.JSeparator();
         cmdInfo = new javax.swing.JButton();
-        jSeparator8 = new javax.swing.JSeparator();
-        cmdSearchRisse = new javax.swing.JButton();
-        cmdSearchBaulasten = new javax.swing.JButton();
-        cmdLagisCrossover = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jSeparator19 = new javax.swing.JSeparator();
         btnHistory = new javax.swing.JButton();
         btnTimeRecovery = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jSeparator20 = new javax.swing.JSeparator();
+        cmdLagisCrossover = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
@@ -1868,6 +1880,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdAbfrageeditor = new javax.swing.JButton();
         cmdVeranlagungsdatei = new javax.swing.JButton();
         cmdOpenInD3 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jSeparator18 = new javax.swing.JSeparator();
+        cmdSearchRisse = new javax.swing.JButton();
+        cmdSearchBaulasten = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2096,9 +2112,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdSAPCheck);
 
+        jPanel2.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel2.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel2.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator6);
+        jPanel2.add(jSeparator6, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel2);
 
         cmdCut.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
@@ -2142,9 +2165,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdPaste);
 
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator4.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator4);
+        jPanel3.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel3.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel3.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jSeparator14.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator14.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel3.add(jSeparator14, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel3);
 
         cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
@@ -2175,11 +2205,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdRecalculateArea);
-        tobVerdis.add(jSeparator12);
 
-        jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator7.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator7);
+        jPanel4.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel4.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel4.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jSeparator15.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator15.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel4.add(jSeparator15, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel4);
 
         cmdAdd.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));  // NOI18N
@@ -2231,7 +2267,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdUndo);
-        tobVerdis.add(jSeparator13);
+
+        jPanel5.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel5.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel5.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jSeparator16.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator16.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel5.add(jSeparator16, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel5);
 
         cmdPdf.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
@@ -2260,9 +2306,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdWorkflow);
 
-        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator3.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator3);
+        jPanel6.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel6.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel6.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jSeparator17.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator17.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel6.add(jSeparator17, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel6);
 
         cmdInfo.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
@@ -2277,57 +2330,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdInfo);
 
-        jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator8);
+        jPanel8.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel8.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel8.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel8.setLayout(new java.awt.BorderLayout());
 
-        cmdSearchRisse.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
-        cmdSearchRisse.setToolTipText("Vermessungsriss-Suche");
-        cmdSearchRisse.setFocusPainted(false);
-        cmdSearchRisse.setFocusable(false);
-        cmdSearchRisse.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchRisse.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSearchRisse.addActionListener(new java.awt.event.ActionListener() {
+        jSeparator19.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator19.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel8.add(jSeparator19, java.awt.BorderLayout.CENTER);
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSearchRisseActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdSearchRisse);
-
-        cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
-        cmdSearchBaulasten.setToolTipText("Baulast-Suche");
-        cmdSearchBaulasten.setFocusPainted(false);
-        cmdSearchBaulasten.setFocusable(false);
-        cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSearchBaulastenActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdSearchBaulasten);
-
-        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
-        cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
-        cmdLagisCrossover.setFocusPainted(false);
-        cmdLagisCrossover.setFocusable(false);
-        cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdLagisCrossoverActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdLagisCrossover);
+        tobVerdis.add(jPanel8);
 
         btnHistory.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
@@ -2368,6 +2380,33 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             LOG.error("error while checking for grundis.timerecovery.dialog", ex);
             btnTimeRecovery.setVisible(false);
         }
+
+        jPanel9.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel9.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel9.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jSeparator20.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator20.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel9.add(jSeparator20, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel9);
+
+        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
+        cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
+        cmdLagisCrossover.setFocusPainted(false);
+        cmdLagisCrossover.setFocusable(false);
+        cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdLagisCrossoverActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdLagisCrossover);
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
         cmdDownloads.setIcon(new javax.swing.ImageIcon(
@@ -2517,6 +2556,49 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdOpenInD3);
+
+        jPanel7.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel7.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel7.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jSeparator18.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator18.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel7.add(jSeparator18, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel7);
+
+        cmdSearchRisse.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
+        cmdSearchRisse.setToolTipText("Vermessungsriss-Suche");
+        cmdSearchRisse.setFocusPainted(false);
+        cmdSearchRisse.setFocusable(false);
+        cmdSearchRisse.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchRisse.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchRisse.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchRisseActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchRisse);
+
+        cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/baulastsuche.png"))); // NOI18N
+        cmdSearchBaulasten.setToolTipText("Baulast-Suche");
+        cmdSearchBaulasten.setFocusPainted(false);
+        cmdSearchBaulasten.setFocusable(false);
+        cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchBaulastenActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchBaulasten);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

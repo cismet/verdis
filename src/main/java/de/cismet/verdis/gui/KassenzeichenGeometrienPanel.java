@@ -504,7 +504,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(13, 3, 2, 3);
+        gridBagConstraints.insets = new java.awt.Insets(5, 3, 2, 3);
         jPanel1.add(jPanel3, gridBagConstraints);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);

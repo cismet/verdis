@@ -27,7 +27,7 @@ import de.cismet.cismap.commons.gui.MappingComponent;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class BaulastNodesSearchCreateSearchGeometryListener extends NodesSearchCreateSearchGeometryListener {
+public class BaulastblattNodesSearchCreateSearchGeometryListener extends NodesSearchCreateSearchGeometryListener {
 
     //~ Constructors -----------------------------------------------------------
 
@@ -36,7 +36,7 @@ public class BaulastNodesSearchCreateSearchGeometryListener extends NodesSearchC
      *
      * @param  mc  DOCUMENT ME!
      */
-    public BaulastNodesSearchCreateSearchGeometryListener(final MappingComponent mc) {
+    public BaulastblattNodesSearchCreateSearchGeometryListener(final MappingComponent mc) {
         super(mc);
     }
 
@@ -51,7 +51,7 @@ public class BaulastNodesSearchCreateSearchGeometryListener extends NodesSearchC
     public CidsServerSearch getCidsServerSearch(final Geometry geometry) {
         final BufferingGeosearch search = new BufferingGeosearch();
         try {
-            final MetaClass mc = CidsBean.getMetaClassFromTableName("WUNDA_BLAU", "alb_baulast");
+            final MetaClass mc = CidsBean.getMetaClassFromTableName("WUNDA_BLAU", "alb_baulastblatt");
             search.setValidClasses(Arrays.asList(mc));
             search.setGeometry(geometry);
             return search;

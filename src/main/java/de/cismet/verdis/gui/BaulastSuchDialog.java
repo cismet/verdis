@@ -17,10 +17,11 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.SwingWorker;
 
-import de.cismet.cids.custom.wunda_blau.search.BaulastCreateSearchGeometryListener;
 import de.cismet.cids.custom.wunda_blau.search.BaulastWindowSearch;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
+import de.cismet.verdis.search.BaulastblattNodesSearchCreateSearchGeometryListener;
 
 /**
  * DOCUMENT ME!
@@ -40,7 +41,8 @@ public class BaulastSuchDialog extends javax.swing.JDialog {
 
             @Override
             public void propertyChange(final PropertyChangeEvent evt) {
-                if (BaulastCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(evt.getPropertyName())) {
+                if (BaulastblattNodesSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(
+                                evt.getPropertyName())) {
                     if ((evt.getNewValue() != null) && (evt.getNewValue() instanceof Geometry)) {
                         final MetaObjectNodeServerSearch search = getServerSearch((Geometry)evt.getNewValue());
                         CidsSearchExecutor.searchAndDisplayResultsWithDialog(
@@ -92,7 +94,7 @@ public class BaulastSuchDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        final java.awt.GridBagConstraints gridBagConstraints;
 
         baulastWindowSearch1 = new de.cismet.cids.custom.wunda_blau.search.BaulastWindowSearch();
 
@@ -106,7 +108,7 @@ public class BaulastSuchDialog extends javax.swing.JDialog {
         getContentPane().add(baulastWindowSearch1, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
