@@ -28,12 +28,16 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.server.middleware.types.MetaClass;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
+
+import org.openide.util.Exceptions;
 
 import java.awt.Event;
 import java.awt.EventQueue;
@@ -300,9 +304,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdRemovePolygon;
     private javax.swing.JToggleButton cmdRotatePolygon;
     private javax.swing.JToggleButton cmdSearchAlkisLandparcel;
+    private javax.swing.JToggleButton cmdSearchBaulasten;
     private javax.swing.JButton cmdSearchKassenzeichen;
     private javax.swing.JToggleButton cmdSearchVermessungRiss;
-    private javax.swing.JToggleButton cmdSearchVermessungRiss1;
     private javax.swing.JToggleButton cmdSelect;
     private javax.swing.JToggleButton cmdSelect1;
     private javax.swing.JToggleButton cmdSnap;
@@ -512,7 +516,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         jSeparator17 = new javax.swing.JSeparator();
         cmdSearchAlkisLandparcel = new javax.swing.JToggleButton();
         cmdSearchVermessungRiss = new javax.swing.JToggleButton();
-        cmdSearchVermessungRiss1 = new javax.swing.JToggleButton();
+        cmdSearchBaulasten = new javax.swing.JToggleButton();
         jPanel6 = new javax.swing.JPanel();
         jSeparator13 = new javax.swing.JSeparator();
         cmdRaisePolygon = new javax.swing.JToggleButton();
@@ -1156,27 +1160,29 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdSearchVermessungRiss);
+        cmdSearchVermessungRiss.setVisible(CidsAppBackend.getInstance().checkPermissionRisse());
 
-        mainGroup.add(cmdSearchVermessungRiss1);
-        cmdSearchVermessungRiss1.setIcon(new javax.swing.ImageIcon(
+        mainGroup.add(cmdSearchBaulasten);
+        cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast.png")));          // NOI18N
-        cmdSearchVermessungRiss1.setToolTipText("Baulasten suchen");
-        cmdSearchVermessungRiss1.setBorderPainted(false);
-        cmdSearchVermessungRiss1.setContentAreaFilled(false);
-        cmdSearchVermessungRiss1.setFocusPainted(false);
-        cmdSearchVermessungRiss1.setFocusable(false);
-        cmdSearchVermessungRiss1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdSearchVermessungRiss1.setSelectedIcon(new javax.swing.ImageIcon(
+        cmdSearchBaulasten.setToolTipText("Baulasten suchen");
+        cmdSearchBaulasten.setBorderPainted(false);
+        cmdSearchBaulasten.setContentAreaFilled(false);
+        cmdSearchBaulasten.setFocusPainted(false);
+        cmdSearchBaulasten.setFocusable(false);
+        cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchBaulasten.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast_selected.png"))); // NOI18N
-        cmdSearchVermessungRiss1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSearchVermessungRiss1.addActionListener(new java.awt.event.ActionListener() {
+        cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSearchVermessungRiss1ActionPerformed(evt);
+                    cmdSearchBaulastenActionPerformed(evt);
                 }
             });
-        tobVerdis.add(cmdSearchVermessungRiss1);
+        tobVerdis.add(cmdSearchBaulasten);
+        cmdSearchBaulasten.setVisible(CidsAppBackend.getInstance().checkPermissionBaulasten());
 
         jPanel6.setMaximumSize(new java.awt.Dimension(2, 28));
         jPanel6.setMinimumSize(new java.awt.Dimension(2, 28));
@@ -1843,9 +1849,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdSearchVermessungRiss1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchVermessungRiss1ActionPerformed
+    private void cmdSearchBaulastenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchBaulastenActionPerformed
         mappingComp.setInteractionMode(Main.ALB_BAULAST_SEARCH_GEOMETRY_LISTENER);
-    }                                                                                            //GEN-LAST:event_cmdSearchVermessungRiss1ActionPerformed
+    }                                                                                      //GEN-LAST:event_cmdSearchBaulastenActionPerformed
 
     /**
      * DOCUMENT ME!

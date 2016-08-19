@@ -2583,6 +2583,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdSearchRisse);
+        cmdSearchRisse.setVisible(CidsAppBackend.getInstance().checkPermissionRisse());
 
         cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/baulastsuche.png"))); // NOI18N
@@ -2599,6 +2600,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdSearchBaulasten);
+        cmdSearchBaulasten.setVisible(CidsAppBackend.getInstance().checkPermissionBaulasten());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
