@@ -20,6 +20,7 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.downloadmanager.CsvExportSearchDownload;
+import Sirius.navigator.event.CatalogueSelectionListener;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -33,6 +34,7 @@ import Sirius.navigator.ui.MutableToolBar;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.ResultNodeListener;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
@@ -76,8 +78,6 @@ import org.jdesktop.swingx.auth.LoginService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-
-import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -149,8 +149,6 @@ import de.cismet.cids.custom.wunda_blau.toolbaritem.TestSetMotdAction;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-
 import de.cismet.cids.navigatorstartuphooks.CidsServerMessageStartUpHook;
 
 import de.cismet.cids.search.QuerySearchResultsAction;
@@ -206,7 +204,6 @@ import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
-import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.Static2DTools;
 import de.cismet.tools.gui.StaticSwingTools;
@@ -252,10 +249,12 @@ import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.interfaces.CidsBeanTable;
 
+import de.cismet.verdis.search.BaulastblattNodesSearchCreateSearchGeometryListener;
+import de.cismet.verdis.search.FlurstueckNodesSearchCreateSearchGeometryListener;
+import de.cismet.verdis.search.RissNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
-import de.cismet.verdis.server.search.AlkisLandparcelSearch;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -278,6 +277,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public static double INITIAL_WMS_BB_Y2 = 5688416.22;
     public static final String KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER = "KASSENZEICHEN_SEARCH_GEOMETRY_LISTENER";
     public static final String ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER = "ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER";
+    public static final String VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER = "VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER";
+    public static final String ALB_BAULAST_SEARCH_GEOMETRY_LISTENER = "ALB_BAULAST_SEARCH_GEOMETRY_LISTENER";
     public static final String KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER =
         "KASSENZEICHEN_GEOMETRIE_ASSIGN_GEOMETRY_LISTENER";
     private static final String DIRECTORYPATH_HOME = System.getProperty("user.home");
@@ -319,6 +320,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private boolean loggedIn = false;
 
     private DescriptionPane descriptionPane;
+    private SearchResultsTree searchResultsTree;
 
     private final Map<String, CidsBean> veranlagungsnummern = new HashMap<String, CidsBean>();
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<String, CidsBean>();
@@ -389,7 +391,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private boolean fixMapExtent;
     private boolean isInit = true;
     private CidsBean kassenzeichenBean;
-    private JDialog alkisRendererDialog;
+    private ObjectRendererDialog alkisRendererDialog;
 
     private QuerySearchResultsActionDialog abfrageDialog;
 
@@ -422,6 +424,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JButton cmdRefreshEnumeration;
     private javax.swing.JButton cmdRemove;
     private javax.swing.JToggleButton cmdSAPCheck;
+    private javax.swing.JButton cmdSearchBaulasten;
+    private javax.swing.JButton cmdSearchRisse;
     private javax.swing.JButton cmdTest;
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
@@ -431,16 +435,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
-    private javax.swing.JToolBar.Separator jSeparator12;
-    private javax.swing.JToolBar.Separator jSeparator13;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator14;
+    private javax.swing.JSeparator jSeparator15;
+    private javax.swing.JSeparator jSeparator16;
+    private javax.swing.JSeparator jSeparator17;
+    private javax.swing.JSeparator jSeparator18;
+    private javax.swing.JSeparator jSeparator19;
+    private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator6;
-    private javax.swing.JSeparator jSeparator7;
-    private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenu menEdit;
@@ -644,9 +657,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             abfrageDialog.getQuerySearchResultsActionPanel().setDateFormat("dd.MM.yyyy");
 
-            alkisRendererDialog = new JDialog(this, false);
-            alkisRendererDialog.setTitle("Alkis Renderer");
-            alkisRendererDialog.setContentPane(descriptionPane);
+            alkisRendererDialog = new ObjectRendererDialog(this, false, descriptionPane);
             alkisRendererDialog.setSize(1000, 800);
 
             configurationManager.setFileName("configuration.xml");
@@ -1000,7 +1011,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void initComponentRegistry(final JFrame frame) throws Exception {
         PropertyManager.getManager().setEditable(true);
 
-        final SearchResultsTree searchResultsTree = new SearchResultsTree() {
+        searchResultsTree = new SearchResultsTree() {
 
                 @Override
                 public void setResultNodes(final Node[] nodes,
@@ -1027,6 +1038,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 true,
                 PropertyManager.getManager().getMaxConnections());
 
+        final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
+                attributeViewer,
+                descriptionPane);
+        searchResultsTree.addTreeSelectionListener(catalogueSelectionListener);
+
         ComponentRegistry.registerComponents(
             frame,
             container,
@@ -1044,23 +1060,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
-     * @param  domain     DOCUMENT ME!
-     * @param  className  DOCUMENT ME!
-     * @param  id         DOCUMENT ME!
+     * @param  nodes  DOCUMENT ME!
      */
-    public void showRenderer(final String domain, final String className, final int id) {
+    public void showRenderer(final Node[] nodes) {
         try {
-            final DescriptionPane descPane = ComponentRegistry.getRegistry().getDescriptionPane();
-            descPane.gotoMetaObjectNode(new MetaObjectNode(
-                    domain,
-                    id,
-                    ClassCacheMultiple.getMetaClass(domain, className).getID(),
-                    "",
-                    null,
-                    null));
-            if (!alkisRendererDialog.isVisible()) {
-                StaticSwingTools.showDialog(alkisRendererDialog);
-            }
+            alkisRendererDialog.setNodes(nodes);
         } catch (Exception ex) {
             // TODO fehlerdialog
             LOG.error("error while loading renderer", ex);
@@ -1174,44 +1178,57 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
 
-        final ServerSearchCreateSearchGeometryListener alkisLandparcelSearchGeometryListener =
-            new ServerSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
-                new AlkisLandparcelSearch());
+        ComponentRegistry.getRegistry().getSearchResultsTree().addResultNodeListener(new ResultNodeListener() {
+
+                @Override
+                public void resultNodesChanged() {
+                    if (!alkisRendererDialog.isVisible()) {
+                        StaticSwingTools.showDialog(alkisRendererDialog);
+                    }
+                }
+
+                @Override
+                public void resultNodesCleared() {
+                }
+
+                @Override
+                public void resultNodesFiltered() {
+                }
+            });
+
+        final FlurstueckNodesSearchCreateSearchGeometryListener flurstueckCreateSearchGeomListener =
+            new FlurstueckNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(
                     ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER,
-                    alkisLandparcelSearchGeometryListener);
+                    flurstueckCreateSearchGeomListener);
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .putCursor(ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
-        alkisLandparcelSearchGeometryListener.setMode(CreateGeometryListener.POINT);
-        alkisLandparcelSearchGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+        flurstueckCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    final String propName = evt.getPropertyName();
+        final RissNodesSearchCreateSearchGeometryListener rissCreateSearchGeomListener =
+            new RissNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .addCustomInputListener(VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER,
+                    rissCreateSearchGeomListener);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .putCursor(VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
+        rissCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
-                    if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_STARTED.equals(propName)) {
-                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(propName)) {
-                        final Collection<Integer> ids = (Collection<Integer>)evt.getNewValue();
-                        if ((ids == null) || ids.isEmpty()) {
-                            JOptionPane.showMessageDialog(
-                                Main.this,
-                                "<html>Es wurden in dem markierten Bereich<br/>keine Flurstücke gefunden.",
-                                "Keine FLurstücke gefunden.",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        } else {
-                            final Integer id = ids.iterator().next();
-                            if (id != null) {
-                                showRenderer("WUNDA_BLAU", "alkis_landparcel", id);
-                            }
-                        }
-                    } else if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_FAILED.equals(propName)) {
-                        LOG.error("error while searching alkis landparcel", (Exception)evt.getNewValue());
-                    }
-                }
-            });
+        final BaulastblattNodesSearchCreateSearchGeometryListener baulastblattCreateSearchGeomListener =
+            new BaulastblattNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap());
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .addCustomInputListener(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER,
+                    baulastblattCreateSearchGeomListener);
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .putCursor(ALB_BAULAST_SEARCH_GEOMETRY_LISTENER, new Cursor(Cursor.CROSSHAIR_CURSOR));
+        baulastblattCreateSearchGeomListener.setMode(CreateGeometryListener.POINT);
 
         final AssignLandparcelGeomSearch assignLandparcelGeomSearch = new AssignLandparcelGeomSearch();
         final String assignLandparcelGeomCrs = assignLandparcelGeomSearch.getCrs();
@@ -1828,27 +1845,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdNewKassenzeichen = new javax.swing.JButton();
         cmdNextKassenzeichenWithoutGeom = new javax.swing.JButton();
         cmdSAPCheck = new javax.swing.JToggleButton();
+        jPanel2 = new javax.swing.JPanel();
         jSeparator6 = new javax.swing.JSeparator();
         cmdCut = new javax.swing.JButton();
         cmdCopy = new javax.swing.JButton();
         cmdPaste = new javax.swing.JButton();
-        jSeparator4 = new javax.swing.JSeparator();
+        jPanel3 = new javax.swing.JPanel();
+        jSeparator14 = new javax.swing.JSeparator();
         cmdRefreshEnumeration = new javax.swing.JButton();
         cmdRecalculateArea = new javax.swing.JButton();
-        jSeparator12 = new javax.swing.JToolBar.Separator();
-        jSeparator7 = new javax.swing.JSeparator();
+        jPanel4 = new javax.swing.JPanel();
+        jSeparator15 = new javax.swing.JSeparator();
         cmdAdd = new javax.swing.JButton();
         cmdRemove = new javax.swing.JButton();
         cmdUndo = new javax.swing.JButton();
-        jSeparator13 = new javax.swing.JToolBar.Separator();
+        jPanel5 = new javax.swing.JPanel();
+        jSeparator16 = new javax.swing.JSeparator();
         cmdPdf = new javax.swing.JButton();
         cmdWorkflow = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JSeparator();
+        jPanel6 = new javax.swing.JPanel();
+        jSeparator17 = new javax.swing.JSeparator();
         cmdInfo = new javax.swing.JButton();
-        jSeparator8 = new javax.swing.JSeparator();
-        cmdLagisCrossover = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jSeparator19 = new javax.swing.JSeparator();
         btnHistory = new javax.swing.JButton();
         btnTimeRecovery = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jSeparator20 = new javax.swing.JSeparator();
+        cmdLagisCrossover = new javax.swing.JButton();
         cmdDownloads = new javax.swing.JButton();
         cmdFortfuehrung = new javax.swing.JButton();
         cmdGrundbuchblattSuche = new javax.swing.JButton();
@@ -1856,6 +1880,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdAbfrageeditor = new javax.swing.JButton();
         cmdVeranlagungsdatei = new javax.swing.JButton();
         cmdOpenInD3 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jSeparator18 = new javax.swing.JSeparator();
+        cmdSearchRisse = new javax.swing.JButton();
+        cmdSearchBaulasten = new javax.swing.JButton();
         panMain = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
@@ -2084,9 +2112,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdSAPCheck);
 
+        jPanel2.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel2.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel2.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
         jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator6.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator6);
+        jPanel2.add(jSeparator6, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel2);
 
         cmdCut.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/cutFl.png"))); // NOI18N
@@ -2130,9 +2165,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdPaste);
 
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator4.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator4);
+        jPanel3.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel3.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel3.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jSeparator14.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator14.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel3.add(jSeparator14, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel3);
 
         cmdRefreshEnumeration.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/refreshEnum.png"))); // NOI18N
@@ -2163,11 +2205,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdRecalculateArea);
-        tobVerdis.add(jSeparator12);
 
-        jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator7.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator7);
+        jPanel4.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel4.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel4.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jSeparator15.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator15.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel4.add(jSeparator15, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel4);
 
         cmdAdd.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png")));  // NOI18N
@@ -2219,7 +2267,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdUndo);
-        tobVerdis.add(jSeparator13);
+
+        jPanel5.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel5.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel5.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jSeparator16.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator16.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel5.add(jSeparator16, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel5);
 
         cmdPdf.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
@@ -2248,9 +2306,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdWorkflow);
 
-        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator3.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator3);
+        jPanel6.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel6.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel6.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jSeparator17.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator17.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel6.add(jSeparator17, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel6);
 
         cmdInfo.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/info.png"))); // NOI18N
@@ -2265,25 +2330,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             });
         tobVerdis.add(cmdInfo);
 
-        jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator8.setMaximumSize(new java.awt.Dimension(2, 32767));
-        tobVerdis.add(jSeparator8);
+        jPanel8.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel8.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel8.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel8.setLayout(new java.awt.BorderLayout());
 
-        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
-        cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
-        cmdLagisCrossover.setFocusPainted(false);
-        cmdLagisCrossover.setFocusable(false);
-        cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
+        jSeparator19.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator19.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel8.add(jSeparator19, java.awt.BorderLayout.CENTER);
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdLagisCrossoverActionPerformed(evt);
-                }
-            });
-        tobVerdis.add(cmdLagisCrossover);
+        tobVerdis.add(jPanel8);
 
         btnHistory.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/history.png"))); // NOI18N
@@ -2324,6 +2380,33 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             LOG.error("error while checking for grundis.timerecovery.dialog", ex);
             btnTimeRecovery.setVisible(false);
         }
+
+        jPanel9.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel9.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel9.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jSeparator20.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator20.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel9.add(jSeparator20, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel9);
+
+        cmdLagisCrossover.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/lagisCrossover.png"))); // NOI18N
+        cmdLagisCrossover.setToolTipText("Öffne zugehöriges Flurstück in LagIS");
+        cmdLagisCrossover.setFocusPainted(false);
+        cmdLagisCrossover.setFocusable(false);
+        cmdLagisCrossover.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdLagisCrossover.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdLagisCrossover.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdLagisCrossoverActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdLagisCrossover);
 
         cmdDownloads.setAction(new DownloadManagerAction(this));
         cmdDownloads.setIcon(new javax.swing.ImageIcon(
@@ -2473,6 +2556,51 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         tobVerdis.add(cmdOpenInD3);
+
+        jPanel7.setMaximumSize(new java.awt.Dimension(2, 38));
+        jPanel7.setMinimumSize(new java.awt.Dimension(2, 38));
+        jPanel7.setPreferredSize(new java.awt.Dimension(2, 38));
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jSeparator18.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator18.setMaximumSize(new java.awt.Dimension(2, 32767));
+        jPanel7.add(jSeparator18, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel7);
+
+        cmdSearchRisse.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsrisssuche.png"))); // NOI18N
+        cmdSearchRisse.setToolTipText("Vermessungsriss-Suche");
+        cmdSearchRisse.setFocusPainted(false);
+        cmdSearchRisse.setFocusable(false);
+        cmdSearchRisse.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchRisse.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchRisse.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchRisseActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchRisse);
+        cmdSearchRisse.setVisible(CidsAppBackend.getInstance().checkPermissionRisse());
+
+        cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/baulastsuche.png"))); // NOI18N
+        cmdSearchBaulasten.setToolTipText("Baulast-Suche");
+        cmdSearchBaulasten.setFocusPainted(false);
+        cmdSearchBaulasten.setFocusable(false);
+        cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdSearchBaulastenActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdSearchBaulasten);
+        cmdSearchBaulasten.setVisible(CidsAppBackend.getInstance().checkPermissionBaulasten());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4195,6 +4323,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mnuRenameAnyKZActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuRenameAnyKZActionPerformed
         showRenameKassenzeichen(false);
     }                                                                                  //GEN-LAST:event_mnuRenameAnyKZActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchRisseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchRisseActionPerformed
+        StaticSwingTools.showDialog(new VermessungsrissSuchDialog(this, false));
+    }                                                                                  //GEN-LAST:event_cmdSearchRisseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdSearchBaulastenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchBaulastenActionPerformed
+        StaticSwingTools.showDialog(new BaulastSuchDialog(this, false));
+    }                                                                                      //GEN-LAST:event_cmdSearchBaulastenActionPerformed
 
     /**
      * DOCUMENT ME!
