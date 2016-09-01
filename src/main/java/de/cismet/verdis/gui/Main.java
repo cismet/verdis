@@ -488,7 +488,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuItem mniSummen;
     private javax.swing.JMenuItem mniTabelle;
     private javax.swing.JMenuItem mnuChangeUser;
-    private javax.swing.JMenuItem mnuEditMode;
     private javax.swing.JMenuItem mnuHelp;
     private javax.swing.JMenuItem mnuInfo;
     private javax.swing.JMenuItem mnuNewKassenzeichen;
@@ -2005,7 +2004,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator10 = new javax.swing.JSeparator();
         mniClose = new javax.swing.JMenuItem();
         menEdit = new javax.swing.JMenu();
-        mnuEditMode = new javax.swing.JMenuItem();
         mnuNewKassenzeichen = new javax.swing.JMenuItem();
         mnuRenameCurrentKZ = new javax.swing.JMenuItem();
         mnuRenameAnyKZ = new javax.swing.JMenuItem();
@@ -2679,16 +2677,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         menEdit.setText("Bearbeiten");
 
-        mnuEditMode.setText("In den Editormodus wechseln");
-        mnuEditMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuEditModeActionPerformed(evt);
-                }
-            });
-        menEdit.add(mnuEditMode);
-
         mnuNewKassenzeichen.setText("Neues Kassenzeichen");
         mnuNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3224,15 +3212,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mnuNewKassenzeichenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuNewKassenzeichenActionPerformed
         cmdNewKassenzeichenActionPerformed(null);
     }                                                                                       //GEN-LAST:event_mnuNewKassenzeichenActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
-        cmdEditModeActionPerformed(null);
-    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
 
     /**
      * DOCUMENT ME!
