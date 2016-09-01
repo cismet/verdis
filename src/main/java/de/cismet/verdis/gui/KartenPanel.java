@@ -96,6 +96,9 @@ import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.*;
 
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
+import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
+
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -411,7 +414,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         addScalePopupMenu("1:7500", 7500);
         addScalePopupMenu("1:10000", 10000);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Fl\u00E4chen\u00DCbersichtsTabellenPanel als Observer anmelden");
+            LOG.debug("Fl\u00E4chen\u00DCbersichtsTable als Observer anmelden");
         }
         ((Observable)mappingComp.getMemUndo()).addObserver(this);
         ((Observable)mappingComp.getMemRedo()).addObserver(this);
@@ -2330,7 +2333,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                             return;
                                         }
 
-                                        Main.getInstance().getRegenFlaechenTabellenPanel().removeBean(cbTwo);
+                                        Main.getInstance().getRegenFlaechenTable().removeBean(cbTwo);
 
                                         cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                                                     + "."
@@ -2483,7 +2486,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                             return;
                                         }
 
-                                        Main.getInstance().getSRFrontenTabellenPanel().removeBean(cbTwo);
+                                        Main.getInstance().getSRFrontenTable().removeBean(cbTwo);
 
                                         cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                                     + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
@@ -2609,6 +2612,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     featureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
                 }
                 break;
+                case KANALDATEN: {
+                    featureCollection.addFeatures(fetchFeaturesBefreiungerlaubnisGeometrie(cidsBean, editable));
+                }
+                break;
             }
             if (withZoom) {
                 final boolean isMapExtentFixed = mappingComp.isFixedMapExtent();
@@ -2723,6 +2730,34 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             + GeomPropertyConstants.PROP__GEO_FIELD);
             add.setEditable(editable);
             featureCollection.add(add);
+        }
+        return featureCollection;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     * @param   editable  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Collection<Feature> fetchFeaturesBefreiungerlaubnisGeometrie(final CidsBean cidsBean,
+            final boolean editable) {
+        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final List<CidsBean> befers = cidsBean.getBeanCollectionProperty(VerdisMetaClassConstants.MC_KANALANSCHLUSS
+                        + "." + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
+        for (final CidsBean befer : befers) {
+            for (final CidsBean beferGeom
+                        : befer.getBeanCollectionProperty(BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN)) {
+                final Feature add = new BeanUpdatingCidsFeature(
+                        beferGeom,
+                        BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
+                                + "."
+                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                add.setEditable(editable);
+                featureCollection.add(add);
+            }
         }
         return featureCollection;
     }

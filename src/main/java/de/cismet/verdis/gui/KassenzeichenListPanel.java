@@ -48,6 +48,7 @@ import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.ArbeitspaketEintragPropertyConstants;
 import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
+import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
@@ -740,6 +741,18 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                             targetCollection = kassenzeichen.getBeanCollectionProperty(
                                     KassenzeichenPropertyConstants.PROP__FRONTEN);
                             newBean = VerdisUtils.createPastedFrontBean(
+                                    beanToPaste,
+                                    targetCollection,
+                                    jCheckBox2.isSelected());
+                        }
+                        break;
+                        case KANALDATEN: {
+                            targetCollection = Main.getInstance().getBefreiungerlaubnisTable().getSelectedBeans()
+                                        .iterator()
+                                        .next()
+                                        .getBeanCollectionProperty(
+                                                BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN);
+                            newBean = VerdisUtils.createPastedBefreiungerlaubnisGeometrieBean(
                                     beanToPaste,
                                     targetCollection,
                                     jCheckBox2.isSelected());

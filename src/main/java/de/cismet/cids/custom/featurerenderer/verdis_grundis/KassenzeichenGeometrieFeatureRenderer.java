@@ -39,7 +39,7 @@ import de.cismet.cismap.commons.gui.piccolo.FixedWidthStroke;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
 
-import de.cismet.verdis.gui.KassenzeichenGeometrienPanel;
+import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienPanel;
 
 /**
  * DOCUMENT ME!

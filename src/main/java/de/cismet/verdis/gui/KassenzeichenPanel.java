@@ -91,6 +91,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private javax.swing.JToggleButton togInfoMode;
     private javax.swing.JToggleButton togRegenMode;
     private javax.swing.JToggleButton togSRMode;
+    private javax.swing.JToggleButton togVersickerungMode;
     private javax.swing.JTextField txtErfassungsdatum;
     private javax.swing.JTextField txtKassenzeichen;
     private javax.swing.JTextField txtSearch;
@@ -262,6 +263,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         togRegenMode = new javax.swing.JToggleButton();
         togSRMode = new javax.swing.JToggleButton();
         togInfoMode = new javax.swing.JToggleButton();
+        togVersickerungMode = new javax.swing.JToggleButton();
         sepTitle1 = new javax.swing.JSeparator();
         sepTitle2 = new javax.swing.JSeparator();
 
@@ -546,7 +548,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         btgMode.add(togInfoMode);
         togInfoMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/info_gr.png"))); // NOI18N
-        togInfoMode.setSelected(true);
         togInfoMode.setToolTipText("Info");
         togInfoMode.setFocusable(false);
         togInfoMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -562,6 +563,26 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         jPanel2.add(togInfoMode, gridBagConstraints);
+
+        btgMode.add(togVersickerungMode);
+        togVersickerungMode.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/kanal_gr.png"))); // NOI18N
+        togVersickerungMode.setSelected(true);
+        togVersickerungMode.setToolTipText("Versickerung");
+        togVersickerungMode.setFocusable(false);
+        togVersickerungMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togVersickerungMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togVersickerungMode.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togVersickerungModeActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(togVersickerungMode, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -733,21 +754,59 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         }
     }                                                                          //GEN-LAST:event_jTextPane1MouseClicked
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void togVersickerungModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togVersickerungModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.KANALDATEN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togVersickerungModeActionPerformed
+
     @Override
     public void appModeChanged() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-            if (!togInfoMode.isSelected()) {
-                togInfoMode.setSelected(true);
+        switch (mode) {
+            case ALLGEMEIN: {
+                if (!togInfoMode.isSelected()) {
+                    togInfoMode.setSelected(true);
+                }
             }
-        } else if (mode.equals(CidsAppBackend.Mode.SR)) {
-            if (!togSRMode.isSelected()) {
-                togSRMode.setSelected(true);
+            break;
+            case SR: {
+                if (!togSRMode.isSelected()) {
+                    togSRMode.setSelected(true);
+                }
             }
-        } else {
-            if (!togRegenMode.isSelected()) {
-                togRegenMode.setSelected(true);
+            break;
+            case REGEN: {
+                if (!togRegenMode.isSelected()) {
+                    togRegenMode.setSelected(true);
+                }
             }
+            break;
+            case KANALDATEN: {
+                if (!togVersickerungMode.isSelected()) {
+                    togVersickerungMode.setSelected(true);
+                }
+            }
+            break;
         }
     }
 

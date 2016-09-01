@@ -82,10 +82,11 @@ import de.cismet.verdis.gui.GrundbuchblattSucheDialog;
 import de.cismet.verdis.gui.LockAlreadyExistsException;
 import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.MultiBemerkung;
-import de.cismet.verdis.gui.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.gui.SingleBemerkung;
 import de.cismet.verdis.gui.WaitDialog;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 
+import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
 
@@ -137,6 +138,13 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             public String toString() {
                 return "ALLGEMEIN";
             }
+        },
+        KANALDATEN {
+
+            @Override
+            public String toString() {
+                return "VERSICKERUNG";
+            }
         }
     }
 
@@ -146,12 +154,14 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private final DefaultHistoryModel historyModel = new DefaultHistoryModel();
     private final MultiMap flaechenidToCrossReferences = new MultiMap();
     private final MultiMap frontenCrossReferences = new MultiMap();
-    private final HashMap<Mode, FeatureAttacher> featureAttacherByMode = new HashMap<Mode, FeatureAttacher>(3);
+    private final MultiMap befreiungerlaubnisCrossReferences = new MultiMap();
     private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
     private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
     private final ArrayList<AppModeListener> appModeListeners = new ArrayList<AppModeListener>();
     private final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
     private final Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
+    private final Map<CidsBean, Integer> befreiungerlaubnisToKassenzeichenQuerverweisMap =
+        new HashMap<CidsBean, Integer>();
     private String domain = DOMAIN;
     private final ConnectionProxy proxy;
     private final AppPreferences appPreferences;
@@ -216,11 +226,13 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @throws  IllegalStateException  DOCUMENT ME!
      */
     public static synchronized void init(final ConnectionProxy proxy, final AppPreferences appPreferences) {
-        if (INSTANCE != null) {
-            throw new IllegalStateException("Backend is already inited.");
-        } else {
-            INSTANCE = new CidsAppBackend(proxy, appPreferences);
-            INSTANCE.historyModel.addHistoryModelListener(INSTANCE);
+        synchronized (CidsAppBackend.class) {
+            if (INSTANCE != null) {
+                throw new IllegalStateException("Backend is already inited.");
+            } else {
+                INSTANCE = new CidsAppBackend(proxy, appPreferences);
+                INSTANCE.historyModel.addHistoryModelListener(INSTANCE);
+            }
         }
     }
 
@@ -232,10 +244,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @throws  IllegalStateException  DOCUMENT ME!
      */
     public static synchronized CidsAppBackend getInstance() {
-        if (INSTANCE == null) {
-            throw new IllegalStateException("Backend is not inited. Please call init(AppPreferences prefs) first.");
+        synchronized (CidsAppBackend.class) {
+            if (INSTANCE == null) {
+                throw new IllegalStateException("Backend is not inited. Please call init(AppPreferences prefs) first.");
+            }
+            return INSTANCE;
         }
-        return INSTANCE;
     }
 
     /**
@@ -414,6 +428,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public void updateCrossReferences(final CidsBean cidsBean) {
         updateFlaechenCrossReferences(cidsBean);
         updateFrontenCrossReferences(cidsBean);
+        updateBefreiungerlaubnisCrossReferences(cidsBean);
     }
 
     /**
@@ -422,6 +437,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public void clearCrossReferences() {
         frontenCrossReferences.clear();
         flaechenidToCrossReferences.clear();
+        befreiungerlaubnisCrossReferences.clear();
     }
 
     /**
@@ -515,6 +531,34 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
+     * @param   kassenzeichenNummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    private Collection<CrossReference> searchBefreiungerlaubnisCrossReferences(final int kassenzeichenNummer)
+            throws ConnectionException {
+        final Collection<CrossReference> crossReferences = new ArrayList<CrossReference>();
+
+        final CidsServerSearch search = new BefreiungerlaubnisCrossReferencesServerSearch(kassenzeichenNummer);
+        final Collection collection = getProxy().customServerSearch(getSession().getUser(),
+                search);
+        for (final Object row : collection) {
+            final Object[] fields = ((Collection)row).toArray();
+            final CrossReference crossReference = new CrossReference((Integer)fields[0],
+                    (Integer)fields[1],
+                    (String)fields[2],
+                    (Integer)fields[3],
+                    (String)fields[2]);
+            crossReferences.add(crossReference);
+        }
+        return crossReferences;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  cidsBean  DOCUMENT ME!
      */
     private void updateFrontenCrossReferences(final CidsBean cidsBean) {
@@ -529,6 +573,29 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                 }
                 // TODO inform via listener
                 Main.getInstance().getSRFrontenDetailsPanel().updateCrossReferences();
+            } catch (ConnectionException ex) {
+                LOG.error("error during retrieval of object", ex);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    private void updateBefreiungerlaubnisCrossReferences(final CidsBean cidsBean) {
+        befreiungerlaubnisCrossReferences.clear();
+        if (cidsBean != null) {
+            final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            try {
+                final Collection<CrossReference> crossReferences = searchBefreiungerlaubnisCrossReferences(
+                        kassenzeichenNummer);
+                for (final CrossReference crossReference : crossReferences) {
+                    befreiungerlaubnisCrossReferences.put(crossReference.getEntityFromId(), crossReference);
+                }
+                Main.getInstance().getBefreiungerlaubnisGeometrieDetailsPanel().updateCrossReferences();
             } catch (ConnectionException ex) {
                 LOG.error("error during retrieval of object", ex);
             }
@@ -651,6 +718,21 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public Collection<CrossReference> getFlaechenCrossReferencesForFlaecheid(final Integer flaecheId) {
         if (flaecheId != null) {
             return (Collection<CrossReference>)flaechenidToCrossReferences.get(flaecheId);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   beferId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<CrossReference> getBefreiungerlaubnisCrossReferencesFor(final Integer beferId) {
+        if (beferId != null) {
+            return (Collection<CrossReference>)befreiungerlaubnisCrossReferences.get(beferId);
         } else {
             return null;
         }
@@ -1144,28 +1226,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  mode  DOCUMENT ME!
-     * @param  fa    DOCUMENT ME!
-     */
-    public void setFeatureAttacher(final Mode mode, final FeatureAttacher fa) {
-        featureAttacherByMode.put(mode, fa);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  f  DOCUMENT ME!
-     */
-    public void attachFeatureAccordingToAppMode(final Feature f) {
-        final FeatureAttacher fa = featureAttacherByMode.get(mode);
-        if (fa != null) {
-            fa.requestFeatureAttach(f);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
     public String getDomain() {
@@ -1295,6 +1355,15 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public Map<CidsBean, Integer> getFrontToKassenzeichenQuerverweisMap() {
         return frontToKassenzeichenQuerverweisMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<CidsBean, Integer> getBefreiungerlaubnisToKassenzeichenQuerverweisMap() {
+        return befreiungerlaubnisToKassenzeichenQuerverweisMap;
     }
 
     /**
@@ -1452,7 +1521,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         for (final CidsBean flaeche
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
             if (((String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
-                Main.getInstance().getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
+                Main.getInstance().getRegenFlaechenTable().selectCidsBean(flaeche);
                 return;
             }
         }
@@ -1475,7 +1544,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         for (final CidsBean front
                     : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)) {
             if (((Integer)front.getProperty(FrontPropertyConstants.PROP__NUMMER)).equals(nummerAsInt)) {
-                Main.getInstance().getSRFrontenTabellenPanel().selectCidsBean(front);
+                Main.getInstance().getSRFrontenTable().selectCidsBean(front);
                 return;
             }
         }

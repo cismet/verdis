@@ -96,7 +96,7 @@ public class CidsBeanSupport {
 
                 final Map<Integer, CidsBean> sourceIdToBeanMap = new HashMap<Integer, CidsBean>();
                 for (final CidsBean cidsBean : sourceList) {
-                    sourceIdToBeanMap.put(cidsBean.getMetaObject().getId(), cidsBean);
+                    sourceIdToBeanMap.put(cidsBean.getMetaObject().getId(), deepcloneCidsBean(cidsBean));
                 }
 
                 final Map<Integer, CidsBean> targetIdToBeanMap = new HashMap<Integer, CidsBean>();

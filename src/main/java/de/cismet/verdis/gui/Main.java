@@ -221,6 +221,7 @@ import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.AbstractClipboard;
 import de.cismet.verdis.AppModeListener;
+import de.cismet.verdis.BefreiungerlaubnisGeometrieClipboard;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.ClipboardListener;
 import de.cismet.verdis.FlaechenClipboard;
@@ -234,6 +235,7 @@ import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontPropertyConstants;
 import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.StrassePropertyConstants;
 import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
@@ -247,7 +249,21 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
-import de.cismet.verdis.interfaces.CidsBeanTable;
+import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
+import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieDetailsPanel;
+import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTable;
+import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTablePanel;
+import de.cismet.verdis.gui.fortfuehrung.FortfuehrungsanlaesseDialog;
+import de.cismet.verdis.gui.history.HistoryPanel;
+import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienPanel;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenSummenPanel;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
+import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTablePanel;
+import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
+import de.cismet.verdis.gui.srfronten.SRFrontenSummenPanel;
+import de.cismet.verdis.gui.srfronten.SRFrontenTable;
+import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 
 import de.cismet.verdis.search.BaulastblattNodesSearchCreateSearchGeometryListener;
 import de.cismet.verdis.search.FlurstueckNodesSearchCreateSearchGeometryListener;
@@ -270,7 +286,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static Main INSTANCE;
     public static double INITIAL_WMS_BB_X1 = 2569442.79;
     public static double INITIAL_WMS_BB_Y1 = 5668858.33;
     public static double INITIAL_WMS_BB_X2 = 2593744.91;
@@ -304,14 +319,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             @Override
             public void windowOpened(final WindowEvent e) {
-                final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-
-                if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-                    setupLayoutInfo();
-                } else if (mode.equals(CidsAppBackend.Mode.SR)) {
-                    setupLayoutSR();
-                } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
-                    setupLayoutRegen();
+                switch (CidsAppBackend.getInstance().getMode()) {
+                    case ALLGEMEIN: {
+                        setupLayoutInfo();
+                    }
+                    break;
+                    case SR: {
+                        setupLayoutSR();
+                    }
+                    break;
+                    case REGEN: {
+                        setupLayoutRegen();
+                    }
+                    break;
+                    case KANALDATEN: {
+                        setupLayoutKanaldaten();
+                    }
+                    break;
                 }
                 removeWindowListener(loadLayoutWhenOpenedAdapter);
             }
@@ -365,6 +389,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private View vInfoAllgemein;
     private View vTabelleRegen;
     private View vDetailsRegen;
+    private View vTabelleVersickerung;
+    private View vDetailsVersickerung;
 //    private View vHistory;
     private RootWindow rootWindow;
     private final StringViewMap viewMap = new StringViewMap();
@@ -378,9 +404,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
     private final AllgemeineInfosPanel allgInfosPanel = new AllgemeineInfosPanel();
     private final RegenFlaechenDetailsPanel regenFlaechenDetailsPanel = RegenFlaechenDetailsPanel.getInstance();
-    private final RegenFlaechenTabellenPanel regenFlaechenTabellenPanel = new RegenFlaechenTabellenPanel();
+    private final RegenFlaechenTablePanel regenFlaechenTablePanel = new RegenFlaechenTablePanel();
+    private final BefreiungerlaubnisGeometrieDetailsPanel befreiungerlaubnisGeometrieDetailsPanel =
+        BefreiungerlaubnisGeometrieDetailsPanel.getInstance();
+    private final BefreiungerlaubnisGeometrieTablePanel befreiungerlaubnisGeometrieTablePanel =
+        new BefreiungerlaubnisGeometrieTablePanel();
     private final KartenPanel kartenPanel = new KartenPanel();
-    private final SRFrontenTabellenPanel srFrontenTabellenPanel = new SRFrontenTabellenPanel();
+    private final SRFrontenTablePanel srFrontenTablePanel = new SRFrontenTablePanel();
     private final SRFrontenDetailsPanel srFrontenDetailsPanel = new SRFrontenDetailsPanel();
     private final SRFrontenSummenPanel srSummenPanel = new SRFrontenSummenPanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
@@ -474,7 +504,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuItem mniSummen;
     private javax.swing.JMenuItem mniTabelle;
     private javax.swing.JMenuItem mnuChangeUser;
-    private javax.swing.JMenuItem mnuEditMode;
     private javax.swing.JMenuItem mnuHelp;
     private javax.swing.JMenuItem mnuInfo;
     private javax.swing.JMenuItem mnuNewKassenzeichen;
@@ -507,13 +536,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(srFrontenTabellenPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(getSRFrontenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenGeometrienPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(allgInfosPanel);
 //        CidsAppBackend.getInstance().addCidsBeanStore(historyPanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(regenFlaechenTabellenPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(getRegenFlaechenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(kanaldatenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(regenSumPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(timeRecoveryPanel);
@@ -524,6 +553,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenGeometrienPanel);
         CidsAppBackend.getInstance().addEditModeListener(allgInfosPanel);
         CidsAppBackend.getInstance().addEditModeListener(regenFlaechenDetailsPanel);
+        CidsAppBackend.getInstance().addEditModeListener(befreiungerlaubnisGeometrieDetailsPanel);
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
         CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
@@ -535,11 +565,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .getFeatureCollection()
-                .addFeatureCollectionListener(regenFlaechenTabellenPanel);
+                .addFeatureCollectionListener(getRegenFlaechenTable());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .getFeatureCollection()
-                .addFeatureCollectionListener(srFrontenTabellenPanel);
+                .addFeatureCollectionListener(getSRFrontenTable());
+        CidsAppBackend.getInstance()
+                .getMainMap()
+                .getFeatureCollection()
+                .addFeatureCollectionListener(getBefreiungerlaubnisGeometrieTable());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .getFeatureCollection()
@@ -579,16 +613,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         }
                     });
 
-        CidsAppBackend.getInstance().setFeatureAttacher(CidsAppBackend.Mode.REGEN, regenFlaechenTabellenPanel);
-        CidsAppBackend.getInstance().setFeatureAttacher(CidsAppBackend.Mode.SR, srFrontenTabellenPanel);
-
         final PCanvas pc = CidsAppBackend.getInstance().getMainMap().getSelectedObjectPresenter();
         pc.setBackground(this.getBackground());
         regenFlaechenDetailsPanel.setBackgroundPCanvas(pc);
         srFrontenDetailsPanel.setBackgroundPCanvas(pc);
 
-        srFrontenTabellenPanel.setSelectedRowListener(srFrontenDetailsPanel);
-        regenFlaechenTabellenPanel.setSelectedRowListener(regenFlaechenDetailsPanel);
+        getSRFrontenTable().setSelectedRowListener(srFrontenDetailsPanel);
+        getRegenFlaechenTable().setSelectedRowListener(regenFlaechenDetailsPanel);
+        getBefreiungerlaubnisGeometrieTable().setSelectedRowListener(befreiungerlaubnisGeometrieDetailsPanel);
 
         try {
             try {
@@ -774,7 +806,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             vTabelleSR = new View(
                     "Tabellenansicht (Fronten)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
-                    srFrontenTabellenPanel);
+                    srFrontenTablePanel);
             viewMap.addView("Tabellenansicht (Fronten)", vTabelleSR);
 
             vDetailsSR = new View(
@@ -804,7 +836,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             vTabelleRegen = new View(
                     "Tabellenansicht (versiegelte Fl\u00E4chen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
-                    regenFlaechenTabellenPanel);
+                    regenFlaechenTablePanel);
             viewMap.addView("Tabellenansicht (versiegelte Flaechen)", vTabelleRegen);
 
             vDetailsRegen = new View(
@@ -812,6 +844,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     regenFlaechenDetailsPanel);
             viewMap.addView("Details (versiegelte Flaechen)", vDetailsRegen);
+
+            vTabelleVersickerung = new View(
+                    "Tabellenansicht (Versickerung/Einleitung)",
+                    Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
+                    befreiungerlaubnisGeometrieTablePanel);
+            viewMap.addView("Tabellenansicht (Versickerung/Einleitung)", vTabelleVersickerung);
+
+            vDetailsVersickerung = new View(
+                    "Details (Versickerung/Einleitung)",
+                    Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
+                    befreiungerlaubnisGeometrieDetailsPanel);
+            viewMap.addView("Details (Versickerung/Einleitung)", vDetailsVersickerung);
 
             rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
 
@@ -1303,11 +1347,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void attachFeatureRequested(final PNotification notification) {
         switch (currentMode) {
             case SR: {
-                srFrontenTabellenPanel.attachFeatureRequested(notification);
+                getSRFrontenTable().attachFeatureRequested(notification);
             }
             break;
             case REGEN: {
-                regenFlaechenTabellenPanel.attachFeatureRequested(notification);
+                getRegenFlaechenTable().attachFeatureRequested(notification);
+            }
+            break;
+            case KANALDATEN: {
+                getBefreiungerlaubnisGeometrieTable().attachFeatureRequested(notification);
             }
             break;
             case ALLGEMEIN: {
@@ -1322,8 +1370,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    public RegenFlaechenTabellenPanel getRegenFlaechenTabellenPanel() {
-        return regenFlaechenTabellenPanel;
+    public RegenFlaechenTable getRegenFlaechenTable() {
+        return (RegenFlaechenTable)regenFlaechenTablePanel.getTable();
     }
 
     /**
@@ -1331,8 +1379,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    public SRFrontenTabellenPanel getSRFrontenTabellenPanel() {
-        return srFrontenTabellenPanel;
+    public SRFrontenTable getSRFrontenTable() {
+        return (SRFrontenTable)srFrontenTablePanel.getTable();
     }
 
     /**
@@ -1349,11 +1397,44 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
+    public BefreiungerlaubnisGeometrieDetailsPanel getBefreiungerlaubnisGeometrieDetailsPanel() {
+        return befreiungerlaubnisGeometrieDetailsPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public BefreiungerlaubnisGeometrieTable getBefreiungerlaubnisGeometrieTable() {
+        return (BefreiungerlaubnisGeometrieTable)befreiungerlaubnisGeometrieTablePanel.getTable();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public KanaldatenPanel getKanaldatenPanel() {
+        return kanaldatenPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public BefreiungerlaubnisTable getBefreiungerlaubnisTable() {
+        return (BefreiungerlaubnisTable)getKanaldatenPanel().getBefreiungerlaubnisTablePanel().getTable();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static Main getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Main();
-        }
-        return INSTANCE;
+        return LazyInitialiser.INSTANCE;
     }
 
     /**
@@ -1491,12 +1572,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         if (!isInit) {
-            if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
-                setupLayoutInfo();
-            } else if (mode.equals(CidsAppBackend.Mode.SR)) {
-                setupLayoutSR();
-            } else if (mode.equals(CidsAppBackend.Mode.REGEN)) {
-                setupLayoutRegen();
+            switch (mode) {
+                case ALLGEMEIN: {
+                    setupLayoutInfo();
+                }
+                break;
+                case SR: {
+                    setupLayoutSR();
+                }
+                break;
+                case REGEN: {
+                    setupLayoutRegen();
+                }
+                break;
+                case KANALDATEN: {
+                    setupLayoutKanaldaten();
+                }
+                break;
             }
         }
         currentMode = mode;
@@ -1598,6 +1690,20 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
+    public void setupLayoutKanaldaten() {
+        final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+        final String fileName = FILEPATH_LAYOUT + "." + mode.name();
+        try {
+            loadLayout(fileName);
+        } catch (Exception e) {
+            LOG.info("Problem beim Lesen des LayoutFiles " + fileName);
+            setupDefaultLayoutKanaldaten();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     public void setupLayoutSR() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final String fileName = FILEPATH_LAYOUT + "." + mode.name();
@@ -1631,30 +1737,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 public void run() {
+                    rootWindow.setWindow(createSplitWindow(vSummen, vTabelleRegen, vDetailsRegen));
+                    rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
+                    rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
+                }
+            });
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void setupDefaultLayoutKanaldaten() {
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
                     rootWindow.setWindow(
-                        new SplitWindow(
-                            false,
-                            0.4353147f,
-                            new SplitWindow(
-                                true,
-                                0.4f,
-                                new SplitWindow(true, 0.62f,
-                                    vKassenzeichen,
-                                    vKassenzeichenList),
-                                new SplitWindow(
-                                    true,
-                                    0.6f,
-                                    vSummen,
-                                    vKanaldaten)),
-                            new SplitWindow(
-                                true,
-                                0.66f,
-                                new TabWindow(
-                                    new DockingWindow[] {
-                                        vKarte,
-                                        vTabelleRegen
-                                    }),
-                                vDetailsRegen)));
+                        createSplitWindow(vKanaldaten, vTabelleVersickerung, vDetailsVersickerung));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 }
@@ -1669,27 +1768,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 public void run() {
-                    rootWindow.setWindow(
-                        new SplitWindow(
-                            false,
-                            0.4353147f,
-                            new SplitWindow(
-                                true,
-                                0.4f,
-                                new SplitWindow(true, 0.62f,
-                                    vKassenzeichen,
-                                    vKassenzeichenList),
-                                vZusammenfassungSR),
-                            new SplitWindow(
-                                true,
-                                0.66f,
-                                new TabWindow(
-                                    new DockingWindow[] {
-                                        vKarte,
-                                        vTabelleSR
-                                    }),
-                                vDetailsSR)));
-
+                    rootWindow.setWindow(createSplitWindow(vZusammenfassungSR, vTabelleSR, vDetailsSR));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 }
@@ -1704,25 +1783,88 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 public void run() {
-                    rootWindow.setWindow(
-                        new SplitWindow(
-                            false,
-                            0.4353147f,
-                            new SplitWindow(
-                                true,
-                                0.4f,
-                                new SplitWindow(true, 0.62f,
-                                    vKassenzeichen,
-                                    vKassenzeichenList),
-                                vInfoAllgemein),
-                            new SplitWindow(true, 0.66f,
-                                vKarte,
-                                vDetailsAllgemein)));
-
+                    rootWindow.setWindow(createSplitWindow(vInfoAllgemein, vDetailsAllgemein));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 }
             });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   table    DOCUMENT ME!
+     * @param   details  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createMapTableDetailsSplitWindow(final View table, final View details) {
+        return new SplitWindow(true, 0.66f,
+                new TabWindow(new DockingWindow[] { vKarte, table }), details);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   table  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createMapTableDetailsSplitWindow(final View table) {
+        return new SplitWindow(true, 0.66f, vKarte, table);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   meta  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createMetaInfoSplitWindow(final View meta) {
+        return new SplitWindow(true, 0.5f, createKassenzeichenSplitWindow(), meta);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createKassenzeichenSplitWindow() {
+        return new SplitWindow(true, 0.62f, vKassenzeichen, vKassenzeichenList);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   meta     DOCUMENT ME!
+     * @param   table    DOCUMENT ME!
+     * @param   details  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createSplitWindow(final View meta, final View table, final View details) {
+        return new SplitWindow(
+                false,
+                0.4353147f,
+                createMetaInfoSplitWindow(meta),
+                createMapTableDetailsSplitWindow(table, details));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   meta   DOCUMENT ME!
+     * @param   table  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private SplitWindow createSplitWindow(final View meta, final View table) {
+        return new SplitWindow(
+                false,
+                0.4353147f,
+                createMetaInfoSplitWindow(meta),
+                createMapTableDetailsSplitWindow(table));
     }
 
     /**
@@ -1893,7 +2035,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jSeparator10 = new javax.swing.JSeparator();
         mniClose = new javax.swing.JMenuItem();
         menEdit = new javax.swing.JMenu();
-        mnuEditMode = new javax.swing.JMenuItem();
         mnuNewKassenzeichen = new javax.swing.JMenuItem();
         mnuRenameCurrentKZ = new javax.swing.JMenuItem();
         mnuRenameAnyKZ = new javax.swing.JMenuItem();
@@ -2667,16 +2808,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         menEdit.setText("Bearbeiten");
 
-        mnuEditMode.setText("In den Editormodus wechseln");
-        mnuEditMode.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    mnuEditModeActionPerformed(evt);
-                }
-            });
-        menEdit.add(mnuEditMode);
-
         mnuNewKassenzeichen.setText("Neues Kassenzeichen");
         mnuNewKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3218,15 +3349,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void mnuEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuEditModeActionPerformed
-        cmdEditModeActionPerformed(null);
-    }                                                                               //GEN-LAST:event_mnuEditModeActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
     private void mnuExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mnuExitActionPerformed
         dispose();
     }                                                                           //GEN-LAST:event_mnuExitActionPerformed
@@ -3321,7 +3443,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdRefreshEnumerationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRefreshEnumerationActionPerformed
-        regenFlaechenTabellenPanel.reEnumerateFlaechen();
+        regenFlaechenTablePanel.reEnumerateFlaechen();
     }                                                                                         //GEN-LAST:event_cmdRefreshEnumerationActionPerformed
 
     /**
@@ -3788,6 +3910,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 showOrHideView(vTabelleSR);
             }
             break;
+            case KANALDATEN: {
+                showOrHideView(vTabelleVersickerung);
+            }
+            break;
         }
     }                                                                              //GEN-LAST:event_mniTabelleActionPerformed
 
@@ -3805,8 +3931,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             case SR: {
                 showOrHideView(vDetailsSR);
             }
+            break;
             case ALLGEMEIN: {
                 showOrHideView(vDetailsAllgemein);
+            }
+            break;
+            case KANALDATEN: {
+                showOrHideView(vDetailsVersickerung);
             }
             break;
         }
@@ -3846,11 +3977,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsBeanTable cidsBeanTable = null;
         switch (CidsAppBackend.getInstance().getMode()) {
             case REGEN: {
-                cidsBeanTable = regenFlaechenTabellenPanel;
+                cidsBeanTable = getRegenFlaechenTable();
             }
             break;
             case SR: {
-                cidsBeanTable = srFrontenTabellenPanel;
+                cidsBeanTable = getSRFrontenTable();
+            }
+            break;
+            case KANALDATEN: {
+                cidsBeanTable = getBefreiungerlaubnisGeometrieTable();
             }
             break;
         }
@@ -4023,7 +4158,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRecalculateAreaActionPerformed
         if (isInEditMode()) {
-            regenFlaechenTabellenPanel.recalculateAreaOfFlaechen();
+            regenFlaechenTablePanel.recalculateAreaOfFlaechen();
         }
     }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
 
@@ -4482,16 +4617,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             final List<CidsBean> toDeleteBeans = new ArrayList<CidsBean>();
 
                             // flaechen loeschen
-                            final Collection<CidsBean> flaechenBeans = regenFlaechenTabellenPanel.getAllBeans();
+                            final Collection<CidsBean> flaechenBeans = getRegenFlaechenTable().getAllBeans();
                             for (final CidsBean flaecheBean : flaechenBeans.toArray(new CidsBean[0])) {
-                                regenFlaechenTabellenPanel.removeBean(flaecheBean);
+                                getRegenFlaechenTable().removeBean(flaecheBean);
                             }
                             toDeleteBeans.addAll(flaechenBeans);
 
                             // fronten loeschen
-                            final Collection<CidsBean> frontenBeans = srFrontenTabellenPanel.getAllBeans();
+                            final Collection<CidsBean> frontenBeans = getSRFrontenTable().getAllBeans();
                             for (final CidsBean frontBean : frontenBeans.toArray(new CidsBean[0])) {
-                                srFrontenTabellenPanel.removeBean(frontBean);
+                                getSRFrontenTable().removeBean(frontBean);
                             }
                             toDeleteBeans.addAll(frontenBeans);
 
@@ -4511,7 +4646,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             if (kanalanschlussBean != null) {
                                 // befreiungen und erlaubnisse von kanalanschluss löschen
                                 final Collection<CidsBean> befUndErlBeans = (Collection<CidsBean>)
-                                    kanalanschlussBean.getProperty("befreiungenunderlaubnisse");
+                                    kanalanschlussBean.getProperty(
+                                        KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
                                 for (final CidsBean befUndErlBean : befUndErlBeans.toArray(new CidsBean[0])) {
                                     befUndErlBeans.remove(befUndErlBean);
                                 }
@@ -4689,6 +4825,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public boolean changesPending() {
         if ((kassenzeichenBean == null) || !editMode) {
+            LOG.fatal(kassenzeichenBean.getMOString());
             return false;
         }
         return (kassenzeichenBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
@@ -4738,6 +4875,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 cmdCut.setToolTipText("Fronten ausschneiden");
                 break;
             }
+            case KANALDATEN: {
+                cmdCopy.setToolTipText("Befreiung/Erlaubnis kopieren");
+                cmdPaste.setToolTipText("Befreiung/Erlaubnis einfügen");
+                cmdCut.setToolTipText("Befreiung/Erlaubnis ausschneiden");
+                break;
+            }
             case ALLGEMEIN: {
                 cmdCopy.setToolTipText("Kassenzeichengeometrie kopieren");
                 cmdPaste.setToolTipText("Kassenzeichengeometrie einfügen");
@@ -4779,12 +4922,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         }
                     }
                     cmdAdd.setEnabled(canAdd);
-                    selectedBeans = regenFlaechenTabellenPanel.getSelectedBeans();
+                    selectedBeans = getRegenFlaechenTable().getSelectedBeans();
                 }
                 break;
                 case SR: {
                     cmdAdd.setEnabled(true);
-                    selectedBeans = srFrontenTabellenPanel.getSelectedBeans();
+                    selectedBeans = getSRFrontenTable().getSelectedBeans();
+                }
+                break;
+                case KANALDATEN: {
+                    boolean canAdd = true;
+                    canAdd = getBefreiungerlaubnisTable().getSelectedBeans().size() > 0;
+                    cmdAdd.setEnabled(canAdd);
+                    selectedBeans = getBefreiungerlaubnisGeometrieTable().getSelectedBeans();
                 }
                 break;
                 case ALLGEMEIN: {
@@ -5007,7 +5157,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             FlaechePropertyConstants.PROP__FLAECHENINFO
                                     + "."
                                     + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                    final CidsBean querverweisFlaecheBean = RegenFlaechenTabellenPanel.createNewFlaecheBean(
+                    final CidsBean querverweisFlaecheBean = RegenFlaechenTable.createNewFlaecheBean(
                             flaechenartBean,
                             flaechenOfQuerverweisKassenzeichen,
                             null);
@@ -5073,7 +5223,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             FrontPropertyConstants.PROP__FRONTINFO
                                     + "."
                                     + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
-                    final CidsBean querverweisFrontBean = SRFrontenTabellenPanel.createNewFrontBean(
+                    final CidsBean querverweisFrontBean = SRFrontenTable.createNewFrontBean(
                             strasseBean,
                             lageBean,
                             reinigungBean,
@@ -5691,8 +5841,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public Validator getValidatorKassenzeichen(final CidsBean kassenzeichenBean) {
         final AggregatedValidator aggVal = new AggregatedValidator();
         aggVal.add(kassenzeichenPanel.getValidator());
-        aggVal.add(regenFlaechenTabellenPanel.getValidator());
-        aggVal.add(srFrontenTabellenPanel.getValidator());
+        aggVal.add(getRegenFlaechenTable().getValidator());
+        aggVal.add(getSRFrontenTable().getValidator());
         aggVal.validate();
         return aggVal;
     }
@@ -6008,8 +6158,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         aggValidator.add(kassenzeichenPanel.getValidator());
-        aggValidator.add(regenFlaechenTabellenPanel.getValidator());
-        aggValidator.add(srFrontenTabellenPanel.getValidator());
+        aggValidator.add(getRegenFlaechenTable().getValidator());
+        aggValidator.add(getSRFrontenTable().getValidator());
         aggValidator.add(regenFlaechenDetailsPanel.getValidator());
         aggValidator.add(srFrontenDetailsPanel.getValidator());
     }
@@ -6030,7 +6180,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             };
 
         clipboards.clear();
-        final AbstractClipboard flaechenClipboard = new FlaechenClipboard(regenFlaechenTabellenPanel);
+        final AbstractClipboard flaechenClipboard = new FlaechenClipboard(getRegenFlaechenTable());
         flaechenClipboard.addListener(clipboardListener);
         flaechenClipboard.loadFromFile();
 
@@ -6044,7 +6194,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
 
-        final AbstractClipboard frontenClipboard = new FrontenClipboard(srFrontenTabellenPanel);
+        final AbstractClipboard frontenClipboard = new FrontenClipboard(getSRFrontenTable());
         frontenClipboard.addListener(clipboardListener);
         frontenClipboard.loadFromFile();
 
@@ -6057,6 +6207,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
 
         clipboards.put(CidsAppBackend.Mode.SR, frontenClipboard);
+
+        final AbstractClipboard befreiungGeometrieClipboard = new BefreiungerlaubnisGeometrieClipboard(
+                getBefreiungerlaubnisTable());
+        befreiungGeometrieClipboard.addListener(clipboardListener);
+        befreiungGeometrieClipboard.loadFromFile();
+
+        if (befreiungGeometrieClipboard.isPastable()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        clipboards.put(CidsAppBackend.Mode.KANALDATEN, befreiungGeometrieClipboard);
 
         final AbstractClipboard kassenzeichenClipboard = new KassenzeichenGeometrienClipboard(
                 kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList());
@@ -6094,6 +6259,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class LazyInitialiser {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final Main INSTANCE = new Main();
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new LazyInitialiser object.
+         */
+        private LazyInitialiser() {
+        }
+    }
 
     /**
      * DOCUMENT ME!

@@ -32,6 +32,8 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
 
     private final Collection<Validator> validators = new ArrayList();
 
+    private boolean validating = false;
+
     //~ Methods ----------------------------------------------------------------
 
     /**

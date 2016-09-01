@@ -61,12 +61,16 @@ public interface Validator {
     /**
      * DOCUMENT ME!
      *
-     * @param  display  DOCUMENT ME!
+     * @param   display  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    void attachDisplay(ValidatorDisplay display);
+    Validator attachDisplay(ValidatorDisplay display);
 
     /**
      * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    void validate();
+    ValidatorState validate();
 }
