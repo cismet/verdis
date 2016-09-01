@@ -274,6 +274,36 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public boolean checkPermissionBaulasten() {
+        MetaClass mc = null;
+        try {
+            mc = CidsBean.getMetaClassFromTableName("WUNDA_BLAU", "alb_baulastblatt");
+        } catch (Exception ex) {
+            LOG.info("exception while getting metaclass alb_baulastblatt", ex);
+        }
+        return mc != null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean checkPermissionRisse() {
+        MetaClass mc = null;
+        try {
+            mc = CidsBean.getMetaClassFromTableName("WUNDA_BLAU", "vermessung_riss");
+        } catch (Exception ex) {
+            LOG.info("exception while getting metaclass vermessung_riss", ex);
+        }
+        return mc != null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  editable  DOCUMENT ME!
      */
     public void setEditable(final boolean editable) {
