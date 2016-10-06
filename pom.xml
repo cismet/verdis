@@ -14,7 +14,11 @@
     <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>VerdIS</name>
+    <properties>
+        <names.verdis-client>VerDIS Client</names.verdis-client>
+    </properties>
+    <name>${names.verdis-client}</name>
+    
     <description>!!! description pending !!!</description>
     <licenses>
         <license>
