@@ -918,30 +918,30 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         final CidsBean newBean = mcArbeitspaket.getEmptyInstance().getBean();
         ((ArbeitspaketeTableModel)jTable1.getModel()).addCidsBean(newBean);
         final int index = jTable1.convertRowIndexToView(((ArbeitspaketeTableModel)jTable1.getModel())
                         .getIndexByCidsBean(newBean));
         jTable1.getSelectionModel().setSelectionInterval(index, index);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         ((ArbeitspaketeTableModel)jTable1.getModel()).removeCidsBean(selectedPaket);
         setSelectedPaket(null);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         StaticSwingTools.showDialog(new KassenzeichenAddDialog(new KassenzeichenAddDialogListener() {
 
                     @Override
@@ -949,14 +949,14 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                         addOneKassenzeichenToList(kassenzeichennummer);
                     }
                 }));
-    }//GEN-LAST:event_jButton4ActionPerformed
+    } //GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         final List<CidsBean> eintraege = selectedPaket.getBeanCollectionProperty(
                 ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN);
 
@@ -965,41 +965,41 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         }
 
         pakedDataChanged();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    } //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
         StaticSwingTools.showDialog(jDialog2);
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton7ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jList2ValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
+    private void jList2ValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_jList2ValueChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_jList2ValueChanged
+    } //GEN-LAST:event_jList2ValueChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
         final int selRow = jTable1.getSelectedRow();
 
         jProgressBar1.setIndeterminate(true);
@@ -1032,23 +1032,23 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    } //GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton8ActionPerformed
         jDialog2.setVisible(false);
-    }//GEN-LAST:event_jButton8ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
         final KassenzeichenlistSearchStatement search = new KassenzeichenlistSearchStatement(jTextArea1.getText());
 
         jButton9.setEnabled(false);
@@ -1080,7 +1080,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton9ActionPerformed
+    } //GEN-LAST:event_jButton9ActionPerformed
 
     /**
      * DOCUMENT ME!

@@ -307,7 +307,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         jPanel2.add(jLabel1, gridBagConstraints);
 
         cmdShowAlkisRendererForSelected.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));     // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/alk.png")));       // NOI18N
         cmdShowAlkisRendererForSelected.setText(org.openide.util.NbBundle.getMessage(
                 KassenzeichenGeometrienPanel.class,
                 "KassenzeichenGeometrienPanel.cmdShowAlkisRendererForSelected.text"));        // NOI18N

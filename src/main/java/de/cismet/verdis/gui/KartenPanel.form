@@ -918,7 +918,7 @@
                   <ComponentRef name="mainGroup"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/alk.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/alk.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Flurst&#xfc;cke suchen"/>
                 <Property name="borderPainted" type="boolean" value="false"/>
@@ -927,7 +927,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/alk_selected.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/alk_selected.png"/>
                 </Property>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
@@ -941,7 +941,7 @@
                   <ComponentRef name="mainGroup"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/vermessungsriss.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/vermessungsriss.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Vermessungsrisse suchen"/>
                 <Property name="borderPainted" type="boolean" value="false"/>
@@ -950,7 +950,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/vermessungsriss_selected.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/vermessungsriss_selected.png"/>
                 </Property>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
@@ -967,7 +967,7 @@
                   <ComponentRef name="mainGroup"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/Baulast.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/Baulast.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Baulasten suchen"/>
                 <Property name="borderPainted" type="boolean" value="false"/>
@@ -976,7 +976,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/Baulast_selected.png"/>
+                  <Image iconType="3" name="/de/cismet/cids/custom/commons/gui/Baulast_selected.png"/>
                 </Property>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>

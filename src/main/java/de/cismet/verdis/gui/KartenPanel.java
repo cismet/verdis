@@ -58,6 +58,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.custom.commons.searchgeometrylistener.BaulastblattNodesSearchCreateSearchGeometryListener;
+import de.cismet.cids.custom.commons.searchgeometrylistener.FlurstueckNodesSearchCreateSearchGeometryListener;
+import de.cismet.cids.custom.commons.searchgeometrylistener.RissNodesSearchCreateSearchGeometryListener;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
@@ -1124,7 +1128,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         mainGroup.add(cmdSearchAlkisLandparcel);
         cmdSearchAlkisLandparcel.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk.png")));          // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/alk.png")));          // NOI18N
         cmdSearchAlkisLandparcel.setToolTipText("Flurstücke suchen");
         cmdSearchAlkisLandparcel.setBorderPainted(false);
         cmdSearchAlkisLandparcel.setContentAreaFilled(false);
@@ -1132,7 +1136,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchAlkisLandparcel.setFocusable(false);
         cmdSearchAlkisLandparcel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdSearchAlkisLandparcel.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/alk_selected.png"))); // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/alk_selected.png"))); // NOI18N
         cmdSearchAlkisLandparcel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchAlkisLandparcel.addActionListener(new java.awt.event.ActionListener() {
 
@@ -1145,7 +1149,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         mainGroup.add(cmdSearchVermessungRiss);
         cmdSearchVermessungRiss.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsriss.png")));          // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/vermessungsriss.png")));          // NOI18N
         cmdSearchVermessungRiss.setToolTipText("Vermessungsrisse suchen");
         cmdSearchVermessungRiss.setBorderPainted(false);
         cmdSearchVermessungRiss.setContentAreaFilled(false);
@@ -1153,7 +1157,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchVermessungRiss.setFocusable(false);
         cmdSearchVermessungRiss.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdSearchVermessungRiss.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/vermessungsriss_selected.png"))); // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/vermessungsriss_selected.png"))); // NOI18N
         cmdSearchVermessungRiss.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchVermessungRiss.addActionListener(new java.awt.event.ActionListener() {
 
@@ -1167,7 +1171,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         mainGroup.add(cmdSearchBaulasten);
         cmdSearchBaulasten.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast.png")));          // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/Baulast.png")));          // NOI18N
         cmdSearchBaulasten.setToolTipText("Baulasten suchen");
         cmdSearchBaulasten.setBorderPainted(false);
         cmdSearchBaulasten.setContentAreaFilled(false);
@@ -1175,7 +1179,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchBaulasten.setFocusable(false);
         cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cmdSearchBaulasten.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/Baulast_selected.png"))); // NOI18N
+                getClass().getResource("/de/cismet/cids/custom/commons/gui/Baulast_selected.png"))); // NOI18N
         cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdSearchBaulasten.addActionListener(new java.awt.event.ActionListener() {
 
@@ -1745,7 +1749,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSearchAlkisLandparcelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchAlkisLandparcelActionPerformed
-        mappingComp.setInteractionMode(Main.ALKIS_LANDPARCEL_SEARCH_GEOMETRY_LISTENER);
+        mappingComp.setInteractionMode(FlurstueckNodesSearchCreateSearchGeometryListener.NAME);
     }                                                                                            //GEN-LAST:event_cmdSearchAlkisLandparcelActionPerformed
 
     /**
@@ -1844,7 +1848,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSearchVermessungRissActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchVermessungRissActionPerformed
-        mappingComp.setInteractionMode(Main.VERMESSUNG_RISS_SEARCH_GEOMETRY_LISTENER);
+        mappingComp.setInteractionMode(RissNodesSearchCreateSearchGeometryListener.NAME);
     }                                                                                           //GEN-LAST:event_cmdSearchVermessungRissActionPerformed
 
     /**
@@ -1853,7 +1857,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSearchBaulastenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchBaulastenActionPerformed
-        mappingComp.setInteractionMode(Main.ALB_BAULAST_SEARCH_GEOMETRY_LISTENER);
+        mappingComp.setInteractionMode(BaulastblattNodesSearchCreateSearchGeometryListener.NAME);
     }                                                                                      //GEN-LAST:event_cmdSearchBaulastenActionPerformed
 
     /**
