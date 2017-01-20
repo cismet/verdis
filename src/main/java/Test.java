@@ -6,17 +6,10 @@
 *
 ****************************************************/
 
-import java.util.List;
-
-import de.cismet.cids.client.tools.DevelopmentTools;
-
-import de.cismet.cids.dynamics.CidsBean;
-
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisConstants;
+import de.cismet.verdis.gui.GrundbuchblattSucheDialog;
 
 /*
  * Copyright (C) 2012 cismet GmbH
@@ -57,27 +50,29 @@ public class Test {
     public static void main(final String[] args) {
         try {
             Log4JQuickConfig.configure4LumbermillOnLocalhost();
-            final CidsBean kassenzeiechenBean = DevelopmentTools.createCidsBeanFromRMIConnectionOnLocalhost(
-                    VerdisConstants.DOMAIN,
-                    "VORN",
-                    "SteinbacherD102",
-                    "vds102",
-                    "kassenzeichen",
-                    41);
-            final List<CidsBean> fronten = (List<CidsBean>)kassenzeiechenBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__FRONTEN);
-            final CidsBean frontBean = fronten.get(fronten.size() - 1);
-            final CidsBean geomBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE);
-
-            if (geomBean != null) {
-                geomBean.delete();
-            }
-            frontBean.delete();
-            fronten.remove(frontBean);
-
-            LOG.fatal(kassenzeiechenBean.getMOString());
-            final CidsBean persistedBean = kassenzeiechenBean.persist();
-            LOG.fatal(persistedBean.getMOString());
+//            final CidsBean kassenzeiechenBean = DevelopmentTools.createCidsBeanFromRMIConnectionOnLocalhost(
+//                    VerdisConstants.DOMAIN,
+//                    "VORN",
+//                    "SteinbacherD102",
+//                    "",
+//                    "kassenzeichen",
+//                    41);
+//            final List<CidsBean> fronten = (List<CidsBean>)kassenzeiechenBean.getProperty(
+//                    KassenzeichenPropertyConstants.PROP__FRONTEN);
+//            final CidsBean frontBean = fronten.get(fronten.size() - 1);
+//            final CidsBean geomBean = (CidsBean)frontBean.getProperty(FrontinfoPropertyConstants.PROP__GEOMETRIE);
+//
+//            if (geomBean != null) {
+//                geomBean.delete();
+//            }
+//            frontBean.delete();
+//            fronten.remove(frontBean);
+//
+//            LOG.fatal(kassenzeiechenBean.getMOString());
+//            final CidsBean persistedBean = kassenzeiechenBean.persist();
+//            LOG.fatal(persistedBean.getMOString());
+            final GrundbuchblattSucheDialog dialog = GrundbuchblattSucheDialog.getInstance();
+            StaticSwingTools.showDialog(dialog);
         } catch (Exception ex) {
             LOG.fatal(ex, ex);
         }

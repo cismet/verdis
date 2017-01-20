@@ -21,8 +21,6 @@ import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
 
-import de.cismet.tools.ConnectionInfo;
-
 /**
  * DOCUMENT ME!
  *
@@ -40,12 +38,9 @@ public class AppPreferences {
     private String domainserver;
     private int kassenzeichenClassId;
     private int geomClassId;
-    private int dmsUrlBaseClassId;
-    private int dmsUrlClassId;
     private String kassenzeichenSuche;
     private Vector usergroups = new Vector();
     private Vector rwGroups = new Vector();
-    private ConnectionInfo dbConnectionInfo;
     private CismapPreferences cismapPrefs;
     private String standaloneDomainname;
     private String standaloneCallServerHost;
@@ -60,6 +55,7 @@ public class AppPreferences {
     private int verdisCrossoverPort;
     private int lagisCrossoverPort;
     private double flurstueckBuffer = -0.5;
+    private boolean veranlagungOnlyForChangedValues = false;
 
     private String appbackenddomain = null;
     private String appbackendconnectionclass = null;
@@ -140,8 +136,6 @@ public class AppPreferences {
             domainserver = root.getChild("general").getAttribute("domainserver").getValue();
             kassenzeichenClassId = root.getChild("general").getAttribute("kassenzeichenClassId").getIntValue();
             geomClassId = root.getChild("general").getAttribute("geomClassId").getIntValue();
-            dmsUrlBaseClassId = root.getChild("general").getAttribute("dmsUrlBaseClassId").getIntValue();
-            dmsUrlClassId = root.getChild("general").getAttribute("dmsUrlClassId").getIntValue();
             kassenzeichenSuche = root.getChild("general").getAttribute("kassenzeichenSuche").getValue();
             standaloneDomainname = root.getChild("standalone").getAttribute("userdomainname").getValue();
             standaloneCallServerHost = root.getChild("standalone").getAttribute("callserverhost").getValue();
@@ -194,38 +188,30 @@ public class AppPreferences {
 
             try {
                 final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                final String crossoverServerPort = crossoverPrefs.getChildText("ServerPort");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: Crossover port: " + crossoverServerPort);
+                try {
+                    final String crossoverServerPort = crossoverPrefs.getChildText("ServerPort");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Crossover: Crossover port: " + crossoverServerPort);
+                    }
+                    setVerdisCrossoverPort(Integer.parseInt(crossoverServerPort));
+                } catch (Exception ex) {
+                    log.warn("Crossover: Error beim setzen des Server ports.", ex);
                 }
-                setVerdisCrossoverPort(Integer.parseInt(crossoverServerPort));
-            } catch (Exception ex) {
-                log.warn("Crossover: Error beim setzen des Server ports", ex);
-            }
-
-            try {
-                final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                final String lagisHost = crossoverPrefs.getChild("LagisConfiguration").getChildText("Host");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: lagisHost: " + lagisHost);
+                try {
+                    setLagisCrossoverPort(Integer.parseInt(crossoverPrefs.getChildText("LagisCrossoverPort")));
+                    if (log.isDebugEnabled()) {
+                        log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
+                    }
+                } catch (Exception ex) {
+                    log.warn("Crossover: Error beim setzen des LagIS servers.", ex);
                 }
-                final String lagisORBPort = crossoverPrefs.getChild("LagisConfiguration").getChildText("ORBPort");
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: lagisHost: " + lagisORBPort);
-                }
-                setLagisCrossoverPort(Integer.parseInt(
-                        crossoverPrefs.getChild("LagisConfiguration").getChildText("LagisCrossoverPort")));
-                if (log.isDebugEnabled()) {
-                    log.debug("Crossover: LagisCrossoverPort: " + getLagisCrossoverPort());
+                try {
+                    flurstueckBuffer = Double.parseDouble(crossoverPrefs.getChildText("FlurstueckBuffer"));
+                } catch (Exception ex) {
+                    log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage.", ex);
                 }
             } catch (Exception ex) {
-                log.warn("Crossover: Error beim setzen des LagIS servers", ex);
-            }
-            try {
-                final Element crossoverPrefs = root.getChild("CrossoverConfiguration");
-                flurstueckBuffer = Double.parseDouble(crossoverPrefs.getChildText("FlurstueckBuffer"));
-            } catch (Exception ex) {
-                log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
+                log.error("Crossover: Fehler beim Konfigurieren.", ex);
             }
 
             final List list = root.getChild("usergroups").getChildren("ug");
@@ -240,7 +226,15 @@ public class AppPreferences {
                     }
                 }
             }
-            dbConnectionInfo = new ConnectionInfo(root.getChild("dbConnectionInfo"));
+
+            try {
+                veranlagungOnlyForChangedValues = Boolean.parseBoolean(root.getChild("general").getAttribute(
+                            "veranlassungOnlyForChangedValues").getValue());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.fatal("Fehler beim parsen von veranlassungOnlyForChangedValues --> benutze default false", e);
+                }
+            }
 
             // cismapPrefs = new CismapPreferences(root.getChild("cismapPreferences"));
 
@@ -441,42 +435,6 @@ public class AppPreferences {
      *
      * @return  DOCUMENT ME!
      */
-    public int getDmsUrlBaseClassId() {
-        return dmsUrlBaseClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dmsUrlBaseClassId  DOCUMENT ME!
-     */
-    public void setDmsUrlBaseClassId(final int dmsUrlBaseClassId) {
-        this.dmsUrlBaseClassId = dmsUrlBaseClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getDmsUrlClassId() {
-        return dmsUrlClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dmsUrlClassId  DOCUMENT ME!
-     */
-    public void setDmsUrlClassId(final int dmsUrlClassId) {
-        this.dmsUrlClassId = dmsUrlClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
     public String getKassenzeichenSuche() {
         return kassenzeichenSuche;
     }
@@ -488,24 +446,6 @@ public class AppPreferences {
      */
     public void setKassenzeichenSuche(final String kassenzeichenSuche) {
         this.kassenzeichenSuche = kassenzeichenSuche;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public ConnectionInfo getDbConnectionInfo() {
-        return dbConnectionInfo;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dbConnectionInfo  DOCUMENT ME!
-     */
-    public void setDbConnectionInfo(final ConnectionInfo dbConnectionInfo) {
-        this.dbConnectionInfo = dbConnectionInfo;
     }
 
     /**
@@ -668,5 +608,23 @@ public class AppPreferences {
      */
     public String getAppbackendDomain() {
         return appbackenddomain;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isVeranlagungOnlyForChangedValues() {
+        return veranlagungOnlyForChangedValues;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
+     */
+    public void setVeranlagungOnlyForChangedValues(final boolean veranlagungOnlyForChangedValues) {
+        this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;
     }
 }

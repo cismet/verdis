@@ -82,11 +82,11 @@ public class BindingValidator extends AbstractValidator implements BindingListen
 
     @Override
     public void bindingBecameBound(final Binding binding) {
+        setState(null);
     }
 
     @Override
     public void bindingBecameUnbound(final Binding binding) {
-        setState(null);
     }
 
     @Override

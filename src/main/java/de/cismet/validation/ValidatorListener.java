@@ -36,7 +36,8 @@ public interface ValidatorListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  state  DOCUMENT ME!
+     * @param  source  DOCUMENT ME!
+     * @param  state   DOCUMENT ME!
      */
-    void stateChanged(ValidatorState state);
+    void stateChanged(final Validator source, final ValidatorState state);
 }

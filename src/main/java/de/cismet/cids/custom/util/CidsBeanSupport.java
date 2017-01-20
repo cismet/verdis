@@ -26,10 +26,13 @@ package de.cismet.cids.custom.util;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -88,19 +91,73 @@ public class CidsBeanSupport {
             } else if (o instanceof CidsBean) {
                 targetBean.setProperty(propName, deepcloneCidsBean((CidsBean)o));
             } else if (o instanceof Collection) {
-                final List<CidsBean> list = (List<CidsBean>)o;
-                final List<CidsBean> newList = new ArrayList<CidsBean>();
+                final List<CidsBean> sourceList = (List<CidsBean>)o;
+                final List<CidsBean> targetList = targetBean.getBeanCollectionProperty(propName);
 
-                for (final CidsBean tmpBean : list) {
-                    newList.add(deepcloneCidsBean(tmpBean));
+                final Map<Integer, CidsBean> sourceIdToBeanMap = new HashMap<Integer, CidsBean>();
+                for (final CidsBean cidsBean : sourceList) {
+                    sourceIdToBeanMap.put(cidsBean.getMetaObject().getId(), deepcloneCidsBean(cidsBean));
                 }
-                targetBean.setProperty(propName, newList);
+
+                final Map<Integer, CidsBean> targetIdToBeanMap = new HashMap<Integer, CidsBean>();
+                for (final CidsBean cidsBean : targetList) {
+                    targetIdToBeanMap.put(cidsBean.getMetaObject().getId(), cidsBean);
+                }
+
+                final Collection<Integer> sourceIds = sourceIdToBeanMap.keySet();
+                final Collection<Integer> targetIds = targetIdToBeanMap.keySet();
+
+                final Collection<Integer> toAdd = new HashSet<Integer>();
+                final Collection<Integer> toRemove = new HashSet<Integer>();
+                final Collection<Integer> toUpdate = new HashSet<Integer>();
+
+                // all ids that are in both lists
+                // source: A B _
+                // target: _ B C
+                // update: _ B _
+                toUpdate.addAll(sourceIds);
+                toUpdate.addAll(targetIds);
+                toUpdate.retainAll(sourceIds);
+                toUpdate.retainAll(targetIds);
+
+                // add all ids that are in the source list
+                // except the ones who are already in the update list
+                // source: _ B C
+                // update: _ B _
+                // add   : _ _ C
+                toAdd.addAll(sourceIds);
+                toAdd.removeAll(toUpdate);
+
+                // remove all ids that are in the target list
+                // except the ones who are already in the update list
+                // target: A B _
+                // update: _ B _
+                // remove: A _ _
+                toRemove.addAll(targetIds);
+                toRemove.removeAll(toUpdate);
+
+                // lists are now:
+                // update: _ B _
+                // add   : _ _ C
+                // remove: A _ _
+
+                for (final Integer id : toRemove) {
+                    targetList.remove(sourceIdToBeanMap.get(id));
+                }
+
+                for (final Integer id : toAdd) {
+                    targetList.add(sourceIdToBeanMap.get(id));
+                }
+
+                for (final Integer id : toUpdate) {
+                    deepcopyAllProperties(sourceIdToBeanMap.get(id), targetIdToBeanMap.get(id));
+                }
             } else if (o instanceof Geometry) {
                 targetBean.setProperty(propName, ((Geometry)o).clone());
             } else if (o instanceof Float) {
                 targetBean.setProperty(propName, new Float(o.toString()));
             } else if (o instanceof Boolean) {
-                targetBean.setProperty(propName, new Boolean(o.toString()));
+                targetBean.setProperty(propName, Boolean.valueOf(o.toString()));
             } else if (o instanceof Long) {
                 targetBean.setProperty(propName, new Long(o.toString()));
             } else if (o instanceof Double) {
@@ -111,6 +168,8 @@ public class CidsBeanSupport {
                 targetBean.setProperty(propName, ((Date)o).clone());
             } else if (o instanceof String) {
                 targetBean.setProperty(propName, o);
+            } else if (o instanceof Timestamp) {
+                targetBean.setProperty(propName, ((Timestamp)o).clone());
             } else {
                 if (o != null) {
                     LOG.error("unknown property type: " + o.getClass().getName());
@@ -118,6 +177,7 @@ public class CidsBeanSupport {
                 targetBean.setProperty(propName, o);
             }
         }
+        targetBean.getMetaObject().forceStatus(sourceBean.getMetaObject().getStatus());
     }
 
     /**

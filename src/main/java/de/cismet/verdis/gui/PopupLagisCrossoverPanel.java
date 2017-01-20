@@ -19,6 +19,8 @@ package de.cismet.verdis.gui;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -47,6 +49,10 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.layout.FadingCardLayout;
 
 import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.GeomPropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -77,7 +83,6 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
     private final FlurstueckTableModel tableModel = new FlurstueckTableModel();
     private int lagisCrossoverPort = -1;
-    private final Main mainApp;
     private final ExecutorService execService = Executors.newCachedThreadPool();
     private FadingCardLayout layout = new FadingCardLayout();
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -103,9 +108,8 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      * Creates new form LagisCrossoverPanel.
      *
      * @param  lagisCrossoverPort  DOCUMENT ME!
-     * @param  verdisMain          DOCUMENT ME!
      */
-    public PopupLagisCrossoverPanel(final int lagisCrossoverPort, final Main verdisMain) {
+    public PopupLagisCrossoverPanel(final int lagisCrossoverPort) {
         initComponents();
         panAll.setLayout(layout);
         panAll.removeAll();
@@ -116,7 +120,6 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
         tblFlurstuecke.addMouseListener(this);
         tblFlurstuecke.getSelectionModel().addListSelectionListener(this);
         this.lagisCrossoverPort = lagisCrossoverPort;
-        mainApp = verdisMain;
         pgbProgress.setIndeterminate(true);
         layout.show(panAll, PROGRESS_CARD_NAME);
     }
@@ -641,7 +644,8 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
                         + "   geom "
                         + "WHERE "
                         + "   geom.id = alkis_landparcel.geometrie "
-                        + " and intersects(geom.geo_field, "
+                        + "   AND not ST_IsEmpty(geom.geo_field)"
+                        + "   AND intersects(geom.geo_field, "
                         + "                    st_buffer(st_buffer("
                         + "st_transform( "
                         + "   geomFromText('" + geom.toText() + "'," + geom.getSRID() + ")"
@@ -666,18 +670,30 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
 
         @Override
         protected List<CidsBean> doInBackground() throws Exception {
-            final String currentKZ = mainApp.getKzPanel().getShownKassenzeichen();
-            if ((currentKZ != null) && (currentKZ.length() > 0)) {
-                final Geometry kassenzeichenGeom = mainApp.getGeometry();
-                if (kassenzeichenGeom != null) {
+            final CidsBean currentKassenzeichen = CidsAppBackend.getInstance().getCidsBean();
+            if (currentKassenzeichen != null) {
+                final List<CidsBean> kgeoms = (List<CidsBean>)currentKassenzeichen.getProperty(
+                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+
+                final List<Geometry> geoms = new ArrayList<Geometry>();
+                for (final CidsBean kgeom : kgeoms) {
+                    geoms.add((Geometry)kgeom.getProperty(
+                            KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                    + "."
+                                    + GeomPropertyConstants.PROP__GEO_FIELD));
+                }
+
+                if (!geoms.isEmpty()) {
+                    final Geometry kassenzeichenGeom = new GeometryCollection(GeometryFactory.toGeometryArray(geoms),
+                            geoms.get(0).getFactory());
                     log.info("Crossover: Geometrie zum bestimmen der Flurstücke: " + kassenzeichenGeom);
                     if (log.isDebugEnabled()) {
-                        log.debug("buffer: " + mainApp.getPrefs().getFlurstueckBuffer());
+                        log.debug("buffer: " + CidsAppBackend.getInstance().getAppPreferences().getFlurstueckBuffer());
                     }
 
                     final List<CidsBean> wfsFlurstuecke = this.getIntersectingFlurstuecke(
                             kassenzeichenGeom,
-                            mainApp.getPrefs().getFlurstueckBuffer());
+                            CidsAppBackend.getInstance().getAppPreferences().getFlurstueckBuffer());
 
                     if ((wfsFlurstuecke.size() > 0)) {
                         if (log.isDebugEnabled()) {

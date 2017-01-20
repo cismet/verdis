@@ -32,6 +32,8 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
 
     private final Collection<Validator> validators = new ArrayList();
 
+    private boolean validating = false;
+
     //~ Methods ----------------------------------------------------------------
 
     /**
@@ -66,9 +68,9 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
      * @return  DOCUMENT ME!
      */
     public boolean add(final Validator validator) {
+        validator.validate();
         validator.addListener(this);
         final boolean result = this.validators.add(validator);
-        validate();
         return result;
     }
 
@@ -82,12 +84,11 @@ public class AggregatedValidator extends AbstractValidator implements ValidatorL
     public boolean remove(final Validator validator) {
         validator.removeListener(this);
         final boolean result = this.validators.remove(validator);
-        validate();
         return result;
     }
 
     @Override
-    public void stateChanged(final ValidatorState state) {
+    public void stateChanged(final Validator source, final ValidatorState state) {
         validate();
     }
 

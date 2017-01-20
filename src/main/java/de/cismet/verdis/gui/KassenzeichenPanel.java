@@ -12,19 +12,13 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.navigator.connection.SessionManager;
-
 import org.apache.log4j.Logger;
-
-import org.jdesktop.swingx.JXBusyLabel;
-
-import java.awt.Color;
-import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -35,8 +29,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
-import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
-import de.cismet.tools.gui.historybutton.HistoryModelListener;
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
 
 import de.cismet.validation.*;
@@ -51,7 +44,6 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
 
 /**
  * DOCUMENT ME!
@@ -59,8 +51,7 @@ import de.cismet.verdis.commons.constants.RegenFlaechenPropertyConstants;
  * @author   hell
  * @version  $Revision$, $Date$
  */
-public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryModelListener,
-    CidsBeanStore,
+public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanStore,
     AppModeListener,
     EditModeListener,
     Validatable {
@@ -71,15 +62,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
 
     //~ Instance fields --------------------------------------------------------
 
-    private boolean editmode = false;
     private Main mainApp;
-    private DefaultHistoryModel historyModel = new DefaultHistoryModel();
     private JHistoryButton hbBack;
     private JHistoryButton hbFwd;
     private CidsBean kassenzeichenBean;
     private final Validator bindingValidator;
     private final AggregatedValidator aggVal = new AggregatedValidator();
-    private Integer nextKassenzeichen = null;
+    private MultiBemerkung multi;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
@@ -87,6 +76,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel lblBemerkung;
     private javax.swing.JLabel lblErfassungsdatum;
     private javax.swing.JLabel lblKassenzeichen;
@@ -100,8 +90,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     private javax.swing.JSeparator sepTitle2;
     private javax.swing.JToggleButton togInfoMode;
     private javax.swing.JToggleButton togRegenMode;
-    private javax.swing.JToggleButton togWDSRMode;
-    private javax.swing.JTextArea txtBemerkung;
+    private javax.swing.JToggleButton togSRMode;
+    private javax.swing.JToggleButton togVersickerungMode;
     private javax.swing.JTextField txtErfassungsdatum;
     private javax.swing.JTextField txtKassenzeichen;
     private javax.swing.JTextField txtSearch;
@@ -117,21 +107,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     public KassenzeichenPanel() {
         initComponents();
 
+        jTextPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
 
-        configureButtons();
-        // de.cismet.gui.tools.DullPane dp=new de.cismet.gui.tools.DullPane();
-        // this.panKZValues.add(dp);
         setEnabled(false);
-        historyModel.addHistoryModelListener(this);
-
-        lblLastModification.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/goto.png")));
-        lblLastModification.setOpaque(false);
-        // lblLastModification.setBorderPainted(false);
-        // lblLastModification.setFocusPainted(false);
-        hbBack.revalidate();
-        hbFwd.revalidate();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -155,10 +135,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         if (cidsBean == null) {
             txtErfassungsdatum.setText("");
             txtKassenzeichen.setText("");
-            txtBemerkung.setText("");
             txtSperreBemerkung.setText("");
             chkSperre.setSelected(false);
+            multi = null;
+        } else {
+            final String asJson = (String)cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG);
+            multi = CidsAppBackend.transformMultiBemerkungFromJson(asJson);
+            CidsAppBackend.cleanupMultiBemerkung(multi);
         }
+        jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
 
         aggVal.clear();
         aggVal.add(bindingValidator);
@@ -170,6 +155,9 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
+        aggVal.validate();
+
+        Main.getInstance().refreshTitle();
     }
 
     /**
@@ -182,16 +170,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     }
 
     @Override
-    public void setEnabled(final boolean b) {
+    public final void setEnabled(final boolean b) {
+        super.setEnabled(b);
         txtErfassungsdatum.setEditable(b);
-        txtBemerkung.setEditable(b);
         chkSperre.setEnabled(b);
         txtSearch.setEnabled(!b);
         btnSearch.setEnabled(!b);
         if (b) {
-            txtBemerkung.setBackground(java.awt.Color.white);
+            jTextPane1.setBackground(java.awt.Color.white);
         } else {
-            txtBemerkung.setBackground(this.getBackground());
+            jTextPane1.setBackground(this.getBackground());
         }
     }
 
@@ -210,6 +198,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @return  DOCUMENT ME!
      */
     public Collection<JComponent> getCustomButtons() {
+        configureButtons();
+        lblLastModification.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/goto.png")));
+        lblLastModification.setOpaque(false);
+        hbBack.revalidate();
+        hbFwd.revalidate();
+
         final Collection<JComponent> tmp = new ArrayList<JComponent>();
         tmp.add(lblLastModification);
         tmp.add(hbBack);
@@ -224,11 +219,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         hbBack = JHistoryButton.getDefaultJHistoryButton(
                 JHistoryButton.DIRECTION_BACKWARD,
                 JHistoryButton.ICON_SIZE_16,
-                historyModel);
+                CidsAppBackend.getInstance().getHistoryModel());
         hbFwd = JHistoryButton.getDefaultJHistoryButton(
                 JHistoryButton.DIRECTION_FORWARD,
                 JHistoryButton.ICON_SIZE_16,
-                historyModel);
+                CidsAppBackend.getInstance().getHistoryModel());
 
         hbBack.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         hbBack.setOpaque(false);
@@ -260,14 +255,15 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         txtErfassungsdatum = new javax.swing.JTextField();
         chkSperre = new javax.swing.JCheckBox();
         scpBemerkung = new javax.swing.JScrollPane();
-        txtBemerkung = new javax.swing.JTextArea();
+        jTextPane1 = new javax.swing.JTextPane();
         txtKassenzeichen = new javax.swing.JTextField();
         txtSperreBemerkung = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         togRegenMode = new javax.swing.JToggleButton();
-        togWDSRMode = new javax.swing.JToggleButton();
+        togSRMode = new javax.swing.JToggleButton();
         togInfoMode = new javax.swing.JToggleButton();
+        togVersickerungMode = new javax.swing.JToggleButton();
         sepTitle1 = new javax.swing.JSeparator();
         sepTitle2 = new javax.swing.JSeparator();
 
@@ -400,6 +396,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sperre}"),
                 chkSperre,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
         bindingGroup.addBinding(binding);
 
         chkSperre.addActionListener(new java.awt.event.ActionListener() {
@@ -420,21 +418,16 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         scpBemerkung.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         scpBemerkung.setMinimumSize(new java.awt.Dimension(6, 36));
 
-        txtBemerkung.setColumns(3);
-        txtBemerkung.setLineWrap(true);
-        txtBemerkung.setRows(3);
-        txtBemerkung.setMinimumSize(new java.awt.Dimension(0, 36));
+        jTextPane1.setEditable(false);
+        jTextPane1.setContentType("text/html"); // NOI18N
+        jTextPane1.addMouseListener(new java.awt.event.MouseAdapter() {
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung}"),
-                txtBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG);
-        bindingGroup.addBinding(binding);
-
-        scpBemerkung.setViewportView(txtBemerkung);
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    jTextPane1MouseClicked(evt);
+                }
+            });
+        scpBemerkung.setViewportView(jTextPane1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -466,8 +459,8 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
         panKZValues.add(txtKassenzeichen, gridBagConstraints);
 
-        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setEditable(false);
+        txtSperreBemerkung.setBackground(getBackground());
         txtSperreBemerkung.setForeground(java.awt.Color.red);
         txtSperreBemerkung.setBorder(null);
 
@@ -478,6 +471,13 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
                 txtSperreBemerkung,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
                 KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE);
+        bindingGroup.addBinding(binding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"),
+                txtSperreBemerkung,
+                org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -527,28 +527,27 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.gridy = 0;
         jPanel2.add(togRegenMode, gridBagConstraints);
 
-        btgMode.add(togWDSRMode);
-        togWDSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
-        togWDSRMode.setToolTipText("ESW");
-        togWDSRMode.setFocusable(false);
-        togWDSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        togWDSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        togWDSRMode.addActionListener(new java.awt.event.ActionListener() {
+        btgMode.add(togSRMode);
+        togSRMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/esw_gr.png"))); // NOI18N
+        togSRMode.setToolTipText("ESW");
+        togSRMode.setFocusable(false);
+        togSRMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togSRMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togSRMode.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    togWDSRModeActionPerformed(evt);
+                    togSRModeActionPerformed(evt);
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
-        jPanel2.add(togWDSRMode, gridBagConstraints);
+        jPanel2.add(togSRMode, gridBagConstraints);
 
         btgMode.add(togInfoMode);
         togInfoMode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/info_gr.png"))); // NOI18N
-        togInfoMode.setSelected(true);
         togInfoMode.setToolTipText("Info");
         togInfoMode.setFocusable(false);
         togInfoMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -564,6 +563,26 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         jPanel2.add(togInfoMode, gridBagConstraints);
+
+        btgMode.add(togVersickerungMode);
+        togVersickerungMode.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/kanal_gr.png"))); // NOI18N
+        togVersickerungMode.setSelected(true);
+        togVersickerungMode.setToolTipText("Versickerung");
+        togVersickerungMode.setFocusable(false);
+        togVersickerungMode.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togVersickerungMode.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togVersickerungMode.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togVersickerungModeActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(togVersickerungMode, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -636,9 +655,24 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  evt  DOCUMENT ME!
      */
     private void togInfoModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togInfoModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togInfoModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togInfoModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -646,19 +680,49 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      * @param  evt  DOCUMENT ME!
      */
     private void togRegenModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togRegenModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                                //GEN-LAST:event_togRegenModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togRegenModeActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void togWDSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togWDSRModeActionPerformed
-        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ESW);
-        mainApp.refreshLeftTitleBarColor();
-    }                                                                               //GEN-LAST:event_togWDSRModeActionPerformed
+    private void togSRModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togSRModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.SR);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togSRModeActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -669,31 +733,115 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
         gotoTxtKassenzeichen();
     }                                                                             //GEN-LAST:event_btnSearchActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jTextPane1MouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_jTextPane1MouseClicked
+        final MultiTempBemerkungsDialog dialog = MultiTempBemerkungsDialog.getInstance();
+        dialog.setMultiBemerkung(multi);
+        dialog.setEditable(isEnabled());
+        StaticSwingTools.showDialog(dialog);
+        try {
+            getCidsBean().setProperty(
+                KassenzeichenPropertyConstants.PROP__BEMERKUNG,
+                CidsAppBackend.transformMultiBemerkungToJson(multi));
+            jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+            jTextPane1.setText(ex.getLocalizedMessage());
+        }
+    }                                                                          //GEN-LAST:event_jTextPane1MouseClicked
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void togVersickerungModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togVersickerungModeActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.KANALDATEN);
+                        mainApp.refreshLeftTitleBarColor();
+                    } catch (Exception e) {
+                        LOG.error("Exception in Background Thread", e);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_togVersickerungModeActionPerformed
+
     @Override
     public void appModeChanged() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-        if (mode.equals(mode.ALLGEMEIN)) {
-            if (!togInfoMode.isSelected()) {
-                togInfoMode.setSelected(true);
+        switch (mode) {
+            case ALLGEMEIN: {
+                if (!togInfoMode.isSelected()) {
+                    togInfoMode.setSelected(true);
+                }
             }
-        } else if (mode.equals(mode.ESW)) {
-            if (!togWDSRMode.isSelected()) {
-                togWDSRMode.setSelected(true);
+            break;
+            case SR: {
+                if (!togSRMode.isSelected()) {
+                    togSRMode.setSelected(true);
+                }
             }
-        } else {
-            if (!togRegenMode.isSelected()) {
-                togRegenMode.setSelected(true);
+            break;
+            case REGEN: {
+                if (!togRegenMode.isSelected()) {
+                    togRegenMode.setSelected(true);
+                }
             }
+            break;
+            case KANALDATEN: {
+                if (!togVersickerungMode.isSelected()) {
+                    togVersickerungMode.setSelected(true);
+                }
+            }
+            break;
         }
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @param  kz  DOCUMENT ME!
      */
-    public void setKZSearchField(final String kz) {
-        this.txtSearch.setText(kz);
+    public void setSearchStarted() {
+        txtSearch.setEnabled(false);
+        btnSearch.setEnabled(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void setSearchFinished() {
+        txtSearch.setEnabled(true);
+        btnSearch.setEnabled(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  kassenzeichen  DOCUMENT ME!
+     */
+    public void setSearchField(final String kassenzeichen) {
+        this.txtSearch.setText(kassenzeichen);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getSearchField() {
+        return this.txtSearch.getText();
     }
 
     /**
@@ -722,9 +870,9 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
      */
     public void refresh() {
         if (txtKassenzeichen.getText().trim().length() > 0) {
-            gotoKassenzeichen(txtKassenzeichen.getText().trim());
+            CidsAppBackend.getInstance().gotoKassenzeichen(txtKassenzeichen.getText().trim());
         } else {
-            gotoKassenzeichen(txtSearch.getText().trim());
+            CidsAppBackend.getInstance().gotoKassenzeichen(txtSearch.getText().trim());
         }
     }
 
@@ -747,297 +895,22 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements HistoryMod
     }
 
     /**
+     * DOCUMENT ME!setKZSearchField.
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getShownBemerkung() {
+        return jTextPane1.getText();
+    }
+
+    /**
      * DOCUMENT ME!
      */
     private void gotoTxtKassenzeichen() {
         if (LOG.isDebugEnabled()) {
             LOG.debug("gotoTxtKassenzeichen");
         }
-        this.gotoKassenzeichen(txtSearch.getText());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  kassenzeichen  DOCUMENT ME!
-     */
-    public void gotoKassenzeichen(final String kassenzeichen) {
-        // Mit History
-        gotoKassenzeichen(kassenzeichen, true);
-    }
-
-    /**
-     * former synchronized method.
-     *
-     * @param  kz              DOCUMENT ME!
-     * @param  historyEnabled  DOCUMENT ME!
-     */
-    public void gotoKassenzeichen(final String kz, final boolean historyEnabled) {
-        boolean refreshFlag = false;
-        final String[] test = kz.split(":");
-
-        final String kassenzeichenNummer;
-        final String flaechenBez;
-        if (test.length > 1) {
-            kassenzeichenNummer = test[0];
-            flaechenBez = test[1];
-        } else {
-            kassenzeichenNummer = kz;
-            flaechenBez = "";
-        }
-
-        if (kassenzeichenNummer.trim().equals(txtKassenzeichen.getText().trim())) {
-            refreshFlag = true;
-        }
-
-        if ((mainApp.changesPending() == false) || (refreshFlag == true)) {
-            mainApp.disableKassenzeichenCmds();
-            txtSearch.setEnabled(false);
-            btnSearch.setEnabled(false);
-            setKZSearchField(kz);
-
-            new SwingWorker<CidsBean, Void>() {
-
-                    @Override
-                    protected CidsBean doInBackground() throws Exception {
-                        return CidsAppBackend.getInstance()
-                                    .loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
-                    }
-
-                    @Override
-                    protected void done() {
-                        try {
-                            final CidsBean cidsBean = get();
-
-                            if (cidsBean != null) {
-                                CidsAppBackend.getInstance().setCidsBean(cidsBean);
-                                selectFlaecheByBez(flaechenBez);
-                                flashSearchField(Color.GREEN);
-                                if (historyEnabled) {
-                                    historyModel.addToHistory(kz);
-                                }
-                            } else {
-                                flashSearchField(Color.RED);
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Exception in Background Thread", e);
-                            flashSearchField(Color.RED);
-                            mainApp.enableEditing(false);
-                        }
-                        txtSearch.setEnabled(true);
-                        btnSearch.setEnabled(true);
-                        mainApp.refreshLeftTitleBarColor();
-                        mainApp.refreshKassenzeichenButtons();
-                        mainApp.refreshClipboardButtons();
-                        mainApp.refreshItemButtons();
-                    }
-                }.execute();
-        } else {
-            JOptionPane.showMessageDialog(
-                mainApp,
-                "Das Kassenzeichen kann nur gewechselt werden wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
-                "Wechseln nicht m\u00F6glich",
-                JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  bez  DOCUMENT ME!
-     */
-    private void selectFlaecheByBez(final String bez) {
-        for (final CidsBean flaeche
-                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-            if (((String)flaeche.getProperty(RegenFlaechenPropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
-                mainApp.getRegenFlaechenTabellenPanel().selectCidsBean(flaeche);
-                return;
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  b  DOCUMENT ME!
-     */
-    public void enableEditing(final boolean b) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("enableEditing(" + b + ")");
-        }
-        this.setEnabled(b);
-        editmode = b;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   object_id  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lockDataset(final String object_id) {
-        return CidsAppBackend.getInstance().lockDataset(object_id);
-
-//        try {
-//            Statement stmnt = connection.createStatement();
-//            ResultSet rs = stmnt.executeQuery("select class_id,object_id,user_string,additional_info from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id);
-//            if (!rs.next()) {
-//                rs.close();
-//                //Kein Eintragvorhanden. Eintrag schreiben
-//                stmnt = connection.createStatement();
-//                String locker = "insert into cs_locks (class_id,object_id,user_string,additional_info) values (" + Main.KASSENZEICHEN_CLASS_ID + "," + object_id + ",'" + userString + "','" + lockNonce + "')";
-//                log.debug("lockDataset: " + locker);
-//                stmnt.executeUpdate(locker);
-//                stmnt.close();
-//                //Sperreintrag geschrieben. Jetzt wird noch \u00FCberpr\u00FCft ob in der zwischenzeit noch jemnad einen Sperreintrag geschrieben hat
-//                stmnt = connection.createStatement();
-//                rs = stmnt.executeQuery("select count(*) from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id);
-//                if (!rs.next()) {
-//                    log.fatal("select count(*) hat nichts zur\u00FCckgeliefert.");
-//                    return false;
-//                } else {
-//                    int count = rs.getInt(1);
-//                    if (count > 1) {
-//                        final JFrame t = mainApp;
-//                        new Thread() {
-//
-//                            {
-//                                start();
-//                            }
-//
-//                            public void run() {
-//                                JOptionPane.showMessageDialog(t, "Es wurde gleichzeitig versucht einen Datensatz zu sperren. Der kl\u00FCgere gibt nach ;-)", "Sperren fehlgeschlagen", JOptionPane.WARNING_MESSAGE);
-//                            }
-//                        };
-//                        stmnt = connection.createStatement();
-//                        int ret = stmnt.executeUpdate("delete from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id + " and additional_info='" + lockNonce + "'");
-//                        stmnt.close();
-//                        if (ret != 1) {
-//                            log.warn("Kassenzeichen " + object_id + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret);
-//                        }
-//
-//                        return false;
-//                    } else {
-//                        return true;
-//                    }
-//                }
-//            } else {
-//                final JFrame t = mainApp;
-//                final String user = rs.getString(3);
-//                rs.close();
-//                new Thread() {
-//
-//                    {
-//                        start();
-//                    }
-//
-//                    public void run() {
-//                        JOptionPane.showMessageDialog(t, "Der Datensatz wird schon vom Benutzer " + user + " zum Ver\u00E4ndern gesperrt", "Kein Editieren m\u00F6glich", JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                };
-//                return false;
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("SQL Fehler beim Sperren", e);
-//            return false;
-//        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  object_id  DOCUMENT ME!
-     */
-    public void unlockDataset(final String object_id) {
-        CidsAppBackend.getInstance().unlockDataset(object_id);
-//        String sql = "delete from cs_locks where class_id=" + Main.KASSENZEICHEN_CLASS_ID + " and object_id=" + object_id + " and additional_info='" + lockNonce + "'";
-//        log.info("unlockDataset: " + sql);
-//        try {
-//            Statement stmnt = connection.createStatement();
-//            int ret = stmnt.executeUpdate(sql);
-//            stmnt.close();
-//            if (ret != 1) {
-//                log.fatal("Kassenzeichen " + object_id + " konnte nicht entsperrt werden. R\u00FCckgabewert des DeleteStmnts:" + ret + "(" + sql + ")");
-//            }
-//
-//        } catch (Exception e) {
-//            log.fatal("SQL Fehler beim Entsperren (Statement=" + sql + ")", e);
-//        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lockDataset() {
-        final String object_id = txtKassenzeichen.getText().trim();
-        return lockDataset(object_id);
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void unlockDataset() {
-        final String object_id = txtKassenzeichen.getText().trim();
-        if ((object_id != null) && (object_id.length() > 0)) {
-            unlockDataset(object_id);
-        }
-    }
-
-    @Override
-    public void historyChanged() {
-        if ((historyModel != null) && (historyModel.getCurrentElement() != null)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("historyChanged:" + historyModel.getCurrentElement().toString());
-            }
-            if ((historyModel.getCurrentElement() != null)
-                        && (!(historyModel.getCurrentElement().equals(txtSearch.getText())))) {
-                txtSearch.setText(historyModel.getCurrentElement().toString());
-                gotoKassenzeichen(txtSearch.getText(), false);
-            }
-        }
-    }
-
-    @Override
-    public void forwardStatusChanged() {
-    }
-
-    @Override
-    public void backStatusChanged() {
-    }
-
-    @Override
-    public void historyActionPerformed() {
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isEditmode() {
-        return editmode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  editmode  DOCUMENT ME!
-     */
-    public void setEditmode(final boolean editmode) {
-        this.editmode = editmode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CidsBean getKassenzeichenObject() {
-        return kassenzeichenBean;
+        CidsAppBackend.getInstance().gotoKassenzeichen(txtSearch.getText());
     }
 
     /**

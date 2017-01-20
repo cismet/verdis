@@ -32,8 +32,8 @@ public abstract class AbstractValidator implements Validator {
 
     //~ Instance fields --------------------------------------------------------
 
-    private ValidatorState state;
-    private Collection<ValidatorListener> listeners = new ArrayList();
+    private ValidatorState state = STATE_NONE;
+    private final Collection<ValidatorListener> listeners = new ArrayList();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -59,8 +59,9 @@ public abstract class AbstractValidator implements Validator {
     protected final void setState(final ValidatorState state) {
         // sicherstellen, dass nicht null gesetzt werden kann
         final ValidatorState setState = (state == null) ? STATE_NONE : state;
+        final ValidatorState thisState = (this.state == null) ? STATE_NONE : this.state;
 
-        final boolean hasChanged = (!setState.equals(this.state));
+        final boolean hasChanged = (!setState.equals(thisState));
 
         if (hasChanged) {
             this.state = setState;
@@ -88,18 +89,21 @@ public abstract class AbstractValidator implements Validator {
             LOG.debug("fire state changed");
         }
         for (final ValidatorListener listener : this.listeners) {
-            listener.stateChanged(state);
+            listener.stateChanged(this, state);
         }
     }
 
     @Override
-    public void attachDisplay(final ValidatorDisplay display) {
+    public Validator attachDisplay(final ValidatorDisplay display) {
         display.addValidator(this);
+        return this;
     }
 
     @Override
-    public void validate() {
-        setState(performValidation());
+    public ValidatorState validate() {
+        final ValidatorState state = performValidation();
+        setState(state);
+        return state;
     }
 
     /**
