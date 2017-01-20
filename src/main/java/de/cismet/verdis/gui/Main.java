@@ -205,8 +205,6 @@ import de.cismet.lookupoptions.gui.OptionsDialog;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
-import de.cismet.rmplugin.RMPlugin;
-
 import de.cismet.tools.Static2DTools;
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -418,7 +416,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final SAPClipboardListener sapClipboardListener = new SAPClipboardListener();
     private final TimeRecoveryPanel timeRecoveryPanel = TimeRecoveryPanel.getInstance();
 
-    private RMPlugin rmPlugin;
     private boolean fixMapExtent;
     private boolean isInit = true;
     private CidsBean kassenzeichenBean;
@@ -1123,15 +1120,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void setReadonly(final boolean readonly) {
         this.readonly = readonly;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  rmPlugin  DOCUMENT ME!
-     */
-    public void setRmPlugin(final RMPlugin rmPlugin) {
-        this.rmPlugin = rmPlugin;
     }
 
     /**
@@ -4808,19 +4796,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         LOG.debug("RMPlugin: Username "
                                     + (cidsAuth.getUserString() + "@" + appPreferences.getStandaloneDomainname()));
                     }
-
-                    final RMPlugin rmPlugin = new RMPlugin(
-                            Main.getInstance(),
-                            appPreferences.getPrimaryPort(),
-                            appPreferences.getSecondaryPort(),
-                            appPreferences.getRmRegistryServerPath(),
-                            cidsAuth.getUserString()
-                                    + "@"
-                                    + appPreferences.getStandaloneDomainname());
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: erfolgreich initialisiert (VerdisStandalone)");
-                    }
-                    main.setRmPlugin(rmPlugin);
                 }
 
                 main.init();
@@ -5815,12 +5790,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Dispose: Verdis wird beendet.");
-        }
-        if (rmPlugin != null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Dispose: RMPlugin wird heruntergefahren");
-            }
-            rmPlugin.setActive(false);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Dispose: layout wird gespeichert.");
