@@ -215,7 +215,9 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
     public void removeBean(final CidsBean cidsBean) {
         if (cidsBean != null) {
             try {
-                cidsBean.delete();
+                if (!Main.getInstance().getCurrentClipboard().getClipboardBeans().contains(cidsBean)) {
+                    cidsBean.delete();
+                }
             } catch (final Exception ex) {
                 LOG.error("error while removing befer", ex);
             }

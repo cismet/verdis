@@ -187,9 +187,9 @@ public class VerdisUtils {
 
         if (!crossreference) {
             final CidsBean befreiungerlaubnisBean = pasteBean;
-            final int id = BefreiungerlaubnisGeometrieTable.getNextNewBeanId();
+            final int id = BefreiungerlaubnisTable.getNextNewBeanId();
             befreiungerlaubnisBean.setProperty("id", id);
-            befreiungerlaubnisBean.getMetaObject().setID(-id);
+            befreiungerlaubnisBean.getMetaObject().setID(id);
             befreiungerlaubnisBean.getMetaObject().forceStatus(MetaObject.NEW);
         }
 
