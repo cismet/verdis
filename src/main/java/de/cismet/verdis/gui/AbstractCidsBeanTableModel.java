@@ -183,7 +183,6 @@ public abstract class AbstractCidsBeanTableModel extends AbstractTableModel {
      */
     public void removeCidsBean(final CidsBean cidsBean) {
         try {
-            cidsBean.delete();
             cidsBeans.remove(cidsBean);
             removedCidsBeans.add(cidsBean);
             fireTableDataChanged();
