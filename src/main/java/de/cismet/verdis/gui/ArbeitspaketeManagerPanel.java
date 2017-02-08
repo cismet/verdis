@@ -18,6 +18,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Color;
 import java.awt.Component;
 
@@ -1189,6 +1191,16 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         }
 
         //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void removeCidsBean(final CidsBean cidsBean) {
+            super.removeCidsBean(cidsBean);
+            try {
+                cidsBean.delete();
+            } catch (final Exception ex) {
+                CidsAppBackend.getInstance().showError("Fehler", "Fehler beim entfernen des Arbeitsauftrages.", ex);
+            }
+        }
 
         @Override
         public Object getValueAt(final int rowIndex, final int columnIndex) {
