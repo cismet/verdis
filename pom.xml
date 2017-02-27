@@ -86,7 +86,7 @@
         <dependency>
             <artifactId>cids-navigator</artifactId>
             <groupId>de.cismet.cids.navigator</groupId>
-            <version>4.0</version>
+            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>de.cismet.cismap</groupId>
