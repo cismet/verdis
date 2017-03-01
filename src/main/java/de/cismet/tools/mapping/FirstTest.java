@@ -12,22 +12,22 @@
  */
 package de.cismet.tools.mapping;
 
-import edu.umd.cs.piccolo.*;
-import edu.umd.cs.piccolo.nodes.*;
-import edu.umd.cs.piccolo.util.*;
-import edu.umd.cs.piccolox.event.*;
-import edu.umd.cs.piccolox.util.*;
-
-import org.postgis.*;
-
-import java.awt.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.sql.*;
-
-import java.util.*;
+//import edu.umd.cs.piccolo.*;
+//import edu.umd.cs.piccolo.nodes.*;
+//import edu.umd.cs.piccolo.util.*;
+//import edu.umd.cs.piccolox.event.*;
+//import edu.umd.cs.piccolox.util.*;
+//
+//import org.postgis.*;
+//
+//import java.awt.*;
+//
+//import java.io.IOException;
+//import java.io.InputStream;
+//
+//import java.sql.*;
+//
+//import java.util.*;
 
 //import org.deegree_impl.graphics.transformation.WorldToScreenTransform;
 
@@ -247,15 +247,15 @@ public class FirstTest extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formComponentResized(final java.awt.event.ComponentEvent evt) { //GEN-FIRST:event_formComponentResized
+    private void formComponentResized(final java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 //showPolygons();        // TODO add your handling code here:
-    } //GEN-LAST:event_formComponentResized
+    }//GEN-LAST:event_formComponentResized
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_formMouseClicked
-    }                                                                    //GEN-LAST:event_formMouseClicked
+    private void formMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+    }//GEN-LAST:event_formMouseClicked
 }

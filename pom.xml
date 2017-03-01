@@ -15,6 +15,12 @@
 
     <properties>
         <names.verdis-client>VerDIS Client</names.verdis-client>
+         <!--
+            WARNING: This DOES NOT override the netbeans.version in
+            cismet-ext-bom -> dependencyManagement needed to redeclare
+            netbeans dependencies.
+        -->
+        <netbeans.version>RELEASE731</netbeans.version>
     </properties>
    
     <name>${names.verdis-client}</name>
@@ -79,10 +85,9 @@
                 <version>5.0-SNAPSHOT</version>
                 <type>jar</type>
                 <!--
-                    set to provided: static final fields will be inlined by the bytecode compiler 
-                    both in the current classes, and in other classes!
+                    NO NOT set to provided!
                 -->
-                <scope>provided</scope>
+                <scope>compile</scope>
             </dependency>
             
             <dependency>
@@ -153,10 +158,63 @@
                 <type>jar</type>
             </dependency>      
             <!-- END: managed cids-dependencies -->  
+            
+            <!--
+                See https://cismet.slack.com/files/pascal.dihe/F4C0V99H9/netbeans-visual-diff-standalone
+            -->
+            <!-- BEGIN: Netbeans Dependencies -->
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-openide-util</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-openide-awt</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-openide-util-lookup</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-openide-dialogs</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-netbeans-api-progress</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-openide-filesystems</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.api</groupId>
+                <artifactId>org-netbeans-api-visual</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans.modules</groupId>
+                <artifactId>org-netbeans-libs-javacup</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+            </dependency>
+            <!-- BEGIN: Netbeans Dependencies -->
         </dependencies>
     </dependencyManagement>
 
-    
 
     <dependencies>
         <!-- BEGIN: cids-dependencies -->
@@ -203,6 +261,15 @@
             <artifactId>cids-custom-wuppertal</artifactId>
         </dependency>
         
+        <!--
+            Although verdis-commons contains only constants, DO NOT set the scope
+            to 'provided' since verdis-commons class are still needed for for .getClass().getResource()!
+        -->
+         <dependency>
+            <groupId>de.cismet.verdis</groupId>
+            <artifactId>verdis-commons</artifactId>
+        </dependency>
+        
         <dependency>
             <groupId>de.cismet.verdis</groupId>
             <artifactId>verdis-server</artifactId>
@@ -223,14 +290,6 @@
             <artifactId>3aweb</artifactId>
             <version>unknown</version>
         </dependency>
-
-        <!-- BEGIN: provided cids-dependencies -->
-        <dependency>
-            <groupId>de.cismet.verdis</groupId>
-            <artifactId>verdis-commons</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- END: provided cids-dependencies -->
         
         <!-- BEGIN: Managed dependencies -->
         <dependency>
@@ -282,6 +341,12 @@
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
@@ -302,6 +367,12 @@
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -313,6 +384,12 @@
             <groupId>net.sf.barcode4j</groupId>
             <artifactId>barcode4j</artifactId>
             <version>2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     
