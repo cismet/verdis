@@ -133,6 +133,7 @@
                 <artifactId>cismap-plugin</artifactId>
                 <version>5.0-SNAPSHOT</version>
                 <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             
             <dependency>
@@ -166,14 +167,16 @@
             <dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-util</artifactId>
-                <version>${netbeans.version}</version>
+                <version>RELEASE731</version>
                 <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-awt</artifactId>
-                <version>${netbeans.version}</version>
+                <version>RELEASE731</version>
                 <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.netbeans.api</groupId>
@@ -262,14 +265,40 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--<dependency>
+        
+        <dependency>
+            <groupId>de.cismet.cismap</groupId>
+            <artifactId>cismap-plugin</artifactId>
+            <exclusions>
+                <!--
+                    WARNING: overridden by org.netbeans.external:swing-layout
+                -->
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swing-layout</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismap-commons</artifactId>
-        </dependency>-->
+            <exclusions>
+                <!--
+                    WARNING: overridden by org.netbeans.external:swing-layout
+                -->
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swing-layout</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server</artifactId>
         </dependency>
+        
         <dependency>
             <groupId>de.cismet.cids.navigator</groupId>
             <artifactId>cids-navigator</artifactId>
@@ -283,6 +312,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>de.cismet.cids.custom.wupp</groupId>
             <artifactId>cids-custom-wuppertal</artifactId>
@@ -311,6 +341,7 @@
          <dependency>
             <groupId>de.cismet.verdis</groupId>
             <artifactId>verdis-commons</artifactId>
+            <scope>compile</scope>
         </dependency>
         
         <dependency>
@@ -329,23 +360,94 @@
         </dependency>
         
         <!-- BEGIN: Managed dependencies -->
-        
-        
+                <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-awt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.umd</groupId>
+            <artifactId>piccolo</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>edu.umd</groupId>
+            <artifactId>piccolox</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
-      
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom-legacy</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
-        
-        
         <dependency>
             <groupId>org.netbeans.external</groupId>
             <artifactId>swing-layout-1.0.4</artifactId>
+            <!-- 
+                override runtime scope in org.netbeans dependencies 
+            -->
             <scope>compile</scope>
+            <type>jar</type>
         </dependency>
         <!-- END: Managed dependencies -->
         
@@ -383,6 +485,28 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.infonode.docking</groupId>
+            <artifactId>docking</artifactId>
+            <version>1.5.0</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>looks</artifactId>
+            <version>2.2.2</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+
     </dependencies>
     
     <build>
