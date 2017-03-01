@@ -5,31 +5,20 @@
     <parent>
         <groupId>de.cismet.cids</groupId>
         <artifactId>cids-parent</artifactId>
-        <version>2.4</version>
+         <version>5.0-SNAPSHOT</version>
     </parent>
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
         <names.verdis-client>VerDIS Client</names.verdis-client>
     </properties>
+   
     <name>${names.verdis-client}</name>
-    
     <description>!!! description pending !!!</description>
-    <licenses>
-        <license>
-            <name>GNU General Public License</name>
-            <distribution>repo</distribution>
-            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
-        </license>
-    </licenses>
-
-    <prerequisites>
-        <maven>3</maven>
-    </prerequisites>
 
     <scm>
         <connection>https://github.com/cismet/verdis.git</connection>
@@ -38,66 +27,257 @@
       <tag>HEAD</tag>
   </scm>
 
-    <repositories>
-        <repository>
-            <id>cismet-repo</id>
-            <url>https://repo.cismet.de/repo</url>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-                <updatePolicy>daily</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-                <updatePolicy>interval:60</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
+  <issueManagement>
+      <system>GitHub</system>
+      <url>https://github.com/switchonproject/verdis-client/issues</url>
+  </issueManagement>
+    
+  <ciManagement>
+      <system>jenkins</system>
+      <url>https://ci.cismet.de/job/verdis-client/</url>
+  </ciManagement>
+    
+  <dependencyManagement>  
+      <!-- IMPORT of cismet-ext-bom -->
+      <dependencies>
+          <dependency>
+              <groupId>de.cismet</groupId>
+              <artifactId>cismet-ext-bom</artifactId>
+              <version>5.0-SNAPSHOT</version>
+              <type>pom</type>
+              <scope>import</scope>
+          </dependency>
+        
+          <!-- BEGIN: managed cids-dependencies -->
+          <dependency>
+              <groupId>de.cismet.commons</groupId>
+              <artifactId>cismet-commons</artifactId>
+              <version>5.0-SNAPSHOT</version>
+              <type>jar</type>
+              <scope>compile</scope>
+          </dependency>
+                        
+          <dependency>
+              <groupId>de.cismet.commons</groupId>
+              <artifactId>cismet-gui-commons</artifactId>
+              <version>5.0-SNAPSHOT</version>
+              <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>de.cismet.commons</groupId>
+                <artifactId>cismap-commons</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.verdis</groupId>
+                <artifactId>verdis-commons</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <!--
+                    set to provided: static final fields will be inlined by the bytecode compiler 
+                    both in the current classes, and in other classes!
+                -->
+                <scope>provided</scope>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.cids.custom.wupp.server</groupId>
+                <artifactId>cids-custom-server-wuppertal</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.cids.custom.wupp</groupId>
+                <artifactId>cids-custom-wuppertal</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+            </dependency>
+                                    
+            <dependency>
+                <groupId>de.cismet.cids</groupId>
+                <artifactId>cids-server</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+                        
+            <dependency>
+                <groupId>de.cismet.verdis</groupId>
+                <artifactId>verdis-server</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.cids.navigator</groupId>
+                <artifactId>cids-navigator</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+                        
+            <dependency>
+                <groupId>de.cismet.cismap</groupId>
+                <artifactId>cismap-plugin</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.custom</groupId>
+                <artifactId>netbeans-visual-diff-standalone</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.commons</groupId>
+                <artifactId>cismet-application-commons</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
+            
+            <dependency>
+                <groupId>de.cismet.custom</groupId>
+                <artifactId>beansbinding</artifactId>
+                <version>5.0-SNAPSHOT</version>
+                <scope>compile</scope>
+                <type>jar</type>
+            </dependency>      
+            <!-- END: managed cids-dependencies -->  
+        </dependencies>
+    </dependencyManagement>
+
+    
 
     <dependencies>
+        <!-- BEGIN: cids-dependencies -->
+        <!--
+            DANGER  DANGER  DANGER  DANGER  DANGER  DANGER  DANGER  DANGER 
+            cismet-deegree must have precedence over deegree-deegree due to incompatible
+            duplicate class  org.deegree.crs.Identifiable
+            
+            See https://cismet.slack.com/files/pascal.dihe/F454S3R0B/cids-deegree_v2_3_8_vs_deegree_v3_2_x
+        -->
+        <dependency>
+            <groupId>de.cismet.custom</groupId>
+            <artifactId>cismet-deegree</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismet-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismet-gui-commons</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismap-commons</artifactId>
+        </dependency>-->
+        <dependency>
+            <groupId>de.cismet.cids</groupId>
+            <artifactId>cids-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.cismet.cids.navigator</groupId>
+            <artifactId>cids-navigator</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>de.cismet.cismap</groupId>
+            <artifactId>cismap-plugin</artifactId>
+        </dependency>-->
+        <dependency>
+            <groupId>de.cismet.cids.custom.wupp</groupId>
+            <artifactId>cids-custom-wuppertal</artifactId>
+        </dependency>
+        
         <dependency>
             <groupId>de.cismet.verdis</groupId>
             <artifactId>verdis-server</artifactId>
-            <version>4.1.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+        
+        <dependency>
+            <groupId>de.cismet.custom</groupId>
+            <artifactId>beansbinding</artifactId>
+        </dependency> 
+        
+        <dependency>
+            <groupId>de.cismet.custom</groupId>
+            <artifactId>netbeans-visual-diff-standalone</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>de.cismet.todo</groupId>
+            <artifactId>3aweb</artifactId>
+            <version>unknown</version>
+        </dependency>
+
+        <!-- BEGIN: provided cids-dependencies -->
+        <dependency>
+            <groupId>de.cismet.verdis</groupId>
+            <artifactId>verdis-commons</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- END: provided cids-dependencies -->
+        
+        <!-- BEGIN: Managed dependencies -->
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swingx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-worker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom-legacy</artifactId>
+        </dependency>
+        <!-- END: Managed dependencies -->
+        
+        <!-- BEGIN: Provided dependencies -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- END: Provided dependencies -->
+        
+        <!-- BEGIN: runtime dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- BEGIN: runtime dependencies -->
+        
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>1.3.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.jdesktop</groupId>
-            <artifactId>swing-worker</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-<!-- Wahrswcheinlich ein Reihenfolgeproblem im Folgenden Block. Ueber jnlp starten funktioniert, Ueber Netbeans nicht. -->
-        <dependency>
-            <artifactId>cids-navigator</artifactId>
-            <groupId>de.cismet.cids.navigator</groupId>
-            <version>4.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet.cismap</groupId>
-            <artifactId>cismap-plugin</artifactId>
-            <version>4.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet.custom</groupId>
-            <artifactId>netbeans-visual-diff-standalone</artifactId>
-            <version>4.0</version>
-        </dependency>
+
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
@@ -123,46 +303,7 @@
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
         </dependency>
-        <dependency>
-            <groupId>de.cismet.cids.custom.wupp</groupId>
-            <artifactId>cids-custom-wuppertal</artifactId>
-            <version>4.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.kenai.nbpwr</groupId>
-            <artifactId>org-apache-commons-logging</artifactId>
-            <version>1.0.4-201003011305</version>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xmlParserAPIs</artifactId>
-            <version>2.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.3.03</version>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet.todo</groupId>
-            <artifactId>3aweb</artifactId>
-            <version>unknown</version>
-        </dependency>
-        <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swingx</artifactId>
-            <version>1.6</version>
-        </dependency>
+
         <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>filters</artifactId>
@@ -176,26 +317,27 @@
     </dependencies>
     
     <build>
-        <finalName>verdis_grundis_extension</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>de.cismet.verdis.gui.Main</mainClass>
-                        </manifest>
-                         <manifestEntries>
-                            <Application-Name>VerdIS</Application-Name>                           
-                            <Permissions>all-permissions</Permissions>                           
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>        
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>de.cismet.verdis.gui.Main</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>        
+            </plugins>
+        </pluginManagement>
         
+        <!--
+            CAUTION ! Ugly Winning bei der Namens-Auswahl !!! siehe Slack =>
+            https://cismet.slack.com/files/jruiz/F3ZC7HX7V/Snapshot_als_finalName_in_pom_xml
+        -->
+        <finalName>verdis_grundis_extension</finalName>
     </build>
 </project>
 
