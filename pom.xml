@@ -211,6 +211,19 @@
                 <version>${netbeans.version}</version>
                 <type>jar</type>
             </dependency>
+            <!--
+                WARNING: Overrides org.jdesktop artificat!
+            -->
+            <dependency>
+                <groupId>org.netbeans.external</groupId>
+                <artifactId>swing-layout-1.0.4</artifactId>
+                <version>${netbeans.version}</version>
+                <type>jar</type>
+                <!--
+                    Explicitely set compile scope
+                -->
+                <scope>compile</scope>
+            </dependency>
             <!-- BEGIN: Netbeans Dependencies -->
         </dependencies>
     </dependencyManagement>
@@ -224,13 +237,13 @@
             duplicate class  org.deegree.crs.Identifiable
             
             See https://cismet.slack.com/files/pascal.dihe/F454S3R0B/cids-deegree_v2_3_8_vs_deegree_v3_2_x
-        -->
+        
         <dependency>
             <groupId>de.cismet.custom</groupId>
             <artifactId>cismet-deegree</artifactId>
             <scope>compile</scope>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
         
         <dependency>
             <groupId>de.cismet.commons</groupId>
@@ -239,6 +252,15 @@
         <dependency>
             <groupId>de.cismet.commons</groupId>
             <artifactId>cismet-gui-commons</artifactId>
+            <exclusions>
+                <!--
+                    WARNING: overridden by org.netbeans.external:swing-layout
+                -->
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swing-layout</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--<dependency>
             <groupId>de.cismet.commons</groupId>
@@ -251,14 +273,35 @@
         <dependency>
             <groupId>de.cismet.cids.navigator</groupId>
             <artifactId>cids-navigator</artifactId>
+            <exclusions>
+                <!--
+                    WARNING: overridden by org.netbeans.external:swing-layout
+                -->
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swing-layout</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!--<dependency>
-            <groupId>de.cismet.cismap</groupId>
-            <artifactId>cismap-plugin</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>de.cismet.cids.custom.wupp</groupId>
             <artifactId>cids-custom-wuppertal</artifactId>
+            <exclusions>
+                <!--
+                    WARNING: overridden by org.netbeans.external:swing-layout
+                -->
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swing-layout</artifactId>
+                </exclusion>
+                <!--
+                    WARNING: overridden by org.netbeans ...
+                -->
+                <exclusion>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!--
@@ -285,32 +328,24 @@
             <artifactId>netbeans-visual-diff-standalone</artifactId>
         </dependency>
         
-        <dependency>
-            <groupId>de.cismet.todo</groupId>
-            <artifactId>3aweb</artifactId>
-            <version>unknown</version>
-        </dependency>
-        
         <!-- BEGIN: Managed dependencies -->
+        
+        
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swing-worker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
+      
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom-legacy</artifactId>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>org.netbeans.external</groupId>
+            <artifactId>swing-layout-1.0.4</artifactId>
+            <scope>compile</scope>
         </dependency>
         <!-- END: Managed dependencies -->
         
@@ -331,55 +366,12 @@
         </dependency>
         <!-- BEGIN: runtime dependencies -->
         
-        <dependency>
+        <!--<dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>1.3.1</version>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-saaj</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-wsdl4j</artifactId>
-            <version>1.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jhlabs</groupId>
-            <artifactId>filters</artifactId>
-            <version>2.0.235</version>
-        </dependency>
         <dependency>
             <groupId>net.sf.barcode4j</groupId>
             <artifactId>barcode4j</artifactId>
@@ -406,7 +398,40 @@
                             </manifest>
                         </archive>
                     </configuration>
-                </plugin>        
+                </plugin> 
+                <!--
+                    Need to extend the analyze-dependencies configuration of cismet-parent.pom
+                    and exclude jersey-json and axis:jar:1.4 from unused declared dependencies.
+                    
+                    TODO: Find put why this is neecessary?!
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>analyze-dependencies</id>
+                            <!-- 
+                                WARNING: Inheritance does not work for ignoredUnusedDeclaredDependencies
+                                Redeclare exclusiosn from https://github.com/cismet/cismet-parent if necessary
+                            -->
+                            <configuration>
+                                <ignoredUnusedDeclaredDependencies>
+                                    <!--
+                                         STRANGE maven-dependency-plugin:analyze-only behaviour:
+                                         - "class file for org.apache.axis.client.Service not found" if dependency axis is missing
+                                         - "Unused declared dependencies found: com.sun.jersey:jersey-json:jar:1.17.1:compile" if dependency jersey-json is present
+                                    -->
+                                    <ignoredUnusedDeclaredDependency>axis:axis:jar</ignoredUnusedDeclaredDependency>
+                                    <!-- 
+                                        jcl-over-slf4j logging bridge is needed to avoid commons-logging compatibility problems 
+                                    -->
+                                    <ignoredUnusedDeclaredDependency>org.slf4j:jcl-over-slf4j</ignoredUnusedDeclaredDependency>
+                                </ignoredUnusedDeclaredDependencies>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>                  
             </plugins>
         </pluginManagement>
         
