@@ -221,8 +221,8 @@
         </activatedProfiles>
     </action>
     <action>
-        <actionName>CUSTOM_visualdiff-Testapplication</actionName>
-        <displayName>visualdiff-Testapplication</displayName>
+        <actionName>CUSTOM-visualdiff-Testapplication</actionName>
+        <displayName>Visualdiff Testapplication</displayName>
         <packagings>
             <packaging>jar</packaging>
         </packagings>
