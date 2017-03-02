@@ -35,7 +35,7 @@
 
   <issueManagement>
       <system>GitHub</system>
-      <url>https://github.com/switchonproject/verdis-client/issues</url>
+      <url>https://github.com/cismet/verdis-client/issues</url>
   </issueManagement>
     
   <ciManagement>
