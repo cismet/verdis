@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>4.0.3</version>
+    <version>4.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -35,7 +35,7 @@
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v4.0.3</tag>
+      <tag>v4.1</tag>
   </scm>
 
     <repositories>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>de.cismet.verdis</groupId>
             <artifactId>verdis-server</artifactId>
-            <version>4.0</version>
+            <version>4.0.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -86,12 +86,12 @@
         <dependency>
             <artifactId>cids-navigator</artifactId>
             <groupId>de.cismet.cids.navigator</groupId>
-            <version>4.0</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>de.cismet.cismap</groupId>
             <artifactId>cismap-plugin</artifactId>
-            <version>4.0</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>de.cismet.custom</groupId>
@@ -126,7 +126,7 @@
         <dependency>
             <groupId>de.cismet.cids.custom.wupp</groupId>
             <artifactId>cids-custom-wuppertal</artifactId>
-            <version>4.0.1</version>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.kenai.nbpwr</groupId>
