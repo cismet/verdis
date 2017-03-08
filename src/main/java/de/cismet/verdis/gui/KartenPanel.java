@@ -38,7 +38,9 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
+import java.awt.Component;
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -69,6 +71,8 @@ import de.cismet.cismap.commons.RetrievalServiceLayer;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
 import de.cismet.cismap.commons.gui.MappingComponent;
+import de.cismet.cismap.commons.gui.ToolbarComponentDescription;
+import de.cismet.cismap.commons.gui.ToolbarComponentsProvider;
 import de.cismet.cismap.commons.gui.piccolo.AngleMeasurementDialog;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.*;
@@ -89,6 +93,7 @@ import de.cismet.gui.tools.PureNewFeatureWithThickerLineString;
 import de.cismet.tools.CurrentStackTrace;
 import de.cismet.tools.StaticDecimalTools;
 
+import de.cismet.tools.gui.BasicGuiComponentProvider;
 import de.cismet.tools.gui.JPopupMenuButton;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.JHistoryButton;
@@ -426,6 +431,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 //        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
 //            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
 //        }
+        initPluginToolbarComponents();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -660,6 +666,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         tobVerdis.setFloatable(false);
         tobVerdis.setMinimumSize(new java.awt.Dimension(1005, 30));
+        tobVerdis.setName("tobVerdis"); // NOI18N
         tobVerdis.setPreferredSize(new java.awt.Dimension(1005, 30));
 
         cmdFullPoly.setIcon(new javax.swing.ImageIcon(
@@ -1178,6 +1185,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSearchBaulasten.setFocusPainted(false);
         cmdSearchBaulasten.setFocusable(false);
         cmdSearchBaulasten.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdSearchBaulasten.setName("cmdBaulastSearch");                                              // NOI18N
         cmdSearchBaulasten.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/cids/custom/commons/gui/Baulast_selected.png"))); // NOI18N
         cmdSearchBaulasten.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -2220,6 +2228,62 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             } else {
                 lblInfo.setText("");
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initPluginToolbarComponents() {
+        final Collection<? extends ToolbarComponentsProvider> toolbarCompProviders = Lookup.getDefault()
+                    .lookupAll(
+                        ToolbarComponentsProvider.class);
+
+        if (toolbarCompProviders != null) {
+            for (final ToolbarComponentsProvider toolbarCompProvider : toolbarCompProviders) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Registering Toolbar Components for Plugin: " + toolbarCompProvider.getPluginName()); // NOI18N
+                }
+
+                final Collection<ToolbarComponentDescription> componentDescriptions =
+                    toolbarCompProvider.getToolbarComponents();
+
+                if (componentDescriptions != null) {
+                    for (final ToolbarComponentDescription componentDescription : componentDescriptions) {
+                        int insertionIndex = tobVerdis.getComponentCount();
+                        final String anchor = componentDescription.getAnchorComponentName();
+
+                        if (anchor != null) {
+                            for (int i = tobVerdis.getComponentCount(); --i >= 0;) {
+                                final Component currentAnchorCandidate = tobVerdis.getComponent(i);
+
+                                if (anchor.equals(currentAnchorCandidate.getName())) {
+                                    if (ToolbarComponentsProvider.ToolbarPositionHint.BEFORE.equals(
+                                                    componentDescription.getPositionHint())) {
+                                        insertionIndex = i;
+                                    } else {
+                                        insertionIndex = i + 1;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        tobVerdis.add(componentDescription.getComponent(), insertionIndex);
+                    }
+                }
+            }
+        }
+        final Collection<? extends BasicGuiComponentProvider> toolbarguiCompProviders = Lookup.getDefault()
+                    .lookupAll(BasicGuiComponentProvider.class);
+        if (toolbarguiCompProviders != null) {
+            for (final BasicGuiComponentProvider gui : toolbarguiCompProviders) {
+                if (gui.getType() == BasicGuiComponentProvider.GuiType.TOOLBARCOMPONENT) {
+                    final int insertionIndex = tobVerdis.getComponentCount();
+                    tobVerdis.add(gui.getComponent(), insertionIndex);
+                }
             }
         }
     }

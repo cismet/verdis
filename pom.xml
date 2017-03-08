@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -86,12 +86,12 @@
         <dependency>
             <artifactId>cids-navigator</artifactId>
             <groupId>de.cismet.cids.navigator</groupId>
-            <version>4.1</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>de.cismet.cismap</groupId>
             <artifactId>cismap-plugin</artifactId>
-            <version>4.1</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>de.cismet.custom</groupId>
@@ -126,7 +126,7 @@
         <dependency>
             <groupId>de.cismet.cids.custom.wupp</groupId>
             <artifactId>cids-custom-wuppertal</artifactId>
-            <version>4.1</version>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.kenai.nbpwr</groupId>
