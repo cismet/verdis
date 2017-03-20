@@ -20,7 +20,6 @@ import com.vividsolutions.jts.io.WKTReader;
 
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 
@@ -64,6 +63,8 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+
+import de.cismet.verdis.data.AppPreferences;
 
 import de.cismet.verdis.gui.Main;
 
@@ -1011,10 +1012,14 @@ public class FortfuehrungsanlaesseDialog extends javax.swing.JDialog {
                             cal.setTime(selectedFortfuehrungItem.getBeginn());
                             final int year = cal.get(Calendar.YEAR);
 
-                            final String urlString = "\\\\stadt\\102\\102\\ALKIS-Dokumente\\Fortführungsnachweise\\"
-                                        + year
-                                        + "\\FN_"
-                                        + year + "_" + ffn.substring(2, 6) + "_" + ffn.substring(6, 11) + ".pdf";
+                            final String urlFormat = CidsAppBackend.getInstance()
+                                        .getAppPreferences()
+                                        .getFortfuehrungLinkFormat();
+                            final String urlString = String.format(
+                                    urlFormat,
+                                    year,
+                                    ffn.substring(2, 6),
+                                    ffn.substring(6, 11));
                             setDokumentLink(urlString);
                         } catch (final Exception ex) {
                             setKassenzeichenNummern(null);

@@ -7,6 +7,10 @@
 ****************************************************/
 package de.cismet.verdis.data;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -27,6 +31,8 @@ import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
+@Getter
+@Setter(AccessLevel.PRIVATE)
 public class AppPreferences {
 
     //~ Instance fields --------------------------------------------------------
@@ -39,6 +45,7 @@ public class AppPreferences {
     private int kassenzeichenClassId;
     private int geomClassId;
     private String kassenzeichenSuche;
+    private String fortfuehrungLinkFormat;
     private Vector usergroups = new Vector();
     private Vector rwGroups = new Vector();
     private CismapPreferences cismapPrefs;
@@ -57,9 +64,9 @@ public class AppPreferences {
     private double flurstueckBuffer = -0.5;
     private boolean veranlagungOnlyForChangedValues = false;
 
-    private String appbackenddomain = null;
-    private String appbackendconnectionclass = null;
-    private String appbackendcallserverurl = null;
+    private String appbackendDomain = null;
+    private String appbackendConnectionclass = null;
+    private String appbackendCallserverurl = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -137,6 +144,7 @@ public class AppPreferences {
             kassenzeichenClassId = root.getChild("general").getAttribute("kassenzeichenClassId").getIntValue();
             geomClassId = root.getChild("general").getAttribute("geomClassId").getIntValue();
             kassenzeichenSuche = root.getChild("general").getAttribute("kassenzeichenSuche").getValue();
+            fortfuehrungLinkFormat = root.getChild("general").getAttribute("fortfuehrungLinkFormat").getValue();
             standaloneDomainname = root.getChild("standalone").getAttribute("userdomainname").getValue();
             standaloneCallServerHost = root.getChild("standalone").getAttribute("callserverhost").getValue();
             try {
@@ -251,380 +259,11 @@ public class AppPreferences {
 
         try {
             final Element cidsappbackendPrefs = root.getChild("cidsAppBackend");
-            appbackenddomain = cidsappbackendPrefs.getChildText("domain");
-            appbackendconnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
-            appbackendcallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
+            appbackendDomain = cidsappbackendPrefs.getChildText("domain");
+            appbackendConnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
+            appbackendCallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
         } catch (Exception ex) {
             log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getVerdisCrossoverPort() {
-        return verdisCrossoverPort;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  verdisCrossoverPort  DOCUMENT ME!
-     */
-    public void setVerdisCrossoverPort(final int verdisCrossoverPort) {
-        this.verdisCrossoverPort = verdisCrossoverPort;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getLagisCrossoverPort() {
-        return lagisCrossoverPort;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  lagisCrossoverPort  DOCUMENT ME!
-     */
-    public void setLagisCrossoverPort(final int lagisCrossoverPort) {
-        this.lagisCrossoverPort = lagisCrossoverPort;
-    }
-
-    /**
-     * ADDED FOR RM PLUGIN FUNCTIONALTY 22.07.07 Sebastian Puhl.
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getPrimaryPort() {
-        return primaryPort;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getSecondaryPort() {
-        return secondaryPort;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getRmRegistryServerPath() {
-        return rmRegistryServerPath;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  version  DOCUMENT ME!
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getEnvironment() {
-        return environment;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  environment  DOCUMENT ME!
-     */
-    public void setEnvironment(final String environment) {
-        this.environment = environment;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getMode() {
-        return mode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  mode  DOCUMENT ME!
-     */
-    public void setMode(final String mode) {
-        this.mode = mode;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getDomainserver() {
-        return domainserver;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  domainserver  DOCUMENT ME!
-     */
-    public void setDomainserver(final String domainserver) {
-        this.domainserver = domainserver;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getKassenzeichenClassId() {
-        return kassenzeichenClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  kassenzeichenClassId  DOCUMENT ME!
-     */
-    public void setKassenzeichenClassId(final int kassenzeichenClassId) {
-        this.kassenzeichenClassId = kassenzeichenClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getGeomClassId() {
-        return geomClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  geomClassId  DOCUMENT ME!
-     */
-    public void setGeomClassId(final int geomClassId) {
-        this.geomClassId = geomClassId;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getKassenzeichenSuche() {
-        return kassenzeichenSuche;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  kassenzeichenSuche  DOCUMENT ME!
-     */
-    public void setKassenzeichenSuche(final String kassenzeichenSuche) {
-        this.kassenzeichenSuche = kassenzeichenSuche;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CismapPreferences getCismapPrefs() {
-        return cismapPrefs;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  cismapPrefs  DOCUMENT ME!
-     */
-    public void setCismapPrefs(final CismapPreferences cismapPrefs) {
-        this.cismapPrefs = cismapPrefs;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Vector getRwGroups() {
-        return rwGroups;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getReportUrl() {
-        return reportUrl;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  reportUrl  DOCUMENT ME!
-     */
-    public void setReportUrl(final String reportUrl) {
-        this.reportUrl = reportUrl;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public HashMap<String, AbstractWFSForm> getWfsForms() {
-        return wfsForms;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Vector getUsergroups() {
-        return usergroups;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  usergroups  DOCUMENT ME!
-     */
-    public void setUsergroups(final Vector usergroups) {
-        this.usergroups = usergroups;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getStandaloneDomainname() {
-        return standaloneDomainname;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  standaloneDomainname  DOCUMENT ME!
-     */
-    public void setStandaloneDomainname(final String standaloneDomainname) {
-        this.standaloneDomainname = standaloneDomainname;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getStandaloneCallServerHost() {
-        return standaloneCallServerHost;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getCallServerUrl() {
-        return standaloneCallServerHost;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  standaloneCallServerHost  DOCUMENT ME!
-     */
-    public void setStandaloneCallServerHost(final String standaloneCallServerHost) {
-        this.standaloneCallServerHost = standaloneCallServerHost;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public double getFlurstueckBuffer() {
-        return flurstueckBuffer;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  flurstueckBuffer  DOCUMENT ME!
-     */
-    public void setFlurstueckBuffer(final double flurstueckBuffer) {
-        this.flurstueckBuffer = flurstueckBuffer;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getAppbackendCallserverurl() {
-        return appbackendcallserverurl;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getAppbackendConnectionclass() {
-        return appbackendconnectionclass;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getAppbackendDomain() {
-        return appbackenddomain;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isVeranlagungOnlyForChangedValues() {
-        return veranlagungOnlyForChangedValues;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  veranlagungOnlyForChangedValues  DOCUMENT ME!
-     */
-    public void setVeranlagungOnlyForChangedValues(final boolean veranlagungOnlyForChangedValues) {
-        this.veranlagungOnlyForChangedValues = veranlagungOnlyForChangedValues;
     }
 }
