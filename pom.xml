@@ -178,12 +178,12 @@
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-util-lookup</artifactId>
                 <version>${netbeans.version}</version>
                 <type>jar</type>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-dialogs</artifactId>
@@ -357,6 +357,12 @@
         <dependency>
             <groupId>de.cismet.custom</groupId>
             <artifactId>netbeans-visual-diff-standalone</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.netbeans.api</groupId>
+                    <artifactId>org-netbeans-api-annotations-common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!-- BEGIN: Managed dependencies -->
@@ -367,7 +373,13 @@
          <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
-        </dependency>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.netbeans.api</groupId>
+                     <artifactId>org-netbeans-api-annotations-common</artifactId>
+                 </exclusion>
+             </exclusions>
+         </dependency>
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
