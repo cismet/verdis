@@ -178,12 +178,12 @@
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
-            <!--<dependency>
+            <dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-util-lookup</artifactId>
                 <version>${netbeans.version}</version>
                 <type>jar</type>
-            </dependency>-->
+            </dependency>
             <dependency>
                 <groupId>org.netbeans.api</groupId>
                 <artifactId>org-openide-dialogs</artifactId>
@@ -514,6 +514,11 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-lookup</artifactId>
+            <version>RELEASE731</version>
         </dependency>
     </dependencies>
     
