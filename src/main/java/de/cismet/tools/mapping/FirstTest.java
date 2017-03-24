@@ -12,22 +12,22 @@
  */
 package de.cismet.tools.mapping;
 
-import edu.umd.cs.piccolo.*;
-import edu.umd.cs.piccolo.nodes.*;
-import edu.umd.cs.piccolo.util.*;
-import edu.umd.cs.piccolox.event.*;
-import edu.umd.cs.piccolox.util.*;
-
-import org.postgis.*;
-
-import java.awt.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.sql.*;
-
-import java.util.*;
+//import edu.umd.cs.piccolo.*;
+//import edu.umd.cs.piccolo.nodes.*;
+//import edu.umd.cs.piccolo.util.*;
+//import edu.umd.cs.piccolox.event.*;
+//import edu.umd.cs.piccolox.util.*;
+//
+//import org.postgis.*;
+//
+//import java.awt.*;
+//
+//import java.io.IOException;
+//import java.io.InputStream;
+//
+//import java.sql.*;
+//
+//import java.util.*;
 
 //import org.deegree_impl.graphics.transformation.WorldToScreenTransform;
 
