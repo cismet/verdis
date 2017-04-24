@@ -322,17 +322,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
 
     /**
      * DOCUMENT ME!
-     */
-    public void save() {
-        try {
-            kassenzeichenBean.persist();
-        } catch (Exception e) {
-            LOG.error("couldn't persist cidsbean", e);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @param   tablename  DOCUMENT ME!
      *
@@ -706,6 +695,19 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                 LOG.error("error during retrieval of object", ex);
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<CrossReference> getFlaechenCrossReferences() {
+        final Collection<CrossReference> all = new HashSet<CrossReference>();
+        for (final Collection coll : (Collection<Collection>)flaechenidToCrossReferences.values()) {
+            all.addAll(coll);
+        }
+        return all;
     }
 
     /**
