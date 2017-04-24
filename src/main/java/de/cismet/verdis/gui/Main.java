@@ -229,6 +229,7 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.BefreiungerlaubnisGeometrieClipboard;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.ClipboardListener;
+import de.cismet.verdis.CrossReference;
 import de.cismet.verdis.FlaechenClipboard;
 import de.cismet.verdis.FrontenClipboard;
 import de.cismet.verdis.KassenzeichenGeometrienClipboard;
@@ -5185,6 +5186,81 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      *
+     * @param   kassenzeichenBean              DOCUMENT ME!
+     * @param   crosslinkKassenzeichenBeanMap  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void createGeometrieCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
+            final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
+        final List<CidsBean> savedGeoms = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+
+        final Collection<CrossReference> crossrefs = CidsAppBackend.getInstance().getFlaechenCrossReferences();
+
+        final Collection<CidsBean> notAllSameKzBeans = new ArrayList<CidsBean>(crossrefs.size());
+        WaitDialog.getInstance().startCreateCrossLinks(crossrefs.size());
+
+        final Map<Integer, CidsBean> crosslinkKassenzeichenBeanTmpMap = new HashMap<>(crossrefs.size());
+
+        final Collection<CidsBean> crossKassenzeichenList = new ArrayList<CidsBean>();
+        // alle (Flächen-)Querverweise durchgehen
+        int index = 0;
+        for (final CrossReference crossref : crossrefs.toArray(new CrossReference[0])) {
+            WaitDialog.getInstance().progressCreateCrossLinks(index);
+            final CidsBean crossKassenzeichen;
+            final Integer crossKassenzeichenNummer = crossref.getEntityToKassenzeichen();
+            if (crosslinkKassenzeichenBeanMap.containsKey(crossKassenzeichenNummer)) {
+                crossKassenzeichen = crosslinkKassenzeichenBeanMap.get(crossKassenzeichenNummer);
+            } else {
+                crossKassenzeichen = CidsAppBackend.getInstance().loadKassenzeichenByNummer(crossKassenzeichenNummer);
+            }
+            crosslinkKassenzeichenBeanTmpMap.put(crossKassenzeichenNummer, crossKassenzeichen);
+
+            crossKassenzeichenList.add(crossKassenzeichen);
+            final List<CidsBean> crossGeoms = crossKassenzeichen.getBeanCollectionProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+
+            // selbe Anzahl an KZ-Geometrien vorhanden ?
+            boolean allSame = crossGeoms.size() == savedGeoms.size();
+            for (final CidsBean savedGeom : savedGeoms) {
+                if (!allSame) {
+                    break;
+                }
+                // Querverweise-Kz-Geometrie enthält Kz-Geometrie ?
+                allSame = crossGeoms.contains(savedGeom);
+            }
+
+            // nicht alle Querverweis-Kz-Geometrien identisch mit allen KZ-Geometrien ?
+            if (!allSame) {
+                notAllSameKzBeans.add(crossKassenzeichen);
+            }
+            index++;
+        }
+
+        if (!notAllSameKzBeans.isEmpty()) {
+            final int answer = JOptionPane.showConfirmDialog(
+                    this,
+                    "Soll die Georeferenzierung auf alle verbundenen Kassenzeichen (Querverweise) übernommen werden?",
+                    "Georeferenzierung - Querverweise",
+                    JOptionPane.YES_NO_OPTION);
+            if (answer == JOptionPane.YES_OPTION) {
+                for (final CidsBean crossKassenzeichen : crossKassenzeichenList) {
+                    final List<CidsBean> crossGeoms = crossKassenzeichen.getBeanCollectionProperty(
+                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    // Querverweis-Kz-Geometrien ersetzen mit KZ-Geometrien
+                    crossGeoms.clear();
+                    crossGeoms.addAll(savedGeoms);
+                }
+                crosslinkKassenzeichenBeanMap.putAll(crosslinkKassenzeichenBeanTmpMap);
+            }
+        }
+        WaitDialog.getInstance().progressCreateCrossLinks(crossKassenzeichenList.size());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   kassenzeichenBean               DOCUMENT ME!
      * @param   nummerToKassenzeichennummerMap  DOCUMENT ME!
      * @param   crosslinkKassenzeichenBeanMap   DOCUMENT ME!
@@ -5262,9 +5338,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public CidsBean saveKassenzeichen(final CidsBean kassenzeichenBean) throws Exception {
         WaitDialog.getInstance().startSavingKassenzeichen(1);
 
+        final Collection<CidsBean> flaecheBeans = kassenzeichenBean.getBeanCollectionProperty(
+                KassenzeichenPropertyConstants.PROP__FLAECHEN);
         // set change date for flaechen
-        for (final CidsBean flaecheBean
-                    : kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+        for (final CidsBean flaecheBean : flaecheBeans) {
             if ((flaecheBean != null)
                         && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
                             || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
@@ -5297,6 +5374,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             persistedKassenzeichenBean,
             flaechebezeichnungToKassenzeichennummerMap,
             kassenzeichennummerToBeanMap);
+
+        // (flächen-)querverweise vorhanden?
+        boolean allTeileigentum = !CidsAppBackend.getInstance().getFlaechenCrossReferences().isEmpty();
+        for (final CidsBean flaecheBean : flaecheBeans) {
+            if (!allTeileigentum) {
+                break;
+            }
+            if (flaecheBean != null) {
+                // Anteil gesetzt ?
+                allTeileigentum = flaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL) != null;
+            }
+        }
+
+        // alle Flächen haben einen Anteil gesetzt ?
+        if (allTeileigentum) {
+            // Geometrie-Querverweise anlegen (falls nötig)
+            createGeometrieCrosslinkKassenzeichenBeans(persistedKassenzeichenBean, kassenzeichennummerToBeanMap);
+        }
 
         createFrontenCrosslinkKassenzeichenBeans(
             persistedKassenzeichenBean,

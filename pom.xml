@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-commons</artifactId>
-                <version>5.0</version>
+                <version>5.0.1</version>
                 <type>jar</type>
                 <!--
                     NO NOT set to provided!
@@ -115,7 +115,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>5.0</version>
+                <version>5.1.1</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
