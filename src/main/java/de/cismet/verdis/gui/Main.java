@@ -259,7 +259,6 @@ import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieDetailsPanel;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTable;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTablePanel;
-import de.cismet.verdis.gui.fortfuehrung.FortfuehrungsanlaesseDialog;
 import de.cismet.verdis.gui.history.HistoryPanel;
 import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienPanel;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
@@ -4103,7 +4102,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCMENT ME!
      */
     private void cmdFortfuehrungActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFortfuehrungActionPerformed
-        StaticSwingTools.showDialog(FortfuehrungsanlaesseDialog.getInstance());
+        StaticSwingTools.showDialog(VerdisFortfuehrungsanlaesseDialog.getInstance());
     }                                                                                   //GEN-LAST:event_cmdFortfuehrungActionPerformed
 
     /**
