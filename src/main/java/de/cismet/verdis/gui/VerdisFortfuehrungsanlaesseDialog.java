@@ -143,7 +143,6 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
                 (String)rawItem[VerdisFortfuehrungItemSearch.FIELD_FFN],
                 (String)rawItem[VerdisFortfuehrungItemSearch.FIELD_ANLASSNAME],
                 (Date)rawItem[VerdisFortfuehrungItemSearch.FIELD_BEGINN],
-                (Integer)rawItem[VerdisFortfuehrungItemSearch.FIELD_FLURSTUECK_ID],
                 (String)rawItem[VerdisFortfuehrungItemSearch.FIELD_FS_ALT],
                 (String)rawItem[VerdisFortfuehrungItemSearch.FIELD_FS_NEU],
                 (Integer)rawItem[VerdisFortfuehrungItemSearch.FIELD_FORTFUEHRUNG_ID]);
@@ -384,8 +383,8 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
                                 FortfuehrungPropertyConstants.PROP__ALKIS_FFN_ID,
                                 selectedFortfuehrungItem.getAnlassId());
                             fortfuehrungBean.setProperty(
-                                FortfuehrungPropertyConstants.PROP__FLURSTUECK_ID,
-                                selectedFortfuehrungItem.getFlurstueck_id());
+                                FortfuehrungPropertyConstants.PROP__ALKIS_FFN,
+                                selectedFortfuehrungItem.getFfn());
                             fortfuehrungBean.setProperty(
                                 FortfuehrungPropertyConstants.PROP__ABGEARBEITET_AM,
                                 new Timestamp(new Date().getTime()));
@@ -393,16 +392,16 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
                                 FortfuehrungPropertyConstants.PROP__ABGEARBEITET_VON,
                                 SessionManager.getSession().getUser().getName());
                             final CidsBean persisted = fortfuehrungBean.persist();
-                            selectedFortfuehrungItem.setFortfuehrung_id(persisted.getMetaObject().getId());
+                            selectedFortfuehrungItem.setFortfuehrungId(persisted.getMetaObject().getId());
                         } else {
                             final MetaClass mc = CidsAppBackend.getInstance()
                                         .getVerdisMetaClass(VerdisMetaClassConstants.MC_FORTFUEHRUNG);
                             final CidsBean fortfuehrungBean = CidsAppBackend.getInstance()
-                                        .getVerdisMetaObject(selectedFortfuehrungItem.getFortfuehrung_id(), mc.getId())
+                                        .getVerdisMetaObject(selectedFortfuehrungItem.getFortfuehrungId(), mc.getId())
                                         .getBean();
                             fortfuehrungBean.delete();
                             fortfuehrungBean.persist();
-                            selectedFortfuehrungItem.setFortfuehrung_id(null);
+                            selectedFortfuehrungItem.setFortfuehrungId(null);
                         }
                     } catch (Exception ex) {
                         LOG.error("fehler beim setzen von ist_abgearbeitet", ex);
@@ -412,7 +411,7 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
 
                 @Override
                 protected void done() {
-                    getFFTableModel().fireTableDataChanged();
+                    refreshFortfuehrungsList();
                 }
             }.execute();
     } //GEN-LAST:event_cbxAbgearbeitetActionPerformed
