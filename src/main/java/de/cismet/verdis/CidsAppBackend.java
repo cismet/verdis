@@ -44,7 +44,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import java.awt.Color;
 import java.awt.Frame;
 
-import java.io.IOException;
 
 import java.util.*;
 
@@ -62,7 +61,6 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
-import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -155,13 +153,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private final MultiMap flaechenidToCrossReferences = new MultiMap();
     private final MultiMap frontenCrossReferences = new MultiMap();
     private final MultiMap befreiungerlaubnisCrossReferences = new MultiMap();
-    private final ArrayList<CidsBeanStore> beanStores = new ArrayList<CidsBeanStore>();
-    private final ArrayList<EditModeListener> editModeListeners = new ArrayList<EditModeListener>();
-    private final ArrayList<AppModeListener> appModeListeners = new ArrayList<AppModeListener>();
-    private final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
-    private final Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap = new HashMap<CidsBean, Integer>();
-    private final Map<CidsBean, Integer> befreiungerlaubnisToKassenzeichenQuerverweisMap =
-        new HashMap<CidsBean, Integer>();
+    private final ArrayList<CidsBeanStore> beanStores = new ArrayList<>();
+    private final ArrayList<EditModeListener> editModeListeners = new ArrayList<>();
+    private final ArrayList<AppModeListener> appModeListeners = new ArrayList<>();
+    private final Map<CidsBean, Collection<Integer>> flaecheToKassenzeichenQuerverweisMap = new HashMap<>();
+    private final Map<CidsBean, Collection<Integer>> frontToKassenzeichenQuerverweisMap = new HashMap<>();
+    private final Map<CidsBean, Collection<Integer>> befreiungerlaubnisToKassenzeichenQuerverweisMap = new HashMap<>();
     private String domain = DOMAIN;
     private final ConnectionProxy proxy;
     private final AppPreferences appPreferences;
@@ -1346,7 +1343,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public Map<CidsBean, Integer> getFlaecheToKassenzeichenQuerverweisMap() {
+    public Map<CidsBean, Collection<Integer>> getFlaecheToKassenzeichenQuerverweisMap() {
         return flaecheToKassenzeichenQuerverweisMap;
     }
 
@@ -1355,7 +1352,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public Map<CidsBean, Integer> getFrontToKassenzeichenQuerverweisMap() {
+    public Map<CidsBean, Collection<Integer>> getFrontToKassenzeichenQuerverweisMap() {
         return frontToKassenzeichenQuerverweisMap;
     }
 
@@ -1364,7 +1361,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @return  DOCUMENT ME!
      */
-    public Map<CidsBean, Integer> getBefreiungerlaubnisToKassenzeichenQuerverweisMap() {
+    public Map<CidsBean, Collection<Integer>> getBefreiungerlaubnisToKassenzeichenQuerverweisMap() {
         return befreiungerlaubnisToKassenzeichenQuerverweisMap;
     }
 

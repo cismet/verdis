@@ -5134,7 +5134,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @throws  Exception  DOCUMENT ME!
      */
     private void createFlaecheCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
-            final Map<String, Integer> bezeichnungToKassenzeichennummerMap,
+            final Map<String, Collection<Integer>> bezeichnungToKassenzeichennummerMap,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedFlaechen = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -5147,35 +5147,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             // in der Map schauen ob für die abgespeicherte Flaechen ein Querverweis erzeugt werden soll
             if (bezeichnungToKassenzeichennummerMap.containsKey(flaechenBezeichnung)) {
-                final int zielKassenzeichennummer = bezeichnungToKassenzeichennummerMap.get(
-                        flaechenBezeichnung);
+                for (final int zielKassenzeichennummer : bezeichnungToKassenzeichennummerMap.get(flaechenBezeichnung)) {
+                    // in welches Kassenzeichen soll der Querverweis erzeugt werden
+                    final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
+                            zielKassenzeichennummer);
+                    if (querverweisKassenzeichenBean != null) {
+                        final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
+                            querverweisKassenzeichenBean.getBeanCollectionProperty(
+                                KassenzeichenPropertyConstants.PROP__FLAECHEN);
 
-                // in welches Kassenzeichen soll der Querverweis erzeugt werden
-                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
-                        zielKassenzeichennummer);
-                if (querverweisKassenzeichenBean != null) {
-                    final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
-                        querverweisKassenzeichenBean.getBeanCollectionProperty(
-                            KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                        // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
+                        final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
+                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        + "."
+                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
+                        final CidsBean querverweisFlaecheBean = RegenFlaechenTable.createNewFlaecheBean(
+                                flaechenartBean,
+                                flaechenOfQuerverweisKassenzeichen,
+                                null);
 
-                    // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
-                    final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                    + "."
-                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
-                    final CidsBean querverweisFlaecheBean = RegenFlaechenTable.createNewFlaecheBean(
-                            flaechenartBean,
-                            flaechenOfQuerverweisKassenzeichen,
-                            null);
+                        // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
+                        querverweisFlaecheBean.setProperty(
+                            FlaechePropertyConstants.PROP__FLAECHENINFO,
+                            savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
 
-                    // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
-                    querverweisFlaecheBean.setProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO,
-                        savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
-
-                    flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
-                } else {
-                    LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                        flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
+                    } else {
+                        LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                    }
                 }
             }
         }
@@ -5267,7 +5266,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @throws  Exception  DOCUMENT ME!
      */
     private void createFrontenCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
-            final Map<Integer, Integer> nummerToKassenzeichennummerMap,
+            final Map<Integer, Collection<Integer>> nummerToKassenzeichennummerMap,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedFronten = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
@@ -5280,45 +5279,44 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             // in der Map schauen ob für die abgespeicherte Front ein Querverweis erzeugt werden soll
             if (nummerToKassenzeichennummerMap.containsKey(frontNummer)) {
-                final int zielKassenzeichennummer = nummerToKassenzeichennummerMap.get(
-                        frontNummer);
+                for (final int zielKassenzeichennummer : nummerToKassenzeichennummerMap.get(frontNummer)) {
+                    // in welches Kassenzeichen soll der Querverweis erzeugt werden
+                    final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
+                            zielKassenzeichennummer);
+                    if (querverweisKassenzeichenBean != null) {
+                        final Collection<CidsBean> frontenOfQuerverweisKassenzeichen =
+                            querverweisKassenzeichenBean.getBeanCollectionProperty(
+                                KassenzeichenPropertyConstants.PROP__FRONTEN);
 
-                // in welches Kassenzeichen soll der Querverweis erzeugt werden
-                final CidsBean querverweisKassenzeichenBean = crosslinkKassenzeichenBeanMap.get(
-                        zielKassenzeichennummer);
-                if (querverweisKassenzeichenBean != null) {
-                    final Collection<CidsBean> frontenOfQuerverweisKassenzeichen =
-                        querverweisKassenzeichenBean.getBeanCollectionProperty(
-                            KassenzeichenPropertyConstants.PROP__FRONTEN);
+                        // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
+                        final CidsBean strasseBean = (CidsBean)savedFront.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                        + "."
+                                        + FrontinfoPropertyConstants.PROP__STRASSE);
+                        final CidsBean lageBean = (CidsBean)savedFront.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                        + "."
+                                        + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                        final CidsBean reinigungBean = (CidsBean)savedFront.getProperty(
+                                FrontPropertyConstants.PROP__FRONTINFO
+                                        + "."
+                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                        final CidsBean querverweisFrontBean = SRFrontenTable.createNewFrontBean(
+                                strasseBean,
+                                lageBean,
+                                reinigungBean,
+                                frontenOfQuerverweisKassenzeichen,
+                                null);
 
-                    // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
-                    final CidsBean strasseBean = (CidsBean)savedFront.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                                    + "."
-                                    + FrontinfoPropertyConstants.PROP__STRASSE);
-                    final CidsBean lageBean = (CidsBean)savedFront.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                                    + "."
-                                    + FrontinfoPropertyConstants.PROP__LAGE_SR);
-                    final CidsBean reinigungBean = (CidsBean)savedFront.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
-                                    + "."
-                                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
-                    final CidsBean querverweisFrontBean = SRFrontenTable.createNewFrontBean(
-                            strasseBean,
-                            lageBean,
-                            reinigungBean,
-                            frontenOfQuerverweisKassenzeichen,
-                            null);
+                        // Überschreiben der FrontInfo zum Erzeugen des Querverweises auf der neuen Front.
+                        querverweisFrontBean.setProperty(
+                            FrontPropertyConstants.PROP__FRONTINFO,
+                            savedFront.getProperty(FrontPropertyConstants.PROP__FRONTINFO));
 
-                    // Überschreiben der FrontInfo zum Erzeugen des Querverweises auf der neuen Front.
-                    querverweisFrontBean.setProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO,
-                        savedFront.getProperty(FrontPropertyConstants.PROP__FRONTINFO));
-
-                    frontenOfQuerverweisKassenzeichen.add(querverweisFrontBean);
-                } else {
-                    LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                        frontenOfQuerverweisKassenzeichen.add(querverweisFrontBean);
+                    } else {
+                        LOG.error("kassenzeichen " + zielKassenzeichennummer + " konnte nicht geladen werden");
+                    }
                 }
             }
         }
@@ -5350,21 +5348,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         }
 
-        final Map<CidsBean, Integer> flaecheToCrosslinknummerMap = CidsAppBackend.getInstance()
+        final Map<CidsBean, Collection<Integer>> flaecheToCrosslinknummerMap = CidsAppBackend.getInstance()
                     .getFlaecheToKassenzeichenQuerverweisMap();
-        final Map<String, Integer> flaechebezeichnungToKassenzeichennummerMap =
+        final Map<String, Collection<Integer>> flaechebezeichnungToKassenzeichennummerMap =
             createFlaechebezeichnungToKassenzeichennummerMap(flaecheToCrosslinknummerMap);
 
-        final Map<CidsBean, Integer> frontToCrosslinknummerMap = CidsAppBackend.getInstance()
+        final Map<CidsBean, Collection<Integer>> frontToCrosslinknummerMap = CidsAppBackend.getInstance()
                     .getFrontToKassenzeichenQuerverweisMap();
-        final Map<Integer, Integer> frontNummerToKassenzeichennummerMap = createFrontnummerToKassenzeichennummerMap(
+        final Map<Integer, Collection<Integer>> frontNummerToKassenzeichennummerMap =
+            createFrontnummerToKassenzeichennummerMap(
                 frontToCrosslinknummerMap);
 
         final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
 
         final Collection<Integer> kassenzeichennummern = new ArrayList<Integer>();
-        kassenzeichennummern.addAll(flaecheToCrosslinknummerMap.values());
-        kassenzeichennummern.addAll(frontToCrosslinknummerMap.values());
+        for (final Collection<Integer> flaechecrosslinks : flaecheToCrosslinknummerMap.values()) {
+            kassenzeichennummern.addAll(flaechecrosslinks);
+        }
+        for (final Collection<Integer> frontcrosslinks : frontToCrosslinknummerMap.values()) {
+            kassenzeichennummern.addAll(frontcrosslinks);
+        }
 
         final Map<Integer, CidsBean> kassenzeichennummerToBeanMap = loadKassenzeichennummerToBeanMap(
                 kassenzeichennummern);
@@ -5442,13 +5445,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private static HashMap<String, Integer> createFlaechebezeichnungToKassenzeichennummerMap(
-            final Map<CidsBean, Integer> flaecheToKassenzeichenQuerverweisMap) {
-        final HashMap<String, Integer> bezeichnungToKassenzeichennummerMap = new HashMap<String, Integer>();
+    private static HashMap<String, Collection<Integer>> createFlaechebezeichnungToKassenzeichennummerMap(
+            final Map<CidsBean, Collection<Integer>> flaecheToKassenzeichenQuerverweisMap) {
+        final HashMap<String, Collection<Integer>> bezeichnungToKassenzeichennummerMap = new HashMap<>();
         for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
             final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
                     FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            final Integer querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
+            final Collection<Integer> querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
                     unsavedFlaecheBean);
             bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
         }
@@ -5462,13 +5465,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private static HashMap<Integer, Integer> createFrontnummerToKassenzeichennummerMap(
-            final Map<CidsBean, Integer> frontToKassenzeichenQuerverweisMap) {
-        final HashMap<Integer, Integer> nummerToKassenzeichennummerMap = new HashMap<Integer, Integer>();
+    private static HashMap<Integer, Collection<Integer>> createFrontnummerToKassenzeichennummerMap(
+            final Map<CidsBean, Collection<Integer>> frontToKassenzeichenQuerverweisMap) {
+        final HashMap<Integer, Collection<Integer>> nummerToKassenzeichennummerMap = new HashMap<>();
         for (final CidsBean unsavedFrontBean : frontToKassenzeichenQuerverweisMap.keySet()) {
             final Integer frontNummer = (Integer)unsavedFrontBean.getProperty(
                     FrontPropertyConstants.PROP__NUMMER);
-            final Integer querverweisKassenzeichenNummer = frontToKassenzeichenQuerverweisMap.get(
+            final Collection<Integer> querverweisKassenzeichenNummer = frontToKassenzeichenQuerverweisMap.get(
                     unsavedFrontBean);
             nummerToKassenzeichennummerMap.put(frontNummer, querverweisKassenzeichenNummer);
         }

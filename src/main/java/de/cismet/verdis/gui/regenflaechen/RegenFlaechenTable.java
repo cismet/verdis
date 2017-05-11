@@ -35,7 +35,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import edu.umd.cs.piccolox.event.PNotification;
 
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.*;
 
 import java.awt.Color;
@@ -47,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -56,7 +56,6 @@ import javax.swing.SortOrder;
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cismap.commons.features.PureNewFeature;
 import de.cismet.cismap.commons.features.SplittedNewFeature;
@@ -500,9 +499,17 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                 if (crossreferences != null) {
                     for (final CrossReference crossreference : crossreferences) {
                         final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
-                        CidsAppBackend.getInstance()
-                                .getFlaecheToKassenzeichenQuerverweisMap()
-                                .put(flaecheBean, kassenzeichenNummer);
+
+                        final Map<CidsBean, Collection<Integer>> crosslinkMap = CidsAppBackend.getInstance()
+                                    .getFlaecheToKassenzeichenQuerverweisMap();
+                        final Collection<Integer> crosslinks;
+                        if (crosslinkMap.containsKey(flaecheBean)) {
+                            crosslinks = crosslinkMap.get(flaecheBean);
+                        } else {
+                            crosslinks = new ArrayList<>();
+                            crosslinkMap.put(flaecheBean, crosslinks);
+                        }
+                        crosslinks.add(kassenzeichenNummer);
                     }
                 }
             }
