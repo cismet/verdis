@@ -44,7 +44,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import java.awt.Color;
 import java.awt.Frame;
 
-
 import java.util.*;
 
 import javax.swing.JDialog;
