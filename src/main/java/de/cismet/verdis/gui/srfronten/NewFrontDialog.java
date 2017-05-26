@@ -52,6 +52,8 @@ public class NewFrontDialog extends javax.swing.JDialog {
         super((JFrame)null, true);
 
         initComponents();
+
+        getRootPane().setDefaultButton(cmdOK);
     }
 
     //~ Methods ----------------------------------------------------------------

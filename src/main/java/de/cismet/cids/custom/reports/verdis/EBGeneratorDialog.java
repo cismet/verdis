@@ -136,6 +136,9 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
             jScrollPane1.setVisible(false);
             lblHinweise.setVisible(false);
         }
+
+        getRootPane().setDefaultButton(btnPrint);
+
         pack();
     }
 
