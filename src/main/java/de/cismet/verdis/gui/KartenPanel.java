@@ -2403,11 +2403,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
                                         Main.getInstance().getRegenFlaechenTable().removeBean(cbTwo);
 
-                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                            (int)(newGeom.getArea()));
-
                                         final boolean sperreOne = (cbOne.getProperty(
                                                     FlaechePropertyConstants.PROP__SPERRE) != null)
                                                     && (Boolean)cbOne.getProperty(
@@ -2427,11 +2422,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         }
                                         // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
                                         RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
-                                        cbOne.setProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
-                                                    + "."
+                                        final int groesse = (int)newGeom.getArea();
+                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                                     + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
-                                            (int)newGeom.getArea());
+                                            groesse);
+                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                                            groesse);
                                         if (LOG.isDebugEnabled()) {
                                             LOG.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
                                         }
@@ -2543,17 +2540,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
                                         Main.getInstance().getSRFrontenTable().removeBean(cbTwo);
 
-                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
-                                            (int)(newGeom.getArea()));
-
                                         // Eine vorhandene Front und eine neuangelegt wurden gejoint
                                         SRFrontenDetailsPanel.setGeometry(newGeom, cbOne);
-                                        cbOne.setProperty(
-                                            FrontPropertyConstants.PROP__FRONTINFO
-                                                    + "."
+                                        final int length = (int)newGeom.getLength();
+                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                                     + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
-                                            (int)newGeom.getLength());
+                                            length);
+                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+                                                    + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                            length);
                                     }
                                     one.getFeature().setGeometry(newGeom);
                                     if (!(one.getFeature().getGeometry().equals(backup))) {
