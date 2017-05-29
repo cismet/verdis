@@ -2560,6 +2560,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             } catch (Exception e) {
                                 LOG.error("one: " + one + "\n two: " + two, e);
                             }
+                            mappingComp.getFeatureCollection().select(one.getFeature());
                         }
                     } else {
                         final PFeature pf = joinCandidate;
