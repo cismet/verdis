@@ -386,7 +386,7 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
 
                 CidsBean strasse = Main.getInstance().getSRFrontenDetailsPanel().getLastStrasseBean();
                 CidsBean lage = null;
-                CidsBean reinigung = null;
+                CidsBean reinigung = strassenreinigungBean;
 
                 try {
                     final Geometry geom = sole.getFeature().getGeometry();
