@@ -92,6 +92,8 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
                     }
                 }
             });
+
+        getRootPane().setDefaultButton(cmdOK);
     }
 
     //~ Methods ----------------------------------------------------------------

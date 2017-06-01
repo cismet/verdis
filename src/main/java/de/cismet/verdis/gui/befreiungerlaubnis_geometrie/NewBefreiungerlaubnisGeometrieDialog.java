@@ -90,6 +90,8 @@ public class NewBefreiungerlaubnisGeometrieDialog extends javax.swing.JDialog {
                 }
             });
 
+        getRootPane().setDefaultButton(cmdOK);
+
         setTitle(getTitle().replace("{Versickerung|Einleitung}", versickerung ? "Versickerung" : "Einleitung"));
         jLabel1.setText(jLabel1.getText().replace(
                 "{Versickerung|Einleitung}",

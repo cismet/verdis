@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -365,9 +366,17 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
                         if (dialog.isQuerverweiseChecked()) {
                             for (final CrossReference crossreference : crossreferences) {
                                 final int kassenzeichenNummer = crossreference.getEntityToKassenzeichen();
-                                CidsAppBackend.getInstance()
-                                        .getFrontToKassenzeichenQuerverweisMap()
-                                        .put(frontBean, kassenzeichenNummer);
+
+                                final Map<CidsBean, Collection<Integer>> crosslinkMap = CidsAppBackend.getInstance()
+                                            .getFrontToKassenzeichenQuerverweisMap();
+                                final Collection<Integer> crosslinks;
+                                if (crosslinkMap.containsKey(frontBean)) {
+                                    crosslinks = crosslinkMap.get(frontBean);
+                                } else {
+                                    crosslinks = new ArrayList<>();
+                                    crosslinkMap.put(frontBean, crosslinks);
+                                }
+                                crosslinks.add(kassenzeichenNummer);
                             }
                         }
                     } else {
@@ -377,7 +386,7 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
 
                 CidsBean strasse = Main.getInstance().getSRFrontenDetailsPanel().getLastStrasseBean();
                 CidsBean lage = null;
-                CidsBean reinigung = null;
+                CidsBean reinigung = strassenreinigungBean;
 
                 try {
                     final Geometry geom = sole.getFeature().getGeometry();

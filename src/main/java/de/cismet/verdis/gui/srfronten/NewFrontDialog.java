@@ -7,26 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui.srfronten;
 
-import Sirius.server.middleware.types.MetaClass;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-
-import de.cismet.cids.custom.util.VerdisUtils;
-
-import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.cids.editors.DefaultBindableReferenceCombo;
-
-import de.cismet.verdis.CidsAppBackend;
-
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
  * DOCUMENT ME!
@@ -70,6 +52,8 @@ public class NewFrontDialog extends javax.swing.JDialog {
         super((JFrame)null, true);
 
         initComponents();
+
+        getRootPane().setDefaultButton(cmdOK);
     }
 
     //~ Methods ----------------------------------------------------------------

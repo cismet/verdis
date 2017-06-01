@@ -113,6 +113,7 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
         jDialog1.setModal(true);
         jDialog1.setResizable(false);
         jDialog1.getContentPane().setLayout(new java.awt.GridBagLayout());
+        jDialog1.getRootPane().setDefaultButton(jButton2);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
