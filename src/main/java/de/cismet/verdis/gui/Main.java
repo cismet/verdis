@@ -184,6 +184,7 @@ import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
+import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.AttachFeatureListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateGeometryListener;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.CustomFeatureInfoListener;
@@ -198,6 +199,7 @@ import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
 import de.cismet.cismap.commons.rasterservice.MapService;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
+import de.cismet.cismap.commons.tools.PFeatureTools;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
@@ -3686,10 +3688,47 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
-        if (changesPending()) {
+        if (checkForDuplicateCoordinates() && changesPending()) {
             saveKassenzeichenAndAssessement();
         }
     }                                                                         //GEN-LAST:event_cmdOkActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean checkForDuplicateCoordinates() {
+        final Collection<PFeature> pFeatures = new ArrayList<>();
+        for (final Feature feature : getMappingComponent().getFeatureCollection().getAllFeatures()) {
+            pFeatures.add(getMappingComponent().getPFeatureHM().get(feature));
+        }
+        final List<PFeatureTools.PFeatureCoordinateInformation> infos = PFeatureTools.identifyMergeableCoordinates(
+                pFeatures,
+                AutomergeCoordinatesDialog.getCoordinateDuplicateThreshold());
+        if (infos.isEmpty()) {
+            return true;
+        } else {
+            final AutomergeCoordinatesDialog.Status status = AutomergeCoordinatesDialog.getInstance().display(infos);
+            if (status != null) {
+                switch (status) {
+                    case IGNORE: {
+                        return true;
+                    }
+                    case MERGE: {
+                        final List<PFeatureTools.PFeatureCoordinateInformation> unmergedInfos = PFeatureTools
+                                    .automergeCoordinates(infos);
+                        for (final PFeatureTools.PFeatureCoordinateInformation unmergedInfo : unmergedInfos) {
+                            LOG.warn("unmerged coordinate of " + unmergedInfo.getPFeature().getFeature() + ": "
+                                        + unmergedInfo.getCoordinate());
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * DOCUMENT ME!

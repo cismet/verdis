@@ -46,6 +46,7 @@ public class AppPreferences {
     private int geomClassId;
     private String kassenzeichenSuche;
     private String fortfuehrungLinkFormat;
+    private double coordinateDuplicateThreshold;
     private Vector usergroups = new Vector();
     private Vector rwGroups = new Vector();
     private CismapPreferences cismapPrefs;
@@ -145,6 +146,12 @@ public class AppPreferences {
             geomClassId = root.getChild("general").getAttribute("geomClassId").getIntValue();
             kassenzeichenSuche = root.getChild("general").getAttribute("kassenzeichenSuche").getValue();
             fortfuehrungLinkFormat = root.getChild("general").getAttribute("fortfuehrungLinkFormat").getValue();
+            try {
+                coordinateDuplicateThreshold = Double.parseDouble(root.getChild("general").getAttribute(
+                            "coordinateDuplicateThreshold").getValue());
+            } catch (final Exception ex) {
+                coordinateDuplicateThreshold = 0;
+            }
             standaloneDomainname = root.getChild("standalone").getAttribute("userdomainname").getValue();
             standaloneCallServerHost = root.getChild("standalone").getAttribute("callserverhost").getValue();
             try {
