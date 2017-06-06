@@ -43,6 +43,7 @@ import org.openide.util.Lookup;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -111,6 +112,8 @@ import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
+
+import static de.cismet.cismap.commons.gui.MappingComponent.PRINTING_AREA_SELECTION;
 
 /**
  * DOCUMENT ME!
@@ -309,6 +312,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JToggleButton cmdNewPolygon;
     private javax.swing.JToggleButton cmdOrthogonalRectangle;
     private javax.swing.JToggleButton cmdPan;
+    private javax.swing.JButton cmdPrint;
     private javax.swing.JToggleButton cmdRaisePolygon;
     private javax.swing.JButton cmdRedo;
     private javax.swing.JButton cmdRefreshSingleLayer;
@@ -330,6 +334,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -348,6 +353,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JSeparator jSeparator16;
     private javax.swing.JSeparator jSeparator17;
     private javax.swing.JSeparator jSeparator18;
+    private javax.swing.JSeparator jSeparator19;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JSeparator jSeparator9;
     private javax.swing.JLabel lblCoord;
@@ -502,6 +508,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdSnap = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         jSeparator10 = new javax.swing.JSeparator();
+        cmdPrint = new javax.swing.JButton();
+        jPanel12 = new javax.swing.JPanel();
+        jSeparator19 = new javax.swing.JSeparator();
         cmdZoom = new javax.swing.JToggleButton();
         cmdPan = new javax.swing.JToggleButton();
         cmdSelect = new javax.swing.JToggleButton();
@@ -705,6 +714,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"))); // NOI18N
         togFixMapExtent.setToolTipText("Kartenausschnitt beibehalten");
         togFixMapExtent.setBorderPainted(false);
+        togFixMapExtent.setContentAreaFilled(false);
         togFixMapExtent.setFocusable(false);
         togFixMapExtent.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togFixMapExtent.setRolloverIcon(new javax.swing.ImageIcon(
@@ -842,6 +852,33 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         jPanel3.add(jSeparator10, java.awt.BorderLayout.CENTER);
 
         tobVerdis.add(jPanel3);
+
+        cmdPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/frameprint.png"))); // NOI18N
+        cmdPrint.setToolTipText("Drucken");
+        cmdPrint.setBorderPainted(false);
+        cmdPrint.setFocusPainted(false);
+        cmdPrint.setFocusable(false);
+        cmdPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdPrint.setName("cmdPrint");                                                                  // NOI18N
+        cmdPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdPrint.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdPrintActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdPrint);
+
+        jPanel12.setMaximumSize(new java.awt.Dimension(2, 28));
+        jPanel12.setMinimumSize(new java.awt.Dimension(2, 28));
+        jPanel12.setPreferredSize(new java.awt.Dimension(2, 28));
+        jPanel12.setLayout(new java.awt.BorderLayout());
+
+        jSeparator19.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel12.add(jSeparator19, java.awt.BorderLayout.CENTER);
+
+        tobVerdis.add(jPanel12);
 
         mainGroup.add(cmdZoom);
         cmdZoom.setIcon(new javax.swing.ImageIcon(
@@ -1871,6 +1908,16 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * DOCUMENT ME!
      *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPrintActionPerformed
+        mappingComp.showPrintingSettingsDialog();
+        changeSelectedButtonAccordingToInteractionMode();
+    }                                                                            //GEN-LAST:event_cmdPrintActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  text              DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      */
@@ -2593,10 +2640,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * Draws the features of the <Code>kassenzeichenBean</Code> for the selected mode (Allgemein, Regen, ESW) in the
      * map. If withZoom is true, then zooms to the position of the Kassenzeichen in the map (if possible).
-     *
-     * @param  withZoom  true, zooms to the position of the Kassenzeichen
      */
-    private void refreshInMap(final boolean withZoom) {
+    private void refreshInMap() {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
         final boolean editable = CidsAppBackend.getInstance().isEditable();
 
@@ -2622,40 +2667,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
                 break;
             }
-            if (withZoom) {
-                final boolean isMapExtentFixed = mappingComp.isFixedMapExtent();
-                final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
-                if ((featureCollection.getFeatureCount() != 0) && !isMapExtentFixed) {
-                    mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
-                        true,
-                        mappingComp.isFixedMapScale());
-                } else {
-                    /* No features found for the currently selected mode, try to fetch features for the Kassenzeichen
-                     * but from other modes.
-                     * To not draw the features in the map, a new FeatureCollection must be used.*/
-                    final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
-                    if (CidsAppBackend.Mode.ALLGEMEIN.equals(mode) || isMapExtentFixed) {
-                        zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
-                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
-                            zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
-                        }
-                    }
-                    if (CidsAppBackend.Mode.REGEN.equals(mode) || isMapExtentFixed) {
-                        zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
-                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
-                            zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
-                        }
-                    }
-                    if (CidsAppBackend.Mode.SR.equals(mode) || isMapExtentFixed) {
-                        zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
-                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
-                            zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
-                        }
-                    }
-                    mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
-                        true,
-                        mappingComp.isFixedMapScale());
-                }
+            final boolean isMapExtentFixed = mappingComp.isFixedMapExtent();
+            if (!isMapExtentFixed) {
+                final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
+                zoomingFeatureCollection.addFeatures(featureCollection.getAllFeatures());
+                mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
+                    true,
+                    mappingComp.isFixedMapScale());
             }
         }
     }
@@ -2778,9 +2796,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         kassenzeichenBean = cidsBean;
 
-        refreshInMap((cidsBean != null)
-                    && (!cidsBean.equals(oldCidsBean)
-                        || (TimeRecoveryPanel.getInstance().isLoading() && !mappingComp.isFixedMapExtent())));
+        refreshInMap();
     }
 
     /**
@@ -2801,7 +2817,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void appModeChanged() {
-        refreshInMap(!mappingComp.isFixedMapExtent());
+        refreshInMap();
         lblMeasurement.setText("");
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final SimpleMoveListener simpleMoveListener = (SimpleMoveListener)mappingComp.getInputListener(
@@ -2818,29 +2834,49 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     public void changeSelectedButtonAccordingToInteractionMode() {
         final String im = mappingComp.getInteractionMode();
+        final String him = mappingComp.getHandleInteractionMode();
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("changeSelectedButtonAccordingToInteractionMode: " + mappingComp.getInteractionMode(),
                 new CurrentStackTrace());
         }
-        if (im.equals(MappingComponent.ZOOM)) {
+        if (MappingComponent.ZOOM.equals(im)) {
             cmdZoom.setSelected(true);
         }
-        if (im.equals(MappingComponent.PAN)) {
+        if (MappingComponent.PAN.equals(im)) {
             cmdPan.setSelected(true);
-        } else if (im.equals(MappingComponent.SELECT)) {
+        } else if (MappingComponent.SELECT.equals(im)) {
             cmdSelect.setSelected(true);
-        } else if (im.equals(MappingComponent.NEW_POLYGON)) {
-            if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode().equals(
-                            CreateGeometryListener.POINT)) {
-                cmdNewPoint.setSelected(true);
-            } else if (((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON)).getMode()
-                        .equals(CreateGeometryListener.POLYGON)) {
+        } else if (MappingComponent.NEW_POLYGON.equals(im)) {
+            final String npm = ((CreateGeometryListener)mappingComp.getInputListener(MappingComponent.NEW_POLYGON))
+                        .getMode();
+            if (CreateGeometryListener.POLYGON.equals(npm)) {
                 cmdNewPolygon.setSelected(true);
-            } else {
-                cmdSelect.setSelected(true);
+            } else if (CreateGeometryListener.LINESTRING.equals(npm)) {
+                cmdNewLinestring.setSelected(true);
+            } else if (CreateGeometryListener.POINT.equals(npm)) {
+                cmdNewPoint.setSelected(true);
             }
         } else {
             cmdSelect.setSelected(true);
+        }
+
+        if (MappingComponent.MOVE_HANDLE.equals(him)) {
+            if (!cmdMoveHandle.isSelected()) {
+                cmdMoveHandle.setSelected(true);
+            }
+        } else if (MappingComponent.ADD_HANDLE.equals(him)) {
+            if (!cmdAddHandle.isSelected()) {
+                cmdAddHandle.setSelected(true);
+            }
+        } else if (MappingComponent.REMOVE_HANDLE.equals(him)) {
+            if (!cmdRemoveHandle.isSelected()) {
+                cmdRemoveHandle.setSelected(true);
+            }
+        } else if (MappingComponent.ROTATE_POLYGON.equals(him)) {
+            if (!cmdRotatePolygon.isSelected()) {
+                cmdRotatePolygon.setSelected(true);
+            }
         }
 
         if (mappingComp.isSnappingEnabled()) {
