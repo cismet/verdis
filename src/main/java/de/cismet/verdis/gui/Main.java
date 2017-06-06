@@ -533,6 +533,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     || CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase()
                     .equals("readonly");
 
+        StaticSwingTools.tweakUI();
+
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
