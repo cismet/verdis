@@ -419,6 +419,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final TimeRecoveryPanel timeRecoveryPanel = TimeRecoveryPanel.getInstance();
 
     private boolean fixMapExtent;
+    private boolean fixMapExtentMode;
     private boolean isInit = true;
     private CidsBean kassenzeichenBean;
     private ObjectRendererDialog alkisRendererDialog;
@@ -1001,6 +1002,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             jToolBar1.add(testSetMotdAction);
         }
         isInit = false;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public KartenPanel getKartenPanel() {
+        return kartenPanel;
     }
 
     /**
@@ -3744,10 +3754,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     "Wollen Sie die gemachten \u00C4nderungen verwerfen?",
                     "Abbrechen",
                     JOptionPane.YES_NO_OPTION);
-            if (answer == JOptionPane.YES_OPTION) {
-                fixMapExtent = CidsAppBackend.getInstance().getMainMap().isFixedMapExtent();
-                CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(true);
-            } else {
+            if (answer != JOptionPane.YES_OPTION) {
                 return;
             }
         }
@@ -5781,8 +5788,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void reloadKassenzeichen(final CidsBean kassenzeichenBean) {
         CidsAppBackend.getInstance().setCidsBean(kassenzeichenBean);
 
-        fixMapExtent = CidsAppBackend.getInstance().getMainMap().isFixedMapExtent();
-        CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(true);
         final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
                     KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
         if (refreshingKassenzeichen == null) {
@@ -5790,13 +5795,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } else {
             CidsAppBackend.getInstance().gotoKassenzeichen(refreshingKassenzeichen);
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void resetFixedMapExtent() {
-        CidsAppBackend.getInstance().getMainMap().setFixedMapExtent(fixMapExtent);
     }
 
     /**
@@ -6394,6 +6392,42 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.warn("error processing system clipboard", ex);
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isFixMapExtent() {
+        return fixMapExtent;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fixMapExtent  DOCUMENT ME!
+     */
+    public void setFixMapExtent(final boolean fixMapExtent) {
+        this.fixMapExtent = fixMapExtent;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isFixMapExtentMode() {
+        return fixMapExtentMode;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fixMapExtentMode  DOCUMENT ME!
+     */
+    public void setFixMapExtentMode(final boolean fixMapExtentMode) {
+        this.fixMapExtentMode = fixMapExtentMode;
     }
 
     //~ Inner Classes ----------------------------------------------------------
