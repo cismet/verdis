@@ -28,8 +28,6 @@
  */
 package de.cismet.verdis.gui;
 
-import Sirius.server.middleware.types.MetaClass;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
@@ -37,20 +35,16 @@ import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.EventQueue;
-import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import java.sql.Date;
 
 import java.util.*;
 
@@ -58,7 +52,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.custom.commons.searchgeometrylistener.BaulastblattNodesSearchCreateSearchGeometryListener;
@@ -112,8 +105,6 @@ import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
-
-import static de.cismet.cismap.commons.gui.MappingComponent.PRINTING_AREA_SELECTION;
 
 /**
  * DOCUMENT ME!
@@ -373,6 +364,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.ButtonGroup searchGroup;
     private javax.swing.JToolBar tobVerdis;
     private javax.swing.JToggleButton togFixMapExtent;
+    private javax.swing.JToggleButton togFixMapExtent1;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -473,6 +466,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         pomScale = new javax.swing.JPopupMenu();
         popMenSearch = new javax.swing.JPopupMenu();
@@ -498,6 +492,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         cmdFullPoly = new javax.swing.JButton();
         cmdFullPoly1 = new javax.swing.JButton();
         togFixMapExtent = new javax.swing.JToggleButton();
+        togFixMapExtent1 = new javax.swing.JToggleButton();
         cmdBack = new JHistoryButton();
         cmdForward = new JHistoryButton();
         cmdRefreshSingleLayer = new javax.swing.JButton();
@@ -711,19 +706,28 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         tobVerdis.add(cmdFullPoly1);
 
         togFixMapExtent.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"))); // NOI18N
-        togFixMapExtent.setToolTipText("Kartenausschnitt beibehalten");
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fixMapExtentMode_disabled.png"))); // NOI18N
+        togFixMapExtent.setToolTipText("Kartenausschnitt für dieses Kassenzeichen beibehalten");
         togFixMapExtent.setBorderPainted(false);
         togFixMapExtent.setContentAreaFilled(false);
         togFixMapExtent.setFocusable(false);
         togFixMapExtent.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togFixMapExtent.setRolloverIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fixMapExtentMode_disabled.png"))); // NOI18N
         togFixMapExtent.setRolloverSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent.png")));          // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fixMapExtentMode.png")));          // NOI18N
         togFixMapExtent.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent.png")));          // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/fixMapExtentMode.png")));          // NOI18N
         togFixMapExtent.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                togFixMapExtent1,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                togFixMapExtent,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         togFixMapExtent.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -732,6 +736,29 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(togFixMapExtent);
+
+        togFixMapExtent1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"))); // NOI18N
+        togFixMapExtent1.setToolTipText("Kartenausschnitt beibehalten");
+        togFixMapExtent1.setBorderPainted(false);
+        togFixMapExtent1.setContentAreaFilled(false);
+        togFixMapExtent1.setFocusable(false);
+        togFixMapExtent1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togFixMapExtent1.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"))); // NOI18N
+        togFixMapExtent1.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent.png")));          // NOI18N
+        togFixMapExtent1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cismap/commons/gui/res/fixMapExtent.png")));          // NOI18N
+        togFixMapExtent1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        togFixMapExtent1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    togFixMapExtent1ActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(togFixMapExtent1);
 
         cmdBack.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/back.png"))); // NOI18N
@@ -1477,6 +1504,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         panMap.add(tobVerdis, java.awt.BorderLayout.NORTH);
 
         add(panMap, java.awt.BorderLayout.CENTER);
+
+        bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -1832,7 +1861,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void togFixMapExtentActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togFixMapExtentActionPerformed
-        mappingComp.setFixedMapExtent(togFixMapExtent.isSelected());
+        Main.getInstance().setFixMapExtentMode(togFixMapExtent.isSelected());
     }                                                                                   //GEN-LAST:event_togFixMapExtentActionPerformed
 
     /**
@@ -1914,6 +1943,15 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         mappingComp.showPrintingSettingsDialog();
         changeSelectedButtonAccordingToInteractionMode();
     }                                                                            //GEN-LAST:event_cmdPrintActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void togFixMapExtent1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_togFixMapExtent1ActionPerformed
+        Main.getInstance().setFixMapExtent(togFixMapExtent1.isSelected());
+    }                                                                                    //GEN-LAST:event_togFixMapExtent1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -2640,8 +2678,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * Draws the features of the <Code>kassenzeichenBean</Code> for the selected mode (Allgemein, Regen, ESW) in the
      * map. If withZoom is true, then zooms to the position of the Kassenzeichen in the map (if possible).
+     *
+     * @param  withZoom  true, zooms to the position of the Kassenzeichen
      */
-    private void refreshInMap() {
+    private void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
         final boolean editable = CidsAppBackend.getInstance().isEditable();
 
@@ -2667,13 +2707,39 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
                 break;
             }
-            final boolean isMapExtentFixed = mappingComp.isFixedMapExtent();
-            if (!isMapExtentFixed) {
-                final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
-                zoomingFeatureCollection.addFeatures(featureCollection.getAllFeatures());
-                mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
-                    true,
-                    mappingComp.isFixedMapScale());
+            if (withZoom) {
+                final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
+                if ((featureCollection.getFeatureCount() != 0)) {
+                    mappingComp.zoomToAFeatureCollection(featureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                } else {
+                    /* No features found for the currently selected mode, try to fetch features for the Kassenzeichen
+                     * but from other modes.
+                     * To not draw the features in the map, a new FeatureCollection must be used.*/
+                    final FeatureCollection zoomingFeatureCollection = new DefaultFeatureCollection();
+                    if (CidsAppBackend.Mode.ALLGEMEIN.equals(mode)) {
+                        zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                        }
+                    }
+                    if (CidsAppBackend.Mode.REGEN.equals(mode)) {
+                        zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesESW(cidsBean, editable));
+                        }
+                    }
+                    if (CidsAppBackend.Mode.SR.equals(mode)) {
+                        zoomingFeatureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+                        if (zoomingFeatureCollection.getFeatureCount() == 0) {
+                            zoomingFeatureCollection.addFeatures(fetchFeaturesAllgemein(cidsBean, editable));
+                        }
+                    }
+                    mappingComp.zoomToAFeatureCollection(zoomingFeatureCollection.getAllFeatures(),
+                        true,
+                        mappingComp.isFixedMapScale());
+                }
             }
         }
     }
@@ -2796,7 +2862,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
         kassenzeichenBean = cidsBean;
 
-        refreshInMap();
+        refreshInMap(!Main.getInstance().isFixMapExtent() && (cidsBean != null)
+                    && (!cidsBean.equals(oldCidsBean)
+                        || (TimeRecoveryPanel.getInstance().isLoading())));
     }
 
     /**
@@ -2817,7 +2885,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     @Override
     public void appModeChanged() {
-        refreshInMap();
+        refreshInMap(!Main.getInstance().isFixMapExtent() && !Main.getInstance().isFixMapExtentMode());
         lblMeasurement.setText("");
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final SimpleMoveListener simpleMoveListener = (SimpleMoveListener)mappingComp.getInputListener(

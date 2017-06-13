@@ -298,6 +298,34 @@
             <Component class="javax.swing.JToggleButton" name="togFixMapExtent">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fixMapExtentMode_disabled.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="Kartenausschnitt f&#xfc;r dieses Kassenzeichen beibehalten"/>
+                <Property name="borderPainted" type="boolean" value="false"/>
+                <Property name="contentAreaFilled" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fixMapExtentMode_disabled.png"/>
+                </Property>
+                <Property name="rolloverSelectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fixMapExtentMode.png"/>
+                </Property>
+                <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/toolbar/fixMapExtentMode.png"/>
+                </Property>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <BindingProperties>
+                <BindingProperty name="enabled" source="togFixMapExtent1" sourcePath="${!selected}" target="togFixMapExtent" targetPath="enabled" updateStrategy="0" immediately="false"/>
+              </BindingProperties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="togFixMapExtentActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JToggleButton" name="togFixMapExtent1">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/cismap/commons/gui/res/fixMapExtent_disabled.png"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Kartenausschnitt beibehalten"/>
@@ -317,7 +345,7 @@
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="togFixMapExtentActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="togFixMapExtent1ActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="cmdBack">
