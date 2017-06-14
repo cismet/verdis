@@ -47,8 +47,6 @@ public class AppPreferences {
     private String kassenzeichenSuche;
     private String fortfuehrungLinkFormat;
     private double coordinateDuplicateThreshold;
-    private Vector usergroups = new Vector();
-    private Vector rwGroups = new Vector();
     private CismapPreferences cismapPrefs;
     private String standaloneDomainname;
     private String standaloneCallServerHost;
@@ -57,9 +55,6 @@ public class AppPreferences {
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private LinkedHashMap<String, AbstractWFSForm> wfsForms = new LinkedHashMap<String, AbstractWFSForm>();
     // ADDED FOR RM PLUGIN FUNCTIONALTY 22.07.07 Sebastian Puhl
-    private int primaryPort;
-    private int secondaryPort;
-    private String rmRegistryServerPath;
     private int verdisCrossoverPort;
     private int lagisCrossoverPort;
     private double flurstueckBuffer = -0.5;
@@ -154,34 +149,6 @@ public class AppPreferences {
             }
             standaloneDomainname = root.getChild("standalone").getAttribute("userdomainname").getValue();
             standaloneCallServerHost = root.getChild("standalone").getAttribute("callserverhost").getValue();
-            try {
-                // Added for RM Plugin functionalty 22.07.2007 Sebastian Puhl
-                primaryPort = Integer.parseInt(root.getChild("rmPlugin").getChild("primaryPort").getText());
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Fehler beim parsen des primaryPorts --> benutze default 1099");
-                }
-                primaryPort = 1099;
-            }
-
-            try {
-                secondaryPort = Integer.parseInt(root.getChild("rmPlugin").getChild("secondaryPort").getText());
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Fehler beim parsen des primaryPorts --> benutze default 9001");
-                }
-                secondaryPort = 9001;
-            }
-
-            try {
-                rmRegistryServerPath = root.getChild("rmPlugin").getChild("rmRegistryServer").getText();
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(
-                        "Fehler beim parsen des primaryPorts --> benutze default rmi://localhost:1099/RMRegistryServer");
-                }
-                rmRegistryServerPath = "rmi://localhost:1099/RMRegistryServer";
-            }
 
             try {
                 reportUrl = root.getChild("general").getAttribute("reportUrl").getValue();
@@ -229,19 +196,6 @@ public class AppPreferences {
                 log.error("Crossover: Fehler beim Konfigurieren.", ex);
             }
 
-            final List list = root.getChild("usergroups").getChildren("ug");
-            final Iterator it = list.iterator();
-            while (it.hasNext()) {
-                final Object o = it.next();
-                if (o instanceof Element) {
-                    final Element e = (Element)o;
-                    usergroups.add(e.getText().toLowerCase());
-                    if (((Element)o).getAttribute("rw").getBooleanValue()) {
-                        rwGroups.add(e.getText().toLowerCase());
-                    }
-                }
-            }
-
             try {
                 veranlagungOnlyForChangedValues = Boolean.parseBoolean(root.getChild("general").getAttribute(
                             "veranlassungOnlyForChangedValues").getValue());
@@ -251,14 +205,12 @@ public class AppPreferences {
                 }
             }
 
-            // cismapPrefs = new CismapPreferences(root.getChild("cismapPreferences"));
-
             try {
                 final WFSFormFactory wfsFormFactory = WFSFormFactory.getInstance();
                 wfsFormFactory.masterConfigure(root);
                 wfsForms = wfsFormFactory.getForms();
             } catch (Exception e) {
-                log.warn("Fehler beim Auslesen der WFSFormsProperties");
+                log.warn("Fehler beim Auslesen der WFSFormsProperties", e);
             }
         } catch (Exception e) {
             log.error("Einstellungen konnten nicht gelesen werden", e);
