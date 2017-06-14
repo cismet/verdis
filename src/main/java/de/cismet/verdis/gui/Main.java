@@ -42,6 +42,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.User;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
@@ -151,7 +152,6 @@ import de.cismet.cids.custom.navigatorstartuphooks.MotdStartUpHook;
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
 import de.cismet.cids.custom.util.VerdisUtils;
 import de.cismet.cids.custom.wunda_blau.startuphooks.MotdWundaStartupHook;
-import de.cismet.cids.custom.wunda_blau.toolbaritem.TestSetMotdAction;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -997,10 +997,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         initTotd();
         initStartupHooks();
 
-        final TestSetMotdAction testSetMotdAction = new TestSetMotdAction();
-        if (testSetMotdAction.isVisible()) {
-            jToolBar1.add(testSetMotdAction);
-        }
         isInit = false;
     }
 
@@ -4830,22 +4826,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 main.setLoggedIn(true);
                 main.setUserString(cidsAuth.getUserString());
                 main.setReadonly(cidsAuth.isReadOnly());
-
-                if (appPreferences.getRmRegistryServerPath() != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: wird initialisiert (VerdisStandalone)");
-                        LOG.debug("RMPlugin: Mainframe " + getInstance());
-                        LOG.debug("RMPlugin: PrimaryPort " + appPreferences.getPrimaryPort());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: SecondaryPort " + appPreferences.getSecondaryPort());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("RMPlugin: Username "
-                                    + (cidsAuth.getUserString() + "@" + appPreferences.getStandaloneDomainname()));
-                    }
-                }
-
                 main.init();
 
                 // REMOVE SPLASHSCREEN
@@ -6525,8 +6505,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         @Override
         public boolean authenticate(final String name, final char[] password, final String server) throws Exception {
             System.setProperty("sun.rmi.transport.connectionTimeout", "15");
-            final String user = name.split("@")[0];
-            final String group = name.split("@")[1];
+            final String username = name.split("@")[0];
+            final String usergroup = name.split("@")[1];
 
             final String callServerURL = appPreferences.getAppbackendCallserverurl();
             if (LOG.isDebugEnabled()) {
@@ -6542,23 +6522,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
                 connectionInfo.setUserDomain(domain);
-                connectionInfo.setUsergroup(group);
+                connectionInfo.setUsergroup(usergroup);
                 connectionInfo.setUsergroupDomain(domain);
-                connectionInfo.setUsername(user);
+                connectionInfo.setUsername(username);
                 final ConnectionSession session = ConnectionFactory.getFactory()
                             .createSession(connection, connectionInfo, true);
                 proxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, session);
 
-                final String tester = (group + "@" + domain).toLowerCase();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("authentication: tester = :" + tester);
-                    LOG.debug("authentication: name = :" + name);
-                }
-                if (appPreferences.getRwGroups().contains(tester)) {
+                final User user = session.getUser();
+                if (proxy.hasConfigAttr(user, "grundis.access.readwrite")) {
                     userString = name;
                     readOnly = false;
                     return true;
-                } else if (appPreferences.getUsergroups().contains(tester)) {
+                } else if (proxy.hasConfigAttr(user, "grundis.access.read")) {
                     readOnly = true;
                     userString = name;
                     return true;
