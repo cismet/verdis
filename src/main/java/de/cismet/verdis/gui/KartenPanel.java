@@ -2758,13 +2758,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzeichen.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
         for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
-            final Feature add = new BeanUpdatingCidsFeature(
-                    kassenzeichenGeometrieBean,
+            final Geometry geom = (Geometry)kassenzeichenGeometrieBean.getProperty(
                     KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
                             + "."
                             + GeomPropertyConstants.PROP__GEO_FIELD);
-            add.setEditable(editable);
-            featureCollection.add(add);
+            if (geom != null) {
+                final Feature add = new BeanUpdatingCidsFeature(
+                        kassenzeichenGeometrieBean,
+                        KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                + "."
+                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                add.setEditable(editable);
+                featureCollection.add(add);
+            }
         }
 
         return featureCollection;
@@ -2784,15 +2790,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         for (final CidsBean flaeche : flaechen) {
-            final Feature add = new BeanUpdatingCidsFeature(
-                    flaeche,
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+            final Geometry geom = (Geometry)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                             + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
                             + "."
                             + GeomPropertyConstants.PROP__GEO_FIELD);
-            add.setEditable(editable);
-            featureCollection.add(add);
+            if (geom != null) {
+                final Feature add = new BeanUpdatingCidsFeature(
+                        flaeche,
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                + "."
+                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                add.setEditable(editable);
+                featureCollection.add(add);
+            }
         }
         return featureCollection;
     }
@@ -2810,15 +2823,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
         for (final CidsBean front : fronten) {
-            final Feature add = new BeanUpdatingCidsFeature(
-                    front,
-                    FrontPropertyConstants.PROP__FRONTINFO
+            final Geometry geom = (Geometry)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO
                             + "."
                             + FrontinfoPropertyConstants.PROP__GEOMETRIE
                             + "."
                             + GeomPropertyConstants.PROP__GEO_FIELD);
-            add.setEditable(editable);
-            featureCollection.add(add);
+            if (geom != null) {
+                final Feature add = new BeanUpdatingCidsFeature(
+                        front,
+                        FrontPropertyConstants.PROP__FRONTINFO
+                                + "."
+                                + FrontinfoPropertyConstants.PROP__GEOMETRIE
+                                + "."
+                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                add.setEditable(editable);
+                featureCollection.add(add);
+            }
         }
         return featureCollection;
     }
@@ -2839,13 +2859,19 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         for (final CidsBean befer : befers) {
             for (final CidsBean beferGeom
                         : befer.getBeanCollectionProperty(BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN)) {
-                final Feature add = new BeanUpdatingCidsFeature(
-                        beferGeom,
+                final Geometry geom = (Geometry)beferGeom.getProperty(
                         BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
                                 + "."
                                 + GeomPropertyConstants.PROP__GEO_FIELD);
-                add.setEditable(editable);
-                featureCollection.add(add);
+                if (geom != null) {
+                    final Feature add = new BeanUpdatingCidsFeature(
+                            beferGeom,
+                            BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
+                                    + "."
+                                    + GeomPropertyConstants.PROP__GEO_FIELD);
+                    add.setEditable(editable);
+                    featureCollection.add(add);
+                }
             }
         }
         return featureCollection;
