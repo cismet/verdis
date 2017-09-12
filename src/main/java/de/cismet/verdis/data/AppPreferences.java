@@ -63,6 +63,7 @@ public class AppPreferences {
     private String appbackendDomain = null;
     private String appbackendConnectionclass = null;
     private String appbackendCallserverurl = null;
+    private boolean compressionEnabled = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -221,6 +222,14 @@ public class AppPreferences {
             appbackendDomain = cidsappbackendPrefs.getChildText("domain");
             appbackendConnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
             appbackendCallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
+            try {
+                compressionEnabled = Boolean.parseBoolean((String)cidsappbackendPrefs.getChildText(
+                            "compressionEnabled"));
+            } catch (final Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.fatal("Fehler beim parsen von compressionEnabled --> benutze default false", e);
+                }
+            }
         } catch (Exception ex) {
             log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
         }
