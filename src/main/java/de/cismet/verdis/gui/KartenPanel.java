@@ -430,7 +430,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 //        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
 //            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
 //        }
-        initPluginToolbarComponents();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -2320,7 +2319,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * DOCUMENT ME!
      */
-    private void initPluginToolbarComponents() {
+    public void initPluginToolbarComponents() {
         final Collection<? extends ToolbarComponentsProvider> toolbarCompProviders = Lookup.getDefault()
                     .lookupAll(
                         ToolbarComponentsProvider.class);

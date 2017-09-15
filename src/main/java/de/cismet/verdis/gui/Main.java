@@ -645,6 +645,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             // dialog for alkis_landparcel - muss vor initComponentRegistry erzeugt werden
             initComponentRegistry(this);
 
+            kartenPanel.initPluginToolbarComponents();
+
             abfrageDialog = new QuerySearchResultsActionDialog(
                     this,
                     false,
@@ -6539,6 +6541,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     userString = name;
                     return true;
                 } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(
+                            "no read, no write: probably the config attrs (grundis.access.readwrite or grundis.access.read) are not set for this user.");
+                    }
                     return false;
                 }
             } catch (final Exception ex) {
