@@ -3429,8 +3429,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             ((JXPanel)((JXPanel)login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
         } catch (final Exception skip) {
         }
-        StaticSwingTools.showDialog(d);
 
+        // StaticSwingTools.showDialog(d);
+        d.setLocationRelativeTo(SPLASH);
+        d.setVisible(true);
         if (handleLoginStatus(d.getStatus(), usernames, login)) {
             return cidsAuth;
         } else {
