@@ -7,10 +7,16 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import java.awt.Dialog;
+import java.awt.Event;
+import java.awt.EventQueue;
+
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import de.cismet.tools.gui.StaticSwingTools;
+
+import de.cismet.verdis.CidsAppBackend;
 
 /**
  * DOCUMENT ME!
@@ -36,8 +42,9 @@ public class WaitDialog extends javax.swing.JDialog {
      * Creates new form LockingDialog.
      */
     private WaitDialog() {
-        super();
+        super(Main.getInstance());
         initComponents();
+        setModal(true);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -100,11 +107,7 @@ public class WaitDialog extends javax.swing.JDialog {
      * @return  DOCUMENT ME!
      */
     public static WaitDialog getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new WaitDialog();
-            INSTANCE.setModal(true);
-        }
-        return INSTANCE;
+        return LazyInitialiser.INSTANCE;
     }
 
     /**
@@ -400,22 +403,62 @@ public class WaitDialog extends javax.swing.JDialog {
             setVisible(false);
         }
     }
-
     /**
      * DOCUMENT ME!
      */
     public void showDialog() {
-        jProgressBar1.setString("bitte warten");
-        jProgressBar1.setMaximum(0);
-        jProgressBar1.setIndeterminate(true);
-        jProgressBar1.setValue(0);
-        new SwingWorker<Void, Void>() {
+        showDialog("bitte warten");
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  message  DOCUMENT ME!
+     */
+    public void showDialog(final String message) {
+        final Runnable r = new Runnable() {
 
                 @Override
-                protected Void doInBackground() throws Exception {
-                    StaticSwingTools.showDialog(WaitDialog.getInstance());
-                    return null;
+                public void run() {
+                    setLocationRelativeTo(Main.getInstance());
+                    jProgressBar1.setString(message);
+                    jProgressBar1.setMaximum(0);
+                    jProgressBar1.setIndeterminate(true);
+                    jProgressBar1.setValue(0);
+                    new Thread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                WaitDialog.this.setVisible(true);
+                            }
+                        }).start();
                 }
-            }.execute();
+            };
+        if (EventQueue.isDispatchThread()) {
+            r.run();
+        } else {
+            EventQueue.invokeLater(r);
+        }
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class LazyInitialiser {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final WaitDialog INSTANCE = new WaitDialog();
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new LazyInitialiser object.
+         */
+        private LazyInitialiser() {
+        }
     }
 }
