@@ -58,7 +58,7 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
      */
     public void setCidsBeans(final Collection<CidsBean> cidsBeans) {
         if ((cidsBeans == null) || cidsBeans.isEmpty()) {
-            setCidsBean(createDummyBean());
+            setCidsBean(null);
             return;
         }
         if ((previousSwingworker != null) && !previousSwingworker.isDone()) {
