@@ -48,11 +48,15 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.JTextComponent;
 
 import de.cismet.cids.custom.util.BindingValidationSupport;
 import de.cismet.cids.custom.util.VerdisUtils;
@@ -884,10 +888,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
         flaecheBean = cidsBean;
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
-        bindingGroup.unbind();
-        ((DefaultBindableReferenceCombo)cboFlaechenart).reload(true);
-        bindingGroup.bind();
-
+        if (cidsBean != null) {
+            bindingGroup.unbind();
+            ((DefaultBindableReferenceCombo)cboFlaechenart).reload(false);
+            bindingGroup.bind();
+        } else {
+            bindingGroup.unbind();
+            hideContent(true);
+        }
         try {
             if ((cidsBean != null)
                         && (cidsBean.getProperty(
@@ -902,10 +910,45 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             LOG.warn("problem when trying to set background enabled (or not). will turn the background off", e);
             bpanRegenFlDetails.setBackgroundEnabled(false);
         }
+        if (cidsBean != null) {
+            updateCrossReferences();
 
-        updateCrossReferences();
+            attachBeanValidators();
+        }
+    }
 
-        attachBeanValidators();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  hide  DOCUMENT ME!
+     */
+    private void hideContent(final boolean hide) {
+        final JTextComponent[] txts = new JTextComponent[] {
+                txtBezeichnung,
+                txtGroesseGrafik,
+                txtGroesseKorrektur,
+                txtAnteil,
+                txtAenderungsdatum,
+                txtVeranlagungsdatum,
+                txtBemerkung,
+                txtFEB_ID,
+                edtQuer
+            };
+
+        final JComboBox[] combos = new JComboBox[] {
+                cboFlaechenart, cboAnschlussgrad,
+                cboBeschreibung
+            };
+
+        if (hide) {
+            for (final JTextComponent c : txts) {
+                c.setText("");
+            }
+            for (final JComboBox c : combos) {
+                c.getModel().setSelectedItem(null);
+            }
+            chkSperre.setSelected(false);
+        }
     }
 
     /**

@@ -430,7 +430,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 //        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
 //            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
 //        }
-        initPluginToolbarComponents();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -2320,7 +2319,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * DOCUMENT ME!
      */
-    private void initPluginToolbarComponents() {
+    public void initPluginToolbarComponents() {
         final Collection<? extends ToolbarComponentsProvider> toolbarCompProviders = Lookup.getDefault()
                     .lookupAll(
                         ToolbarComponentsProvider.class);
@@ -2982,62 +2981,92 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
     /**
      * DOCUMENT ME!
+     */
+    private void initSearch() {
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  notfication  DOCUMENT ME!
      */
     public void doubleClickPerformed(final PNotification notfication) {
-        final Object o = notfication.getObject();
-        if ((o instanceof SelectionListener)
-                    && !mappingComp.getHandleInteractionMode().equals(MappingComponent.ADD_HANDLE)) {
-            final SelectionListener selectionListener = (SelectionListener)o;
-            final Geometry searchGeom = selectionListener.getDoubleclickPoint();
+        // Attention: this unchecked invokeLate is done with intention to execute the code at the end of the event loop
+        // it is collaed from the SelectionListener alreade within the EDT and with invokeLaater it is ensured that the
+        // actions will be done at the end.
+        EventQueue.invokeLater(new Runnable() {
 
-            if (searchGeom != null) {
-                final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
-                geomSearch.setScaleDenominator(CismapBroker.getInstance().getMappingComponent().getScaleDenominator());
-                geomSearch.setFlaecheFilter(CidsAppBackend.getInstance().getMode().equals(
-                        CidsAppBackend.Mode.REGEN));
-                geomSearch.setFrontFilter(CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR));
-                geomSearch.setAllgemeinFilter(CidsAppBackend.getInstance().getMode().equals(
-                        CidsAppBackend.Mode.ALLGEMEIN));
+                @Override
+                public void run() {
+                    WaitDialog.getInstance().showDialog("Kassenzeichen suchen...");
+                    final Object o = notfication.getObject();
+                    if ((o instanceof SelectionListener)
+                                && !mappingComp.getHandleInteractionMode().equals(MappingComponent.ADD_HANDLE)) {
+                        final SelectionListener selectionListener = (SelectionListener)o;
+                        final Geometry searchGeom = selectionListener.getDoubleclickPoint();
 
-                final ServerSearchCreateSearchGeometryListener serverSearchCreateSearchGeometryListener =
-                    new ServerSearchCreateSearchGeometryListener(
-                        mappingComp,
-                        geomSearch);
-                serverSearchCreateSearchGeometryListener.setMode(CreateGeometryListener.POINT);
-                serverSearchCreateSearchGeometryListener.addPropertyChangeListener(new PropertyChangeListener() {
+                        if (searchGeom != null) {
+                            final KassenzeichenGeomSearch geomSearch = new KassenzeichenGeomSearch();
+                            geomSearch.setScaleDenominator(
+                                CismapBroker.getInstance().getMappingComponent().getScaleDenominator());
+                            geomSearch.setFlaecheFilter(
+                                CidsAppBackend.getInstance().getMode().equals(
+                                    CidsAppBackend.Mode.REGEN));
+                            geomSearch.setFrontFilter(
+                                CidsAppBackend.getInstance().getMode().equals(CidsAppBackend.Mode.SR));
+                            geomSearch.setAllgemeinFilter(
+                                CidsAppBackend.getInstance().getMode().equals(
+                                    CidsAppBackend.Mode.ALLGEMEIN));
 
-                        @Override
-                        public void propertyChange(final PropertyChangeEvent evt) {
-                            if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(
-                                            evt.getPropertyName())) {
-                                final Collection<Integer> result = (Collection<Integer>)evt.getNewValue();
-                                if (!result.isEmpty()) {
-                                    final Integer kassenzeichennummer = result.iterator().next();
-                                    final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
-                                    if ((kassenzeichennummer != null)
-                                                && ((kassenzeichenBean == null)
-                                                    || !kassenzeichennummer.equals(
-                                                        (Integer)kassenzeichenBean.getProperty(
-                                                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER)))) {
-                                        CidsAppBackend.getInstance().gotoKassenzeichen(kassenzeichennummer.toString());
+                            final ServerSearchCreateSearchGeometryListener serverSearchCreateSearchGeometryListener =
+                                new ServerSearchCreateSearchGeometryListener(
+                                    mappingComp,
+                                    geomSearch);
+                            serverSearchCreateSearchGeometryListener.setMode(CreateGeometryListener.POINT);
+                            serverSearchCreateSearchGeometryListener.addPropertyChangeListener(
+                                new PropertyChangeListener() {
+
+                                    @Override
+                                    public void propertyChange(final PropertyChangeEvent evt) {
+                                        if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(
+                                                        evt.getPropertyName())) {
+                                            final Collection<Integer> result = (Collection<Integer>)evt.getNewValue();
+                                            if (!result.isEmpty()) {
+                                                final Integer kassenzeichennummer = result.iterator().next();
+                                                final CidsBean kassenzeichenBean = CidsAppBackend.getInstance()
+                                                                .getCidsBean();
+                                                if ((kassenzeichennummer != null)
+                                                            && ((kassenzeichenBean == null)
+                                                                || !kassenzeichennummer.equals(
+                                                                    (Integer)kassenzeichenBean.getProperty(
+                                                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER)))) {
+                                                    CidsAppBackend.getInstance()
+                                                                .gotoKassenzeichen(kassenzeichennummer.toString());
+                                                } else {
+                                                    WaitDialog.getInstance().dispose();
+                                                }
+                                            } else {
+                                                WaitDialog.getInstance().dispose();
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                        }
-                    });
+                                });
 
-                final SearchFeature newFeature = new SearchFeature(
-                        searchGeom,
-                        ServerSearchCreateSearchGeometryListener.INPUT_LISTENER_NAME);
-                newFeature.setEditable(false);
-                newFeature.setGeometryType(AbstractNewFeature.geomTypes.POINT);
-                newFeature.setCanBeSelected(false);
-                // serverSearchCreateSearchGeometryListener.sh
-                serverSearchCreateSearchGeometryListener.search(newFeature);
-            }
-        }
+                            final SearchFeature newFeature = new SearchFeature(
+                                    searchGeom,
+                                    ServerSearchCreateSearchGeometryListener.INPUT_LISTENER_NAME);
+                            newFeature.setEditable(false);
+                            newFeature.setGeometryType(AbstractNewFeature.geomTypes.POINT);
+                            newFeature.setCanBeSelected(false);
+                            // serverSearchCreateSearchGeometryListener.sh
+
+                            serverSearchCreateSearchGeometryListener.search(newFeature);
+                        } else {
+                            WaitDialog.getInstance().dispose();
+                        }
+                    }
+                }
+            });
     }
 
     /**

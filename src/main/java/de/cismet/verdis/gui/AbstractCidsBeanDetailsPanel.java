@@ -57,6 +57,10 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
      * @param  cidsBeans  DOCUMENT ME!
      */
     public void setCidsBeans(final Collection<CidsBean> cidsBeans) {
+        if ((cidsBeans == null) || cidsBeans.isEmpty()) {
+            setCidsBean(null);
+            return;
+        }
         if ((previousSwingworker != null) && !previousSwingworker.isDone()) {
             previousSwingworker.cancel(true);
         }
