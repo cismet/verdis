@@ -2991,6 +2991,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  notfication  DOCUMENT ME!
      */
     public void doubleClickPerformed(final PNotification notfication) {
+        // Attention: this unchecked invokeLate is done with intention to execute the code at the end of the event loop
+        // it is collaed from the SelectionListener alreade within the EDT and with invokeLaater it is ensured that the
+        // actions will be done at the end.
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
