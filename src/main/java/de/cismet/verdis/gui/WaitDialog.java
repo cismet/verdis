@@ -7,16 +7,9 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
-import java.awt.Dialog;
-import java.awt.Event;
 import java.awt.EventQueue;
 
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
-import de.cismet.tools.gui.StaticSwingTools;
-
-import de.cismet.verdis.CidsAppBackend;
 
 /**
  * DOCUMENT ME!
@@ -403,12 +396,14 @@ public class WaitDialog extends javax.swing.JDialog {
             setVisible(false);
         }
     }
+
     /**
      * DOCUMENT ME!
      */
     public void showDialog() {
         showDialog("bitte warten");
     }
+
     /**
      * DOCUMENT ME!
      *
