@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>5.5.1</version>
+    <version>5.5.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -23,14 +23,14 @@
         <netbeans.version>RELEASE731</netbeans.version>
     </properties>
    
-    <name>${names.verdis-client}</name>
+    <name>${names.verdis-client}  [${project.version}]</name>
     <description>!!! description pending !!!</description>
 
     <scm>
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v5.5.1</tag>
+      <tag>v5.5.2</tag>
   </scm>
 
   <issueManagement>
@@ -74,7 +74,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>5.3.2</version>
+                <version>5.4.1</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -93,14 +93,14 @@
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp.server</groupId>
                 <artifactId>cids-custom-server-wuppertal</artifactId>
-                <version>5.0.6</version>
+                <version>5.2</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp</groupId>
                 <artifactId>cids-custom-wuppertal</artifactId>
-                <version>5.0.8</version>
+                <version>5.2.1</version>
                 <type>jar</type>
             </dependency>
                                     
@@ -123,7 +123,7 @@
             <dependency>
                 <groupId>de.cismet.cids.navigator</groupId>
                 <artifactId>cids-navigator</artifactId>
-                <version>5.1.1</version>
+                <version>5.3.2</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
