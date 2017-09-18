@@ -889,7 +889,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         flaecheBean = cidsBean;
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
-            hideContent(false);
             bindingGroup.unbind();
             ((DefaultBindableReferenceCombo)cboFlaechenart).reload(false);
             bindingGroup.bind();
@@ -924,10 +923,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  hide  DOCUMENT ME!
      */
     private void hideContent(final boolean hide) {
-//        Color c = txtBezeichnung.getForeground();
-//        int alpha = hide ? 255 : 0;
-//        Color nc = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
-
         final JTextComponent[] txts = new JTextComponent[] {
                 txtBezeichnung,
                 txtGroesseGrafik,
