@@ -840,12 +840,16 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
     public final void setEnabled(final boolean b) {
         super.setEnabled(b);
         txtBemerkung.setEditable(b);
+        txtBemerkung.setEnabled(true);
         txtBemerkung.setOpaque(b);
         txtGewaessername.setEditable(b);
+        txtGewaessername.setEnabled(true);
         txtGewaessername.setOpaque(b);
         txtDurchfluss.setEditable(b);
+        txtDurchfluss.setEnabled(true);
         txtDurchfluss.setOpaque(b);
         txtFilterkonstante.setEditable(b);
+        txtFilterkonstante.setEnabled(true);
         txtFilterkonstante.setOpaque(b);
         chkGutachtenVorhanden.setEnabled(b);
         chkGutachtenVorhanden.setOpaque(b);
