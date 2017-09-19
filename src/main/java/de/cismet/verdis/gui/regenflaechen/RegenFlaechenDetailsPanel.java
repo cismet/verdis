@@ -885,8 +885,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             return;
         }
 
-        setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
         flaecheBean = cidsBean;
+        setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
             bindingGroup.unbind();
@@ -1016,9 +1016,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     @Override
     public final void setEnabled(final boolean b) {
         super.setEnabled(b);
+        txtAnteil.setEnabled(true);
         txtAnteil.setEditable(b);
+        txtBemerkung.setEnabled(true);
         txtBemerkung.setEditable(b);
+        txtBezeichnung.setEnabled(true);
         txtBezeichnung.setEditable(b);
+        txtFEB_ID.setEnabled(true);
         txtFEB_ID.setEditable(b);
         try {
             txtGroesseGrafik.setEditable(b
@@ -1032,8 +1036,11 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         } catch (final Exception ex) {
             txtGroesseGrafik.setEditable(b);
         }
+        txtGroesseGrafik.setEnabled(true);
         txtGroesseKorrektur.setEditable(b);
+        txtGroesseKorrektur.setEnabled(true);
         txtVeranlagungsdatum.setEditable(b);
+        txtVeranlagungsdatum.setEnabled(true);
         chkSperre.setEnabled(b);
         try {
             cboAnschlussgrad.setEnabled(b
