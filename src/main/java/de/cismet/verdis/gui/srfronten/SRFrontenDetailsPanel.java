@@ -820,7 +820,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboStrasseActionPerformed
+    private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
         CidsBean strasseBean = null;
         if (frontBean != null) {
             strasseBean = (CidsBean)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
@@ -882,14 +882,14 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             dcmSR.addElement(null);
             cboLageSR.setModel(dcmSR);
         }
-    }//GEN-LAST:event_cboStrasseActionPerformed
+    } //GEN-LAST:event_cboStrasseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboLageSRActionPerformed
+    private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
         try {
             final CidsBean oldLageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
                             + "."
@@ -916,14 +916,14 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             LOG.warn(ex, ex);
         }
         updateLageSrCbo();
-    }//GEN-LAST:event_cboLageSRActionPerformed
+    } //GEN-LAST:event_cboLageSRActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cboSRActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboSRActionPerformed
+    private void cboSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboSRActionPerformed
         if (getCidsBean() != null) {
             try {
                 final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
@@ -941,7 +941,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             }
             updateLageSrCbo();
         }
-    }//GEN-LAST:event_cboSRActionPerformed
+    }                                                                         //GEN-LAST:event_cboSRActionPerformed
 
     /**
      * DOCUMENT ME!
