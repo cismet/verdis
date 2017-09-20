@@ -1489,7 +1489,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         } else {
             JOptionPane.showMessageDialog(
                 Main.getInstance(),
-                "Das Kassenzeichen kann nur gewechselt werden wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
+                "Das Kassenzeichen kann nur gewechselt werden, wenn alle \u00C4nderungen gespeichert oder verworfen worden sind.",
                 "Wechseln nicht m\u00F6glich",
                 JOptionPane.WARNING_MESSAGE);
         }
