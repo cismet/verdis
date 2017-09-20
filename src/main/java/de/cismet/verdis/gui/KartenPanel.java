@@ -2999,7 +2999,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
                     @Override
                     public void run() {
-                        WaitDialog.getInstance().showDialog("Kassenzeichen suchen...");
                         final Object o = notfication.getObject();
                         if ((o instanceof SelectionListener)
                                     && !mappingComp.getHandleInteractionMode().equals(MappingComponent.ADD_HANDLE)) {
@@ -3054,6 +3053,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         }
                                     });
 
+                                WaitDialog.getInstance().showDialog("Kassenzeichen suchen...");
                                 final SearchFeature newFeature = new SearchFeature(
                                         searchGeom,
                                         ServerSearchCreateSearchGeometryListener.INPUT_LISTENER_NAME);
@@ -3063,8 +3063,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                 // serverSearchCreateSearchGeometryListener.sh
 
                                 serverSearchCreateSearchGeometryListener.search(newFeature);
-                            } else {
-                                WaitDialog.getInstance().dispose();
                             }
                         }
                     }
