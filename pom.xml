@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>5.6-SNAPSHOT</version>
+    <version>5.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -74,7 +74,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>5.4.1</version>
+                <version>5.4.10</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -93,21 +93,21 @@
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp.server</groupId>
                 <artifactId>cids-custom-server-wuppertal</artifactId>
-                <version>5.2</version>
+                <version>5.3.1</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp</groupId>
                 <artifactId>cids-custom-wuppertal</artifactId>
-                <version>5.2.1</version>
+                <version>5.2.5</version>
                 <type>jar</type>
             </dependency>
                                     
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>5.2.1</version>
+                <version>5.4.5</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -115,7 +115,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>5.1.5</version>
+                <version>5.2</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -123,7 +123,7 @@
             <dependency>
                 <groupId>de.cismet.cids.navigator</groupId>
                 <artifactId>cids-navigator</artifactId>
-                <version>5.3.2</version>
+                <version>5.4</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -131,7 +131,7 @@
             <dependency>
                 <groupId>de.cismet.cismap</groupId>
                 <artifactId>cismap-plugin</artifactId>
-                <version>5.0.5</version>
+                <version>5.0.14</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -490,6 +490,12 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.deegree</groupId>
+            <artifactId>deegree-core-style</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>        
         <!-- END: Managed dependencies -->
         
         <!-- BEGIN: Provided dependencies -->
