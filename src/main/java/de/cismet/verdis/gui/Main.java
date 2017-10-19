@@ -170,8 +170,6 @@ import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
 
 import de.cismet.cismap.commons.CidsLayerFactory;
 import de.cismet.cismap.commons.CrsTransformer;
-import de.cismet.cismap.commons.MappingModelEvent;
-import de.cismet.cismap.commons.MappingModelListener;
 import de.cismet.cismap.commons.ModeLayer;
 import de.cismet.cismap.commons.ModeLayerRegistry;
 import de.cismet.cismap.commons.PNodeProvider;
@@ -179,9 +177,6 @@ import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
 import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.cismap.commons.features.PostgisFeature;
-import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
-import de.cismet.cismap.commons.featureservice.SimplePostgisFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
@@ -196,9 +191,6 @@ import de.cismet.cismap.commons.gui.piccolo.eventlistener.SplitPolygonListener;
 import de.cismet.cismap.commons.gui.simplelayerwidget.NewSimpleInternalLayerWidget;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
-import de.cismet.cismap.commons.rasterservice.MapService;
-import de.cismet.cismap.commons.retrieval.RetrievalEvent;
-import de.cismet.cismap.commons.retrieval.RetrievalListener;
 import de.cismet.cismap.commons.tools.PFeatureTools;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
@@ -347,9 +339,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private DescriptionPane descriptionPane;
     private SearchResultsTree searchResultsTree;
 
-    private final Map<String, CidsBean> veranlagungsnummern = new HashMap<String, CidsBean>();
-    private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<String, CidsBean>();
-    private final Map<String, Double> veranlagungSummeMap = new HashMap<String, Double>();
+    private final Map<String, CidsBean> veranlagungsnummern = new HashMap<>();
+    private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<>();
+    private final Map<String, Double> veranlagungSummeMap = new HashMap<>();
     private CidsAppBackend.Mode currentMode = null;
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -361,8 +353,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 "/de/cismet/verdis/res/images/titlebars/sum.png"));
     private final Icon icoKanal = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/pipe.png"));
-    private final Icon icoDokumente = new javax.swing.ImageIcon(getClass().getResource(
-                "/de/cismet/verdis/res/images/titlebars/docs.png"));
     private final Icon icoKarte = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/flaechen.png"));
     private final Icon icoTabelle = new javax.swing.ImageIcon(getClass().getResource(
@@ -374,8 +364,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private boolean editMode = false;
     private boolean readonly = true;
     private String userString;
-    private final EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards =
-        new EnumMap<CidsAppBackend.Mode, AbstractClipboard>(CidsAppBackend.Mode.class);
+    private final EnumMap<CidsAppBackend.Mode, AbstractClipboard> clipboards = new EnumMap<>(CidsAppBackend.Mode.class);
 
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
@@ -594,15 +583,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         @Override
                         public void featuresAdded(final FeatureCollectionEvent fce) {
                             refreshItemButtons();
-                            for (final Feature feature : fce.getEventFeatures()) {
-                                if (feature instanceof PostgisFeature) {
-                                    final PostgisFeature postgisFeature = (PostgisFeature)feature;
-                                    if (postgisFeature.getFeatureType().equals("Versiegelte Flächen")) {
-                                        // fce.get
-                                    }
-                                }
-                            }
-                            // CidsAppBackend.getInstance().getMode()
                         }
 
                         @Override
@@ -662,8 +642,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             final String title = getMetaClass().getName();
 
                             if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(Main.this)) {
-                                final List<String> header = new ArrayList<String>(getAttributeNames().size());
-                                final List<String> fields = new ArrayList<String>(getAttributeNames().size());
+                                final List<String> header = new ArrayList<>(getAttributeNames().size());
+                                final List<String> fields = new ArrayList<>(getAttributeNames().size());
                                 for (final String attrKey : getAttributeKeys()) {
                                     final MemberAttributeInfo mai = (MemberAttributeInfo)getMetaClass()
                                                     .getMemberAttributeInfos().get(attrKey);
@@ -909,7 +889,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.debug("Crossover: starte server.");
             }
             initCrossoverServer(CidsAppBackend.getInstance().getAppPreferences().getVerdisCrossoverPort());
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             LOG.error("Fehler im Konstruktor", t);
         }
 
@@ -987,8 +967,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     getMappingComponent().getInputListener(MappingComponent.JOIN_POLYGONS));
 
         initValidator();
-
-        setPostgisFeaturesSelectable(false);
 
         initGeomServerSearches();
 
@@ -1141,9 +1119,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void showRenderer(final MetaObject[] metaObjects) {
         try {
-            final List<MetaObjectNode> mons = new ArrayList<MetaObjectNode>();
+            final List<MetaObjectNode> mons = new ArrayList<>();
             for (final MetaObject metaObject : metaObjects) {
-                final CidsBean bean = metaObject.getBean();
                 mons.add(new MetaObjectNode(
                         metaObject.getDomain(),
                         metaObject.getId(),
@@ -1184,7 +1161,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (!alkisRendererDialog.isVisible()) {
                 StaticSwingTools.showDialog(alkisRendererDialog);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             // TODO fehlerdialog
             LOG.error("error while loading renderer", ex);
         }
@@ -1488,110 +1465,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private AbstractFeatureService getFleachenFeatureService() {
-        for (final MapService mapService : mappingModel.getMapServices().values()) {
-            if (checkForFlaechenFeatureService(mapService)) {
-                return (AbstractFeatureService)mapService;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   mapService  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private static boolean checkForFlaechenFeatureService(final MapService mapService) {
-        if (mapService instanceof SimplePostgisFeatureService) {
-            final AbstractFeatureService featureService = (AbstractFeatureService)mapService;
-            final String name = featureService.getName();
-            if (name.equals("Versiegelte Flächen")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  selectable  DOCUMENT ME!
-     */
-    private void setPostgisFeaturesSelectable(final boolean selectable) {
-        // falls neue dazu kommen
-        mappingModel.addMappingModelListener(new MappingModelListener() {
-
-                @Override
-                public void mapServiceLayerStructureChanged(final MappingModelEvent mme) {
-                }
-
-                @Override
-                public void mapServiceAdded(final MapService mapService) {
-                    if (mapService instanceof ModeLayer) {
-                        setFeaturesSelectable((ModeLayer)mapService, selectable);
-                    }
-                }
-
-                @Override
-                public void mapServiceRemoved(final MapService mapService) {
-                }
-            });
-
-        for (final MapService mapService : mappingModel.getMapServices().values()) {
-            if (mapService instanceof ModeLayer) {
-                setFeaturesSelectable((ModeLayer)mapService, selectable);
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  mapService  DOCUMENT ME!
-     * @param  selectable  DOCUMENT ME!
-     */
-    private static void setFeaturesSelectable(final ModeLayer mapService, final boolean selectable) {
-        if (mapService != null) {
-            mapService.addRetrievalListener(new RetrievalListener() {
-
-                    @Override
-                    public void retrievalStarted(final RetrievalEvent e) {
-                    }
-
-                    @Override
-                    public void retrievalProgress(final RetrievalEvent e) {
-                    }
-
-                    @Override
-                    public void retrievalComplete(final RetrievalEvent e) {
-                        if (mapService.getCurrentLayer() instanceof SimplePostgisFeatureService) {
-                            if (e.getRetrievedObject() != null) {
-                                for (final PostgisFeature feature : (Collection<PostgisFeature>)e.getRetrievedObject()) {
-                                    feature.setCanBeSelected(selectable);
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void retrievalAborted(final RetrievalEvent e) {
-                    }
-
-                    @Override
-                    public void retrievalError(final RetrievalEvent e) {
-                    }
-                });
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
      */
     @Override
     public void appModeChanged() {
@@ -1663,21 +1536,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                     try {
                         visible = element.getAttribute("visible").getBooleanValue();
-                    } catch (Exception skip) {
+                    } catch (final Exception skip) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Setting default value for visible", skip);
                         }
                     }
                     try {
                         enabled = element.getAttribute("enabled").getBooleanValue();
-                    } catch (Exception skip) {
+                    } catch (final Exception skip) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Setting default value for enabled", skip);
                         }
                     }
                     try {
                         translucency = element.getAttribute("translucency").getDoubleValue();
-                    } catch (Exception skip) {
+                    } catch (final Exception skip) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Setting default value for translucency", skip);
                         }
@@ -1701,7 +1574,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             }
         } catch (final Exception e) {
-            LOG.error("Problem beim Lesen des MapFiles " + fileName);
+            LOG.error("Problem beim Lesen des MapFiles " + fileName, e);
         }
     }
 
@@ -4287,7 +4160,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         @Override
                         protected List<Integer> doInBackground() throws Exception {
                             WaitDialog.getInstance().startSearchDeletedKassenzeichenFromHistory();
-                            final List<Integer> tmpList = new ArrayList<Integer>();
+                            final List<Integer> tmpList = new ArrayList<>();
                             final Collection coll = CidsAppBackend.getInstance().executeCustomServerSearch(search);
                             tmpList.addAll(coll);
                             return tmpList;
@@ -4348,7 +4221,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             try {
                 final Runtime rt = Runtime.getRuntime();
                 final Process pr = rt.exec("clink.exe verdis " + kz);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 CidsAppBackend.getInstance()
                         .showError(
                             "Fehler beim Öffnen von d.3",
@@ -4451,11 +4324,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                         .executeServerAction(
                                             RenameKassenzeichenServerAction.TASKNAME,
                                             null,
-                                            new ServerActionParameter<Integer>(
+                                            new ServerActionParameter<>(
                                                 RenameKassenzeichenServerAction.ParameterType.KASSENZEICHENNUMMER_OLD
                                                     .toString(),
                                                 oldKassenzeichenNummer),
-                                            new ServerActionParameter<Integer>(
+                                            new ServerActionParameter<>(
                                                 RenameKassenzeichenServerAction.ParameterType.KASSENZEICHENNUMMER_NEW
                                                     .toString(),
                                                 newKassenzeichenNummer));
@@ -4682,7 +4555,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         protected Void doInBackground() throws Exception {
                             WaitDialog.getInstance().startDeletingKassenzeichen(1);
 
-                            final List<CidsBean> toDeleteBeans = new ArrayList<CidsBean>();
+                            final List<CidsBean> toDeleteBeans = new ArrayList<>();
 
                             // flaechen loeschen
                             final Collection<CidsBean> flaechenBeans = getRegenFlaechenTable().getAllBeans();
@@ -4803,7 +4676,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     org.apache.log4j.PropertyConfigurator.configure(DIRECTORYPATH_VERDIS + FILESEPARATOR
                                 + "custom.log4j.properties");
                     LOG.info("CustomLoggingOn");
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource(
                             "log4j.properties"));
                 }
@@ -5081,7 +4954,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         fillVeranlagungMaps(newVeranlagungSummeMap);
 
         if (CidsAppBackend.getInstance().getAppPreferences().isVeranlagungOnlyForChangedValues()) {
-            changedVeranlagungSummeMap = new HashMap<String, Double>();
+            changedVeranlagungSummeMap = new HashMap<>();
             for (final CidsBean veranlagungsgrundlage : veranlagungsgrundlageMap.values()) {
                 final String bezeichner = (String)veranlagungsgrundlage.getProperty("veranlagungsnummer.bezeichner");
                 if ((newVeranlagungSummeMap.get(bezeichner) - oldVeranlagungSummeMap.get(bezeichner)) != 0.0d) {
@@ -5228,12 +5101,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final Collection<CrossReference> crossrefs = CidsAppBackend.getInstance().getFlaechenCrossReferences();
 
-        final Collection<CidsBean> notAllSameKzBeans = new ArrayList<CidsBean>(crossrefs.size());
+        final Collection<CidsBean> notAllSameKzBeans = new ArrayList<>(crossrefs.size());
         WaitDialog.getInstance().startCreateCrossLinks(crossrefs.size());
 
         final Map<Integer, CidsBean> crosslinkKassenzeichenBeanTmpMap = new HashMap<>(crossrefs.size());
 
-        final Collection<CidsBean> crossKassenzeichenList = new ArrayList<CidsBean>();
+        final Collection<CidsBean> crossKassenzeichenList = new ArrayList<>();
         // alle (Flächen-)Querverweise durchgehen
         int index = 0;
         for (final CrossReference crossref : crossrefs.toArray(new CrossReference[0])) {
@@ -5393,7 +5266,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final CidsBean persistedKassenzeichenBean = persistKassenzeichen(kassenzeichenBean);
 
-        final Collection<Integer> kassenzeichennummern = new ArrayList<Integer>();
+        final Collection<Integer> kassenzeichennummern = new ArrayList<>();
         for (final Collection<Integer> flaechecrosslinks : flaecheToCrosslinknummerMap.values()) {
             kassenzeichennummern.addAll(flaechecrosslinks);
         }
@@ -5652,7 +5525,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void saveKassenzeichenAndAssessement() {
         final Map<String, Double> oldVeranlagungSummeMap = veranlagungSummeMap;
-        final Map<String, Double> newVeranlagungSummeMap = new HashMap<String, Double>();
+        final Map<String, Double> newVeranlagungSummeMap = new HashMap<>();
 
         final Map<String, Double> changedVeranlagungSummeMap = calculateChangedVeranlagungSummeMap(
                 oldVeranlagungSummeMap,
