@@ -61,6 +61,8 @@ import de.cismet.cids.custom.commons.searchgeometrylistener.RissNodesSearchCreat
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.cismap.cidslayer.CidsLayerFeature;
+
 import de.cismet.cismap.commons.RetrievalServiceLayer;
 import de.cismet.cismap.commons.ServiceLayer;
 import de.cismet.cismap.commons.features.*;
@@ -126,7 +128,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
     private boolean isAssignLandparcel = false;
-    private Action searchAction = new AbstractAction() {
+    private final Action searchAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -169,7 +171,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         };
 
-    private Action searchRectangleAction = new AbstractAction() {
+    private final Action searchRectangleAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -207,7 +209,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         };
 
-    private Action searchPolygonAction = new AbstractAction() {
+    private final Action searchPolygonAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -245,7 +247,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         };
 
-    private Action searchEllipseAction = new AbstractAction() {
+    private final Action searchEllipseAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -381,16 +383,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         CismapBroker.getInstance().setMappingComponent(mappingComp);
 
         mappingComp.getFeatureCollection().addFeatureCollectionListener(this);
-        // mappingComp.putInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA, new AttachFeatureListener());
-
         mappingComp.setBackgroundEnabled(true);
 
-//        CreateGeometryListener g=new CreateGeometryListener(mappingComp,JLabel.class) {
-//
-//
-//        };
-        // mappingComp.addInputListener("TIM_EASY_CREATOR",)
-        // TIM Easy
         cmdNewPoint.setVisible(true);
 
         ((JHistoryButton)cmdForward).setDirection(JHistoryButton.DIRECTION_FORWARD);
@@ -426,10 +420,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
         ((Observable)mappingComp.getMemUndo()).addObserver(this);
         ((Observable)mappingComp.getMemRedo()).addObserver(this);
-
-//        if (mappingComp.getFeatureCollection() instanceof DefaultFeatureCollection) {
-//            ((DefaultFeatureCollection) mappingComp.getFeatureCollection()).setSingleSelection(true);
-//        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -1546,7 +1536,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdFullPoly1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdFullPoly1ActionPerformed
-        final Collection<Feature> coll = new ArrayList<Feature>();
+        final Collection<Feature> coll = new ArrayList<>();
         for (final Object f : mappingComp.getFeatureCollection().getSelectedFeatures()) {
             if ((f instanceof CidsFeature) || (f instanceof PureNewFeature)) {
                 coll.add((Feature)f);
@@ -2115,7 +2105,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * DOCUMENT ME!
      */
     private void checkProgress() {
-        // log.debug(activeRetrievalServices);
         if (activeRetrievalServices.size() > 0) {
             setWaiting(true);
         } else {
@@ -2196,7 +2185,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     public void refreshMeasurementsInStatus() {
         final Collection<Feature> selectedFeatures = mappingComp.getFeatureCollection().getSelectedFeatures();
-        final Collection<Feature> cidsFeatures = new ArrayList<Feature>();
+        final Collection<Feature> cidsFeatures = new ArrayList<>();
         for (final Feature feature : selectedFeatures) {
             if ((feature instanceof CidsFeature) || (feature instanceof PureNewFeature)) {
                 cidsFeatures.add(feature);
@@ -2205,7 +2194,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         refreshMeasurementsInStatus(cidsFeatures);
     }
 
-    /**
+    /*
      * DOCUMENT ME!
      *
      * @param  b  DOCUMENT ME!
@@ -2278,10 +2267,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
             lblCoord.setText(MappingComponent.getCoordinateString(x, y)); // + "... " +test);
             final PFeature pf = ((SimpleMoveListener)o).getUnderlyingPFeature();
-            if ((pf != null) && (pf.getFeature() instanceof PostgisFeature) && (pf.getVisible() == true)
+            if ((pf != null) && (pf.getFeature() instanceof CidsLayerFeature) && (pf.getVisible() == true)
                         && (pf.getParent() != null)
                         && (pf.getParent().getVisible() == true)) {
-                lblInfo.setText(((PostgisFeature)pf.getFeature()).getObjectName());
+                lblInfo.setText(((CidsLayerFeature)pf.getFeature()).toString());
             } else if ((pf != null) && (pf.getFeature() instanceof CidsFeature)) {
                 final CidsFeature cf = (CidsFeature)pf.getFeature();
                 final CidsBean cb = (CidsBean)cf.getMetaObject().getBean();
@@ -2752,7 +2741,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @return  DOCUMENT ME!
      */
     private Collection<Feature> fetchFeaturesAllgemein(final CidsBean kassenzeichen, final boolean editable) {
-        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final ArrayList<Feature> featureCollection = new ArrayList<>();
 
         final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzeichen.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
@@ -2785,7 +2774,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @return  DOCUMENT ME!
      */
     private Collection<Feature> fetchFeaturesRegen(final CidsBean kassenzeichen, final boolean editable) {
-        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final ArrayList<Feature> featureCollection = new ArrayList<>();
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         for (final CidsBean flaeche : flaechen) {
@@ -2818,7 +2807,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @return  DOCUMENT ME!
      */
     private Collection<Feature> fetchFeaturesESW(final CidsBean cidsBean, final boolean editable) {
-        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final ArrayList<Feature> featureCollection = new ArrayList<>();
         final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
         for (final CidsBean front : fronten) {
@@ -2852,7 +2841,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     private Collection<Feature> fetchFeaturesBefreiungerlaubnisGeometrie(final CidsBean cidsBean,
             final boolean editable) {
-        final ArrayList<Feature> featureCollection = new ArrayList<Feature>();
+        final ArrayList<Feature> featureCollection = new ArrayList<>();
         final List<CidsBean> befers = cidsBean.getBeanCollectionProperty(VerdisMetaClassConstants.MC_KANALANSCHLUSS
                         + "." + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
         for (final CidsBean befer : befers) {
@@ -2977,12 +2966,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         } else {
             cmdSnap.setSelected(false);
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void initSearch() {
     }
 
     /**
