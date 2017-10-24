@@ -420,6 +420,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         }
         ((Observable)mappingComp.getMemUndo()).addObserver(this);
         ((Observable)mappingComp.getMemRedo()).addObserver(this);
+
+        ((SimpleMoveListener)mappingComp.getInputListener(
+                MappingComponent.MOTION)).setDeepSeekEnabled(true);
     }
 
     //~ Methods ----------------------------------------------------------------
