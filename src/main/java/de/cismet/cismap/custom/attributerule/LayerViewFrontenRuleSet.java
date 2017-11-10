@@ -98,7 +98,7 @@ public class LayerViewFrontenRuleSet extends DefaultAttributeTableRuleSet {
 
         @Override
         public int getLineWidth() {
-            return 1;
+            return 8;
         }
     }
 }
