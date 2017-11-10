@@ -95,5 +95,10 @@ public class LayerViewFrontenRuleSet extends DefaultAttributeTableRuleSet {
         public Paint getLinePaint() {
             return new Color(-6710887);
         }
+
+        @Override
+        public int getLineWidth() {
+            return 1;
+        }
     }
 }
