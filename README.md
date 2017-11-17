@@ -1,6 +1,6 @@
 verdis D3 Opener [![Build Status](http://ci.cismet.de/buildStatus/icon?job=verdis)](https://ci.cismet.de/job/verdis/)
 ======
-VerDIS D3 Opener is a custom tool to call the search functionaliyt of a legacy DMS.
+VerDIS D3 Opener is a custom tool to call the search functionality of a legacy DMS used by the webclient verdis2go.
 
 
 ![verdis Screener](http://www.cismet.de/images/projects/screener/verdis.png)
@@ -24,3 +24,6 @@ License
 =======
 
 verdis is distributed under [GPLv3](https://github.com/cismet/verdis/blob/dev/LICENSE)
+
+This small tool is distributed under [MIT License](https://github.com/cismet/verdis-d3-opener/blob/dev/LICENSE)
+
