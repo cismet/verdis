@@ -1,4 +1,4 @@
-verdis D3 Opener [![Build Status](http://ci.cismet.de/buildStatus/icon?job=verdis)](https://ci.cismet.de/job/verdis/)
+verdis D3 Opener 
 ======
 VerDIS D3 Opener is a custom tool to call the search functionality of a legacy DMS used by the webclient verdis2go.
 
