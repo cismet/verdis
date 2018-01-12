@@ -4887,11 +4887,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
         cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
         cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
-        if (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
+        if (!b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
                         .isEmpty());
-        } else if (CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())) {
+        } else if (!b && CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)
                         .isEmpty());
