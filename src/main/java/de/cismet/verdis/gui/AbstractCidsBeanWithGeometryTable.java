@@ -14,6 +14,7 @@ import edu.umd.cs.piccolox.event.PNotification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -47,7 +48,7 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
 
     //~ Instance fields --------------------------------------------------------
 
-    private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<CidsBean, CidsFeature>();
+    private final HashMap<CidsBean, CidsFeature> featureMap = new HashMap<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -76,7 +77,10 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
             final CidsBean newBean = createNewBean();
             if (newBean != null) {
                 addBean(newBean);
-                Main.getMappingComponent().getFeatureCollection().select(new CidsFeature(newBean.getMetaObject()));
+                final CidsFeature feature = featureMap.get(newBean);
+                if (feature != null) {
+                    Main.getMappingComponent().getFeatureCollection().select(feature);
+                }
             }
         } catch (final Exception ex) {
             LOG.error("error while creating new bean", ex);
@@ -329,5 +333,11 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
                 LOG.error("error when trying to attach new feature to existing bean", exception);
             }
         }
+    }
+
+    @Override
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        featureMap.clear();
+        super.setCidsBeans(cidsBeans);
     }
 }
