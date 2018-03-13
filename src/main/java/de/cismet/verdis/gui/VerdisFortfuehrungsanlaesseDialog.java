@@ -41,6 +41,8 @@ import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cismap.commons.CrsTransformer;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
@@ -84,7 +86,7 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
      * @param  modal   DOCUMENT ME!
      */
     public VerdisFortfuehrungsanlaesseDialog(final java.awt.Frame parent, final boolean modal) {
-        super(parent, modal);
+        super(parent, modal, ConnectionContext.createDeprecated());
     }
 
     //~ Methods ----------------------------------------------------------------

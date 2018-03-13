@@ -194,6 +194,8 @@ import de.cismet.cismap.commons.interaction.events.ActiveLayerEvent;
 import de.cismet.cismap.commons.tools.PFeatureTools;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
@@ -1245,7 +1247,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final FlurstueckNodesSearchCreateSearchGeometryListener flurstueckCreateSearchGeomListener =
             new FlurstueckNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
-                propChangeListener);
+                propChangeListener,
+                ConnectionContext.createDeprecated());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(
@@ -1258,7 +1261,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final RissNodesSearchCreateSearchGeometryListener rissCreateSearchGeomListener =
             new RissNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
-                propChangeListener);
+                propChangeListener,
+                ConnectionContext.createDeprecated());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(RissNodesSearchCreateSearchGeometryListener.NAME,
@@ -1270,7 +1274,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         final BaulastblattNodesSearchCreateSearchGeometryListener baulastblattCreateSearchGeomListener =
             new BaulastblattNodesSearchCreateSearchGeometryListener(CidsAppBackend.getInstance().getMainMap(),
-                propChangeListener);
+                propChangeListener,
+                ConnectionContext.createDeprecated());
         CidsAppBackend.getInstance()
                 .getMainMap()
                 .addCustomInputListener(
@@ -4406,7 +4411,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSearchRisseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchRisseActionPerformed
-        StaticSwingTools.showDialog(new VermessungsrissSuchDialog(this, false));
+        StaticSwingTools.showDialog(new VermessungsrissSuchDialog(this, false, ConnectionContext.createDeprecated()));
     }                                                                                  //GEN-LAST:event_cmdSearchRisseActionPerformed
 
     /**
@@ -4415,7 +4420,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSearchBaulastenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSearchBaulastenActionPerformed
-        StaticSwingTools.showDialog(new BaulastSuchDialog(this, false));
+        StaticSwingTools.showDialog(new BaulastSuchDialog(this, false, ConnectionContext.createDeprecated()));
     }                                                                                      //GEN-LAST:event_cmdSearchBaulastenActionPerformed
 
     /**
