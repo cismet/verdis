@@ -21,6 +21,8 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.server.action.EBReportServerAction;
+
 /**
  * DOCUMENT ME!
  *

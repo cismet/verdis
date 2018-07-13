@@ -15,18 +15,12 @@ import Sirius.navigator.exception.ConnectionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
-
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import java.util.ArrayList;
@@ -35,6 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -43,10 +38,8 @@ import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRender
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 
@@ -70,8 +63,8 @@ public class FlaechenReportBean extends EBReportBean {
 
     //~ Instance fields --------------------------------------------------------
 
-    private List<CidsBean> dachflaechen = new LinkedList<CidsBean>();
-    private List<CidsBean> versiegelteflaechen = new LinkedList<CidsBean>();
+    private List<CidsBean> dachflaechen = new LinkedList<>();
+    private List<CidsBean> versiegelteflaechen = new LinkedList<>();
     private String hinweise;
 
     //~ Constructors -----------------------------------------------------------
@@ -79,6 +72,7 @@ public class FlaechenReportBean extends EBReportBean {
     /**
      * Creates a new FebBean object.
      *
+     * @param  properties        DOCUMENT ME!
      * @param  kassenzeichen     DOCUMENT ME!
      * @param  hinweise          DOCUMENT ME!
      * @param  mapHeight         DOCUMENT ME!
@@ -86,13 +80,14 @@ public class FlaechenReportBean extends EBReportBean {
      * @param  scaleDenominator  DOCUMENT ME!
      * @param  fillAbfluss       DOCUMENT ME!
      */
-    public FlaechenReportBean(final CidsBean kassenzeichen,
+    public FlaechenReportBean(final Properties properties,
+            final CidsBean kassenzeichen,
             final String hinweise,
             final int mapHeight,
             final int mapWidth,
             final Double scaleDenominator,
             final boolean fillAbfluss) {
-        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, fillAbfluss);
+        super(properties, kassenzeichen, mapHeight, mapWidth, scaleDenominator, fillAbfluss);
         loadMap();
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
@@ -188,9 +183,7 @@ public class FlaechenReportBean extends EBReportBean {
         final List<CidsBean> flaechen = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
-        final int fontSize = Integer.parseInt(NbBundle.getMessage(
-                    FlaechenReportBean.class,
-                    "FEBReportBean.annotationFontSize"));
+        final int fontSize = Integer.parseInt(getProperties().getProperty("FEBReportBean.annotationFontSize"));
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());

@@ -268,6 +268,7 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
+import de.cismet.verdis.server.action.EBReportServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;

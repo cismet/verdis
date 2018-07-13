@@ -29,8 +29,6 @@ import java.awt.Stroke;
 
 import javax.swing.JComponent;
 
-import de.cismet.cids.custom.objectrenderer.wunda_blau.AlkisBuchungsblattRenderer;
-
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.cismap.commons.Refreshable;
@@ -38,8 +36,6 @@ import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 import de.cismet.cismap.commons.gui.piccolo.FixedWidthStroke;
 
 import de.cismet.cismap.navigatorplugin.CidsFeature;
-
-import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienPanel;
 
 /**
  * DOCUMENT ME!
@@ -53,6 +49,13 @@ public class KassenzeichenGeometrieFeatureRenderer extends CustomCidsFeatureRend
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             KassenzeichenGeometrieFeatureRenderer.class);
+    private static final Color[] COLORS = new Color[] {
+            new Color(41, 86, 178),
+            new Color(101, 156, 239),
+            new Color(125, 189, 0),
+            new Color(220, 246, 0),
+            new Color(255, 91, 0)
+        };
 
     //~ Methods ----------------------------------------------------------------
 
@@ -62,8 +65,8 @@ public class KassenzeichenGeometrieFeatureRenderer extends CustomCidsFeatureRend
         if (colorIndex < 0) {
             colorIndex = -colorIndex;
         }
-        colorIndex %= KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.size();
-        return KassenzeichenGeometrienPanel.LANDPARCEL_COLORS.get(colorIndex);
+        colorIndex %= COLORS.length;
+        return COLORS[colorIndex];
     }
 
     @Override

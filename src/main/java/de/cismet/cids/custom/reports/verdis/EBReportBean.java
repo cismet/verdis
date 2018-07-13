@@ -25,8 +25,6 @@ import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.tools.UnitConv;
 
-import org.openide.util.NbBundle;
-
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
@@ -37,6 +35,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -75,23 +74,27 @@ public abstract class EBReportBean {
     private final int mapHeight;
     private final Double scaleDenominator;
     private boolean fillAbflusswirksamkeit = false;
+    private final Properties properties;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FebBean object.
      *
+     * @param  properties        DOCUMENT ME!
      * @param  kassenzeichen     DOCUMENT ME!
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      * @param  fillAbfluss       DOCUMENT ME!
      */
-    public EBReportBean(final CidsBean kassenzeichen,
+    public EBReportBean(final Properties properties,
+            final CidsBean kassenzeichen,
             final int mapHeight,
             final int mapWidth,
             final Double scaleDenominator,
             final boolean fillAbfluss) {
+        this.properties = properties;
         this.kassenzeichen = kassenzeichen;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
@@ -211,6 +214,15 @@ public abstract class EBReportBean {
 
     /**
      * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * DOCUMENT ME!
      */
     protected void loadMap() {
         final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(
@@ -292,9 +304,7 @@ public abstract class EBReportBean {
 
         mapProvider.setBoundingBox(boundingBox);
 
-        final int mapDPI = Integer.parseInt(NbBundle.getMessage(
-                    EBReportBean.class,
-                    "FEBReportBean.mapDPI"));
+        final int mapDPI = Integer.parseInt(properties.getProperty("FEBReportBean.mapDPI"));
 
         mapProvider.setFeatureResolutionFactor(mapDPI);
         try {

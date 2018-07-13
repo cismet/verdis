@@ -25,15 +25,11 @@ package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
 import java.awt.Paint;
 
-import de.cismet.cids.custom.util.VerdisUtils;
-
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-
-import de.cismet.verdis.gui.Main;
 
 /**
  * DOCUMENT ME!
@@ -44,6 +40,14 @@ import de.cismet.verdis.gui.Main;
 public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Static fields/initializers ---------------------------------------------
+
+    public static final int PROPVAL_ART_DACH = 1;
+    public static final int PROPVAL_ART_GRUENDACH = 2;
+    public static final int PROPVAL_ART_VERSIEGELTEFLAECHE = 3;
+    public static final int PROPVAL_ART_OEKOPFLASTER = 4;
+    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE = 5;
+    public static final int PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER = 6;
+    public static final int PROPVAL_ART_VORLAEUFIGEVERANLASSUNG = 7;
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             FlaecheFeatureRenderer.class);
@@ -69,22 +73,22 @@ public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
         }
         final int alpha = 255;
         switch (art) {
-            case VerdisUtils.PROPVAL_ART_DACH: {
+            case PROPVAL_ART_DACH: {
                 return new java.awt.Color(162, 76, 41, alpha);
             }
-            case VerdisUtils.PROPVAL_ART_GRUENDACH: {
+            case PROPVAL_ART_GRUENDACH: {
                 return new java.awt.Color(106, 122, 23, alpha);
             }
-            case VerdisUtils.PROPVAL_ART_VERSIEGELTEFLAECHE: {
+            case PROPVAL_ART_VERSIEGELTEFLAECHE: {
                 return new java.awt.Color(120, 129, 128, alpha);
             }
-            case VerdisUtils.PROPVAL_ART_OEKOPFLASTER: {
+            case PROPVAL_ART_OEKOPFLASTER: {
                 return new java.awt.Color(159, 155, 108, alpha);
             }
-            case VerdisUtils.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE: {
+            case PROPVAL_ART_STAEDTISCHESTRASSENFLAECHE: {
                 return new java.awt.Color(138, 134, 132, alpha);
             }
-            case VerdisUtils.PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER: {
+            case PROPVAL_ART_STAEDTISCHESTRASSENFLAECHEOEKOPLFASTER: {
                 return new java.awt.Color(126, 91, 71, alpha);
             }
             default: {
