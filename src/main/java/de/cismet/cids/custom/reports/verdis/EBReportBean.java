@@ -25,8 +25,6 @@ import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.tools.UnitConv;
 
-import org.openide.util.NbBundle;
-
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
@@ -37,6 +35,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -75,23 +74,27 @@ public abstract class EBReportBean {
     private final int mapHeight;
     private final Double scaleDenominator;
     private boolean fillAbflusswirksamkeit = false;
+    private final Properties properties;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FebBean object.
      *
+     * @param  properties        DOCUMENT ME!
      * @param  kassenzeichen     DOCUMENT ME!
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      * @param  fillAbfluss       DOCUMENT ME!
      */
-    public EBReportBean(final CidsBean kassenzeichen,
+    public EBReportBean(final Properties properties,
+            final CidsBean kassenzeichen,
             final int mapHeight,
             final int mapWidth,
             final Double scaleDenominator,
             final boolean fillAbfluss) {
+        this.properties = properties;
         this.kassenzeichen = kassenzeichen;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
@@ -211,21 +214,26 @@ public abstract class EBReportBean {
 
     /**
      * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * DOCUMENT ME!
      */
     protected void loadMap() {
-        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(
-
-                    // "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
-                    "http://S102w484:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default"));
+        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(EBGenerator.WMS_CALL));
         final HeadlessMapProvider mapProvider = new HeadlessMapProvider();
         mapProvider.setCenterMapOnResize(true);
-        final String crsString = "EPSG:31466";
-        final Crs crs = new Crs(crsString, "", "", true, true);
+        final Crs crs = new Crs(EBGenerator.SRS, "", "", true, true);
         mapProvider.setCrs(crs);
         mapProvider.addLayer(simpleWms);
 
         final Collection<Feature> features = createFeatures();
-        int srid = CrsTransformer.extractSridFromCrs(crsString);
+        int srid = CrsTransformer.extractSridFromCrs(EBGenerator.SRS);
         boolean first = true;
         final List<Geometry> geomList = new ArrayList<Geometry>(features.size());
         for (final Feature feature : features) {
@@ -239,7 +247,7 @@ public abstract class EBReportBean {
                     first = false;
                 } else {
                     if (geometry.getSRID() != srid) {
-                        geometry = CrsTransformer.transformToGivenCrs(geometry, crsString);
+                        geometry = CrsTransformer.transformToGivenCrs(geometry, EBGenerator.SRS);
                     }
                 }
 
@@ -292,9 +300,7 @@ public abstract class EBReportBean {
 
         mapProvider.setBoundingBox(boundingBox);
 
-        final int mapDPI = Integer.parseInt(NbBundle.getMessage(
-                    EBReportBean.class,
-                    "FEBReportBean.mapDPI"));
+        final int mapDPI = Integer.parseInt(properties.getProperty("FEBReportBean.mapDPI"));
 
         mapProvider.setFeatureResolutionFactor(mapDPI);
         try {

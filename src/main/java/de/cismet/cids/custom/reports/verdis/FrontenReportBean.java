@@ -24,7 +24,6 @@ import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -36,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JLabel;
 
@@ -43,10 +43,8 @@ import de.cismet.cids.custom.featurerenderer.verdis_grundis.FrontFeatureRenderer
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 
@@ -69,23 +67,25 @@ public class FrontenReportBean extends EBReportBean {
 
     //~ Instance fields --------------------------------------------------------
 
-    private List<CidsBean> fronten = new LinkedList<CidsBean>();
+    private List<CidsBean> fronten = new LinkedList<>();
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FebBean object.
      *
+     * @param  properties        DOCUMENT ME!
      * @param  kassenzeichen     DOCUMENT ME!
      * @param  mapHeight         DOCUMENT ME!
      * @param  mapWidth          DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      */
-    public FrontenReportBean(final CidsBean kassenzeichen,
+    public FrontenReportBean(final Properties properties,
+            final CidsBean kassenzeichen,
             final int mapHeight,
             final int mapWidth,
             final Double scaleDenominator) {
-        super(kassenzeichen, mapHeight, mapWidth, scaleDenominator, false);
+        super(properties, kassenzeichen, mapHeight, mapWidth, scaleDenominator, false);
         this.fronten = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
         Collections.sort(this.fronten, new FrontenComparator());
@@ -107,14 +107,12 @@ public class FrontenReportBean extends EBReportBean {
 
     @Override
     protected Collection<Feature> createFeatures() {
-        final Collection<Feature> features = new ArrayList<Feature>();
+        final Collection<Feature> features = new ArrayList<>();
         final FrontFeatureRenderer fr = new FrontFeatureRenderer();
         final Collection<CidsBean> fronten = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
-        final int fontSize = Integer.parseInt(NbBundle.getMessage(
-                    FrontenReportBean.class,
-                    "FEBReportBean.annotationFontSize"));
+        final int fontSize = Integer.parseInt(getProperties().getProperty("FEBReportBean.annotationFontSize"));
         for (final CidsBean b : fronten) {
             try {
                 fr.setMetaObject(b.getMetaObject());

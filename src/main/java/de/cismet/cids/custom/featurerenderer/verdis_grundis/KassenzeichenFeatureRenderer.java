@@ -25,8 +25,6 @@ package de.cismet.cids.custom.featurerenderer.verdis_grundis;
 
 import java.awt.Paint;
 
-import javax.swing.Icon;
-
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
