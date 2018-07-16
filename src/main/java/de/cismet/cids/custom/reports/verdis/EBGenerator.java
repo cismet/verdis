@@ -304,180 +304,175 @@ public class EBGenerator {
             final Double scaleDenominator,
             final String hints,
             final boolean abflusswirksamkeit,
-            final ConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) throws Exception {
+        final User user = SessionManager.getSession().getUser();
+        final MetaClass kassenzeichenMc = CidsBean.getMetaClassFromTableName(
+                VerdisConstants.DOMAIN,
+                VerdisMetaClassConstants.MC_KASSENZEICHEN,
+                connectionContext);
+        final CidsBean kassenzeichen = SessionManager.getConnection()
+                    .getMetaObject(
+                            user,
+                            kassenzeichenId,
+                            kassenzeichenMc.getId(),
+                            VerdisConstants.DOMAIN,
+                            connectionContext)
+                    .getBean();
+
+        final FileOutputStream out = null;
+        final boolean forceQuit = false;
         try {
-            final User user = SessionManager.getSession().getUser();
-            final MetaClass kassenzeichenMc = CidsBean.getMetaClassFromTableName(
-                    VerdisConstants.DOMAIN,
-                    VerdisMetaClassConstants.MC_KASSENZEICHEN,
-                    connectionContext);
-            final CidsBean kassenzeichen = SessionManager.getConnection()
-                        .getMetaObject(
-                                user,
-                                kassenzeichenId,
-                                kassenzeichenMc.getId(),
-                                VerdisConstants.DOMAIN,
-                                connectionContext)
-                        .getBean();
+            final Properties properties = getProperties(user, connectionContext);
 
-            final FileOutputStream out = null;
-            final boolean forceQuit = false;
-            try {
-                final Properties properties = getProperties(user, connectionContext);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("generating report beans");
+            }
+            String repMap;
+            String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
+            String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
+            if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                        || EBReportServerAction.MapFormat.A4P.equals(mapFormat)) {
+                repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
+                mapHeightPropkey += A4_FORMAT;
+                mapWidthPropkey += A4_FORMAT;
+            } else {
+                repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
+                mapHeightPropkey += A3_FORMAT;
+                mapWidthPropkey += A3_FORMAT;
+            }
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("generating report beans");
-                }
-                String repMap;
-                String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
-                String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
-                if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                            || EBReportServerAction.MapFormat.A4P.equals(mapFormat)) {
-                    repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
-                    mapHeightPropkey += A4_FORMAT;
-                    mapWidthPropkey += A4_FORMAT;
-                } else {
-                    repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
-                    mapHeightPropkey += A3_FORMAT;
-                    mapWidthPropkey += A3_FORMAT;
-                }
+            if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                        || EBReportServerAction.MapFormat.A3LS.equals(mapFormat)) {
+                repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
+                mapHeightPropkey += LANDSCAPE_ORIENTATION;
+                mapWidthPropkey += LANDSCAPE_ORIENTATION;
+            } else {
+                repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
+                mapHeightPropkey += PORTRAIT_ORIENTATION;
+                mapWidthPropkey += PORTRAIT_ORIENTATION;
+            }
 
-                if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                            || EBReportServerAction.MapFormat.A3LS.equals(mapFormat)) {
-                    repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
-                    mapHeightPropkey += LANDSCAPE_ORIENTATION;
-                    mapWidthPropkey += LANDSCAPE_ORIENTATION;
-                } else {
-                    repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
-                    mapHeightPropkey += PORTRAIT_ORIENTATION;
-                    mapWidthPropkey += PORTRAIT_ORIENTATION;
-                }
+            if (EBReportServerAction.Type.FRONTEN.equals(type)) {
+                repMap = repMap.replace("<mode>", "fronten");
+            } else {
+                repMap = repMap.replace("<mode>", "feb");
+            }
+            repMap = repMap.replace("<subreportDir>", properties.getProperty("reportsDirectory"));
 
-                if (EBReportServerAction.Type.FRONTEN.equals(type)) {
-                    repMap = repMap.replace("<mode>", "fronten");
-                } else {
-                    repMap = repMap.replace("<mode>", "feb");
-                }
-                repMap = repMap.replace("<subreportDir>", properties.getProperty("reportsDirectory"));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Report File for Map: " + repMap);
+            }
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Report File for Map: " + repMap);
-                }
+            final int mapWidth = Integer.parseInt(properties.getProperty(mapWidthPropkey));
+            final int mapHeight = Integer.parseInt(properties.getProperty(mapHeightPropkey));
 
-                final int mapWidth = Integer.parseInt(properties.getProperty(mapWidthPropkey));
-                final int mapHeight = Integer.parseInt(properties.getProperty(mapHeightPropkey));
+            final EBReportBean reportBean;
+            if (EBReportServerAction.Type.FRONTEN.equals(type)) {
+                reportBean = new FrontenReportBean(
+                        properties,
+                        kassenzeichen,
+                        mapHeight,
+                        mapWidth,
+                        scaleDenominator);
+            } else {
+                reportBean = new FlaechenReportBean(
+                        properties,
+                        kassenzeichen,
+                        hints,
+                        mapHeight,
+                        mapWidth,
+                        scaleDenominator,
+                        abflusswirksamkeit);
+            }
+            final Collection<EBReportBean> reportBeans = new LinkedList<>();
+            reportBeans.add(reportBean);
+            boolean ready;
 
-                final EBReportBean reportBean;
-                if (EBReportServerAction.Type.FRONTEN.equals(type)) {
-                    reportBean = new FrontenReportBean(
-                            properties,
-                            kassenzeichen,
-                            mapHeight,
-                            mapWidth,
-                            scaleDenominator);
-                } else {
-                    reportBean = new FlaechenReportBean(
-                            properties,
-                            kassenzeichen,
-                            hints,
-                            mapHeight,
-                            mapWidth,
-                            scaleDenominator,
-                            abflusswirksamkeit);
-                }
-                final Collection<EBReportBean> reportBeans = new LinkedList<>();
-                reportBeans.add(reportBean);
-                boolean ready;
-
-                do {
-                    ready = true;
-                    for (final EBReportBean rb : reportBeans) {
-                        if (!rb.isReadyToProceed() || forceQuit) {
-                            ready = false;
-                            break;
-                        }
-                    }
-                } while (!ready);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("ready to procced");
-                }
-                final HashMap parameters = new HashMap();
-                parameters.put("SUBREPORT_DIR", properties.getProperty("reportsDirectory"));
-                parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
-
-                final List<InputStream> ins = new ArrayList<>();
-
-                if (mapFormat != null) {
-                    final VerdisServerResources reportResource;
-                    switch (mapFormat) {
-                        case A4LS: {
-                            reportResource = VerdisServerResources.EB_MAP_A4LS_JASPER;
-                        }
+            do {
+                ready = true;
+                for (final EBReportBean rb : reportBeans) {
+                    if (!rb.isReadyToProceed() || forceQuit) {
+                        ready = false;
                         break;
-                        case A4P: {
-                            reportResource = VerdisServerResources.EB_MAP_A4P_JASPER;
-                        }
-                        break;
-                        case A3LS: {
-                            reportResource = VerdisServerResources.EB_MAP_A3LS_JASPER;
-                        }
-                        break;
-                        case A3P: {
-                            reportResource = VerdisServerResources.EB_MAP_A3P_JASPER;
-                        }
-                        break;
-                        default: {
-                            reportResource = null;
-                        }
-                    }
-                    if (reportResource != null) {
-                        final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                        final byte[] bytes = generateReport(
-                                reportResource,
-                                parameters,
-                                dataSource,
-                                connectionContext);
-                        ins.add(new ByteArrayInputStream(bytes));
                     }
                 }
+            } while (!ready);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ready to procced");
+            }
+            final HashMap parameters = new HashMap();
+            parameters.put("SUBREPORT_DIR", properties.getProperty("reportsDirectory"));
+            parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
 
-                if (type != null) {
-                    VerdisServerResources reportResource;
-                    switch (type) {
-                        case FLAECHEN: {
-                            reportResource = VerdisServerResources.EB_FLAECHEN_JASPER;
-                        }
-                        break;
-                        case FRONTEN: {
-                            reportResource = VerdisServerResources.EB_FRONTEN_JASPER;
-                        }
-                        break;
-                        default: {
-                            reportResource = null;
-                        }
+            final List<InputStream> ins = new ArrayList<>();
+
+            if (mapFormat != null) {
+                final VerdisServerResources reportResource;
+                switch (mapFormat) {
+                    case A4LS: {
+                        reportResource = VerdisServerResources.EB_MAP_A4LS_JASPER;
                     }
-
-                    if (reportResource != null) {
-                        final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                        final byte[] bytes = generateReport(reportResource,
-                                parameters,
-                                dataSource,
-                                connectionContext);
-                        ins.add(new ByteArrayInputStream(bytes));
+                    break;
+                    case A4P: {
+                        reportResource = VerdisServerResources.EB_MAP_A4P_JASPER;
+                    }
+                    break;
+                    case A3LS: {
+                        reportResource = VerdisServerResources.EB_MAP_A3LS_JASPER;
+                    }
+                    break;
+                    case A3P: {
+                        reportResource = VerdisServerResources.EB_MAP_A3P_JASPER;
+                    }
+                    break;
+                    default: {
+                        reportResource = null;
                     }
                 }
-
-                final ByteArrayOutputStream byteArrayReportsStream = new ByteArrayOutputStream();
-                ReportHelper.concatPDFs(ins, byteArrayReportsStream, false);
-                return byteArrayReportsStream.toByteArray();
-            } finally {
-                if (out != null) {
-                    out.close();
+                if (reportResource != null) {
+                    final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
+                    final byte[] bytes = generateReport(
+                            reportResource,
+                            parameters,
+                            dataSource,
+                            connectionContext);
+                    ins.add(new ByteArrayInputStream(bytes));
                 }
             }
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-            return null;
+
+            if (type != null) {
+                VerdisServerResources reportResource;
+                switch (type) {
+                    case FLAECHEN: {
+                        reportResource = VerdisServerResources.EB_FLAECHEN_JASPER;
+                    }
+                    break;
+                    case FRONTEN: {
+                        reportResource = VerdisServerResources.EB_FRONTEN_JASPER;
+                    }
+                    break;
+                    default: {
+                        reportResource = null;
+                    }
+                }
+
+                if (reportResource != null) {
+                    final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
+                    final byte[] bytes = generateReport(reportResource,
+                            parameters,
+                            dataSource,
+                            connectionContext);
+                    ins.add(new ByteArrayInputStream(bytes));
+                }
+            }
+
+            final ByteArrayOutputStream byteArrayReportsStream = new ByteArrayOutputStream();
+            ReportHelper.concatPDFs(ins, byteArrayReportsStream, false);
+            return byteArrayReportsStream.toByteArray();
+        } finally {
+            if (out != null) {
+                out.close();
+            }
         }
     }
 
