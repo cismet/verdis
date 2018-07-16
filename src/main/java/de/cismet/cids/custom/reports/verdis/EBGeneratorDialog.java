@@ -18,16 +18,22 @@ import java.awt.Frame;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import de.cismet.cids.custom.utils.ByteArrayActionDownload;
+
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.cismap.commons.gui.printing.BackgroundTaskDownload;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
+import de.cismet.tools.gui.downloadmanager.ByteArrayDownload;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.EBReportServerAction;
 
@@ -457,6 +463,70 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
             }
         }
 
+        if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(parent)) {
+            final String jobname = DownloadManagerDialog.getInstance().getJobName();
+
+            final int nummer = (Integer)kassenzeichen.getProperty(
+                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+            final String fileName = (Mode.FLAECHEN.equals(mode)) ? ("FEB-" + nummer) : ("STR-" + nummer);
+            downloadFromGenerator(type, mapFormat, hints, jobname, fileName);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  type       DOCUMENT ME!
+     * @param  mapFormat  DOCUMENT ME!
+     * @param  hints      DOCUMENT ME!
+     * @param  title      DOCUMENT ME!
+     * @param  fileName   DOCUMENT ME!
+     */
+    private void downloadFromAction(final EBReportServerAction.Type type,
+            final EBReportServerAction.MapFormat mapFormat,
+            final String hints,
+            final String title,
+            final String fileName) {
+        final ByteArrayActionDownload download = new ByteArrayActionDownload(
+                VerdisConstants.DOMAIN,
+                EBReportServerAction.TASK_NAME,
+                kassenzeichen.getMetaObject().getId(),
+                new ServerActionParameter[] {
+                    new ServerActionParameter(EBReportServerAction.Parameter.TYPE.toString(), type.toString()),
+                    new ServerActionParameter(
+                        EBReportServerAction.Parameter.MAP_FORMAT.toString(),
+                        mapFormat.toString()),
+                    new ServerActionParameter(
+                        EBReportServerAction.Parameter.MAP_SCALE.toString(),
+                        getSelectedScaleDenominator()),
+                    new ServerActionParameter(EBReportServerAction.Parameter.HINTS.toString(), hints),
+                    new ServerActionParameter(
+                        EBReportServerAction.Parameter.ABLUSSWIRKSAMKEIT.toString(),
+                        chkFillAbflusswirksamkeit.isSelected()),
+                },
+                "",
+                title,
+                fileName,
+                ".pdf",
+                ConnectionContext.createDummy());
+
+        DownloadManager.instance().add(download);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  type       DOCUMENT ME!
+     * @param  mapFormat  DOCUMENT ME!
+     * @param  hints      DOCUMENT ME!
+     * @param  title      DOCUMENT ME!
+     * @param  fileName   DOCUMENT ME!
+     */
+    private void downloadFromGenerator(final EBReportServerAction.Type type,
+            final EBReportServerAction.MapFormat mapFormat,
+            final String hints,
+            final String title,
+            final String fileName) {
         final BackgroundTaskDownload.DownloadTask swingWorkerBackgroundTask =
             new BackgroundTaskDownload.DownloadTask() {
 
@@ -476,14 +546,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                 }
             };
 
-        if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(parent)) {
-            final String jobname = DownloadManagerDialog.getInstance().getJobName();
-
-            final int nummer = (Integer)kassenzeichen.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-            final String fileName = (Mode.FLAECHEN.equals(mode)) ? ("FEB-" + nummer) : ("STR-" + nummer);
-            DownloadManager.instance()
-                    .add(new BackgroundTaskDownload(swingWorkerBackgroundTask, "", jobname, fileName, ".pdf"));
-        }
+        DownloadManager.instance()
+                .add(new BackgroundTaskDownload(swingWorkerBackgroundTask, "", title, fileName, ".pdf"));
     }
 }

@@ -207,7 +207,7 @@ public class EBGenerator {
                     hints,
                     abflussWirksamkeit,
                     ConnectionContext.createDummy());
-            System.out.println(new String(Base64.getEncoder().encode(bytes)));
+            System.out.println(Base64.getEncoder().encodeToString(bytes));
             System.exit(0);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
