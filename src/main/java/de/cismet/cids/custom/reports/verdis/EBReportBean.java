@@ -225,19 +225,15 @@ public abstract class EBReportBean {
      * DOCUMENT ME!
      */
     protected void loadMap() {
-        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(
-
-                    // "http://s10221.wuppertal-intra.de:7098/alkis/services?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=TRUE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=algw&STYLES=default"));
-                    "http://S102w484:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default"));
+        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(EBGenerator.WMS_CALL));
         final HeadlessMapProvider mapProvider = new HeadlessMapProvider();
         mapProvider.setCenterMapOnResize(true);
-        final String crsString = "EPSG:31466";
-        final Crs crs = new Crs(crsString, "", "", true, true);
+        final Crs crs = new Crs(EBGenerator.SRS, "", "", true, true);
         mapProvider.setCrs(crs);
         mapProvider.addLayer(simpleWms);
 
         final Collection<Feature> features = createFeatures();
-        int srid = CrsTransformer.extractSridFromCrs(crsString);
+        int srid = CrsTransformer.extractSridFromCrs(EBGenerator.SRS);
         boolean first = true;
         final List<Geometry> geomList = new ArrayList<Geometry>(features.size());
         for (final Feature feature : features) {
@@ -251,7 +247,7 @@ public abstract class EBReportBean {
                     first = false;
                 } else {
                     if (geometry.getSRID() != srid) {
-                        geometry = CrsTransformer.transformToGivenCrs(geometry, crsString);
+                        geometry = CrsTransformer.transformToGivenCrs(geometry, EBGenerator.SRS);
                     }
                 }
 

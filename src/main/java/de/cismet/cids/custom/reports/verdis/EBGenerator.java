@@ -12,7 +12,12 @@
  */
 package de.cismet.cids.custom.reports.verdis;
 
+import Sirius.navigator.connection.ConnectionFactory;
+import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.connection.ConnectionSession;
+import Sirius.navigator.connection.RESTfulConnection;
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.newuser.User;
@@ -49,9 +54,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import de.cismet.cids.client.tools.DevelopmentTools;
-
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.GetServerResourceServerAction;
 
@@ -64,7 +69,10 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 
+import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
+
+import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -128,13 +136,9 @@ public class EBGenerator {
             false,
             "Abflusswirksamkeit");
 
-    private static final String SRS = "EPSG:4326";
-
-    private static final String WMS_CALL =
-        "http://osm.wheregroup.com/cgi-bin/osm_basic.xml?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SERVICE=WMS&LAYERS=Grenzen,Landwirtschaft,Industriegebiet,Bauland,Gruenflaeche,unkultiviertes_Land,Park,Naherholungsgebiet,Wald,Wiese,Fussgaengerzone,Gebaeude,Wasser,Fluesse,Baeche,Kanal,Wasserbecken,Insel,Kueste,Inselpunkte,Strand,Fussgaengerweg,Radweg,Wege,Wohnstrasse,Zufahrtswege,einfache_Strasse,Landstrasse,Bundesstrasse,Kraftfahrstrasse,Autobahn,Ortschaft,Weiler,Stadtteil,Dorf,Stadt,Grossstadt,Bahn,Bahnhof,Airport,Kirchengelaende,Friedhof,Kirche,Graeber,copyright&STYLES=,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,&SRS=EPSG:4326&FORMAT=image/png;%20mode=24bit&BGCOLOR=0xffffff&TRANSPARENT=TRUE&EXCEPTIONS=application/vnd.ogc.se_inimage"
-                + "&BBOX=<cismap:boundingBox>"
-                + "&WIDTH=<cismap:width>"
-                + "&HEIGHT=<cismap:height>";
+    public static final String SRS = "EPSG:31466";
+    public static final String WMS_CALL =
+        "http://S102w484:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default";
 
     //~ Methods ----------------------------------------------------------------
 
@@ -184,13 +188,16 @@ public class EBGenerator {
         final boolean abflussWirksamkeit = cmd.hasOption(OPTION__ABFLUSSWIRKSAMKEIT.getOpt());
 
         try {
-            DevelopmentTools.initSessionManagerFromRestfulConnection(
+            initSessionManager(
                 callserverUrl,
                 domain,
                 group,
                 user,
                 password,
-                compressionEnabled);
+                compressionEnabled,
+                ConnectionContext.create(
+                    AbstractConnectionContext.Category.OTHER,
+                    EBGenerator.class.getCanonicalName()));
             initMap();
             final byte[] bytes = gen(
                     kassenzeichenId,
@@ -206,6 +213,53 @@ public class EBGenerator {
             Exceptions.printStackTrace(ex);
             System.exit(1);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverUrl       DOCUMENT ME!
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   user                DOCUMENT ME!
+     * @param   pass                DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     * @param   connectionContext   DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManager(final String callserverUrl,
+            final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws Exception {
+        final ConnectionInfo info = new ConnectionInfo();
+        info.setCallserverURL(callserverUrl);
+        info.setUsername(user);
+        info.setUsergroup(group);
+        info.setPassword(pass);
+        info.setUserDomain(domain);
+        info.setUsergroupDomain(domain);
+
+        final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
+                    .createConnection(
+                        RESTfulConnection.class.getCanonicalName(),
+                        info.getCallserverURL(),
+                        Proxy.fromPreferences(),
+                        compressionEnabled,
+                        connectionContext);
+        final ConnectionSession session = ConnectionFactory.getFactory()
+                    .createSession(connection, info, true, connectionContext);
+        final ConnectionProxy conProxy = ConnectionFactory.getFactory()
+                    .createProxy(
+                        "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                        session,
+                        connectionContext);
+        SessionManager.init(conProxy);
+
+        ClassCacheMultiple.setInstance(domain, connectionContext);
     }
 
     /**
@@ -267,12 +321,14 @@ public class EBGenerator {
                         .getBean();
 
             final FileOutputStream out = null;
+            final boolean forceQuit = false;
             try {
-                final boolean forceQuit = false;
+                final Properties properties = getProperties(user, connectionContext);
+
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("generating report beans");
                 }
-                String repMap = "";
+                String repMap;
                 String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
                 String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
                 if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
@@ -302,9 +358,7 @@ public class EBGenerator {
                 } else {
                     repMap = repMap.replace("<mode>", "feb");
                 }
-                final Properties properties = getProperties(user, connectionContext);
-
-                repMap = repMap.replace("<subreportDir>", properties.getProperty("serverResourcesPath") + "reports");
+                repMap = repMap.replace("<subreportDir>", properties.getProperty("reportsDirectory"));
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Report File for Map: " + repMap);
@@ -348,7 +402,7 @@ public class EBGenerator {
                     LOG.debug("ready to procced");
                 }
                 final HashMap parameters = new HashMap();
-                parameters.put("SUBREPORT_DIR", properties.getProperty("serverResourcesPath"));
+                parameters.put("SUBREPORT_DIR", properties.getProperty("reportsDirectory"));
                 parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
 
                 final List<InputStream> ins = new ArrayList<>();
