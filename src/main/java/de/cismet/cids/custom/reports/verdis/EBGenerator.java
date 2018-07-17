@@ -83,11 +83,6 @@ import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 import de.cismet.verdis.server.action.EBReportServerAction;
 import de.cismet.verdis.server.utils.VerdisServerResources;
 
-import static de.cismet.cismap.commons.gui.layerwidget.LayerDropUtils.LOG;
-
-import static de.cismet.verdis.server.action.EBReportServerAction.Type.FLAECHEN;
-import static de.cismet.verdis.server.action.EBReportServerAction.Type.FRONTEN;
-
 /**
  * DOCUMENT ME!
  *
@@ -98,11 +93,14 @@ public class EBGenerator {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(EBGenerator.class);
+
     private static final String A4_FORMAT = "A4";
     private static final String A3_FORMAT = "A3";
     private static final String LANDSCAPE_ORIENTATION = "LS";
     private static final String PORTRAIT_ORIENTATION = "P";
 
+    private static final Option OPTION__LOGGER = new Option("l", "logger", true, "Logger");
     private static final Option OPTION__CALLSERVER_URL = new Option("c", "callserver-url", true, "Callserver");
     private static final Option OPTION__GZIP_COMPRESSION = new Option(
             "z",
@@ -132,12 +130,6 @@ public class EBGenerator {
             false,
             "Abflusswirksamkeit");
 
-    //~ Instance fields --------------------------------------------------------
-
-    private final ConnectionContext connectionContext = ConnectionContext.create(
-            AbstractConnectionContext.Category.OTHER,
-            getClass().getCanonicalName());
-
     //~ Methods ----------------------------------------------------------------
 
     /**
@@ -148,8 +140,6 @@ public class EBGenerator {
      * @throws  IllegalStateException  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        Log4JQuickConfig.configure4LumbermillOnLocalhost();
-
         final CommandLine cmd;
         try {
             cmd =
@@ -163,6 +153,11 @@ public class EBGenerator {
             Exceptions.printStackTrace(ex);
             System.exit(1);
             throw new IllegalStateException();
+        }
+
+        final boolean loggerEnabled = cmd.hasOption(OPTION__LOGGER.getOpt());
+        if (loggerEnabled) {
+            Log4JQuickConfig.configure4LumbermillOnLocalhost();
         }
 
         final String callserverUrl = cmd.hasOption(OPTION__CALLSERVER_URL.getOpt())
