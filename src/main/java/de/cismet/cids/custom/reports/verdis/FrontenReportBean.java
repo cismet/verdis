@@ -112,7 +112,7 @@ public class FrontenReportBean extends EBReportBean {
         final Collection<CidsBean> fronten = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
-        final int fontSize = Integer.parseInt(getProperties().getProperty("FEBReportBean.annotationFontSize"));
+        final int fontSize = Integer.parseInt(getProperties().getProperty("annotationFontSize"));
         for (final CidsBean b : fronten) {
             try {
                 fr.setMetaObject(b.getMetaObject());

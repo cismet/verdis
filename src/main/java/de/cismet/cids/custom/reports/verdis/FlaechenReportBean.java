@@ -15,6 +15,8 @@ import Sirius.navigator.exception.ConnectionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import net.sf.jasperreports.engine.JasperReport;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
@@ -38,6 +40,8 @@ import de.cismet.cids.custom.featurerenderer.verdis_grundis.FlaecheFeatureRender
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.cids.utils.serverresources.ServerResourcesLoader;
+
 import de.cismet.cismap.commons.features.DefaultXStyledFeature;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
@@ -47,6 +51,8 @@ import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
 import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
 import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
 import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+
+import de.cismet.verdis.server.utils.VerdisServerResources;
 
 /**
  * DOCUMENT ME!
@@ -112,6 +118,42 @@ public class FlaechenReportBean extends EBReportBean {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public JasperReport getDachflaechenSubreport() throws Exception {
+        return ServerResourcesLoader.getInstance()
+                    .loadJasperReport(VerdisServerResources.EB_FLAECHEN_DACH_JASPER.getValue());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public JasperReport getVersiegelteFlaechenSubreport() throws Exception {
+        return ServerResourcesLoader.getInstance()
+                    .loadJasperReport(VerdisServerResources.EB_FLAECHEN_VERSIEGELT_JASPER.getValue());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public JasperReport getHinweiseSubreport() throws Exception {
+        return ServerResourcesLoader.getInstance()
+                    .loadJasperReport(VerdisServerResources.EB_FLAECHEN_HINWEISE_JASPER.getValue());
+    }
 
     /**
      * DOCUMENT ME!
@@ -183,7 +225,7 @@ public class FlaechenReportBean extends EBReportBean {
         final List<CidsBean> flaechen = (List<CidsBean>)getKassenzeichenBean().getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
-        final int fontSize = Integer.parseInt(getProperties().getProperty("FEBReportBean.annotationFontSize"));
+        final int fontSize = Integer.parseInt(getProperties().getProperty("annotationFontSize"));
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());
