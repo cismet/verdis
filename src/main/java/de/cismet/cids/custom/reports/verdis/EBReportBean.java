@@ -225,17 +225,18 @@ public abstract class EBReportBean {
      * DOCUMENT ME!
      */
     protected void loadMap() {
-        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(EBGenerator.WMS_CALL));
+        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(properties.getProperty("mapUrl")));
         final HeadlessMapProvider mapProvider = new HeadlessMapProvider();
         mapProvider.setCenterMapOnResize(true);
-        final Crs crs = new Crs(EBGenerator.SRS, "", "", true, true);
+        final String srs = properties.getProperty("mapSrs");
+        final Crs crs = new Crs(srs, "", "", true, true);
         mapProvider.setCrs(crs);
         mapProvider.addLayer(simpleWms);
 
         final Collection<Feature> features = createFeatures();
-        int srid = CrsTransformer.extractSridFromCrs(EBGenerator.SRS);
+        int srid = CrsTransformer.extractSridFromCrs(srs);
         boolean first = true;
-        final List<Geometry> geomList = new ArrayList<Geometry>(features.size());
+        final List<Geometry> geomList = new ArrayList<>(features.size());
         for (final Feature feature : features) {
             Geometry geometry = feature.getGeometry();
 
@@ -247,7 +248,7 @@ public abstract class EBReportBean {
                     first = false;
                 } else {
                     if (geometry.getSRID() != srid) {
-                        geometry = CrsTransformer.transformToGivenCrs(geometry, EBGenerator.SRS);
+                        geometry = CrsTransformer.transformToGivenCrs(geometry, srs);
                     }
                 }
 
@@ -300,7 +301,7 @@ public abstract class EBReportBean {
 
         mapProvider.setBoundingBox(boundingBox);
 
-        final int mapDPI = Integer.parseInt(properties.getProperty("FEBReportBean.mapDPI"));
+        final int mapDPI = Integer.parseInt(properties.getProperty("mapDPI"));
 
         mapProvider.setFeatureResolutionFactor(mapDPI);
         try {

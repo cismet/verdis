@@ -26,9 +26,10 @@ import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.cismap.commons.gui.printing.BackgroundTaskDownload;
 
+import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
-import de.cismet.tools.gui.downloadmanager.ByteArrayDownload;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
@@ -43,7 +44,7 @@ import de.cismet.verdis.server.action.EBReportServerAction;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
-public class EBGeneratorDialog extends javax.swing.JDialog {
+public class EBGeneratorDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -65,9 +66,12 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
 
     //~ Instance fields --------------------------------------------------------
 
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            AbstractConnectionContext.Category.OTHER,
+            getClass().getCanonicalName());
     private final Mode mode;
-    private CidsBean kassenzeichen;
-    private Frame parent;
+    private final CidsBean kassenzeichen;
+    private final Frame parent;
     private String title = "";
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
@@ -127,6 +131,11 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 
     /**
      * Creates new form FEPGeneratorDialog.
@@ -535,13 +544,14 @@ public class EBGeneratorDialog extends javax.swing.JDialog {
                     try(final FileOutputStream out = new FileOutputStream(fileToSaveTo)) {
                         out.write(
                             EBGenerator.gen(
+                                EBGenerator.getProperties(connectionContext),
                                 kassenzeichen.getMetaObject().getId(),
                                 type,
                                 mapFormat,
                                 getSelectedScaleDenominator(),
                                 hints,
                                 chkFillAbflusswirksamkeit.isSelected(),
-                                ConnectionContext.createDummy()));
+                                connectionContext));
                     }
                 }
             };

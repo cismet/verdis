@@ -18,6 +18,7 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.RESTfulConnection;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
+import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.newuser.User;
@@ -84,10 +85,6 @@ import de.cismet.verdis.server.utils.VerdisServerResources;
 
 import static de.cismet.cismap.commons.gui.layerwidget.LayerDropUtils.LOG;
 
-import static de.cismet.verdis.server.action.EBReportServerAction.MapFormat.A3LS;
-import static de.cismet.verdis.server.action.EBReportServerAction.MapFormat.A3P;
-import static de.cismet.verdis.server.action.EBReportServerAction.MapFormat.A4LS;
-import static de.cismet.verdis.server.action.EBReportServerAction.MapFormat.A4P;
 import static de.cismet.verdis.server.action.EBReportServerAction.Type.FLAECHEN;
 import static de.cismet.verdis.server.action.EBReportServerAction.Type.FRONTEN;
 
@@ -101,7 +98,6 @@ public class EBGenerator {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final String MAP_REPORT = "<subreportDir>/<mode>_map<format><orientation>.jasper";
     private static final String A4_FORMAT = "A4";
     private static final String A3_FORMAT = "A3";
     private static final String LANDSCAPE_ORIENTATION = "LS";
@@ -136,9 +132,11 @@ public class EBGenerator {
             false,
             "Abflusswirksamkeit");
 
-    public static final String SRS = "EPSG:31466";
-    public static final String WMS_CALL =
-        "http://S102w484:8399/arcgis/services/WuNDa-ALKIS-Hintergrund/MapServer/WMSServer?&VERSION=1.1.1&REQUEST=GetMap&BBOX=<cismap:boundingBox>&WIDTH=<cismap:width>&HEIGHT=<cismap:height>&SRS=EPSG:31466&FORMAT=image/png&TRANSPARENT=FALSE&BGCOLOR=0xF0F0F0&EXCEPTIONS=application/vnd.ogc.se_xml&LAYERS=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&STYLES=default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default";
+    //~ Instance fields --------------------------------------------------------
+
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            AbstractConnectionContext.Category.OTHER,
+            getClass().getCanonicalName());
 
     //~ Methods ----------------------------------------------------------------
 
@@ -170,7 +168,7 @@ public class EBGenerator {
         final String callserverUrl = cmd.hasOption(OPTION__CALLSERVER_URL.getOpt())
             ? cmd.getOptionValue(OPTION__CALLSERVER_URL.getOpt()) : null;
         final boolean compressionEnabled = cmd.hasOption(OPTION__GZIP_COMPRESSION.getOpt());
-        final String user = cmd.hasOption(OPTION__USER.getOpt()) ? cmd.getOptionValue(OPTION__USER.getOpt()) : null;
+        final String login = cmd.hasOption(OPTION__USER.getOpt()) ? cmd.getOptionValue(OPTION__USER.getOpt()) : null;
         final String group = cmd.hasOption(OPTION__GROUP.getOpt()) ? cmd.getOptionValue(OPTION__GROUP.getOpt()) : null;
         final String domain = cmd.hasOption(OPTION__DOMAIN.getOpt()) ? cmd.getOptionValue(OPTION__DOMAIN.getOpt())
                                                                      : null;
@@ -188,25 +186,30 @@ public class EBGenerator {
         final boolean abflussWirksamkeit = cmd.hasOption(OPTION__ABFLUSSWIRKSAMKEIT.getOpt());
 
         try {
+            final ConnectionContext connectionContext = ConnectionContext.create(
+                    AbstractConnectionContext.Category.OTHER,
+                    EBGenerator.class.getCanonicalName());
+
             initSessionManager(
                 callserverUrl,
                 domain,
                 group,
-                user,
+                login,
                 password,
                 compressionEnabled,
-                ConnectionContext.create(
-                    AbstractConnectionContext.Category.OTHER,
-                    EBGenerator.class.getCanonicalName()));
-            initMap();
+                connectionContext);
+            final Properties properties = getProperties(connectionContext);
+
+            initMap(properties);
             final byte[] bytes = gen(
+                    properties,
                     kassenzeichenId,
                     type,
                     mapFormat,
                     scaleDenominator,
                     hints,
                     abflussWirksamkeit,
-                    ConnectionContext.createDummy());
+                    connectionContext);
             System.out.println(Base64.getEncoder().encodeToString(bytes));
             System.exit(0);
         } catch (Exception ex) {
@@ -264,18 +267,21 @@ public class EBGenerator {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  properties  DOCUMENT ME!
      */
-    private static void initMap() {
+    private static void initMap(final Properties properties) {
         final MappingComponent mappingComponent = new MappingComponent();
         final Dimension d = new Dimension(300, 300);
         mappingComponent.setPreferredSize(d);
         mappingComponent.setSize(d);
 
+        final String srs = properties.getProperty("mapSrs");
         final ActiveLayerModel mappingModel = new ActiveLayerModel();
-        mappingModel.addHome(new XBoundingBox(6.7d, 49.1, 7.1d, 49.33d, SRS, false));
-        mappingModel.setSrs(SRS);
+        mappingModel.addHome(new XBoundingBox(6.7d, 49.1, 7.1d, 49.33d, srs, false));
+        mappingModel.setSrs(srs);
 
-        final SimpleWMS swms = new SimpleWMS(new SimpleWmsGetMapUrl(WMS_CALL));
+        final SimpleWMS swms = new SimpleWMS(new SimpleWmsGetMapUrl(properties.getProperty("mapUrl")));
         mappingModel.addLayer(swms);
         mappingComponent.setInteractionMode(MappingComponent.SELECT);
         mappingComponent.setMappingModel(mappingModel);
@@ -288,6 +294,30 @@ public class EBGenerator {
     /**
      * DOCUMENT ME!
      *
+     * @param   reportResource     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    private static JasperReport getReport(final VerdisServerResources reportResource,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        final User user = SessionManager.getSession().getUser();
+        final JasperReport jasperReport = (JasperReport)SessionManager.getProxy()
+                    .executeTask(
+                            user,
+                            GetServerResourceServerAction.TASK_NAME,
+                            VerdisConstants.DOMAIN,
+                            reportResource.getValue(),
+                            connectionContext);
+        return jasperReport;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   properties          DOCUMENT ME!
      * @param   kassenzeichenId     DOCUMENT ME!
      * @param   type                DOCUMENT ME!
      * @param   mapFormat           DOCUMENT ME!
@@ -297,8 +327,11 @@ public class EBGenerator {
      * @param   connectionContext   DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public static byte[] gen(final int kassenzeichenId,
+    public static byte[] gen(final Properties properties,
+            final int kassenzeichenId,
             final EBReportServerAction.Type type,
             final EBReportServerAction.MapFormat mapFormat,
             final Double scaleDenominator,
@@ -322,49 +355,21 @@ public class EBGenerator {
         final FileOutputStream out = null;
         final boolean forceQuit = false;
         try {
-            final Properties properties = getProperties(user, connectionContext);
-
             if (LOG.isDebugEnabled()) {
                 LOG.debug("generating report beans");
             }
-            String repMap;
-            String mapHeightPropkey = "FEPGeneratorDialog.mapHeight";
-            String mapWidthPropkey = "FEPGeneratorDialog.mapWidth";
-            if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                        || EBReportServerAction.MapFormat.A4P.equals(mapFormat)) {
-                repMap = MAP_REPORT.replace("<format>", A4_FORMAT);
-                mapHeightPropkey += A4_FORMAT;
-                mapWidthPropkey += A4_FORMAT;
-            } else {
-                repMap = MAP_REPORT.replace("<format>", A3_FORMAT);
-                mapHeightPropkey += A3_FORMAT;
-                mapWidthPropkey += A3_FORMAT;
-            }
 
-            if (EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                        || EBReportServerAction.MapFormat.A3LS.equals(mapFormat)) {
-                repMap = repMap.replace("<orientation>", LANDSCAPE_ORIENTATION);
-                mapHeightPropkey += LANDSCAPE_ORIENTATION;
-                mapWidthPropkey += LANDSCAPE_ORIENTATION;
-            } else {
-                repMap = repMap.replace("<orientation>", PORTRAIT_ORIENTATION);
-                mapHeightPropkey += PORTRAIT_ORIENTATION;
-                mapWidthPropkey += PORTRAIT_ORIENTATION;
-            }
+            final boolean a4 = EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                        || EBReportServerAction.MapFormat.A4P.equals(mapFormat);
+            final boolean landscape = EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                        || EBReportServerAction.MapFormat.A3LS.equals(mapFormat);
+            final String suffix = (a4 ? A4_FORMAT : A3_FORMAT)
+                        + (landscape ? LANDSCAPE_ORIENTATION : PORTRAIT_ORIENTATION);
 
-            if (EBReportServerAction.Type.FRONTEN.equals(type)) {
-                repMap = repMap.replace("<mode>", "fronten");
-            } else {
-                repMap = repMap.replace("<mode>", "feb");
-            }
-            repMap = repMap.replace("<subreportDir>", properties.getProperty("reportsDirectory"));
+            final int mapHeight = Integer.parseInt(properties.getProperty("mapHeight" + suffix));
+            final int mapWidth = Integer.parseInt(properties.getProperty("mapWidth" + suffix));
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Report File for Map: " + repMap);
-            }
-
-            final int mapWidth = Integer.parseInt(properties.getProperty(mapWidthPropkey));
-            final int mapHeight = Integer.parseInt(properties.getProperty(mapHeightPropkey));
+            final HashMap parameters = new HashMap();
 
             final EBReportBean reportBean;
             if (EBReportServerAction.Type.FRONTEN.equals(type)) {
@@ -374,6 +379,10 @@ public class EBGenerator {
                         mapHeight,
                         mapWidth,
                         scaleDenominator);
+
+                parameters.put(
+                    "TABLE_SUBREPORT",
+                    getReport(VerdisServerResources.EB_FRONTEN_TABLE_JASPER, connectionContext));
             } else {
                 reportBean = new FlaechenReportBean(
                         properties,
@@ -383,6 +392,16 @@ public class EBGenerator {
                         mapWidth,
                         scaleDenominator,
                         abflusswirksamkeit);
+
+                parameters.put(
+                    "DACH_SUBREPORT",
+                    getReport(VerdisServerResources.EB_FLAECHEN_DACH_JASPER, connectionContext));
+                parameters.put(
+                    "VERSIEGELT_SUBREPORT",
+                    getReport(VerdisServerResources.EB_FLAECHEN_VERSIEGELT_JASPER, connectionContext));
+                parameters.put(
+                    "HINWEISE_SUBREPORT",
+                    getReport(VerdisServerResources.EB_FLAECHEN_HINWEISE_JASPER, connectionContext));
             }
             final Collection<EBReportBean> reportBeans = new LinkedList<>();
             reportBeans.add(reportBean);
@@ -400,44 +419,41 @@ public class EBGenerator {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("ready to procced");
             }
-            final HashMap parameters = new HashMap();
-            parameters.put("SUBREPORT_DIR", properties.getProperty("reportsDirectory"));
             parameters.put("fillKanal", reportBean.isFillAbflusswirksamkeit());
 
             final List<InputStream> ins = new ArrayList<>();
 
             if (mapFormat != null) {
                 final VerdisServerResources reportResource;
-                switch (mapFormat) {
-                    case A4LS: {
-                        reportResource = VerdisServerResources.EB_MAP_A4LS_JASPER;
+                if (EBReportServerAction.Type.FRONTEN.equals(type)) {
+                    if (a4 && landscape) {
+                        reportResource = VerdisServerResources.MAP_FRONTEN_A4LS_JASPER;
+                    } else if (a4) {
+                        reportResource = VerdisServerResources.MAP_FRONTEN_A4P_JASPER;
+                    } else if (landscape) {
+                        reportResource = VerdisServerResources.MAP_FRONTEN_A3LS_JASPER;
+                    } else {
+                        reportResource = VerdisServerResources.MAP_FRONTEN_A3P_JASPER;
                     }
-                    break;
-                    case A4P: {
-                        reportResource = VerdisServerResources.EB_MAP_A4P_JASPER;
-                    }
-                    break;
-                    case A3LS: {
-                        reportResource = VerdisServerResources.EB_MAP_A3LS_JASPER;
-                    }
-                    break;
-                    case A3P: {
-                        reportResource = VerdisServerResources.EB_MAP_A3P_JASPER;
-                    }
-                    break;
-                    default: {
-                        reportResource = null;
+                } else {
+                    if (a4 && landscape) {
+                        reportResource = VerdisServerResources.MAP_FLAECHEN_A4LS_JASPER;
+                    } else if (a4) {
+                        reportResource = VerdisServerResources.MAP_FLAECHEN_A4P_JASPER;
+                    } else if (landscape) {
+                        reportResource = VerdisServerResources.MAP_FLAECHEN_A3LS_JASPER;
+                    } else {
+                        reportResource = VerdisServerResources.MAP_FLAECHEN_A3P_JASPER;
                     }
                 }
-                if (reportResource != null) {
-                    final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                    final byte[] bytes = generateReport(
-                            reportResource,
-                            parameters,
-                            dataSource,
-                            connectionContext);
-                    ins.add(new ByteArrayInputStream(bytes));
-                }
+
+                final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
+                final byte[] bytes = generateReport(
+                        reportResource,
+                        parameters,
+                        dataSource,
+                        connectionContext);
+                ins.add(new ByteArrayInputStream(bytes));
             }
 
             if (type != null) {
@@ -479,15 +495,14 @@ public class EBGenerator {
     /**
      * DOCUMENT ME!
      *
-     * @param   user               DOCUMENT ME!
      * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private static Properties getProperties(final User user, final ConnectionContext connectionContext)
-            throws Exception {
+    public static Properties getProperties(final ConnectionContext connectionContext) throws Exception {
+        final User user = SessionManager.getSession().getUser();
         final Properties properties = new Properties();
         properties.load(new StringReader(
                 (String)SessionManager.getProxy().executeTask(
@@ -514,26 +529,12 @@ public class EBGenerator {
             final Map<String, Object> parameters,
             final JRDataSource dataSource,
             final ConnectionContext connectionContext) throws Exception {
-        final User user = SessionManager.getSession().getUser();
-        final JasperReport jasperReport = (JasperReport)SessionManager.getProxy()
-                    .executeTask(
-                            user,
-                            GetServerResourceServerAction.TASK_NAME,
-                            VerdisConstants.DOMAIN,
-                            reportResource.getValue(),
-                            connectionContext);
+        final JasperReport jasperReport = getReport(reportResource, connectionContext);
         final JasperPrint print = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-
-        ByteArrayOutputStream os = null;
-        try {
-            os = new ByteArrayOutputStream();
+        try(final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             JasperExportManager.exportReportToPdfStream(print, os);
             final byte[] bytes = os.toByteArray();
             return bytes;
-        } finally {
-            if (os != null) {
-                os.close();
-            }
         }
     }
 }
