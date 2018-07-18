@@ -11,6 +11,8 @@
  */
 package de.cismet.cids.custom.reports.verdis;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.apache.log4j.Logger;
 
 import java.awt.Frame;
@@ -402,27 +404,27 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_rbA3ActionPerformed
-    }                                                                        //GEN-LAST:event_rbA3ActionPerformed
+    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbA3ActionPerformed
+    }//GEN-LAST:event_rbA3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
+    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         generateReport(taHinweise.getText());
         this.setVisible(false);
-    }                                                                            //GEN-LAST:event_btnPrintActionPerformed
+    }//GEN-LAST:event_btnPrintActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.setVisible(false);
-    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -517,7 +519,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                 title,
                 fileName,
                 ".pdf",
-                ConnectionContext.createDummy());
+                getConnectionContext());
 
         DownloadManager.instance().add(download);
     }
@@ -545,7 +547,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                         out.write(
                             EBGenerator.gen(
                                 EBGenerator.getProperties(connectionContext),
-                                kassenzeichen.getMetaObject().getId(),
+                                (Integer)kassenzeichen.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER),
                                 type,
                                 mapFormat,
                                 getSelectedScaleDenominator(),

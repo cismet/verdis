@@ -20,7 +20,7 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
 
-import Sirius.server.middleware.types.MetaClass;
+import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -78,9 +78,9 @@ import de.cismet.netutil.Proxy;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.server.action.EBReportServerAction;
+import de.cismet.verdis.server.search.KassenzeichenSearchStatement;
 import de.cismet.verdis.server.utils.VerdisServerResources;
 
 /**
@@ -111,11 +111,11 @@ public class EBGenerator {
     private static final Option OPTION__GROUP = new Option("g", "group", true, "Group");
     private static final Option OPTION__DOMAIN = new Option("d", "group", true, "Group");
     private static final Option OPTION__PASSWORD = new Option("p", "password", true, "Password");
-    private static final Option OPTION__KASSENZEICHEN_ID = new Option(
+    private static final Option OPTION__KASSENZEICHEN = new Option(
             "k",
-            "kassenzeichen-id",
+            "kassenzeichen",
             true,
-            "Kassenzeichen ID");
+            "Kassenzeichen");
     private static final Option OPTION__TYPE = new Option("t", "type", true, "Type [FLAECHEN|FRONTEN]");
     private static final Option OPTION__MAP_FORMAT = new Option(
             "f",
@@ -144,7 +144,7 @@ public class EBGenerator {
         try {
             cmd =
                 new DefaultParser().parse(new Options().addOption(OPTION__CALLSERVER_URL).addOption(
-                        OPTION__GZIP_COMPRESSION).addOption(OPTION__KASSENZEICHEN_ID).addOption(OPTION__USER).addOption(
+                        OPTION__GZIP_COMPRESSION).addOption(OPTION__KASSENZEICHEN).addOption(OPTION__USER).addOption(
                         OPTION__GROUP).addOption(OPTION__DOMAIN).addOption(OPTION__PASSWORD).addOption(OPTION__TYPE)
                             .addOption(OPTION__MAP_FORMAT).addOption(OPTION__HINTS).addOption(
                         OPTION__SCALE_DENOMINATOR).addOption(OPTION__ABFLUSSWIRKSAMKEIT),
@@ -171,8 +171,8 @@ public class EBGenerator {
                                                                          : null;
         final EBReportServerAction.Type type = cmd.hasOption(OPTION__TYPE.getOpt())
             ? EBReportServerAction.Type.valueOf(cmd.getOptionValue(OPTION__TYPE.getOpt())) : null;
-        final Integer kassenzeichenId = cmd.hasOption(OPTION__KASSENZEICHEN_ID.getOpt())
-            ? Integer.valueOf(cmd.getOptionValue(OPTION__KASSENZEICHEN_ID.getOpt())) : null;
+        final Integer kassenzeichen = cmd.hasOption(OPTION__KASSENZEICHEN.getOpt())
+            ? Integer.valueOf(cmd.getOptionValue(OPTION__KASSENZEICHEN.getOpt())) : null;
         final EBReportServerAction.MapFormat mapFormat = cmd.hasOption(OPTION__MAP_FORMAT.getOpt())
             ? EBReportServerAction.MapFormat.valueOf(cmd.getOptionValue(OPTION__MAP_FORMAT.getOpt())) : null;
         final String hints = cmd.hasOption(OPTION__HINTS.getOpt()) ? cmd.getOptionValue(OPTION__HINTS.getOpt()) : null;
@@ -198,7 +198,7 @@ public class EBGenerator {
             initMap(properties);
             final byte[] bytes = gen(
                     properties,
-                    kassenzeichenId,
+                    kassenzeichen,
                     type,
                     mapFormat,
                     scaleDenominator,
@@ -312,38 +312,42 @@ public class EBGenerator {
     /**
      * DOCUMENT ME!
      *
-     * @param   properties          DOCUMENT ME!
-     * @param   kassenzeichenId     DOCUMENT ME!
-     * @param   type                DOCUMENT ME!
-     * @param   mapFormat           DOCUMENT ME!
-     * @param   scaleDenominator    DOCUMENT ME!
-     * @param   hints               DOCUMENT ME!
-     * @param   abflusswirksamkeit  DOCUMENT ME!
-     * @param   connectionContext   DOCUMENT ME!
+     * @param   properties           DOCUMENT ME!
+     * @param   kassenzeichenNummer  DOCUMENT ME!
+     * @param   type                 DOCUMENT ME!
+     * @param   mapFormat            DOCUMENT ME!
+     * @param   scaleDenominator     DOCUMENT ME!
+     * @param   hints                DOCUMENT ME!
+     * @param   abflusswirksamkeit   DOCUMENT ME!
+     * @param   connectionContext    DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
     public static byte[] gen(final Properties properties,
-            final int kassenzeichenId,
+            final Integer kassenzeichenNummer,
             final EBReportServerAction.Type type,
             final EBReportServerAction.MapFormat mapFormat,
             final Double scaleDenominator,
             final String hints,
             final boolean abflusswirksamkeit,
             final ConnectionContext connectionContext) throws Exception {
-        final User user = SessionManager.getSession().getUser();
-        final MetaClass kassenzeichenMc = CidsBean.getMetaClassFromTableName(
-                VerdisConstants.DOMAIN,
-                VerdisMetaClassConstants.MC_KASSENZEICHEN,
-                connectionContext);
-        final CidsBean kassenzeichen = SessionManager.getConnection()
+
+        final KassenzeichenSearchStatement search = new KassenzeichenSearchStatement(Integer.toString(
+                    kassenzeichenNummer));
+        final Collection<MetaObjectNode> mons = SessionManager.getProxy().customServerSearch(search, connectionContext);
+        if ((mons == null) || (mons.size() != 1)) {
+            throw new Exception(String.format("kassenzeichen %d not found", kassenzeichenNummer));
+        }
+
+        final MetaObjectNode mon = mons.iterator().next();
+        final CidsBean kassenzeichenBean = SessionManager.getProxy()
                     .getMetaObject(
-                            user,
-                            kassenzeichenId,
-                            kassenzeichenMc.getId(),
-                            VerdisConstants.DOMAIN,
+                            SessionManager.getSession().getUser(),
+                            mon.getObjectId(),
+                            mon.getClassId(),
+                            mon.getDomain(),
                             connectionContext)
                     .getBean();
 
@@ -370,7 +374,7 @@ public class EBGenerator {
             if (EBReportServerAction.Type.FRONTEN.equals(type)) {
                 reportBean = new FrontenReportBean(
                         properties,
-                        kassenzeichen,
+                        kassenzeichenBean,
                         mapHeight,
                         mapWidth,
                         scaleDenominator);
@@ -381,7 +385,7 @@ public class EBGenerator {
             } else {
                 reportBean = new FlaechenReportBean(
                         properties,
-                        kassenzeichen,
+                        kassenzeichenBean,
                         hints,
                         mapHeight,
                         mapWidth,
