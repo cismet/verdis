@@ -545,7 +545,8 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                         out.write(
                             EBGenerator.gen(
                                 EBGenerator.getProperties(connectionContext),
-                                kassenzeichen.getMetaObject().getId(),
+                                (Integer)kassenzeichen.getProperty(
+                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER),
                                 type,
                                 mapFormat,
                                 getSelectedScaleDenominator(),
