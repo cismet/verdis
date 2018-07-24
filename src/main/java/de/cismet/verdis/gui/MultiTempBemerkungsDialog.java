@@ -260,14 +260,20 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        jDialog1.setTitle(org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jDialog1.title_1")); // NOI18N
+        jDialog1.setTitle(org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jDialog1.title_1")); // NOI18N
         jDialog1.setModal(true);
         jDialog1.setResizable(false);
         jDialog1.getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblBemerkung, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.lblBemerkung.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblBemerkung,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.lblBemerkung.text_1")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -277,20 +283,32 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton1.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton1.text_1")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         jPanel4.add(jButton1);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton4.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton4,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton4.text_1")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton4ActionPerformed(evt);
+                }
+            });
         jPanel4.add(jButton4);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -310,7 +328,11 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
         jPanel1.add(jComboBox1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblBemerkung1, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.lblBemerkung1.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblBemerkung1,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.lblBemerkung1.text_1")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -342,7 +364,9 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
 
         jDialog1.getRootPane().setDefaultButton(jButton4);
 
-        setTitle(org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.title")); // NOI18N
+        setTitle(org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.title")); // NOI18N
         setPreferredSize(new java.awt.Dimension(600, 300));
         setResizable(false);
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -368,19 +392,28 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton5, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton5.text_1")); // NOI18N
-        jButton5.setToolTipText(org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton5.toolTipText_1")); // NOI18N
+        jButton5.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/add.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton5,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton5.text_1"));                              // NOI18N
+        jButton5.setToolTipText(org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton5.toolTipText_1"));                       // NOI18N
         jButton5.setBorderPainted(false);
         jButton5.setContentAreaFilled(false);
         jButton5.setDisabledIcon(null);
         jButton5.setDisabledSelectedIcon(null);
         jButton5.setFocusPainted(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton5ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -389,19 +422,28 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         jPanel3.add(jButton5, gridBagConstraints);
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton3, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton3.text_1")); // NOI18N
-        jButton3.setToolTipText(org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton3.toolTipText_1")); // NOI18N
+        jButton3.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/remove.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton3,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton3.text_1"));                                 // NOI18N
+        jButton3.setToolTipText(org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton3.toolTipText_1"));                          // NOI18N
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
         jButton3.setDisabledIcon(null);
         jButton3.setDisabledSelectedIcon(null);
         jButton3.setFocusPainted(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton3ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
@@ -413,12 +455,18 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel2.add(jPanel3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(MultiTempBemerkungsDialog.class, "MultiTempBemerkungsDialog.jButton2.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                MultiTempBemerkungsDialog.class,
+                "MultiTempBemerkungsDialog.jButton2.text_1")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -434,57 +482,57 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel2, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         jTextArea1.setText(null);
         jComboBox1.setSelectedIndex(0);
         jTextArea1.requestFocus();
         StaticSwingTools.showDialog(jDialog1);
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         final int index = jTable1.getSelectedRow();
         if ((index >= 0) && (index < multiBemerkung.getBemerkungen().size())) {
             multiBemerkung.getBemerkungen().remove(index);
             ((AbstractTableModel)jTable1.getModel()).fireTableDataChanged();
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         setVisible(false);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         jDialog1.setVisible(false);
         final Date date = new Date();
         final String bem = jTextArea1.getText();
@@ -497,7 +545,7 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         }
         multiBemerkung.getBemerkungen().add(new SingleBemerkung(date, user, bem, verfaellt));
         ((AbstractTableModel)jTable1.getModel()).fireTableDataChanged();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton4ActionPerformed
 
     @Override
     public void setEnabled(final boolean b) {

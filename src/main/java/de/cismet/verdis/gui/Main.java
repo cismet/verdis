@@ -346,6 +346,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<>();
     private final Map<String, Double> veranlagungSummeMap = new HashMap<>();
     private CidsAppBackend.Mode currentMode = null;
+
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private final Icon icoKassenzeichen = new javax.swing.ImageIcon(getClass().getResource(
@@ -517,6 +518,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsAppBackend.Mode getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public KassenzeichenGeometrienPanel getKassenzeichenGeometrienPanel() {
+        return kassenzeichenGeometrienPanel;
+    }
 
     /**
      * DOCUMENT ME!
@@ -1022,7 +1041,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     getMappingComponent().getInputListener(MappingComponent.SPLIT_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
-                    this,
+                    kartenPanel,
                     "attachFeatureRequested",
                     AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA));
@@ -1422,32 +1441,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 }
             });
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  notification  DOCUMENT ME!
-     */
-    public void attachFeatureRequested(final PNotification notification) {
-        switch (currentMode) {
-            case SR: {
-                getSRFrontenTable().attachFeatureRequested(notification);
-            }
-            break;
-            case REGEN: {
-                getRegenFlaechenTable().attachFeatureRequested(notification);
-            }
-            break;
-            case KANALDATEN: {
-                getBefreiungerlaubnisGeometrieTable().attachFeatureRequested(notification);
-            }
-            break;
-            case ALLGEMEIN: {
-                kassenzeichenGeometrienPanel.attachFeatureRequested(notification);
-            }
-            break;
-        }
     }
 
     /**
