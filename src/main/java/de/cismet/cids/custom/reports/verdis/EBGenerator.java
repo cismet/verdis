@@ -333,7 +333,6 @@ public class EBGenerator {
             final String hints,
             final boolean abflusswirksamkeit,
             final ConnectionContext connectionContext) throws Exception {
-
         final KassenzeichenSearchStatement search = new KassenzeichenSearchStatement(Integer.toString(
                     kassenzeichenNummer));
         final Collection<MetaObjectNode> mons = SessionManager.getProxy().customServerSearch(search, connectionContext);
