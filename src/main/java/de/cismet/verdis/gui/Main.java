@@ -773,6 +773,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     "Kassenzeichen",
                     Static2DTools.borderIcon(icoKassenzeichen, 0, 3, 0, 1),
                     kassenzeichenPanel);
+            vKassenzeichen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen", vKassenzeichen);
             vKassenzeichen.getCustomTitleBarComponents().addAll(kassenzeichenPanel.getCustomButtons());
 
@@ -780,69 +785,134 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     "Kassenzeichen-Liste",
                     Static2DTools.borderIcon(icoKassenzeichenList, 0, 3, 0, 1),
                     kassenzeichenListPanel);
+            vKassenzeichenList.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen-Liste", vKassenzeichenList);
 
             vSummen = new View("Summen", Static2DTools.borderIcon(icoSummen, 0, 3, 0, 1), regenSumPanel);
+            vSummen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Summen", vSummen);
 
             vKanaldaten = new View("Kanalanschluss", Static2DTools.borderIcon(icoKanal, 0, 3, 0, 1), kanaldatenPanel);
+            vKanaldaten.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kanalanschluss", vKanaldaten);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
+            vKarte.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Karte", vKarte);
 
             vTabelleSR = new View(
                     "Tabellenansicht (Fronten)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     srFrontenTablePanel);
+            vTabelleSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (Fronten)", vTabelleSR);
 
             vDetailsSR = new View(
                     "Details (Fronten)",
                     Static2DTools.borderIcon(icoDetails, 0, 3, 0, 1),
                     srFrontenDetailsPanel);
+            vDetailsSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details", vDetailsSR);
 
             vZusammenfassungSR = new View(
                     "ESW Zusammenfassung",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     srSummenPanel);
+            vZusammenfassungSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("ESW Zusammenfassung", vZusammenfassungSR);
 
             vDetailsAllgemein = new View(
                     "Details (Flächen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     kassenzeichenGeometrienPanel);
+            vDetailsAllgemein.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen-Flächen", vDetailsAllgemein);
 
             vInfoAllgemein = new View(
                     "Informationen",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     allgInfosPanel);
+            vInfoAllgemein.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Informationen", vInfoAllgemein);
 
             vTabelleRegen = new View(
                     "Tabellenansicht (versiegelte Fl\u00E4chen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     regenFlaechenTablePanel);
+            vTabelleRegen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (versiegelte Flaechen)", vTabelleRegen);
 
             vDetailsRegen = new View(
                     "Details (versiegelte Fl\u00E4chen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     regenFlaechenDetailsPanel);
+            vDetailsRegen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details (versiegelte Flaechen)", vDetailsRegen);
 
             vTabelleVersickerung = new View(
                     "Tabellenansicht (Versickerung/Einleitung)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     befreiungerlaubnisGeometrieTablePanel);
+            vTabelleVersickerung.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (Versickerung/Einleitung)", vTabelleVersickerung);
 
             vDetailsVersickerung = new View(
                     "Details (Versickerung/Einleitung)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     befreiungerlaubnisGeometrieDetailsPanel);
+            vDetailsVersickerung.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details (Versickerung/Einleitung)", vDetailsVersickerung);
 
             rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
