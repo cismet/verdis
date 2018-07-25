@@ -18,6 +18,7 @@ import de.cismet.cids.custom.util.CidsBeanSupport;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.gui.CidsBeanComponent;
+import de.cismet.verdis.gui.CidsBeanTable;
 import de.cismet.verdis.gui.Main;
 
 /**
@@ -110,19 +111,24 @@ public abstract class AbstractClipboard {
             try {
                 int notPastableCounter = 0;
                 final int numOfClipBoardItems = clipboardBeans.size();
-                final ArrayList<CidsBean> removedBeans = new ArrayList<CidsBean>();
+                final ArrayList<CidsBean> removedBeans = new ArrayList<>();
+                final ArrayList<CidsBean> pastedBeans = new ArrayList<>();
 
                 for (final CidsBean clipboardBean : clipboardBeans) {
                     if (isPastable(clipboardBean)) {
                         final CidsBean pasteBean = createPastedBean(clipboardBean);
                         getComponent().addBean(pasteBean);
+                        pastedBeans.add(pasteBean);
                         removedBeans.add(clipboardBean);
                     } else {
                         notPastableCounter++;
                     }
                 }
-
                 clipboardBeans.removeAll(removedBeans);
+                if (getComponent() instanceof CidsBeanTable) {
+                    ((CidsBeanTable)getComponent()).selectCidsBeans(pastedBeans);
+                }
+
                 if (notPastableCounter < numOfClipBoardItems) {
                     fireClipboardChanged();
                 }

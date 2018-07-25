@@ -117,4 +117,11 @@ public interface CidsBeanTable extends Validatable, CidsBeanComponent, CidsBeanS
      * @param  cidsBean  DOCUMENT ME!
      */
     void selectCidsBean(final CidsBean cidsBean);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBeans  DOCUMENT ME!
+     */
+    void selectCidsBeans(final List<CidsBean> cidsBeans);
 }

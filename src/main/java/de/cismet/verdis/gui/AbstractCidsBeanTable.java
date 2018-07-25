@@ -303,6 +303,15 @@ public abstract class AbstractCidsBeanTable extends JXTable implements CidsBeanT
     }
 
     @Override
+    public void selectCidsBeans(final List<CidsBean> beans) {
+        getSelectionModel().clearSelection();
+        for (final CidsBean bean : beans) {
+            final int index = getModel().getIndexByCidsBean(bean);
+            getSelectionModel().addSelectionInterval(index, index);
+        }
+    }
+
+    @Override
     public final Validator getValidator() {
         return aggVal;
     }
