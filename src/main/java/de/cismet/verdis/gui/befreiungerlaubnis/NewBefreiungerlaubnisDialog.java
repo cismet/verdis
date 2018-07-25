@@ -12,15 +12,20 @@
 package de.cismet.verdis.gui.befreiungerlaubnis;
 
 import java.awt.Frame;
+import java.awt.event.KeyEvent;
 
 import java.sql.Date;
 
 import java.util.List;
 
+import javax.swing.KeyStroke;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.validation.*;
 
@@ -108,6 +113,11 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
 
         initComponents();
         getRootPane().setDefaultButton(btnGo);
+        StaticSwingTools.doClickButtonOnKeyStroke(btnGo, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            btnCancel,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
 
         setCidsBean(cidsBean);
     }

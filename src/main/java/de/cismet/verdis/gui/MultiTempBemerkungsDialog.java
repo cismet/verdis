@@ -12,6 +12,7 @@ import Sirius.navigator.connection.SessionManager;
 import org.apache.log4j.Logger;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -132,6 +134,25 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         super(parent, modal);
 
         initComponents();
+
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton4,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            jDialog1.getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton1,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            jDialog1.getRootPane());
+
+        getRootPane().setDefaultButton(jButton2);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton2,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            jDialog1.getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton2,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            jDialog1.getRootPane());
 
         dateRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
         userRenderer.setHorizontalAlignment(DefaultTableCellRenderer.LEFT);

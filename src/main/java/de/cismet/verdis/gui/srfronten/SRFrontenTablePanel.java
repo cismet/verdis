@@ -16,9 +16,12 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.KeyStroke;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -136,6 +139,14 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
         jxtOverview1.getColumnExt(0).setComparator(new NumberStringComparator());
 
         jDialog1.getRootPane().setDefaultButton(jButton2);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton2,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            jDialog1.getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton1,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            jDialog1.getRootPane());
     }
 
     //~ Methods ----------------------------------------------------------------

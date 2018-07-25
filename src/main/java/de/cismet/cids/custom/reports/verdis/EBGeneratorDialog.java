@@ -16,9 +16,12 @@ import Sirius.navigator.connection.SessionManager;
 import org.apache.log4j.Logger;
 
 import java.awt.Frame;
+import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import javax.swing.KeyStroke;
 
 import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
@@ -32,6 +35,7 @@ import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
@@ -128,6 +132,14 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         }
 
         getRootPane().setDefaultButton(btnPrint);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            btnPrint,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            btnCancel,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
 
         pack();
     }
