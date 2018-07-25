@@ -346,6 +346,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<>();
     private final Map<String, Double> veranlagungSummeMap = new HashMap<>();
     private CidsAppBackend.Mode currentMode = null;
+
     private JDialog about = null;
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private final Icon icoKassenzeichen = new javax.swing.ImageIcon(getClass().getResource(
@@ -517,6 +518,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsAppBackend.Mode getCurrentMode() {
+        return currentMode;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public KassenzeichenGeometrienPanel getKassenzeichenGeometrienPanel() {
+        return kassenzeichenGeometrienPanel;
+    }
 
     /**
      * DOCUMENT ME!
@@ -773,6 +792,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     "Kassenzeichen",
                     Static2DTools.borderIcon(icoKassenzeichen, 0, 3, 0, 1),
                     kassenzeichenPanel);
+            vKassenzeichen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen", vKassenzeichen);
             vKassenzeichen.getCustomTitleBarComponents().addAll(kassenzeichenPanel.getCustomButtons());
 
@@ -780,69 +804,134 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     "Kassenzeichen-Liste",
                     Static2DTools.borderIcon(icoKassenzeichenList, 0, 3, 0, 1),
                     kassenzeichenListPanel);
+            vKassenzeichenList.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen-Liste", vKassenzeichenList);
 
             vSummen = new View("Summen", Static2DTools.borderIcon(icoSummen, 0, 3, 0, 1), regenSumPanel);
+            vSummen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Summen", vSummen);
 
             vKanaldaten = new View("Kanalanschluss", Static2DTools.borderIcon(icoKanal, 0, 3, 0, 1), kanaldatenPanel);
+            vKanaldaten.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kanalanschluss", vKanaldaten);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
+            vKarte.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Karte", vKarte);
 
             vTabelleSR = new View(
                     "Tabellenansicht (Fronten)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     srFrontenTablePanel);
+            vTabelleSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (Fronten)", vTabelleSR);
 
             vDetailsSR = new View(
                     "Details (Fronten)",
                     Static2DTools.borderIcon(icoDetails, 0, 3, 0, 1),
                     srFrontenDetailsPanel);
+            vDetailsSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details", vDetailsSR);
 
             vZusammenfassungSR = new View(
                     "ESW Zusammenfassung",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     srSummenPanel);
+            vZusammenfassungSR.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("ESW Zusammenfassung", vZusammenfassungSR);
 
             vDetailsAllgemein = new View(
                     "Details (Flächen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     kassenzeichenGeometrienPanel);
+            vDetailsAllgemein.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Kassenzeichen-Flächen", vDetailsAllgemein);
 
             vInfoAllgemein = new View(
                     "Informationen",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     allgInfosPanel);
+            vInfoAllgemein.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Informationen", vInfoAllgemein);
 
             vTabelleRegen = new View(
                     "Tabellenansicht (versiegelte Fl\u00E4chen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     regenFlaechenTablePanel);
+            vTabelleRegen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (versiegelte Flaechen)", vTabelleRegen);
 
             vDetailsRegen = new View(
                     "Details (versiegelte Fl\u00E4chen)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     regenFlaechenDetailsPanel);
+            vDetailsRegen.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details (versiegelte Flaechen)", vDetailsRegen);
 
             vTabelleVersickerung = new View(
                     "Tabellenansicht (Versickerung/Einleitung)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     befreiungerlaubnisGeometrieTablePanel);
+            vTabelleVersickerung.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Tabellenansicht (Versickerung/Einleitung)", vTabelleVersickerung);
 
             vDetailsVersickerung = new View(
                     "Details (Versickerung/Einleitung)",
                     Static2DTools.borderIcon(icoTabelle, 0, 3, 0, 1),
                     befreiungerlaubnisGeometrieDetailsPanel);
+            vDetailsVersickerung.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
             viewMap.addView("Details (Versickerung/Einleitung)", vDetailsVersickerung);
 
             rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
@@ -952,7 +1041,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     getMappingComponent().getInputListener(MappingComponent.SPLIT_POLYGON));
         PNotificationCenter.defaultCenter()
                 .addListener(
-                    this,
+                    kartenPanel,
                     "attachFeatureRequested",
                     AttachFeatureListener.ATTACH_FEATURE_NOTIFICATION,
                     getMappingComponent().getInputListener(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA));
@@ -1352,32 +1441,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     }
                 }
             });
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  notification  DOCUMENT ME!
-     */
-    public void attachFeatureRequested(final PNotification notification) {
-        switch (currentMode) {
-            case SR: {
-                getSRFrontenTable().attachFeatureRequested(notification);
-            }
-            break;
-            case REGEN: {
-                getRegenFlaechenTable().attachFeatureRequested(notification);
-            }
-            break;
-            case KANALDATEN: {
-                getBefreiungerlaubnisGeometrieTable().attachFeatureRequested(notification);
-            }
-            break;
-            case ALLGEMEIN: {
-                kassenzeichenGeometrienPanel.attachFeatureRequested(notification);
-            }
-            break;
-        }
     }
 
     /**
@@ -4105,7 +4168,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRecalculateAreaActionPerformed
         if (isInEditMode()) {
-            regenFlaechenTablePanel.recalculateAreaOfFlaechen();
+            switch (CidsAppBackend.getInstance().getMode()) {
+                case REGEN: {
+                    regenFlaechenTablePanel.recalculateAreaOfFlaechen();
+                    break;
+                }
+                case SR: {
+                    srFrontenTablePanel.recalculateLengthOfFronten();
+                    break;
+                }
+            }
         }
     }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
 
@@ -4892,7 +4964,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         && !kassenzeichenPanel.getSearchField().isEmpty());
         }
         cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
-        cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
+        cmdRecalculateArea.setEnabled(b
+                    && (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())
+                        || CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())));
         if (!b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)

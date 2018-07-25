@@ -11,13 +11,21 @@ import Sirius.navigator.connection.SessionManager;
 
 import org.apache.log4j.Logger;
 
+import java.awt.Component;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -82,28 +90,15 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
-    private static final TableCellRenderer dateRenderer = new DefaultTableCellRenderer();
-    private static final TableCellRenderer userRenderer = new DefaultTableCellRenderer();
-    private static final TableCellRenderer bemerkungRenderer = new DefaultTableCellRenderer() {
-
-            @Override
-            public String getToolTipText() {
-                return super.getText();
-            }
-        };
-
-    static {
-        ((DefaultTableCellRenderer)dateRenderer).setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-        ((DefaultTableCellRenderer)userRenderer).setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
-        ((DefaultTableCellRenderer)bemerkungRenderer).setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
-    }
-
     //~ Instance fields --------------------------------------------------------
 
     private MultiBemerkung multiBemerkung;
     private boolean selectionEmpty;
 
     private boolean editable = false;
+    private final DefaultTableCellRenderer dateRenderer = new DefaultTableCellRenderer();
+    private final DefaultTableCellRenderer userRenderer = new DefaultTableCellRenderer();
+    private final DefaultTableCellRenderer bemerkungRenderer = new TextAreaCellRenderer();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -135,7 +130,12 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
      */
     private MultiTempBemerkungsDialog(final java.awt.Frame parent, final boolean modal) {
         super(parent, modal);
+
         initComponents();
+
+        dateRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+        userRenderer.setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
+        bemerkungRenderer.setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
 
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(90);
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(120);
@@ -343,7 +343,9 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
         jScrollPane2.setPreferredSize(new java.awt.Dimension(300, 100));
 
         jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
+        jTextArea1.setWrapStyleWord(true);
         jScrollPane2.setViewportView(jTextArea1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -642,6 +644,65 @@ public class MultiTempBemerkungsDialog extends javax.swing.JDialog {
                     return null;
                 }
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class TextAreaCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final List<List<Integer>> rowAndCellHeightList = new ArrayList<>();
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public Component getTableCellRendererComponent(final JTable table,
+                final Object value,
+                final boolean isSelected,
+                final boolean hasFocus,
+                final int row,
+                final int column) {
+            final JTextArea textArea = new JTextArea(Objects.toString(value, ""));
+            textArea.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setFont(table.getFont());
+            textArea.setBackground(super.getTableCellRendererComponent(
+                    table,
+                    value,
+                    isSelected,
+                    hasFocus,
+                    row,
+                    column).getBackground());
+            textArea.setBounds(table.getCellRect(row, column, false));
+
+            final int preferredHeight = textArea.getPreferredSize().height;
+            while (rowAndCellHeightList.size() <= row) {
+                rowAndCellHeightList.add(new ArrayList<Integer>(column));
+            }
+
+            final List<Integer> cellHeightList = rowAndCellHeightList.get(row);
+            while (cellHeightList.size() <= column) {
+                cellHeightList.add(0);
+            }
+            cellHeightList.set(column, preferredHeight);
+
+            Integer max = Integer.MIN_VALUE;
+            for (final Integer i : cellHeightList) {
+                if (max < i) {
+                    max = i;
+                }
+            }
+            if (table.getRowHeight(row) != max) {
+                table.setRowHeight(row, max);
+            }
+
+            return textArea;
         }
     }
 }

@@ -286,6 +286,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
             }
         };
 
+    private String lastInteractionMode = null;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdAdd;
     private javax.swing.JToggleButton cmdAddHandle;
@@ -1708,9 +1710,59 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * DOCUMENT ME!
      *
+     * @param  notification  DOCUMENT ME!
+     */
+    public void attachFeatureRequested(final PNotification notification) {
+        switch (Main.getInstance().getCurrentMode()) {
+            case SR: {
+                Main.getInstance().getSRFrontenTable().attachFeatureRequested(notification);
+            }
+            break;
+            case REGEN: {
+                Main.getInstance().getRegenFlaechenTable().attachFeatureRequested(notification);
+            }
+            break;
+            case KANALDATEN: {
+                Main.getInstance().getBefreiungerlaubnisGeometrieTable().attachFeatureRequested(notification);
+            }
+            break;
+            case ALLGEMEIN: {
+                Main.getInstance().getKassenzeichenGeometrienPanel().attachFeatureRequested(notification);
+            }
+            break;
+        }
+
+        final String lastInteractionMode = getLastInteractionMode();
+        setLastInteractionMode(null);
+        mappingComp.setInteractionMode(lastInteractionMode);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  lastInteractionMode  DOCUMENT ME!
+     */
+    public void setLastInteractionMode(final String lastInteractionMode) {
+        this.lastInteractionMode = lastInteractionMode;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+
+    public String getLastInteractionMode() {
+        return lastInteractionMode;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  evt  DOCUMENT ME!
      */
     private void cmdAttachPolyToAlphadataActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAttachPolyToAlphadataActionPerformed
+        setLastInteractionMode(mappingComp.getInteractionMode());
         mappingComp.setInteractionMode(MappingComponent.ATTACH_POLYGON_TO_ALPHADATA);
     }                                                                                            //GEN-LAST:event_cmdAttachPolyToAlphadataActionPerformed
 
