@@ -4168,7 +4168,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void cmdRecalculateAreaActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRecalculateAreaActionPerformed
         if (isInEditMode()) {
-            regenFlaechenTablePanel.recalculateAreaOfFlaechen();
+            switch (CidsAppBackend.getInstance().getMode()) {
+                case REGEN: {
+                    regenFlaechenTablePanel.recalculateAreaOfFlaechen();
+                    break;
+                }
+                case SR: {
+                    srFrontenTablePanel.recalculateLengthOfFronten();
+                    break;
+                }
+            }
         }
     }                                                                                      //GEN-LAST:event_cmdRecalculateAreaActionPerformed
 
@@ -4955,7 +4964,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         && !kassenzeichenPanel.getSearchField().isEmpty());
         }
         cmdRefreshEnumeration.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
-        cmdRecalculateArea.setEnabled(b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode()));
+        cmdRecalculateArea.setEnabled(b
+                    && (CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())
+                        || CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())));
         if (!b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
                         && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
