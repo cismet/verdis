@@ -9,15 +9,20 @@ package de.cismet.verdis.gui.befreiungerlaubnis_geometrie;
 
 import Sirius.server.middleware.types.MetaClass;
 
+import java.awt.event.KeyEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
@@ -91,6 +96,11 @@ public class NewBefreiungerlaubnisGeometrieDialog extends javax.swing.JDialog {
             });
 
         getRootPane().setDefaultButton(cmdOK);
+        StaticSwingTools.doClickButtonOnKeyStroke(cmdOK, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            cmdCancel,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
 
         setTitle(getTitle().replace("{Versickerung|Einleitung}", versickerung ? "Versickerung" : "Einleitung"));
         jLabel1.setText(jLabel1.getText().replace(

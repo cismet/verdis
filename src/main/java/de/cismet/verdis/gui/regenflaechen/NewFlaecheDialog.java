@@ -9,11 +9,14 @@ package de.cismet.verdis.gui.regenflaechen;
 
 import Sirius.server.middleware.types.MetaClass;
 
+import java.awt.event.KeyEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import de.cismet.cids.custom.util.VerdisUtils;
@@ -21,6 +24,8 @@ import de.cismet.cids.custom.util.VerdisUtils;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
@@ -94,6 +99,11 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
             });
 
         getRootPane().setDefaultButton(cmdOK);
+        StaticSwingTools.doClickButtonOnKeyStroke(cmdOK, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            cmdCancel,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -225,6 +235,8 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weightx = 1.0;
@@ -241,6 +253,8 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 10;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
@@ -257,9 +271,11 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 10;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         jPanel2.add(cmdCancel, gridBagConstraints);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);

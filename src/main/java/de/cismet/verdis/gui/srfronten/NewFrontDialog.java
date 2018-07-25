@@ -7,8 +7,13 @@
 ****************************************************/
 package de.cismet.verdis.gui.srfronten;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -54,6 +59,11 @@ public class NewFrontDialog extends javax.swing.JDialog {
         initComponents();
 
         getRootPane().setDefaultButton(cmdOK);
+        StaticSwingTools.doClickButtonOnKeyStroke(cmdOK, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            cmdCancel,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -144,6 +154,8 @@ public class NewFrontDialog extends javax.swing.JDialog {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 10;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
@@ -160,6 +172,8 @@ public class NewFrontDialog extends javax.swing.JDialog {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 10;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
