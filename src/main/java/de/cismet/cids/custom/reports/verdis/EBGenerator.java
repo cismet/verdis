@@ -160,6 +160,8 @@ public class EBGenerator {
         final boolean loggerEnabled = cmd.hasOption(OPTION__LOGGER.getOpt());
         if (loggerEnabled) {
             Log4JQuickConfig.configure4LumbermillOnLocalhost();
+        } else {
+            Log4JQuickConfig.configure4LumbermillOnLocalhost("OFF");
         }
 
         final String callserverUrl = cmd.hasOption(OPTION__CALLSERVER_URL.getOpt())
