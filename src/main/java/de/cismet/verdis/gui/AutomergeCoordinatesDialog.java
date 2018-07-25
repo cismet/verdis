@@ -15,6 +15,7 @@ package de.cismet.verdis.gui;
 import lombok.Getter;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -96,6 +98,14 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         getRootPane().setDefaultButton(jButton1);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton1,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton3,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
     }
 
     //~ Methods ----------------------------------------------------------------

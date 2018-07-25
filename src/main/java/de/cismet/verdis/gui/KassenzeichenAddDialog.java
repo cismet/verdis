@@ -10,10 +10,14 @@ package de.cismet.verdis.gui;
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
@@ -54,6 +58,14 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
     public KassenzeichenAddDialog(final KassenzeichenAddDialogListener listener) {
         initComponents();
         getRootPane().setDefaultButton(jButton6);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton6,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            getRootPane());
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton6,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            getRootPane());
         jFormattedTextField1.requestFocus();
         this.listener = listener;
     }

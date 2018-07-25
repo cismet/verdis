@@ -17,8 +17,11 @@ package de.cismet.verdis.gui;
 
 import Sirius.server.middleware.types.MetaObject;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -75,6 +78,10 @@ public class GrundbuchblattSucheDialog extends javax.swing.JDialog {
         super((JFrame)null, false);
         initComponents();
         getRootPane().setDefaultButton(jButton1);
+        StaticSwingTools.doClickButtonOnKeyStroke(
+            jButton1,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+            getRootPane());
         jProgressBar1.setVisible(false);
     }
 
