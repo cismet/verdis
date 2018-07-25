@@ -100,7 +100,7 @@ public class EBGenerator {
     private static final String LANDSCAPE_ORIENTATION = "LS";
     private static final String PORTRAIT_ORIENTATION = "P";
 
-    private static final Option OPTION__LOGGER = new Option("l", "logger", true, "Logger");
+    private static final Option OPTION__LOGGER = new Option("l", "logger", false, "Logger");
     private static final Option OPTION__CALLSERVER_URL = new Option("c", "callserver-url", true, "Callserver");
     private static final Option OPTION__GZIP_COMPRESSION = new Option(
             "z",
@@ -143,10 +143,12 @@ public class EBGenerator {
         final CommandLine cmd;
         try {
             cmd =
-                new DefaultParser().parse(new Options().addOption(OPTION__CALLSERVER_URL).addOption(
-                        OPTION__GZIP_COMPRESSION).addOption(OPTION__KASSENZEICHEN).addOption(OPTION__USER).addOption(
-                        OPTION__GROUP).addOption(OPTION__DOMAIN).addOption(OPTION__PASSWORD).addOption(OPTION__TYPE)
-                            .addOption(OPTION__MAP_FORMAT).addOption(OPTION__HINTS).addOption(
+                new DefaultParser().parse(new Options().addOption(OPTION__CALLSERVER_URL).addOption(OPTION__LOGGER)
+                            .addOption(
+                                OPTION__GZIP_COMPRESSION).addOption(OPTION__KASSENZEICHEN).addOption(OPTION__USER)
+                            .addOption(
+                                OPTION__GROUP).addOption(OPTION__DOMAIN).addOption(OPTION__PASSWORD).addOption(
+                        OPTION__TYPE).addOption(OPTION__MAP_FORMAT).addOption(OPTION__HINTS).addOption(
                         OPTION__SCALE_DENOMINATOR).addOption(OPTION__ABFLUSSWIRKSAMKEIT),
                     args);
         } catch (ParseException ex) {
@@ -209,6 +211,7 @@ public class EBGenerator {
             System.exit(0);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+            LOG.error(ex, ex);
             System.exit(1);
         }
     }
