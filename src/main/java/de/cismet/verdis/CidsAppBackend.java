@@ -1379,7 +1379,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @param  kassenzeichen  DOCUMENT ME!
      */
     public void gotoKassenzeichenAndEdit(final String kassenzeichen) {
-        gotoKassenzeichen(kassenzeichen, true, false);
+        gotoKassenzeichen(kassenzeichen, true, true);
     }
 
     /**

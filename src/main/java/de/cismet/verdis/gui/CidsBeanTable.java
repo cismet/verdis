@@ -58,6 +58,15 @@ public interface CidsBeanTable extends Validatable, CidsBeanComponent, CidsBeanS
     /**
      * DOCUMENT ME!
      *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    CidsBean getBeanBackup(final CidsBean cidsBean);
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  selectedRowListener  cidsBean DOCUMENT ME!
      */
     // void addBean(final CidsBean cidsBean);
@@ -117,4 +126,11 @@ public interface CidsBeanTable extends Validatable, CidsBeanComponent, CidsBeanS
      * @param  cidsBean  DOCUMENT ME!
      */
     void selectCidsBean(final CidsBean cidsBean);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBeans  DOCUMENT ME!
+     */
+    void selectCidsBeans(final List<CidsBean> cidsBeans);
 }

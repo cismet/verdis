@@ -149,6 +149,11 @@ public abstract class AbstractCidsBeanTable extends JXTable implements CidsBeanT
         beanBackups.remove((Integer)cidsBean.getProperty("id"));
     }
 
+    @Override
+    public CidsBean getBeanBackup(final CidsBean cidsBean) {
+        return beanBackups.get((Integer)cidsBean.getProperty("id"));
+    }
+
     /**
      * DOCUMENT ME!
      *
@@ -299,6 +304,15 @@ public abstract class AbstractCidsBeanTable extends JXTable implements CidsBeanT
         if (index >= 0) {
             final int viewIndex = convertRowIndexToView(index);
             getSelectionModel().setSelectionInterval(viewIndex, viewIndex);
+        }
+    }
+
+    @Override
+    public void selectCidsBeans(final List<CidsBean> beans) {
+        getSelectionModel().clearSelection();
+        for (final CidsBean bean : beans) {
+            final int index = getModel().getIndexByCidsBean(bean);
+            getSelectionModel().addSelectionInterval(index, index);
         }
     }
 
