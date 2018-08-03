@@ -64,6 +64,7 @@ public class AppPreferences {
     private String appbackendConnectionclass = null;
     private String appbackendCallserverurl = null;
     private boolean compressionEnabled = false;
+    private Integer nachgewiesenFalseThreshold = 10;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -164,9 +165,10 @@ public class AppPreferences {
             }
 
             try {
-                albUrl = root.getChild("general").getChild("albUrl").getTextTrim();
+                nachgewiesenFalseThreshold = Integer.valueOf(root.getChild("general").getChild(
+                            "nachgewiesenFalseThreshold").getTextTrim());
             } catch (Exception e) {
-                log.error("Fehler beim auslesen von albUrl", e);
+                log.error("Fehler beim auslesen von nachgewiesenFalseThreshold", e);
             }
 
             try {
