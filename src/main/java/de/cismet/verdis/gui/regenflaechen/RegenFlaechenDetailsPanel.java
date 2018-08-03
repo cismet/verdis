@@ -116,6 +116,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JComboBox cboFlaechenart;
     private javax.swing.JCheckBox chkSperre;
     private javax.swing.JEditorPane edtQuer;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblAenderungsdatum;
@@ -390,6 +391,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jPanel1 = new javax.swing.JPanel();
         lblBeschreibung = new javax.swing.JLabel();
         cboBeschreibung = new DefaultBindableReferenceCombo();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -476,8 +478,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
                         + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
 
         txtGroesseGrafik.addActionListener(new java.awt.event.ActionListener() {
@@ -490,8 +490,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(txtGroesseGrafik, gridBagConstraints);
 
@@ -511,8 +511,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(txtGroesseKorrektur, gridBagConstraints);
 
@@ -837,6 +837,28 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboBeschreibung, gridBagConstraints);
+
+        jCheckBox1.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.jCheckBox1.text")); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.nachgewiesen}"),
+                jCheckBox1,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
+        bpanRegenFlDetails.add(jCheckBox1, gridBagConstraints);
 
         jPanel2.add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);
 
@@ -1266,10 +1288,34 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
                     } else {
-                        final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                        final CidsBean backupBean = Main.getInstance()
+                                    .getRegenFlaechenTable()
+                                    .getBeanBackup(flaecheBean);
+                        final Integer groesseGrafik = (Integer)flaecheBean.getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
                                         + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                        if (backupBean != null) {
+                            final Integer backupGroesseGrafik = (Integer)backupBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                            if (Math.abs(backupGroesseGrafik - groesseGrafik)
+                                        > CidsAppBackend.getInstance().getAppPreferences()
+                                        .getNachgewiesenFalseThreshold()) {
+                                try {
+                                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                + "."
+                                                + FlaecheninfoPropertyConstants.PROP__NACHGEWIESEN,
+                                        false);
+                                } catch (final Exception ex) {
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("error while setting nachgewiesen", ex);
+                                    }
+                                }
+                            }
+                        }
+
                         final Geometry geom = RegenFlaechenDetailsPanel.getGeometry(flaecheBean);
                         final Action action = new AbstractAction() {
 
@@ -1334,7 +1380,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                             return new ValidatorStateImpl(
                                     ValidatorState.Type.WARNING,
                                     "kann nicht validiert werden, Flächenart ist nicht gesetzt.");
-                        } else if (gr_grafik == null) {
+                        } else if (groesseGrafik == null) {
                             if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG != artId) {
                                 return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert ist leer", action);
                             } else {
@@ -1342,7 +1388,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                             }
                         } else if (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG == artId) {
                             return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Wert muss leer sein", action);
-                        } else if ((geom != null) && !gr_grafik.equals(new Integer((int)(geom.getArea())))) {
+                        } else if ((geom != null) && !groesseGrafik.equals(new Integer((int)(geom.getArea())))) {
                             return new ValidatorStateImpl(
                                     ValidatorState.Type.WARNING,
                                     "Fl\u00E4che der Geometrie stimmt nicht \u00FCberein ("
@@ -1386,14 +1432,39 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
                         return null;
                     } else {
-                        final Integer gr_grafik = (Integer)flaecheBean.getProperty(
+                        final Integer groesseGrafik = (Integer)flaecheBean.getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
                                         + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                        final Integer gr_korrektur = (Integer)flaecheBean.getProperty(
+                        final Integer groesseKorrektur = (Integer)flaecheBean.getProperty(
                                 FlaechePropertyConstants.PROP__FLAECHENINFO
                                         + "."
                                         + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+
+                        final CidsBean backupBean = Main.getInstance()
+                                    .getRegenFlaechenTable()
+                                    .getBeanBackup(flaecheBean);
+                        if (backupBean != null) {
+                            final Integer backupGroesseKorrektur = (Integer)backupBean.getProperty(
+                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            + "."
+                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+
+                            if (Math.abs(backupGroesseKorrektur - groesseKorrektur)
+                                        > CidsAppBackend.getInstance().getAppPreferences()
+                                        .getNachgewiesenFalseThreshold()) {
+                                try {
+                                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                + "."
+                                                + FlaecheninfoPropertyConstants.PROP__NACHGEWIESEN,
+                                        false);
+                                } catch (final Exception ex) {
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("error while setting nachgewiesen", ex);
+                                    }
+                                }
+                            }
+                        }
 
                         final Action action = new AbstractAction() {
 
@@ -1429,10 +1500,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                     }
                                 }
                             };
-                        if (gr_grafik == null) {
+                        if (groesseGrafik == null) {
                             return new ValidatorStateImpl(ValidatorState.Type.WARNING, "Wert ist leer");
-                        } else if (gr_korrektur != null) {
-                            final int diff = gr_korrektur.intValue() - gr_grafik.intValue();
+                        } else if (groesseKorrektur != null) {
+                            final int diff = groesseKorrektur.intValue() - groesseGrafik.intValue();
                             if (Math.abs(diff) > 20) {
                                 return new ValidatorStateImpl(
                                         ValidatorState.Type.WARNING,

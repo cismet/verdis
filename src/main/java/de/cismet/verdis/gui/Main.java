@@ -49,7 +49,6 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolox.event.PNotification;
 import edu.umd.cs.piccolox.event.PNotificationCenter;
 
 import net.infonode.docking.DockingWindow;
@@ -268,7 +267,6 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
-import de.cismet.verdis.server.action.EBReportServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;

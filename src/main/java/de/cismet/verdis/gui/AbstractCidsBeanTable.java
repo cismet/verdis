@@ -149,6 +149,11 @@ public abstract class AbstractCidsBeanTable extends JXTable implements CidsBeanT
         beanBackups.remove((Integer)cidsBean.getProperty("id"));
     }
 
+    @Override
+    public CidsBean getBeanBackup(final CidsBean cidsBean) {
+        return beanBackups.get((Integer)cidsBean.getProperty("id"));
+    }
+
     /**
      * DOCUMENT ME!
      *
