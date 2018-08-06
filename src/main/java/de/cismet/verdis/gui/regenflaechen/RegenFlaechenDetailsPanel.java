@@ -1300,9 +1300,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                     FlaechePropertyConstants.PROP__FLAECHENINFO
                                             + "."
                                             + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-                            if (Math.abs(backupGroesseGrafik - groesseGrafik)
-                                        > CidsAppBackend.getInstance().getAppPreferences()
-                                        .getNachgewiesenFalseThreshold()) {
+                            if ((backupGroesseGrafik != null) && (groesseGrafik != null)
+                                        && (Math.abs(backupGroesseGrafik - groesseGrafik)
+                                            > CidsAppBackend.getInstance().getAppPreferences()
+                                            .getNachgewiesenFalseThreshold())) {
                                 try {
                                     flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                                                 + "."
@@ -1450,9 +1451,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                             + "."
                                             + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
 
-                            if (Math.abs(backupGroesseKorrektur - groesseKorrektur)
-                                        > CidsAppBackend.getInstance().getAppPreferences()
-                                        .getNachgewiesenFalseThreshold()) {
+                            if ((backupGroesseKorrektur != null) && (groesseKorrektur != null)
+                                        && (Math.abs(backupGroesseKorrektur - groesseKorrektur)
+                                            > CidsAppBackend.getInstance().getAppPreferences()
+                                            .getNachgewiesenFalseThreshold())) {
                                 try {
                                     flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
                                                 + "."
