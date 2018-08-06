@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>6.4</version>
+    <version>6.4.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v6.4</tag>
+      <tag>v6.4.1</tag>
   </scm>
 
   <issueManagement>
@@ -66,7 +66,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-gui-commons</artifactId>
-              <version>6.2.1</version>
+              <version>6.2.2</version>
               <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.3.1</version>
+                <version>6.3.2</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
