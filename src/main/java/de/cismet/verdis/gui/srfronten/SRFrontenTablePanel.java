@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.KeyStroke;
 
@@ -94,13 +95,13 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
                     }
 
                     final int displayedIndex = componentAdapter.row;
-                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-                    final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
-                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
-                    final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+                    final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final Integer newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+                    final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+                    final Integer newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
 
-                    return ((componentAdapter.column == 2) && (oldGrafik != newGrafik))
-                                || ((componentAdapter.column == 4) && (oldKorrektur != newKorrektur));
+                    return ((componentAdapter.column == 2) && (!Objects.equals(oldGrafik, newGrafik)))
+                                || ((componentAdapter.column == 4) && (!Objects.equals(oldKorrektur, newKorrektur)));
                 }
             };
 
@@ -113,10 +114,10 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
                     }
 
                     final int displayedIndex = componentAdapter.row;
-                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+                    final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
 
-                    return oldGrafik != oldKorrektur;
+                    return !Objects.equals(oldGrafik, oldKorrektur);
                 }
             };
 
@@ -291,12 +292,12 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
             final CidsBean frontBean = ((GrafikPreviewTableModel)jxtOverview1.getModel()).getCidsBeanByIndex(
                     modelIndex);
 
-            final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-            final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
-            final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
-            final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+            final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+            final Integer newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+            final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+            final Integer newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
 
-            if (oldGrafik != newGrafik) {
+            if (!Objects.equals(oldGrafik, newGrafik)) {
                 try {
                     frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                 + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
@@ -305,7 +306,7 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
                     LOG.warn(ex, ex);
                 }
             }
-            if (oldKorrektur != newKorrektur) {
+            if (!Objects.equals(oldKorrektur, newKorrektur)) {
                 try {
                     frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                                 + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
@@ -381,13 +382,12 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
 
             final Geometry geom = sRFrontenTable1.getGeometry(cidsBean);
 
-            final int oldGrafik = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+            final Integer oldGrafik = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
-            final int oldKorrektur = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
+            final Integer oldKorrektur = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
                             + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
-            final boolean korrekturEqualsGrafik = oldKorrektur == oldGrafik;
-            final int newGrafik = (geom != null) ? (int)geom.getLength() : 0;
-            final int newKorrektur = (korrekturEqualsGrafik) ? newGrafik : oldKorrektur;
+            final Integer newGrafik = (geom != null) ? (int)geom.getLength() : 0;
+            final Integer newKorrektur = (oldKorrektur == oldGrafik) ? newGrafik : oldKorrektur;
 
             switch (columnIndex) {
                 case 0: {

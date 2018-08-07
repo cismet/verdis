@@ -21,6 +21,7 @@ import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.KeyStroke;
 
@@ -232,13 +233,13 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
                     }
 
                     final int displayedIndex = componentAdapter.row;
-                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-                    final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
-                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
-                    final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+                    final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final Integer newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+                    final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+                    final Integer newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
 
-                    return ((componentAdapter.column == 2) && (oldGrafik != newGrafik))
-                                || ((componentAdapter.column == 4) && (oldKorrektur != newKorrektur));
+                    return ((componentAdapter.column == 2) && (!Objects.equals(oldGrafik, newGrafik)))
+                                || ((componentAdapter.column == 4) && (!Objects.equals(oldKorrektur, newKorrektur)));
                 }
             };
 
@@ -251,10 +252,10 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
                     }
 
                     final int displayedIndex = componentAdapter.row;
-                    final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-                    final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+                    final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+                    final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
 
-                    return oldGrafik != oldKorrektur;
+                    return !Objects.equals(oldGrafik, oldKorrektur);
                 }
             };
 
@@ -300,12 +301,12 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
             final CidsBean flaecheBean = ((GrafikPreviewTableModel)jxtOverview1.getModel()).getCidsBeanByIndex(
                     modelIndex);
 
-            final int oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
-            final int newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
-            final int oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
-            final int newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
+            final Integer oldGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 1);
+            final Integer newGrafik = (Integer)jxtOverview1.getValueAt(displayedIndex, 2);
+            final Integer oldKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 3);
+            final Integer newKorrektur = (Integer)jxtOverview1.getValueAt(displayedIndex, 4);
 
-            if (oldGrafik != newGrafik) {
+            if (!Objects.equals(oldGrafik, newGrafik)) {
                 try {
                     flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                 + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
@@ -314,7 +315,7 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
                     LOG.warn(ex, ex);
                 }
             }
-            if (oldKorrektur != newKorrektur) {
+            if (!Objects.equals(oldKorrektur, newKorrektur)) {
                 try {
                     flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                                 + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
@@ -331,7 +332,7 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
      * DOCUMENT ME!
      */
     public void recalculateAreaOfFlaechen() {
-        final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<CidsBean>();
+        final List<CidsBean> toCorrectFlaecheBeans = new ArrayList<>();
 
         for (int index = 0; index < regenFlaechenTable1.getRowCount(); ++index) {
             final CidsBean flaecheBean = regenFlaechenTable1.getModel()
@@ -449,13 +450,12 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
 
             final Geometry geom = regenFlaechenTable1.getGeometry(cidsBean);
 
-            final int oldGrafik = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+            final Integer oldGrafik = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-            final int oldKorrektur = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
+            final Integer oldKorrektur = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
-            final boolean korrekturEqualsGrafik = oldKorrektur == oldGrafik;
-            final int newGrafik = (geom != null) ? (int)geom.getArea() : 0;
-            final int newKorrektur = (korrekturEqualsGrafik) ? newGrafik : oldKorrektur;
+            final Integer newGrafik = (geom != null) ? (int)geom.getArea() : 0;
+            final Integer newKorrektur = (Objects.equals(oldKorrektur, oldGrafik)) ? newGrafik : oldKorrektur;
 
             switch (columnIndex) {
                 case 0: {
