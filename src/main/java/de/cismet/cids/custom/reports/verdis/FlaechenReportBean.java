@@ -19,8 +19,6 @@ import net.sf.jasperreports.engine.JasperReport;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -78,23 +76,16 @@ public class FlaechenReportBean extends EBReportBean {
     /**
      * Creates a new FebBean object.
      *
-     * @param  properties        DOCUMENT ME!
-     * @param  kassenzeichen     DOCUMENT ME!
-     * @param  hinweise          DOCUMENT ME!
-     * @param  mapHeight         DOCUMENT ME!
-     * @param  mapWidth          DOCUMENT ME!
-     * @param  scaleDenominator  DOCUMENT ME!
-     * @param  fillAbfluss       DOCUMENT ME!
+     * @param  properties     DOCUMENT ME!
+     * @param  kassenzeichen  DOCUMENT ME!
+     * @param  hinweise       DOCUMENT ME!
+     * @param  fillAbfluss    DOCUMENT ME!
      */
     public FlaechenReportBean(final Properties properties,
             final CidsBean kassenzeichen,
             final String hinweise,
-            final int mapHeight,
-            final int mapWidth,
-            final Double scaleDenominator,
             final boolean fillAbfluss) {
-        super(properties, kassenzeichen, mapHeight, mapWidth, scaleDenominator, fillAbfluss);
-        loadMap();
+        super(properties, kassenzeichen, fillAbfluss);
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
 
@@ -113,8 +104,6 @@ public class FlaechenReportBean extends EBReportBean {
         Collections.sort(dachflaechen, new DachflaechenComparator());
         Collections.sort(versiegelteflaechen, new VersiegelteFlaechenComparator());
         this.hinweise = hinweise;
-
-        genBarcode();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -219,18 +208,25 @@ public class FlaechenReportBean extends EBReportBean {
         return super.isReadyToProceed() && (versiegelteflaechen != null) && (dachflaechen != null);
     }
 
-    @Override
-    protected Collection<Feature> createFeatures() {
-        final Collection<Feature> features = new ArrayList<Feature>();
-        final List<CidsBean> flaechen = (List<CidsBean>)getKassenzeichenBean().getProperty(
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     * @param   properties         DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static Collection<Feature> createFeatures(final CidsBean kassenzeichenBean, final Properties properties) {
+        final Collection<Feature> features = new ArrayList<>();
+        final List<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
-        final int fontSize = Integer.parseInt(getProperties().getProperty("annotationFontSize"));
+        final int fontSize = Integer.parseInt(properties.getProperty("annotationFontSize"));
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());
-            } catch (ConnectionException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch (final ConnectionException ex) {
+                LOG.error(ex, ex);
             }
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
@@ -251,8 +247,8 @@ public class FlaechenReportBean extends EBReportBean {
         for (final CidsBean b : flaechen) {
             try {
                 fr.setMetaObject(b.getMetaObject());
-            } catch (ConnectionException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch (final ConnectionException ex) {
+                LOG.error(ex, ex);
             }
             final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
                             + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
