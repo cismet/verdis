@@ -23,8 +23,6 @@ import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -74,23 +72,14 @@ public class FrontenReportBean extends EBReportBean {
     /**
      * Creates a new FebBean object.
      *
-     * @param  properties        DOCUMENT ME!
-     * @param  kassenzeichen     DOCUMENT ME!
-     * @param  mapHeight         DOCUMENT ME!
-     * @param  mapWidth          DOCUMENT ME!
-     * @param  scaleDenominator  DOCUMENT ME!
+     * @param  properties     DOCUMENT ME!
+     * @param  kassenzeichen  DOCUMENT ME!
      */
-    public FrontenReportBean(final Properties properties,
-            final CidsBean kassenzeichen,
-            final int mapHeight,
-            final int mapWidth,
-            final Double scaleDenominator) {
-        super(properties, kassenzeichen, mapHeight, mapWidth, scaleDenominator, false);
+    public FrontenReportBean(final Properties properties, final CidsBean kassenzeichen) {
+        super(properties, kassenzeichen, false);
         this.fronten = (List<CidsBean>)kassenzeichen.getProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
         Collections.sort(this.fronten, new FrontenComparator());
-        loadMap();
-        genBarcode();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -105,19 +94,26 @@ public class FrontenReportBean extends EBReportBean {
         return super.isReadyToProceed();
     }
 
-    @Override
-    protected Collection<Feature> createFeatures() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     * @param   properties         DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static Collection<Feature> createFeatures(final CidsBean kassenzeichenBean, final Properties properties) {
         final Collection<Feature> features = new ArrayList<>();
         final FrontFeatureRenderer fr = new FrontFeatureRenderer();
-        final Collection<CidsBean> fronten = (List<CidsBean>)getKassenzeichenBean().getProperty(
+        final Collection<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
                 KassenzeichenPropertyConstants.PROP__FRONTEN);
 
-        final int fontSize = Integer.parseInt(getProperties().getProperty("annotationFontSize"));
+        final int fontSize = Integer.parseInt(properties.getProperty("annotationFontSize"));
         for (final CidsBean b : fronten) {
             try {
                 fr.setMetaObject(b.getMetaObject());
-            } catch (ConnectionException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch (final ConnectionException ex) {
+                LOG.error(ex, ex);
             }
             fr.assign();
             final Geometry g = (Geometry)b.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."

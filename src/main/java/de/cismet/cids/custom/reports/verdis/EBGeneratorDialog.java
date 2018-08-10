@@ -11,8 +11,6 @@
  */
 package de.cismet.cids.custom.reports.verdis;
 
-import Sirius.navigator.connection.SessionManager;
-
 import org.apache.log4j.Logger;
 
 import java.awt.Frame;
@@ -86,6 +84,10 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
     private javax.swing.JButton btnPrint;
     private javax.swing.JComboBox cbScale;
     private javax.swing.JCheckBox chkFillAbflusswirksamkeit;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JCheckBox jCheckBox3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFiller2;
     private javax.swing.JLabel lblFiller3;
@@ -101,6 +103,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
     private javax.swing.JRadioButton rbLandscapeMode;
     private javax.swing.JRadioButton rbPortraitMode;
     private javax.swing.JTextArea taHinweise;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -162,6 +165,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         btnGroupFormat = new javax.swing.ButtonGroup();
         btnGroupOrientation = new javax.swing.ButtonGroup();
@@ -174,12 +178,16 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         rbA4 = new javax.swing.JRadioButton();
         rbA3 = new javax.swing.JRadioButton();
         lblFiller2 = new javax.swing.JLabel();
+        jCheckBox2 = new javax.swing.JCheckBox();
         pnlOrientation = new javax.swing.JPanel();
         rbPortraitMode = new javax.swing.JRadioButton();
         rbLandscapeMode = new javax.swing.JRadioButton();
         lblFiller3 = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
         lblScale = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         cbScale = new javax.swing.JComboBox();
+        jCheckBox3 = new javax.swing.JCheckBox();
         pnlButtons = new javax.swing.JPanel();
         btnPrint = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -245,10 +253,20 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         rbA4.setActionCommand(org.openide.util.NbBundle.getMessage(
                 EBGeneratorDialog.class,
                 "EBGeneratorDialog.rbA4.actionCommand"));                                                  // NOI18N
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox2,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                rbA4,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlFormat.add(rbA4, gridBagConstraints);
 
         btnGroupFormat.add(rbA3);
@@ -258,6 +276,15 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         rbA3.setActionCommand(org.openide.util.NbBundle.getMessage(
                 EBGeneratorDialog.class,
                 "EBGeneratorDialog.rbA3.actionCommand"));                                                  // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox2,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                rbA3,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         rbA3.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -266,7 +293,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
@@ -276,11 +303,20 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
             lblFiller2,
             org.openide.util.NbBundle.getMessage(EBGeneratorDialog.class, "EBGeneratorDialog.lblFiller2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         pnlFormat.add(lblFiller2, gridBagConstraints);
+
+        jCheckBox2.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox2,
+            org.openide.util.NbBundle.getMessage(EBGeneratorDialog.class, "EBGeneratorDialog.jCheckBox2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        pnlFormat.add(jCheckBox2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -299,10 +335,20 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         rbPortraitMode.setActionCommand(org.openide.util.NbBundle.getMessage(
                 EBGeneratorDialog.class,
                 "EBGeneratorDialog.rbPortraitMode.actionCommand"));                                                  // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox1,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                rbPortraitMode,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         pnlOrientation.add(rbPortraitMode, gridBagConstraints);
 
         btnGroupOrientation.add(rbLandscapeMode);
@@ -312,8 +358,17 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         rbLandscapeMode.setActionCommand(org.openide.util.NbBundle.getMessage(
                 EBGeneratorDialog.class,
                 "EBGeneratorDialog.rbLandscapeMode.actionCommand"));                                                  // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox1,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                rbLandscapeMode,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
@@ -323,11 +378,20 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
             lblFiller3,
             org.openide.util.NbBundle.getMessage(EBGeneratorDialog.class, "EBGeneratorDialog.lblFiller3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         pnlOrientation.add(lblFiller3, gridBagConstraints);
+
+        jCheckBox1.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox1,
+            org.openide.util.NbBundle.getMessage(EBGeneratorDialog.class, "EBGeneratorDialog.jCheckBox1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        pnlOrientation.add(jCheckBox1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -343,19 +407,46 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
         getContentPane().add(lblScale, gridBagConstraints);
 
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
         cbScale.setModel(new javax.swing.DefaultComboBoxModel(
-                new String[] { "optimal angepasst", "1:200", "1:300", "1:400", "1:500", "1:750", "1:1000" }));
+                new String[] { "1:200", "1:300", "1:400", "1:500", "1:750", "1:1000" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox3,
+                org.jdesktop.beansbinding.ELProperty.create("${!selected}"),
+                cbScale,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel1.add(cbScale, gridBagConstraints);
+
+        jCheckBox3.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox3,
+            org.openide.util.NbBundle.getMessage(EBGeneratorDialog.class, "EBGeneratorDialog.jCheckBox3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel1.add(jCheckBox3, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        getContentPane().add(cbScale, gridBagConstraints);
+        getContentPane().add(jPanel1, gridBagConstraints);
 
         pnlButtons.setLayout(new java.awt.GridBagLayout());
 
@@ -409,7 +500,9 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
         getContentPane().add(chkFillAbflusswirksamkeit, gridBagConstraints);
-    }                                                                 // </editor-fold>//GEN-END:initComponents
+
+        bindingGroup.bind();
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -425,7 +518,13 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
      * @param  evt  DOCUMENT ME!
      */
     private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
-        generateReport(taHinweise.getText());
+        generateReport(
+            taHinweise.getText(),
+            jCheckBox2.isSelected() ? null
+                                    : btnGroupFormat.getSelection().getActionCommand().equals(rbA4.getActionCommand()),
+            jCheckBox1.isSelected()
+                ? null
+                : btnGroupOrientation.getSelection().getActionCommand().equals(rbLandscapeMode.getActionCommand()));
         this.setVisible(false);
     }                                                                            //GEN-LAST:event_btnPrintActionPerformed
 
@@ -445,21 +544,23 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
      */
     private Double getSelectedScaleDenominator() {
         final String scale = (String)cbScale.getSelectedItem();
-        if (scale.matches("1:[0-9]+")) {
+        if (jCheckBox3.isSelected()) {
+            return null;
+        } else {
             // format of string eg 1:500
             final String[] splittedScale = scale.split(":");
             return Double.parseDouble(splittedScale[1]);
-        } else {
-            return null;
         }
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  hints  DOCUMENT ME!
+     * @param  hints      DOCUMENT ME!
+     * @param  dinA4      DOCUMENT ME!
+     * @param  landscape  DOCUMENT ME!
      */
-    private void generateReport(final String hints) {
+    private void generateReport(final String hints, final Boolean dinA4, final Boolean landscape) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("starting report generation for feb report");
         }
@@ -472,18 +573,25 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
         } else {
             type = EBReportServerAction.Type.FLAECHEN;
         }
-        if (btnGroupFormat.getSelection().getActionCommand().equals(rbA4.getActionCommand())) {
-            if (btnGroupOrientation.getSelection().getActionCommand().equals(rbLandscapeMode.getActionCommand())) {
-                mapFormat = EBReportServerAction.MapFormat.A4LS;
-            } else {
-                mapFormat = EBReportServerAction.MapFormat.A4P;
-            }
+
+        if ((dinA4 == null) && (landscape == null)) {
+            mapFormat = null;
+        } else if (dinA4 && (landscape == null)) {
+            mapFormat = EBReportServerAction.MapFormat.A4;
+        } else if (!dinA4 && (landscape == null)) {
+            mapFormat = EBReportServerAction.MapFormat.A3;
+        } else if ((dinA4 == null) && landscape) {
+            mapFormat = EBReportServerAction.MapFormat.LS;
+        } else if ((dinA4 == null) && !landscape) {
+            mapFormat = EBReportServerAction.MapFormat.P;
+        } else if (dinA4 && landscape) {
+            mapFormat = EBReportServerAction.MapFormat.A4LS;
+        } else if (dinA4) {
+            mapFormat = EBReportServerAction.MapFormat.A4P;
+        } else if (landscape) {
+            mapFormat = EBReportServerAction.MapFormat.A3LS;
         } else {
-            if (btnGroupOrientation.getSelection().getActionCommand().equals(rbLandscapeMode.getActionCommand())) {
-                mapFormat = EBReportServerAction.MapFormat.A3LS;
-            } else {
-                mapFormat = EBReportServerAction.MapFormat.A3P;
-            }
+            mapFormat = EBReportServerAction.MapFormat.A3P;
         }
 
         if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(parent)) {

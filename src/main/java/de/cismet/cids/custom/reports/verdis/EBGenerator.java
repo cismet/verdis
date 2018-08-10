@@ -23,6 +23,14 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PBounds;
+
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -36,15 +44,24 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import org.krysalis.barcode4j.impl.code39.Code39Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.krysalis.barcode4j.tools.UnitConv;
+
 import org.openide.util.Exceptions;
 
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+
+import java.text.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -63,7 +80,11 @@ import de.cismet.cids.server.actions.GetServerResourceServerAction;
 
 import de.cismet.cids.utils.jasperreports.ReportHelper;
 
+import de.cismet.cismap.commons.Crs;
+import de.cismet.cismap.commons.CrsTransformer;
+import de.cismet.cismap.commons.HeadlessMapProvider;
 import de.cismet.cismap.commons.XBoundingBox;
+import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.interaction.CismapBroker;
@@ -129,6 +150,9 @@ public class EBGenerator {
             "abfluss-wirksamkeit",
             false,
             "Abflusswirksamkeit");
+
+    private static final double PPI = 72.156d;
+    private static final double METERS_TO_INCH_FACTOR = 0.0254d;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -362,38 +386,24 @@ public class EBGenerator {
                 LOG.debug("generating report beans");
             }
 
-            final boolean a4 = EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                        || EBReportServerAction.MapFormat.A4P.equals(mapFormat);
-            final boolean landscape = EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
-                        || EBReportServerAction.MapFormat.A3LS.equals(mapFormat);
-            final String suffix = (a4 ? A4_FORMAT : A3_FORMAT)
-                        + (landscape ? LANDSCAPE_ORIENTATION : PORTRAIT_ORIENTATION);
-
-            final int mapHeight = Integer.parseInt(properties.getProperty("mapHeight" + suffix));
-            final int mapWidth = Integer.parseInt(properties.getProperty("mapWidth" + suffix));
-
             final HashMap parameters = new HashMap();
 
             final EBReportBean reportBean;
+            final Collection<Feature> features;
             if (EBReportServerAction.Type.FRONTEN.equals(type)) {
                 reportBean = new FrontenReportBean(
                         properties,
-                        kassenzeichenBean,
-                        mapHeight,
-                        mapWidth,
-                        scaleDenominator);
+                        kassenzeichenBean);
 
                 parameters.put(
                     "TABLE_SUBREPORT",
                     getReport(VerdisServerResources.EB_FRONTEN_TABLE_JASPER, connectionContext));
+                features = FrontenReportBean.createFeatures(kassenzeichenBean, properties);
             } else {
                 reportBean = new FlaechenReportBean(
                         properties,
                         kassenzeichenBean,
                         hints,
-                        mapHeight,
-                        mapWidth,
-                        scaleDenominator,
                         abflusswirksamkeit);
 
                 parameters.put(
@@ -405,7 +415,97 @@ public class EBGenerator {
                 parameters.put(
                     "HINWEISE_SUBREPORT",
                     getReport(VerdisServerResources.EB_FLAECHEN_HINWEISE_JASPER, connectionContext));
+                features = FlaechenReportBean.createFeatures(kassenzeichenBean, properties);
             }
+
+            final XBoundingBox boundingBox = genBoundingBox(features, properties);
+
+            final boolean hasOrientation = (mapFormat != null)
+                        && (EBReportServerAction.MapFormat.LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.P.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A4P.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3P.equals(mapFormat));
+
+            final boolean hasFormat = (mapFormat != null)
+                        && (EBReportServerAction.MapFormat.A4.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A4P.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3P.equals(mapFormat));
+
+            final boolean landscape = hasOrientation
+                ? (EBReportServerAction.MapFormat.LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                            || EBReportServerAction.MapFormat.A3LS.equals(mapFormat))
+                : (boundingBox.getHeight() < boundingBox.getWidth());
+
+            final boolean a4;
+            if (hasFormat) {
+                a4 = (EBReportServerAction.MapFormat.A4.equals(mapFormat)
+                                || EBReportServerAction.MapFormat.A4LS.equals(mapFormat)
+                                || EBReportServerAction.MapFormat.A4P.equals(mapFormat));
+            } else {
+                final int mapHeight = Integer.parseInt(properties.getProperty(
+                            "mapHeight"
+                                    + A4_FORMAT
+                                    + (landscape ? LANDSCAPE_ORIENTATION : PORTRAIT_ORIENTATION)));
+                final int mapWidth = Integer.parseInt(properties.getProperty(
+                            "mapWidth"
+                                    + A4_FORMAT
+                                    + (landscape ? LANDSCAPE_ORIENTATION : PORTRAIT_ORIENTATION)));
+
+                final double bbFittingScaleDenominatorA4 = getScaleDenom(
+                        mapWidth,
+                        mapHeight,
+                        boundingBox.getWidth(),
+                        boundingBox.getHeight());
+
+                // fits in 1:500 ?
+                a4 = bbFittingScaleDenominatorA4 < 500;
+            }
+
+            final int mapHeightLs = Integer.parseInt(properties.getProperty(
+                        "mapHeight"
+                                + (a4 ? A4_FORMAT : A3_FORMAT)
+                                + LANDSCAPE_ORIENTATION));
+            final int mapWidthLs = Integer.parseInt(properties.getProperty(
+                        "mapWidth"
+                                + (a4 ? A4_FORMAT : A3_FORMAT)
+                                + LANDSCAPE_ORIENTATION));
+            final int mapHeightP = Integer.parseInt(properties.getProperty(
+                        "mapHeight"
+                                + (a4 ? A4_FORMAT : A3_FORMAT)
+                                + PORTRAIT_ORIENTATION));
+            final int mapWidthP = Integer.parseInt(properties.getProperty(
+                        "mapWidth"
+                                + (a4 ? A4_FORMAT : A3_FORMAT)
+                                + PORTRAIT_ORIENTATION));
+
+            final int mapHeight;
+            final int mapWidth;
+            final double newScaleDenominator;
+            if (scaleDenominator != null) {
+                mapWidth = landscape ? mapWidthLs : mapWidthP;
+                mapHeight = landscape ? mapHeightLs : mapHeightP;
+                newScaleDenominator = scaleDenominator;
+            } else {
+                mapWidth = landscape ? mapWidthLs : mapWidthP;
+                mapHeight = landscape ? mapHeightLs : mapHeightP;
+                final double bbFittingScaleDenominator = getScaleDenom(
+                        mapWidth,
+                        mapHeight,
+                        boundingBox.getWidth(),
+                        boundingBox.getHeight());
+                newScaleDenominator = Math.round((bbFittingScaleDenominator / 100) + 0.5d) * 100;
+            }
+
+            reportBean.setMapImage(genMapImage(features, mapWidth, mapHeight, newScaleDenominator, properties));
+            reportBean.setBarcodeImage(genBarcodeImage(reportBean.getKznr()));
+            reportBean.setScale("1:" + (NumberFormat.getIntegerInstance().format(newScaleDenominator)));
+
             final Collection<EBReportBean> reportBeans = new LinkedList<>();
             reportBeans.add(reportBean);
             boolean ready;
@@ -426,62 +526,61 @@ public class EBGenerator {
 
             final List<InputStream> ins = new ArrayList<>();
 
-            if (mapFormat != null) {
-                final VerdisServerResources reportResource;
-                if (EBReportServerAction.Type.FRONTEN.equals(type)) {
-                    if (a4 && landscape) {
-                        reportResource = VerdisServerResources.MAP_FRONTEN_A4LS_JASPER;
-                    } else if (a4) {
-                        reportResource = VerdisServerResources.MAP_FRONTEN_A4P_JASPER;
-                    } else if (landscape) {
-                        reportResource = VerdisServerResources.MAP_FRONTEN_A3LS_JASPER;
-                    } else {
-                        reportResource = VerdisServerResources.MAP_FRONTEN_A3P_JASPER;
-                    }
+            final VerdisServerResources reportResourceMap;
+            if (EBReportServerAction.Type.FRONTEN.equals(type)) {
+                if (a4 && landscape) {
+                    reportResourceMap = VerdisServerResources.MAP_FRONTEN_A4LS_JASPER;
+                } else if (a4) {
+                    reportResourceMap = VerdisServerResources.MAP_FRONTEN_A4P_JASPER;
+                } else if (landscape) {
+                    reportResourceMap = VerdisServerResources.MAP_FRONTEN_A3LS_JASPER;
                 } else {
-                    if (a4 && landscape) {
-                        reportResource = VerdisServerResources.MAP_FLAECHEN_A4LS_JASPER;
-                    } else if (a4) {
-                        reportResource = VerdisServerResources.MAP_FLAECHEN_A4P_JASPER;
-                    } else if (landscape) {
-                        reportResource = VerdisServerResources.MAP_FLAECHEN_A3LS_JASPER;
-                    } else {
-                        reportResource = VerdisServerResources.MAP_FLAECHEN_A3P_JASPER;
-                    }
+                    reportResourceMap = VerdisServerResources.MAP_FRONTEN_A3P_JASPER;
                 }
-
-                final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                final byte[] bytes = generateReport(
-                        reportResource,
-                        parameters,
-                        dataSource,
-                        connectionContext);
-                ins.add(new ByteArrayInputStream(bytes));
+            } else {
+                if (a4 && landscape) {
+                    reportResourceMap = VerdisServerResources.MAP_FLAECHEN_A4LS_JASPER;
+                } else if (a4) {
+                    reportResourceMap = VerdisServerResources.MAP_FLAECHEN_A4P_JASPER;
+                } else if (landscape) {
+                    reportResourceMap = VerdisServerResources.MAP_FLAECHEN_A3LS_JASPER;
+                } else {
+                    reportResourceMap = VerdisServerResources.MAP_FLAECHEN_A3P_JASPER;
+                }
             }
 
+            final JRBeanCollectionDataSource dataSourceMap = new JRBeanCollectionDataSource(reportBeans);
+            final byte[] bytesMap = generateReport(
+                    reportResourceMap,
+                    parameters,
+                    dataSourceMap,
+                    connectionContext);
+            ins.add(new ByteArrayInputStream(bytesMap));
+
             if (type != null) {
-                VerdisServerResources reportResource;
+                VerdisServerResources reportResourceTable;
                 switch (type) {
                     case FLAECHEN: {
-                        reportResource = VerdisServerResources.EB_FLAECHEN_JASPER;
+                        reportResourceTable = VerdisServerResources.EB_FLAECHEN_JASPER;
                     }
                     break;
                     case FRONTEN: {
-                        reportResource = VerdisServerResources.EB_FRONTEN_JASPER;
+                        reportResourceTable = VerdisServerResources.EB_FRONTEN_JASPER;
                     }
                     break;
                     default: {
-                        reportResource = null;
+                        reportResourceTable = null;
                     }
                 }
 
-                if (reportResource != null) {
-                    final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportBeans);
-                    final byte[] bytes = generateReport(reportResource,
+                if (reportResourceTable != null) {
+                    final JRBeanCollectionDataSource dataSourceTable = new JRBeanCollectionDataSource(reportBeans);
+                    final byte[] bytesTable = generateReport(
+                            reportResourceTable,
                             parameters,
-                            dataSource,
+                            dataSourceTable,
                             connectionContext);
-                    ins.add(new ByteArrayInputStream(bytes));
+                    ins.add(new ByteArrayInputStream(bytesTable));
                 }
             }
 
@@ -493,6 +592,172 @@ public class EBGenerator {
                 out.close();
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenNummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Image genBarcodeImage(final String kassenzeichenNummer) {
+        try {
+            final int dpi = 72;
+            final Code39Bean bean = new Code39Bean();
+            // BarcodeDimension dimension = bean.calcDimensions(getKznr());
+            bean.setModuleWidth(UnitConv.in2mm(1.0f / dpi)); // makes the narrow bar
+            // width exactly one pixel
+            bean.setWideFactor(3);
+            bean.setModuleWidth(1);
+            bean.setIntercharGapWidth(1);
+            bean.setFontSize(8);
+            bean.setBarHeight(22);
+            bean.setPattern("*________*");
+
+            final BitmapCanvasProvider provider = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+            bean.generateBarcode(provider, kassenzeichenNummer);
+
+            provider.finish();
+
+            return provider.getBufferedImage();
+        } catch (final IOException ex) {
+            LOG.error("error while generating Barcode", ex);
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   features    DOCUMENT ME!
+     * @param   properties  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static XBoundingBox genBoundingBox(final Collection<Feature> features, final Properties properties) {
+        final String srs = properties.getProperty("mapSrs");
+        int srid = CrsTransformer.extractSridFromCrs(srs);
+        boolean first = true;
+        final Collection<Geometry> geoms = new ArrayList<>(features.size());
+        for (final Feature feature : features) {
+            Geometry geometry = feature.getGeometry();
+
+            if (geometry != null) {
+                geometry = geometry.getEnvelope();
+
+                if (first) {
+                    srid = geometry.getSRID();
+                    first = false;
+                } else {
+                    if (geometry.getSRID() != srid) {
+                        geometry = CrsTransformer.transformToGivenCrs(geometry, srs);
+                    }
+                }
+
+                geoms.add(geometry);
+            }
+        }
+        final GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), srid);
+        Geometry union = factory.buildGeometry(geoms);
+        if (union instanceof GeometryCollection) {
+            union = ((GeometryCollection)union).union();
+        }
+        final XBoundingBox boundingBox = new XBoundingBox(union);
+        return boundingBox;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   features          DOCUMENT ME!
+     * @param   mapWidth          DOCUMENT ME!
+     * @param   mapHeight         DOCUMENT ME!
+     * @param   scaleDenominator  DOCUMENT ME!
+     * @param   properties        DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Image genMapImage(final Collection<Feature> features,
+            final int mapWidth,
+            final int mapHeight,
+            final Double scaleDenominator,
+            final Properties properties) {
+        final SimpleWMS simpleWms = new SimpleWMS(new SimpleWmsGetMapUrl(properties.getProperty("mapUrl")));
+        final HeadlessMapProvider mapProvider = new HeadlessMapProvider();
+        mapProvider.setCenterMapOnResize(true);
+        final String srs = properties.getProperty("mapSrs");
+        final Crs crs = new Crs(srs, "", "", true, true);
+        mapProvider.setCrs(crs);
+        mapProvider.addLayer(simpleWms);
+
+        for (final Feature feature : features) {
+            mapProvider.addFeature(feature);
+            if (mapProvider.getMappingComponent().getPFeatureHM().get(feature) != null) {
+                final PNode annotationNode = mapProvider.getMappingComponent()
+                            .getPFeatureHM()
+                            .get(feature)
+                            .getPrimaryAnnotationNode();
+                if (annotationNode != null) {
+                    final PBounds bounds = annotationNode.getBounds();
+                    bounds.x = -bounds.width / 2;
+                    bounds.y = -bounds.height / 2;
+                    annotationNode.setBounds(bounds);
+                }
+            }
+        }
+
+        final XBoundingBox boundingBox = genBoundingBox(features, properties);
+
+        final double bbWidth = boundingBox.getWidth();
+        final double bbHeight = boundingBox.getHeight();
+        final double bbCenterX = boundingBox.getX1() + (bbWidth / 2);
+        final double bbCenterY = boundingBox.getY1() + (bbHeight / 2);
+
+        final double mapWidthInMeter = (mapWidth / PPI) * METERS_TO_INCH_FACTOR;
+        final double mapHeightInMeter = (mapHeight / PPI) * METERS_TO_INCH_FACTOR;
+        final double worldWidthInPx = mapWidthInMeter * scaleDenominator;
+        final double worldHeightInPx = mapHeightInMeter * scaleDenominator;
+
+        boundingBox.setX1(bbCenterX - (worldWidthInPx / 2d));
+        boundingBox.setX2(bbCenterX + (worldWidthInPx / 2d));
+        boundingBox.setY1(bbCenterY - (worldHeightInPx / 2d));
+        boundingBox.setY2(bbCenterY + (worldHeightInPx / 2d));
+
+        mapProvider.setBoundingBox(boundingBox);
+
+        final int mapDPI = Integer.parseInt(properties.getProperty("mapDPI"));
+
+        mapProvider.setFeatureResolutionFactor(mapDPI);
+        try {
+            return mapProvider.getImageAndWait(72, mapDPI, mapWidth, mapHeight);
+        } catch (final Exception ex) {
+            LOG.error("error while creating mapImage", ex);
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mapWidthInPx     DOCUMENT ME!
+     * @param   mapHeightInPx    DOCUMENT ME!
+     * @param   bbWidthInMeter   DOCUMENT ME!
+     * @param   bbHeightInMeter  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static double getScaleDenom(final int mapWidthInPx,
+            final int mapHeightInPx,
+            final double bbWidthInMeter,
+            final double bbHeightInMeter) {
+        final double mapRatio = mapWidthInPx / (double)mapHeightInPx;
+        final double bbRatio = bbWidthInMeter / bbHeightInMeter;
+
+        final double mapWidthInMeter = (mapWidthInPx / PPI) * METERS_TO_INCH_FACTOR;
+        final double mapHeightInMeter = (mapHeightInPx / PPI) * METERS_TO_INCH_FACTOR;
+
+        return (bbRatio > mapRatio) ? (bbWidthInMeter / mapWidthInMeter) : (bbHeightInMeter / mapHeightInMeter);
     }
 
     /**
