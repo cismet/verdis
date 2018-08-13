@@ -115,6 +115,7 @@ public class EBGenerator {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(EBGenerator.class);
+    public static final String NULL_VALUE = "_null_";
 
     private static final String A4_FORMAT = "A4";
     private static final String A3_FORMAT = "A3";
@@ -197,14 +198,19 @@ public class EBGenerator {
                                                                      : null;
         final String password = cmd.hasOption(OPTION__PASSWORD.getOpt()) ? cmd.getOptionValue(OPTION__PASSWORD.getOpt())
                                                                          : null;
-        final EBReportServerAction.Type type = cmd.hasOption(OPTION__TYPE.getOpt())
+        final EBReportServerAction.Type type =
+            (cmd.hasOption(OPTION__TYPE.getOpt()) && !NULL_VALUE.equals(cmd.getOptionValue(OPTION__TYPE.getOpt())))
             ? EBReportServerAction.Type.valueOf(cmd.getOptionValue(OPTION__TYPE.getOpt())) : null;
         final Integer kassenzeichen = cmd.hasOption(OPTION__KASSENZEICHEN.getOpt())
             ? Integer.valueOf(cmd.getOptionValue(OPTION__KASSENZEICHEN.getOpt())) : null;
-        final EBReportServerAction.MapFormat mapFormat = cmd.hasOption(OPTION__MAP_FORMAT.getOpt())
+        final EBReportServerAction.MapFormat mapFormat =
+            (cmd.hasOption(OPTION__MAP_FORMAT.getOpt())
+                        && !NULL_VALUE.equals(cmd.getOptionValue(OPTION__MAP_FORMAT.getOpt())))
             ? EBReportServerAction.MapFormat.valueOf(cmd.getOptionValue(OPTION__MAP_FORMAT.getOpt())) : null;
         final String hints = cmd.hasOption(OPTION__HINTS.getOpt()) ? cmd.getOptionValue(OPTION__HINTS.getOpt()) : null;
-        final Double scaleDenominator = cmd.hasOption(OPTION__SCALE_DENOMINATOR.getOpt())
+        final Double scaleDenominator =
+            (cmd.hasOption(OPTION__SCALE_DENOMINATOR.getOpt())
+                        && !NULL_VALUE.equals(cmd.getOptionValue(OPTION__SCALE_DENOMINATOR.getOpt())))
             ? Double.valueOf(cmd.getOptionValue(OPTION__SCALE_DENOMINATOR.getOpt())) : null;
         final boolean abflussWirksamkeit = cmd.hasOption(OPTION__ABFLUSSWIRKSAMKEIT.getOpt());
 
