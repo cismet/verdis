@@ -505,7 +505,13 @@ public class EBGenerator {
                         mapHeight,
                         boundingBox.getWidth(),
                         boundingBox.getHeight());
-                newScaleDenominator = Math.round((bbFittingScaleDenominator / 100) + 0.5d) * 100;
+                final double bbFittingScaleDenominatorWithBorder = Math.round((bbFittingScaleDenominator / 100) + 0.5d)
+                            * 100;
+                if (bbFittingScaleDenominatorWithBorder < 500) {
+                    newScaleDenominator = 500;
+                } else {
+                    newScaleDenominator = bbFittingScaleDenominatorWithBorder;
+                }
             }
 
             reportBean.setMapImage(genMapImage(features, mapWidth, mapHeight, newScaleDenominator, properties));
