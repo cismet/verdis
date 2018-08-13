@@ -505,12 +505,27 @@ public class EBGenerator {
                         mapHeight,
                         boundingBox.getWidth(),
                         boundingBox.getHeight());
-                newScaleDenominator = Math.round((bbFittingScaleDenominator / 100) + 0.5d) * 100;
+                final double bbFittingScaleDenominatorWithBorder = Math.round((bbFittingScaleDenominator / 100) + 0.5d)
+                            * 100;
+                final Integer minScale = (properties.get("minScale") != null)
+                    ? Integer.parseInt((String)properties.get("minScale")) : null;
+                if ((minScale != null) && (bbFittingScaleDenominatorWithBorder < minScale)) {
+                    newScaleDenominator = minScale;
+                } else {
+                    newScaleDenominator = bbFittingScaleDenominatorWithBorder;
+                }
             }
 
             reportBean.setMapImage(genMapImage(features, mapWidth, mapHeight, newScaleDenominator, properties));
             reportBean.setBarcodeImage(genBarcodeImage(reportBean.getKznr()));
             reportBean.setScale("1:" + (NumberFormat.getIntegerInstance().format(newScaleDenominator)));
+
+            final Integer maxScaleBeforeHint = (properties.getProperty("maxScaleBeforHint") != null)
+                ? Integer.parseInt(properties.getProperty("maxScaleBeforHint")) : null;
+            final String maxScaleHint = properties.getProperty("maxScaleHint");
+            if ((maxScaleBeforeHint != null) && (scaleDenominator > maxScaleBeforeHint)) {
+                reportBean.setMapHint(maxScaleHint);
+            }
 
             final Collection<EBReportBean> reportBeans = new LinkedList<>();
             reportBeans.add(reportBean);

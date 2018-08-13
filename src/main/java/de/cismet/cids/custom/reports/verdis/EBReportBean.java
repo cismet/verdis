@@ -41,6 +41,7 @@ public abstract class EBReportBean {
     private Image mapImage = null;
     private Image barcodeImage = null;
     private boolean fillAbflusswirksamkeit = false;
+    private String mapHint = null;
     private final Properties properties;
 
     //~ Constructors -----------------------------------------------------------
@@ -61,6 +62,24 @@ public abstract class EBReportBean {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getMapHint() {
+        return mapHint;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mapHint  DOCUMENT ME!
+     */
+    public void setMapHint(final String mapHint) {
+        this.mapHint = mapHint;
+    }
 
     /**
      * DOCUMENT ME!
