@@ -516,14 +516,10 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
 
         if ((dinA4 == null) && (landscape == null)) {
             mapFormat = null;
-        } else if (dinA4 && (landscape == null)) {
-            mapFormat = EBReportServerAction.MapFormat.A4;
-        } else if (!dinA4 && (landscape == null)) {
-            mapFormat = EBReportServerAction.MapFormat.A3;
-        } else if ((dinA4 == null) && landscape) {
-            mapFormat = EBReportServerAction.MapFormat.LS;
-        } else if ((dinA4 == null) && !landscape) {
-            mapFormat = EBReportServerAction.MapFormat.P;
+        } else if ((dinA4 != null) && (landscape == null)) {
+            mapFormat = dinA4 ? EBReportServerAction.MapFormat.A4 : EBReportServerAction.MapFormat.A3;
+        } else if ((landscape != null) && (dinA4 == null)) {
+            mapFormat = landscape ? EBReportServerAction.MapFormat.LS : EBReportServerAction.MapFormat.P;
         } else if (dinA4 && landscape) {
             mapFormat = EBReportServerAction.MapFormat.A4LS;
         } else if (dinA4) {

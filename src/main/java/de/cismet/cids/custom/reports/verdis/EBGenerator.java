@@ -520,10 +520,10 @@ public class EBGenerator {
             reportBean.setBarcodeImage(genBarcodeImage(reportBean.getKznr()));
             reportBean.setScale("1:" + (NumberFormat.getIntegerInstance().format(newScaleDenominator)));
 
-            final Integer maxScaleBeforeHint = (properties.getProperty("maxScaleBeforHint") != null)
-                ? Integer.parseInt(properties.getProperty("maxScaleBeforHint")) : null;
+            final Integer maxScaleBeforeHint = (properties.getProperty("maxScaleBeforeHint") != null)
+                ? Integer.parseInt(properties.getProperty("maxScaleBeforeHint")) : null;
             final String maxScaleHint = properties.getProperty("maxScaleHint");
-            if ((maxScaleBeforeHint != null) && (scaleDenominator > maxScaleBeforeHint)) {
+            if ((maxScaleBeforeHint != null) && (newScaleDenominator > maxScaleBeforeHint)) {
                 reportBean.setMapHint(maxScaleHint);
             }
 
