@@ -239,7 +239,9 @@ public class StacCreationDialog extends JDialog {
         jButton1 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jCheckBox2 = new javax.swing.JCheckBox();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 32767));
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -255,7 +257,9 @@ public class StacCreationDialog extends JDialog {
         jPanel8.setLayout(new java.awt.GridBagLayout());
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/images/stac.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel3,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel3.text"));      // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -263,7 +267,9 @@ public class StacCreationDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 20);
         jPanel8.add(jLabel3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel4.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel4,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel4.text")); // NOI18N
         jLabel4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -272,7 +278,9 @@ public class StacCreationDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         jPanel8.add(jLabel4, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel6.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel6,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel6.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -289,7 +297,9 @@ public class StacCreationDialog extends JDialog {
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
         jTextField1.setEditable(false);
-        jTextField1.setText(org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jTextField1.text")); // NOI18N
+        jTextField1.setText(org.openide.util.NbBundle.getMessage(
+                StacCreationDialog.class,
+                "StacCreationDialog.jTextField1.text")); // NOI18N
         jTextField1.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -299,7 +309,9 @@ public class StacCreationDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel1.text")); // NOI18N
         jLabel1.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -322,7 +334,9 @@ public class StacCreationDialog extends JDialog {
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jRadioButton2,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -331,7 +345,9 @@ public class StacCreationDialog extends JDialog {
         jPanel5.add(jRadioButton2, gridBagConstraints);
 
         buttonGroup1.add(jRadioButton1);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jRadioButton1,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -342,19 +358,28 @@ public class StacCreationDialog extends JDialog {
         jPanel9.setLayout(new java.awt.GridBagLayout());
 
         buttonGroup1.add(jRadioButton3);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jRadioButton3,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jRadioButton3.text")); // NOI18N
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton3ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jRadioButton3ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jPanel9.add(jRadioButton3, gridBagConstraints);
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jRadioButton3, org.jdesktop.beansbinding.ELProperty.create("${selected}"), defaultBindableDateChooser1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jRadioButton3,
+                org.jdesktop.beansbinding.ELProperty.create("${selected}"),
+                defaultBindableDateChooser1,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -380,7 +405,9 @@ public class StacCreationDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         jPanel3.add(jPanel5, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel2,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -407,12 +434,16 @@ public class StacCreationDialog extends JDialog {
 
         jPanel6.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jButton2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jButton2.text")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -421,12 +452,16 @@ public class StacCreationDialog extends JDialog {
         jPanel6.add(jButton2, gridBagConstraints);
         jButton2.setVisible(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jButton1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -438,12 +473,16 @@ public class StacCreationDialog extends JDialog {
         jPanel7.setLayout(new java.awt.GridLayout(0, 1));
 
         jCheckBox2.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox2, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jCheckBox2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox2,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jCheckBox2.text")); // NOI18N
         jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jCheckBox2ActionPerformed(evt);
+                }
+            });
         jPanel7.add(jCheckBox2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -469,7 +508,9 @@ public class StacCreationDialog extends JDialog {
         jPanel1.add(filler1, gridBagConstraints);
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel5.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel5,
+            org.openide.util.NbBundle.getMessage(StacCreationDialog.class, "StacCreationDialog.jLabel5.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -487,14 +528,14 @@ public class StacCreationDialog extends JDialog {
         bindingGroup.bind();
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         final ServerActionParameter<String> paramUser = new ServerActionParameter<>(
                 CreateAStacForKassenzeichenServerAction.Parameter.USER.toString(),
                 SessionManager.getSession().getUser().getName());
@@ -600,7 +641,7 @@ public class StacCreationDialog extends JDialog {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -622,30 +663,30 @@ public class StacCreationDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         setVisible(false);
         jCheckBox2.setEnabled(true);
         jTextField1.setText(null);
         finishCreation();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton3ActionPerformed
         if (defaultBindableDateChooser1.getDate() == null) {
             defaultBindableDateChooser1.setDate(new Date());
         }
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
+    }                                                                                 //GEN-LAST:event_jRadioButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
         jButton2.setVisible(!jCheckBox2.isSelected());
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
 }
