@@ -448,6 +448,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JToggleButton cmdSAPCheck;
     private javax.swing.JButton cmdSearchBaulasten;
     private javax.swing.JButton cmdSearchRisse;
+    private javax.swing.JButton cmdStac;
     private javax.swing.JButton cmdTest;
     private javax.swing.JButton cmdTest2;
     private javax.swing.JButton cmdUndo;
@@ -1975,6 +1976,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdUndo = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jSeparator16 = new javax.swing.JSeparator();
+        cmdStac = new javax.swing.JButton();
         cmdPdf = new javax.swing.JButton();
         cmdWorkflow = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
@@ -2391,6 +2393,32 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         jPanel5.add(jSeparator16, java.awt.BorderLayout.CENTER);
 
         tobVerdis.add(jPanel5);
+
+        cmdStac.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/stac.png"))); // NOI18N
+        cmdStac.setToolTipText("temporären Zugriffscode erzeugen");
+        cmdStac.setFocusable(false);
+        cmdStac.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdStac.setMaximumSize(new java.awt.Dimension(34, 36));
+        cmdStac.setMinimumSize(new java.awt.Dimension(34, 36));
+        cmdStac.setPreferredSize(new java.awt.Dimension(34, 36));
+        cmdStac.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdStac.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdStacActionPerformed(evt);
+                }
+            });
+        try {
+            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
+                    SessionManager.getSession().getUser(),
+                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+        } catch (final Exception ex) {
+            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
+            cmdFortfuehrung.setVisible(false);
+        }
+        tobVerdis.add(cmdStac);
 
         cmdPdf.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/pdf.png"))); // NOI18N
@@ -4496,6 +4524,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdStacActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdStacActionPerformed
+        StaticSwingTools.showDialog(StacCreationDialog.getInstance());
+    }                                                                           //GEN-LAST:event_cmdStacActionPerformed
+
+    /**
+     * DOCUMENT ME!
      */
     public void renameCurrentKassenzeichen() {
         showRenameKassenzeichen(true);
@@ -4976,6 +5013,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } else {
             cmdPdf.setEnabled(false);
         }
+        cmdStac.setEnabled(kassenzeichenBean != null);
     }
 
     /**
