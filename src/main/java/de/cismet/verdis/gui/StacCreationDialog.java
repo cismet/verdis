@@ -27,6 +27,9 @@ import java.io.StringReader;
 
 import java.sql.Timestamp;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -71,6 +74,11 @@ public class StacCreationDialog extends JDialog {
 //    private static final String PROPERTY__MS_BEFORE_AUTOCLOSE="ms_before_autoclose";
     private static final String PROPERTY__STAC_URL_TEMPLATE = "stac_url_template";
     private static final String PROPERTY__STAC_MESSAGE_TEMPLATE = "stac_message_template";
+    private static final String PROPERTY__STAC_MESSAGE_TEMPLATE_DATE = "stac_message_template_date";
+    private static final String PROPERTY__STAC_MESSAGE_TEMPLATE_SHORT = "stac_message_template_short";
+    private static final String PROPERTY__STAC_MESSAGE_TEMPLATE_LONG = "stac_message_template_long";
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -193,15 +201,42 @@ public class StacCreationDialog extends JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @param  stac  DOCUMENT ME!
+     * @param  stac          DOCUMENT ME!
+     * @param  shortNotLong  DOCUMENT ME!
+     * @param  date          DOCUMENT ME!
      */
-    private void toClipboard(final String stac) {
+    private void toClipboard(final String stac, final Boolean shortNotLong, final Date date) {
         final String stacWithDashes = toDashes(stac);
-        final String stacUrl = String.format(properties.getProperty(PROPERTY__STAC_URL_TEMPLATE), stac);
-        final StringSelection stringSelection = new StringSelection(String.format(
-                    properties.getProperty(PROPERTY__STAC_MESSAGE_TEMPLATE),
-                    stacWithDashes,
-                    stacUrl));
+        final String stacUrl = properties.getProperty(PROPERTY__STAC_URL_TEMPLATE).contains("%s")
+            ? String.format(properties.getProperty(PROPERTY__STAC_URL_TEMPLATE), stac)
+            : properties.getProperty(PROPERTY__STAC_URL_TEMPLATE);
+
+        final String message;
+        if (properties.containsKey(PROPERTY__STAC_MESSAGE_TEMPLATE_SHORT)
+                    && !properties.getProperty(PROPERTY__STAC_MESSAGE_TEMPLATE_SHORT).isEmpty()
+                    && properties.containsKey(PROPERTY__STAC_MESSAGE_TEMPLATE_LONG)
+                    && !properties.getProperty(PROPERTY__STAC_MESSAGE_TEMPLATE_LONG).isEmpty()) {
+            if (shortNotLong != null) {
+                message = String.format(
+                        properties.getProperty(
+                            shortNotLong ? PROPERTY__STAC_MESSAGE_TEMPLATE_SHORT
+                                         : PROPERTY__STAC_MESSAGE_TEMPLATE_LONG),
+                        stacUrl,
+                        stacWithDashes);
+            } else {
+                final String dateString = DATE_FORMAT.format(date);
+                message = String.format(
+                        properties.getProperty(PROPERTY__STAC_MESSAGE_TEMPLATE_DATE),
+                        dateString,
+                        stacUrl,
+                        stacWithDashes);
+            }
+        } else {
+            message = String.format(properties.getProperty(PROPERTY__STAC_MESSAGE_TEMPLATE),
+                    stacUrl,
+                    stacWithDashes);
+        }
+        final StringSelection stringSelection = new StringSelection(message);
         final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
     }
@@ -535,7 +570,7 @@ public class StacCreationDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         final ServerActionParameter<String> paramUser = new ServerActionParameter<>(
                 CreateAStacForKassenzeichenServerAction.Parameter.USER.toString(),
                 SessionManager.getSession().getUser().getName());
@@ -619,7 +654,17 @@ public class StacCreationDialog extends JDialog {
                 protected void done() {
                     try {
                         final String stac = get();
-                        toClipboard(stac);
+                        final Boolean shortNotLong;
+                        if (jRadioButton1.isSelected()) {
+                            shortNotLong = true;
+                        } else if (jRadioButton2.isSelected()) {
+                            shortNotLong = false;
+                        } else {
+                            shortNotLong = null;
+                        }
+                        final Date date = jRadioButton2.isSelected() ? defaultBindableDateChooser1.getDate() : null;
+
+                        toClipboard(stac, shortNotLong, date);
                         jTextField1.setText(toDashes(stac));
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
@@ -641,7 +686,7 @@ public class StacCreationDialog extends JDialog {
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -663,30 +708,30 @@ public class StacCreationDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         setVisible(false);
         jCheckBox2.setEnabled(true);
         jTextField1.setText(null);
         finishCreation();
-    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton3ActionPerformed
+    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         if (defaultBindableDateChooser1.getDate() == null) {
             defaultBindableDateChooser1.setDate(new Date());
         }
-    }                                                                                 //GEN-LAST:event_jRadioButton3ActionPerformed
+    }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
         jButton2.setVisible(!jCheckBox2.isSelected());
-    }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
 }
