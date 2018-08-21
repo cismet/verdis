@@ -272,6 +272,7 @@ import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
+import de.cismet.verdis.server.search.StacInfoSearchStatement;
 
 /**
  * DOCUMENT ME!
@@ -1644,6 +1645,22 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (final Exception e) {
             LOG.error("Problem beim Lesen des MapFiles " + fileName, e);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Object searchStacInformations(final CidsBean kassenzeichenBean) throws ConnectionException {
+        final Object o = SessionManager.getProxy()
+                    .customServerSearch(new StacInfoSearchStatement(kassenzeichenBean.getMetaObject().getId()),
+                        ConnectionContext.createDummy());
+        return o;
     }
 
     /**
