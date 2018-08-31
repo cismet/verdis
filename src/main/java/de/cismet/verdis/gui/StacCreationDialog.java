@@ -570,7 +570,7 @@ public class StacCreationDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         final ServerActionParameter<String> paramUser = new ServerActionParameter<>(
                 CreateAStacForKassenzeichenServerAction.Parameter.USER.toString(),
                 SessionManager.getSession().getUser().getName());
@@ -686,7 +686,7 @@ public class StacCreationDialog extends JDialog {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -708,30 +708,30 @@ public class StacCreationDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         setVisible(false);
         jCheckBox2.setEnabled(true);
         jTextField1.setText(null);
         finishCreation();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    private void jRadioButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton3ActionPerformed
         if (defaultBindableDateChooser1.getDate() == null) {
             defaultBindableDateChooser1.setDate(new Date());
         }
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
+    }                                                                                 //GEN-LAST:event_jRadioButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
         jButton2.setVisible(!jCheckBox2.isSelected());
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
 }

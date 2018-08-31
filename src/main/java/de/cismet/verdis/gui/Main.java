@@ -267,6 +267,7 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
+import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
@@ -2416,9 +2417,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdStac.setToolTipText("temporären Zugriffscode erzeugen");
         cmdStac.setFocusable(false);
         cmdStac.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cmdStac.setMaximumSize(new java.awt.Dimension(34, 36));
-        cmdStac.setMinimumSize(new java.awt.Dimension(34, 36));
-        cmdStac.setPreferredSize(new java.awt.Dimension(34, 36));
         cmdStac.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         cmdStac.addActionListener(new java.awt.event.ActionListener() {
 
@@ -2428,12 +2426,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         try {
-            cmdFortfuehrung.setVisible(SessionManager.getConnection().getConfigAttr(
+            cmdStac.setVisible(SessionManager.getConnection().hasConfigAttr(
                     SessionManager.getSession().getUser(),
-                    "grundis.fortfuehrungsanlaesse.dialog") != null);
+                    "csa://"
+                            + CreateAStacForKassenzeichenServerAction.TASKNAME,
+                    ConnectionContext.createDummy()));
         } catch (final Exception ex) {
-            LOG.error("error while checking for grundis.fortfuehrungsanlaesse.dialog", ex);
-            cmdFortfuehrung.setVisible(false);
+            LOG.error(ex, ex);
+            cmdStac.setVisible(false);
         }
         tobVerdis.add(cmdStac);
 
@@ -5030,7 +5030,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } else {
             cmdPdf.setEnabled(false);
         }
-        cmdStac.setEnabled(kassenzeichenBean != null);
+
+        boolean hasCreateStacPermission = false;
+        try {
+            hasCreateStacPermission = SessionManager.getProxy()
+                        .hasConfigAttr(SessionManager.getSession().getUser(),
+                                "csa://"
+                                + CreateAStacForKassenzeichenServerAction.TASKNAME,
+                                ConnectionContext.createDummy());
+        } catch (ConnectionException ex) {
+            LOG.error(ex, ex);
+        }
+        cmdStac.setEnabled(hasCreateStacPermission && (kassenzeichenBean != null));
     }
 
     /**
