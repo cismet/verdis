@@ -49,9 +49,7 @@ import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -872,16 +870,16 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtGroesseGrafikActionPerformed
+    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGroesseGrafikActionPerformed
         // TODO add your handling code here:
-    } //GEN-LAST:event_txtGroesseGrafikActionPerformed
+    }//GEN-LAST:event_txtGroesseGrafikActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
+    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
         final boolean sperre = chkSperre.isSelected();
         if (sperre) {
             final String answer = JOptionPane.showInputDialog(Main.getInstance().getRootPane(),
@@ -894,7 +892,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         } else {
             txtSperreBemerkung.setText(null);
         }
-    }                                                                             //GEN-LAST:event_chkSperreActionPerformed
+    }//GEN-LAST:event_chkSperreActionPerformed
 
     @Override
     public CidsBean getCidsBean() {
@@ -954,6 +952,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 txtVeranlagungsdatum,
                 txtBemerkung,
                 txtFEB_ID,
+                txtSperreBemerkung,
                 edtQuer
             };
 
@@ -970,6 +969,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 c.getModel().setSelectedItem(null);
             }
             chkSperre.setSelected(false);
+            jCheckBox1.setSelected(false);
         }
     }
 
@@ -1064,6 +1064,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtVeranlagungsdatum.setEditable(b);
         txtVeranlagungsdatum.setEnabled(true);
         chkSperre.setEnabled(b);
+        jCheckBox1.setEnabled(b);
         try {
             cboAnschlussgrad.setEnabled(b
                         && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
