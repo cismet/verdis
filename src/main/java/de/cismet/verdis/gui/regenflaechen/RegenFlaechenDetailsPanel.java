@@ -49,9 +49,7 @@ import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -954,6 +952,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 txtVeranlagungsdatum,
                 txtBemerkung,
                 txtFEB_ID,
+                txtSperreBemerkung,
                 edtQuer
             };
 
@@ -970,6 +969,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 c.getModel().setSelectedItem(null);
             }
             chkSperre.setSelected(false);
+            jCheckBox1.setSelected(false);
         }
     }
 
@@ -1064,6 +1064,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtVeranlagungsdatum.setEditable(b);
         txtVeranlagungsdatum.setEnabled(true);
         chkSperre.setEnabled(b);
+        jCheckBox1.setEnabled(b);
         try {
             cboAnschlussgrad.setEnabled(b
                         && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG

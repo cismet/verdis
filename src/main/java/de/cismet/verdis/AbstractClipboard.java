@@ -20,6 +20,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.gui.CidsBeanComponent;
 import de.cismet.verdis.gui.CidsBeanTable;
 import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienList;
 
 /**
  * DOCUMENT ME!
@@ -127,6 +128,8 @@ public abstract class AbstractClipboard {
                 clipboardBeans.removeAll(removedBeans);
                 if (getComponent() instanceof CidsBeanTable) {
                     ((CidsBeanTable)getComponent()).selectCidsBeans(pastedBeans);
+                } else if (getComponent() instanceof KassenzeichenGeometrienList) {
+                    ((KassenzeichenGeometrienList)getComponent()).selectCidsBeans(pastedBeans);
                 }
 
                 if (notPastableCounter < numOfClipBoardItems) {
