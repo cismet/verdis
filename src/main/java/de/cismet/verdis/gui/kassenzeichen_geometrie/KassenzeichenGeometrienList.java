@@ -122,8 +122,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
     @Override
     public List<CidsBean> getSelectedBeans() {
-        final List<CidsBean> cidsBeans = new ArrayList<CidsBean>();
-
+        final List<CidsBean> cidsBeans = new ArrayList<>();
         final int[] selectedIndices = getSelectedIndices();
 
         for (final int index : selectedIndices) {
@@ -142,7 +141,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
         final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
 
         int firstSelectedIndex = -1;
-        final Collection<CidsBean> beansToRemove = new ArrayList<CidsBean>();
+        final Collection<CidsBean> beansToRemove = new ArrayList<>();
         for (int index = 0; index < selectedIndices.length; ++index) {
             final int selectedIndex = selectedIndices[index];
 
@@ -190,7 +189,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
     @Override
     public List<CidsBean> getAllBeans() {
-        final List<CidsBean> cidsBeans = new ArrayList<CidsBean>();
+        final List<CidsBean> cidsBeans = new ArrayList<>();
 
         for (int i = 0; i < getModel().getSize(); i++) {
             cidsBeans.add(getModel().getElementAt(i));
@@ -206,5 +205,19 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
      */
     public void setPanel(final KassenzeichenGeometrienPanel panel) {
         this.panel = panel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  beans  DOCUMENT ME!
+     */
+    public void selectCidsBeans(final List<CidsBean> beans) {
+        getSelectionModel().clearSelection();
+        for (final CidsBean bean : beans) {
+            final int index = getAllBeans().indexOf(bean);
+            ;
+            getSelectionModel().addSelectionInterval(index, index);
+        }
     }
 }

@@ -870,16 +870,16 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGroesseGrafikActionPerformed
+    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtGroesseGrafikActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtGroesseGrafikActionPerformed
+    } //GEN-LAST:event_txtGroesseGrafikActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSperreActionPerformed
+    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
         final boolean sperre = chkSperre.isSelected();
         if (sperre) {
             final String answer = JOptionPane.showInputDialog(Main.getInstance().getRootPane(),
@@ -892,7 +892,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         } else {
             txtSperreBemerkung.setText(null);
         }
-    }//GEN-LAST:event_chkSperreActionPerformed
+    }                                                                             //GEN-LAST:event_chkSperreActionPerformed
 
     @Override
     public CidsBean getCidsBean() {
