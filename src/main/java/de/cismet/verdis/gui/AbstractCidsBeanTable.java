@@ -311,7 +311,7 @@ public abstract class AbstractCidsBeanTable extends JXTable implements CidsBeanT
     public void selectCidsBeans(final List<CidsBean> beans) {
         getSelectionModel().clearSelection();
         for (final CidsBean bean : beans) {
-            final int index = getModel().getIndexByCidsBean(bean);
+            final int index = convertRowIndexToView(getModel().getIndexByCidsBean(bean));
             getSelectionModel().addSelectionInterval(index, index);
         }
     }

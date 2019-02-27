@@ -216,7 +216,6 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
         getSelectionModel().clearSelection();
         for (final CidsBean bean : beans) {
             final int index = getAllBeans().indexOf(bean);
-            ;
             getSelectionModel().addSelectionInterval(index, index);
         }
     }
