@@ -827,6 +827,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     .getNormalProperties()
                     .setToolTipText(null);
             viewMap.addView("Kanalanschluss", vKanaldaten);
+            rootWindow.setWindow(vKanaldaten);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
             vKarte.getWindowProperties()
