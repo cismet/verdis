@@ -30,8 +30,6 @@ import java.util.Date;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import de.cismet.cids.custom.util.VerdisUtils;
-
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
@@ -55,11 +53,11 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             RegenFlaechenTableModel.class);
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
-    private static ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
-    private static ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/edited.png"));
-    private static ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
                 "/de/cismet/verdis/res/images/table/warn.png"));
 
     private static final String[] COLUMN_NAMES = {
@@ -69,6 +67,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             "Gr\u00F6\u00DFe in m²",
             "Fl\u00E4chenart",
             "Anschlu\u00DFgrad",
+            "Beschreibung",
             "Erfassungsdatum"
         };
 
@@ -77,6 +76,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             String.class,
             Icon.class,
             Integer.class,
+            String.class,
             String.class,
             String.class,
             String.class
@@ -167,6 +167,14 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                                 + AnschlussgradPropertyConstants.PROP__GRAD_ABKUERZUNG);
             }
             case 6: {
+                // Beschreibung
+                return (String)cidsBean.getProperty(
+                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                + "."
+                                + FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG
+                                + ".beschreibung");
+            }
+            case 7: {
                 // Änderungsdatum
                 final Date datum_erfassung = (Date)cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG);
                 if (datum_erfassung == null) {
