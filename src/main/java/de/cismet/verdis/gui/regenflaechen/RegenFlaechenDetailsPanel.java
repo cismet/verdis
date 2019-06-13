@@ -114,6 +114,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JComboBox cboFlaechenart;
     private javax.swing.JEditorPane edtQuer;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblAenderungsdatum;
     private javax.swing.JLabel lblAnschlussgrad;
@@ -363,6 +364,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         lblBeschreibung = new javax.swing.JLabel();
         cboBeschreibung = new DefaultBindableReferenceCombo();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -625,9 +627,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboAnschlussgrad, gridBagConstraints);
 
-        scpBemerkung.setMinimumSize(new java.awt.Dimension(23, 40));
+        scpBemerkung.setMinimumSize(new java.awt.Dimension(23, 70));
         scpBemerkung.setOpaque(false);
-        scpBemerkung.setPreferredSize(new java.awt.Dimension(19, 60));
+        scpBemerkung.setPreferredSize(new java.awt.Dimension(19, 70));
 
         txtBemerkung.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 11)); // NOI18N
         txtBemerkung.setLineWrap(true);
@@ -729,6 +731,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(jCheckBox1, gridBagConstraints);
+
+        jPanel1.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 0.01;
+        bpanRegenFlDetails.add(jPanel1, gridBagConstraints);
 
         jPanel2.add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);
 
