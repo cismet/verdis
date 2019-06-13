@@ -1279,7 +1279,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                         + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
                 FlaechePropertyConstants.PROP__FLAECHENINFO
                         + "."
-                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE) {
+                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                        + "."
+                        + GeomPropertyConstants.PROP__GEO_FIELD) {
 
                 @Override
                 public ValidatorState performValidation() {
