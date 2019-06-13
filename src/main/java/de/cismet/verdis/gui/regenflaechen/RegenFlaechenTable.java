@@ -157,10 +157,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                         }
                         break;
                         default: {
-                            final AggregatedValidator aggVal = new AggregatedValidator();
-                            aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
-                            aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
-                            validator = aggVal;
+                            validator = RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean);
                         }
                         break;
                     }
@@ -340,7 +337,6 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
         aggVal.add(RegenFlaechenDetailsPanel.getValidatorAnteil(flaecheBean));
         aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumErfassung(flaecheBean));
         aggVal.add(RegenFlaechenDetailsPanel.getValidatorDatumVeranlagung(flaecheBean));
-        aggVal.add(RegenFlaechenDetailsPanel.getValidatorFebId(flaecheBean));
         aggVal.validate();
         return aggVal;
     }

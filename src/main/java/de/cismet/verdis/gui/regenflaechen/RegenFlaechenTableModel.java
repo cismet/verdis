@@ -104,10 +104,6 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                 if (cidsBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL) != null) {
                     return MULT_IMAGE;
                 }
-                if ((cidsBean.getProperty(FlaechePropertyConstants.PROP__SPERRE) instanceof Boolean)
-                            && (Boolean)cidsBean.getProperty(FlaechePropertyConstants.PROP__SPERRE)) {
-                    return WARN_IMAGE;
-                }
                 return null;
             }
             case 1: {

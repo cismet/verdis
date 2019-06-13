@@ -102,7 +102,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     //~ Instance fields --------------------------------------------------------
 
-    private CidsBean anschlussgradBean;
+    private final CidsBean anschlussgradBean;
 
     private CidsBean flaecheBean;
     private final Validator bindingValidator;
@@ -112,10 +112,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JComboBox cboAnschlussgrad;
     private javax.swing.JComboBox cboBeschreibung;
     private javax.swing.JComboBox cboFlaechenart;
-    private javax.swing.JCheckBox chkSperre;
     private javax.swing.JEditorPane edtQuer;
     private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblAenderungsdatum;
     private javax.swing.JLabel lblAnschlussgrad;
@@ -123,11 +121,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JLabel lblBemerkung;
     private javax.swing.JLabel lblBeschreibung;
     private javax.swing.JLabel lblBezeichnung;
-    private javax.swing.JLabel lblFEB_ID;
     private javax.swing.JLabel lblFlaechenart;
     private javax.swing.JLabel lblGroesseGrafik;
     private javax.swing.JLabel lblGroesseKorrektur;
-    private javax.swing.JLabel lblSperre;
     private javax.swing.JLabel lblTeileigentumQuerverweise;
     private javax.swing.JLabel lblVeranlagungsdatum;
     private javax.swing.JScrollPane scpBemerkung;
@@ -136,10 +132,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JTextField txtAnteil;
     private javax.swing.JTextArea txtBemerkung;
     private javax.swing.JTextField txtBezeichnung;
-    private javax.swing.JTextField txtFEB_ID;
     private javax.swing.JTextField txtGroesseGrafik;
     private javax.swing.JTextField txtGroesseKorrektur;
-    private javax.swing.JTextField txtSperreBemerkung;
     private javax.swing.JTextField txtVeranlagungsdatum;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
@@ -217,18 +211,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtBemerkung,
             FlaechePropertyConstants.PROP__BEMERKUNG,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            chkSperre,
-            FlaechePropertyConstants.PROP__SPERRE,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            txtSperreBemerkung,
-            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
-            getMultiBeanHelper());
-        EmbeddedMultiBeanDisplay.registerComponentForProperty(
-            txtFEB_ID,
-            FlaechePropertyConstants.PROP__FEB_ID,
             getMultiBeanHelper());
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
@@ -339,9 +321,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtVeranlagungsdatum);
         getValidatorDatumVeranlagung(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
                 txtVeranlagungsdatum));
-        ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtFEB_ID);
-        getValidatorFebId(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtFEB_ID));
-
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(cboFlaechenart);
         getValidatorFlaechenart(flaecheBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
                 cboFlaechenart));
@@ -378,15 +357,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         cboAnschlussgrad = new DefaultBindableReferenceCombo();
         scpBemerkung = new javax.swing.JScrollPane();
         txtBemerkung = new javax.swing.JTextArea();
-        lblSperre = new javax.swing.JLabel();
-        chkSperre = new javax.swing.JCheckBox();
-        txtFEB_ID = new javax.swing.JTextField();
-        lblFEB_ID = new javax.swing.JLabel();
-        txtSperreBemerkung = new javax.swing.JTextField();
         lblTeileigentumQuerverweise = new javax.swing.JLabel();
         scpQuer = new javax.swing.JScrollPane();
         edtQuer = new javax.swing.JEditorPane();
-        jPanel1 = new javax.swing.JPanel();
         lblBeschreibung = new javax.swing.JLabel();
         cboBeschreibung = new DefaultBindableReferenceCombo();
         jCheckBox1 = new javax.swing.JCheckBox();
@@ -652,17 +625,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboAnschlussgrad, gridBagConstraints);
 
-        scpBemerkung.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        scpBemerkung.setMinimumSize(new java.awt.Dimension(103, 40));
+        scpBemerkung.setMinimumSize(new java.awt.Dimension(23, 40));
         scpBemerkung.setOpaque(false);
-        scpBemerkung.setPreferredSize(new java.awt.Dimension(40, 40));
+        scpBemerkung.setPreferredSize(new java.awt.Dimension(19, 60));
 
         txtBemerkung.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 11)); // NOI18N
         txtBemerkung.setLineWrap(true);
-        txtBemerkung.setRows(2);
-        txtBemerkung.setMinimumSize(new java.awt.Dimension(73, 38));
+        txtBemerkung.setRows(4);
         txtBemerkung.setOpaque(false);
-        txtBemerkung.setPreferredSize(new java.awt.Dimension(21, 756));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -684,102 +654,12 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(scpBemerkung, gridBagConstraints);
 
-        lblSperre.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblSperre.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
-        bpanRegenFlDetails.add(lblSperre, gridBagConstraints);
-
-        chkSperre.setForeground(java.awt.Color.red);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.sperre}"),
-                chkSperre,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"));
-        binding.setSourceNullValue(false);
-        binding.setSourceUnreadableValue(false);
-        bindingGroup.addBinding(binding);
-
-        chkSperre.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    chkSperreActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 0);
-        bpanRegenFlDetails.add(chkSperre, gridBagConstraints);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.feb_id}"),
-                txtFEB_ID,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FEB_ID);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
-        bpanRegenFlDetails.add(txtFEB_ID, gridBagConstraints);
-
-        lblFEB_ID.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblFEB_ID.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
-        bpanRegenFlDetails.add(lblFEB_ID, gridBagConstraints);
-
-        txtSperreBemerkung.setEditable(false);
-        txtSperreBemerkung.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
-        txtSperreBemerkung.setForeground(java.awt.Color.red);
-        txtSperreBemerkung.setBorder(null);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"),
-                txtSperreBemerkung,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
-        bpanRegenFlDetails.add(txtSperreBemerkung, gridBagConstraints);
-
         lblTeileigentumQuerverweise.setText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.lblTeileigentumQuerverweise.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 5);
         bpanRegenFlDetails.add(lblTeileigentumQuerverweise, gridBagConstraints);
@@ -793,20 +673,12 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(scpQuer, gridBagConstraints);
-
-        jPanel1.setOpaque(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 0.01;
-        bpanRegenFlDetails.add(jPanel1, gridBagConstraints);
 
         lblBeschreibung.setText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
@@ -874,26 +746,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         // TODO add your handling code here:
     } //GEN-LAST:event_txtGroesseGrafikActionPerformed
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void chkSperreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_chkSperreActionPerformed
-        final boolean sperre = chkSperre.isSelected();
-        if (sperre) {
-            final String answer = JOptionPane.showInputDialog(Main.getInstance().getRootPane(),
-                    "Bitte eine Bemerkung zur Sperre angeben.",
-                    txtSperreBemerkung.getText());
-            if (answer == null) {
-                chkSperre.setSelected(false);
-            }
-            txtSperreBemerkung.setText(answer);
-        } else {
-            txtSperreBemerkung.setText(null);
-        }
-    }                                                                             //GEN-LAST:event_chkSperreActionPerformed
-
     @Override
     public CidsBean getCidsBean() {
         return flaecheBean;
@@ -951,8 +803,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 txtAenderungsdatum,
                 txtVeranlagungsdatum,
                 txtBemerkung,
-                txtFEB_ID,
-                txtSperreBemerkung,
                 edtQuer
             };
 
@@ -968,7 +818,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             for (final JComboBox c : combos) {
                 c.getModel().setSelectedItem(null);
             }
-            chkSperre.setSelected(false);
             jCheckBox1.setSelected(false);
         }
     }
@@ -1044,8 +893,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtBemerkung.setEditable(b);
         txtBezeichnung.setEnabled(true);
         txtBezeichnung.setEditable(b);
-        txtFEB_ID.setEnabled(true);
-        txtFEB_ID.setEditable(b);
         try {
             txtGroesseGrafik.setEditable(b
                         && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
@@ -1063,7 +910,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtGroesseKorrektur.setEnabled(true);
         txtVeranlagungsdatum.setEditable(b);
         txtVeranlagungsdatum.setEnabled(true);
-        chkSperre.setEnabled(b);
         jCheckBox1.setEnabled(b);
         try {
             cboAnschlussgrad.setEnabled(b
@@ -1084,11 +930,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtBemerkung.setOpaque(b);
         txtBezeichnung.setOpaque(b);
         txtAenderungsdatum.setOpaque(b);
-        txtFEB_ID.setOpaque(b);
         txtGroesseGrafik.setOpaque(b);
         txtGroesseKorrektur.setOpaque(b);
         txtVeranlagungsdatum.setOpaque(b);
-        chkSperre.setOpaque(b);
 
         cboAnschlussgrad.setOpaque(b);
         cboFlaechenart.setOpaque(b);
@@ -1628,51 +1472,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                         ValidatorState.Type.ERROR,
                                         "Veranlagungsdatum muss im Format JJ/MM eingegeben werden.");
                             }
-                        }
-                        return new ValidatorStateImpl(ValidatorState.Type.VALID);
-                    }
-                }
-            };
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   flaecheBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static Validator getValidatorFebId(final CidsBean flaecheBean) {
-        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
-        return new CidsBeanValidator(flaecheBean, FlaechePropertyConstants.PROP__FEB_ID) {
-
-                @Override
-                public ValidatorState performValidation() {
-                    final boolean doNotValidate = (flaecheBean == null)
-                                || ((getTriggerdByProperty() != null)
-                                    && mbh.getAttachedProperties().contains(getTriggerdByProperty())
-                                    && !mbh.isValuesAllEquals(getTriggerdByProperty()));
-                    if (doNotValidate && ((flaecheBean == null) || flaecheBean.equals(mbh.getDummyBean()))) {
-                        return null;
-                    } else {
-                        final String febId = (String)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FEB_ID);
-                        if ((febId == null) || febId.trim().isEmpty()) {
-                            return new ValidatorStateImpl(ValidatorState.Type.VALID);
-                        }
-                        Integer febIdInt = null;
-                        try {
-                            febIdInt = Integer.parseInt(febId);
-                        } catch (final Exception ex) {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("error while parsing febId to integer", ex);
-                            }
-                            return new ValidatorStateImpl(ValidatorState.Type.ERROR, "FEB muss eine Zahl sein.");
-                        }
-
-                        if ((febIdInt.intValue() < 20000001) || (febIdInt.intValue() > 20200000)) {
-                            return new ValidatorStateImpl(
-                                    ValidatorState.Type.ERROR,
-                                    "FEB muss zwischen 20.000.000 und 20.200.000 liegen.");
                         }
                         return new ValidatorStateImpl(ValidatorState.Type.VALID);
                     }

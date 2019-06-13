@@ -2531,23 +2531,6 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
                                         Main.getInstance().getRegenFlaechenTable().removeBean(cbTwo);
 
-                                        final boolean sperreOne = (cbOne.getProperty(
-                                                    FlaechePropertyConstants.PROP__SPERRE) != null)
-                                                    && (Boolean)cbOne.getProperty(
-                                                        FlaechePropertyConstants.PROP__SPERRE);
-                                        final boolean sperreTwo = (cbTwo.getProperty(
-                                                    FlaechePropertyConstants.PROP__SPERRE) != null)
-                                                    && (Boolean)cbTwo.getProperty(
-                                                        FlaechePropertyConstants.PROP__SPERRE);
-
-                                        if (!sperreOne && sperreTwo) {
-                                            cbOne.setProperty(FlaechePropertyConstants.PROP__SPERRE, true);
-                                            cbOne.setProperty(
-                                                FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE,
-                                                "JOIN::"
-                                                        + cbTwo.getProperty(
-                                                            FlaechePropertyConstants.PROP__BEMERKUNG_SPERRE));
-                                        }
                                         // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
                                         RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
                                         final int groesse = (int)newGeom.getArea();
