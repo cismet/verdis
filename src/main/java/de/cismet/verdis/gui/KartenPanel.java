@@ -381,6 +381,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         initComponents();
 
         ((JPopupMenuButton)cmdSearchKassenzeichen).setPopupMenu(popMenSearch);
+        mappingComp.setSnappingMode(MappingComponent.SnappingMode.BOTH);
         CidsAppBackend.getInstance().setMainMap(mappingComp);
         CismapBroker.getInstance().setMappingComponent(mappingComp);
 
@@ -1587,7 +1588,8 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      * @param  evt  DOCUMENT ME!
      */
     private void cmdSnapActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSnapActionPerformed
-        mappingComp.setSnappingEnabled(cmdSnap.isSelected());
+        mappingComp.setSnappingMode(cmdSnap.isSelected() ? MappingComponent.SnappingMode.BOTH
+                                                         : MappingComponent.SnappingMode.OFF);
         mappingComp.setVisualizeSnappingEnabled(cmdSnap.isSelected());
         mappingComp.setInGlueIdenticalPointsMode(cmdSnap.isSelected());
     }                                                                           //GEN-LAST:event_cmdSnapActionPerformed
