@@ -21,6 +21,9 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
@@ -56,6 +59,8 @@ import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
+@Getter
+@Setter
 public class FrontenReportBean extends EBReportBean {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -163,24 +168,6 @@ public class FrontenReportBean extends EBReportBean {
             }
         }
         return features;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> getFronten() {
-        return fronten;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  fronten  DOCUMENT ME!
-     */
-    public void setFronten(final List<CidsBean> fronten) {
-        this.fronten = fronten;
     }
 
     //~ Inner Classes ----------------------------------------------------------

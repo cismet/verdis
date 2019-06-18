@@ -15,6 +15,9 @@ import Sirius.navigator.exception.ConnectionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import net.sf.jasperreports.engine.JasperReport;
 
 import org.apache.log4j.Logger;
@@ -58,6 +61,8 @@ import de.cismet.verdis.server.utils.VerdisServerResources;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
+@Getter
+@Setter
 public class FlaechenReportBean extends EBReportBean {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -142,60 +147,6 @@ public class FlaechenReportBean extends EBReportBean {
     public JasperReport getHinweiseSubreport() throws Exception {
         return ServerResourcesLoader.getInstance()
                     .loadJasperReport(VerdisServerResources.EB_FLAECHEN_HINWEISE_JASPER.getValue());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getHinweise() {
-        return hinweise;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  hinweise  DOCUMENT ME!
-     */
-    public void setHinweise(final String hinweise) {
-        this.hinweise = hinweise;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> getDachflaechen() {
-        return dachflaechen;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  dachFlaechen  DOCUMENT ME!
-     */
-    public void setDachflaechen(final List<CidsBean> dachFlaechen) {
-        this.dachflaechen = dachFlaechen;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> getVersiegelteflaechen() {
-        return versiegelteflaechen;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  versiegelteFlaechen  DOCUMENT ME!
-     */
-    public void setVersiegelteflaechen(final List<CidsBean> versiegelteFlaechen) {
-        this.versiegelteflaechen = versiegelteFlaechen;
     }
 
     /**
