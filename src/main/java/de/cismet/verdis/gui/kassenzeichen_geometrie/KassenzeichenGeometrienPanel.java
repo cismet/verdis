@@ -1104,13 +1104,9 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                             kassenzeichenGeometrieBean.setProperty(
                                 KassenzeichenGeometriePropertyConstants.PROP__ISTFREI,
                                 true);
-                            if (!alterIstFrei) {
-                                kassenzeichenGeometrieBean.setProperty(
-                                    KassenzeichenGeometriePropertyConstants.PROP__NAME,
-                                    "freie Geometrie ("
-                                            + alterText
-                                            + ")");
-                            }
+                            kassenzeichenGeometrieBean.setProperty(
+                                KassenzeichenGeometriePropertyConstants.PROP__NAME,
+                                "freie Geometrie");
 
                             if (!refreshNeeded) {
                                 final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
