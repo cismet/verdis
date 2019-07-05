@@ -15,6 +15,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import java.net.URL;
@@ -219,21 +222,167 @@ public class AppPreferences {
             log.error("Einstellungen konnten nicht gelesen werden", e);
         }
 
-        try {
-            final Element cidsappbackendPrefs = root.getChild("cidsAppBackend");
-            appbackendDomain = cidsappbackendPrefs.getChildText("domain");
-            appbackendConnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
-            appbackendCallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
+        final String cfgFile = JnlpSystemPropertyHelper.getProperty("configFile");
+        if (cfgFile != null) {
+            final AppProperties appProperties;
             try {
-                compressionEnabled = Boolean.parseBoolean((String)cidsappbackendPrefs.getChildText(
-                            "compressionEnabled"));
-            } catch (final Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.fatal("Fehler beim parsen von compressionEnabled --> benutze default false", e);
+                if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
+                            || (cfgFile.indexOf("file:/") == 0)) {
+                    appProperties = new AppProperties(new URL(cfgFile));
+                } else {
+                    appProperties = new AppProperties(new File(cfgFile));
                 }
+                appbackendCallserverurl = appProperties.getCallserverUrl();
+                compressionEnabled = appProperties.isCompressionEnabled();
+                appbackendDomain = appProperties.getDomain();
+                appbackendConnectionclass = appProperties.getConnectionClass();
+            } catch (final Exception ex) {
+                log.fatal("Error while reading config file", ex);
+                System.exit(2);
             }
-        } catch (Exception ex) {
-            log.error("Crossover: Fehler beim setzen den buffers für die Flurstückabfrage", ex);
+        } else {
+            try {
+                final Element cidsappbackendPrefs = root.getChild("cidsAppBackend");
+                appbackendDomain = cidsappbackendPrefs.getChildText("domain");
+                appbackendConnectionclass = cidsappbackendPrefs.getChildText("connectionclass");
+                appbackendCallserverurl = cidsappbackendPrefs.getChildText("callserverurl");
+                try {
+                    compressionEnabled = Boolean.parseBoolean((String)cidsappbackendPrefs.getChildText(
+                                "compressionEnabled"));
+                } catch (final Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.fatal("Fehler beim parsen von compressionEnabled --> benutze default false", e);
+                    }
+                }
+            } catch (Exception ex) {
+                log.error("Fehler beim parsen von cidsAppBackend", ex);
+            }
+        }
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class JnlpSystemPropertyHelper {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   propertyName  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public static String getProperty(final String propertyName) {
+            return getProperty(propertyName, null);
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   propertyName  DOCUMENT ME!
+         * @param   defaultValue  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public static String getProperty(String propertyName, final String defaultValue) {
+            if (propertyName == null) {
+                return null;
+            }
+
+            final String normalPropertyValue = System.getProperty(propertyName);
+
+            if (normalPropertyValue == null) {
+                propertyName = "jnlp." + propertyName;
+            }
+
+            return System.getProperty(propertyName, defaultValue);
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  args  DOCUMENT ME!
+         */
+        public static void main(final String[] args) {
+            System.setProperty("testProp", "ohne jnlp");
+            System.setProperty("jnlp.testProp", "mit jnlp");
+            System.out.println(getProperty("testProp"));
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class AppProperties extends PropertyResourceBundle {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new AppProperties object.
+         *
+         * @param   url  DOCUMENT ME!
+         *
+         * @throws  Exception  DOCUMENT ME!
+         */
+        public AppProperties(final URL url) throws Exception {
+            super(url.openStream());
+        }
+
+        /**
+         * Creates a new AppProperties object.
+         *
+         * @param   file  DOCUMENT ME!
+         *
+         * @throws  Exception  DOCUMENT ME!
+         */
+        public AppProperties(final File file) throws Exception {
+            super(new BufferedInputStream(new FileInputStream(file)));
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getCallserverUrl() {
+            return getString("callserverUrl");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public boolean isCompressionEnabled() {
+            return Boolean.parseBoolean(getString("compressionEnabled"));
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getConnectionClass() {
+            return getString("connectionClass");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getDomain() {
+            return getString("domain");
         }
     }
 }
