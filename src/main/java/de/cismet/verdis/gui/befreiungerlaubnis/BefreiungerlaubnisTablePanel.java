@@ -25,8 +25,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.AbstractCidsBeanTablePanel;
@@ -185,13 +184,13 @@ public class BefreiungerlaubnisTablePanel extends AbstractCidsBeanTablePanel {
         try {
             final List<CidsBean> list = getTable().getCidsBean()
                         .getBeanCollectionProperty(
-                            VerdisMetaClassConstants.MC_KANALANSCHLUSS
+                            VerdisConstants.MC.KANALANSCHLUSS
                             + "."
-                            + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
+                            + VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE);
 
             final CidsBean newBefreiungBean = CidsBean.createNewCidsBeanFromTableName(CidsAppBackend.getInstance()
                             .getDomain(),
-                    VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS);
+                    VerdisConstants.MC.BEFREIUNGERLAUBNIS);
 
             final JDialog dialog = new NewBefreiungerlaubnisDialog(StaticSwingTools.getParentFrame(this),
                     newBefreiungBean,

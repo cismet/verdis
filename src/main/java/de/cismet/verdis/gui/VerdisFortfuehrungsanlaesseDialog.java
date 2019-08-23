@@ -47,9 +47,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.FortfuehrungPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.VerdisFortfuehrungItemSearch;
@@ -380,24 +378,24 @@ public class VerdisFortfuehrungsanlaesseDialog extends FortfuehrungsanlaesseDial
                         if (istAbgearbeitet) {
                             final CidsBean fortfuehrungBean = CidsBean.createNewCidsBeanFromTableName(
                                     VerdisConstants.DOMAIN,
-                                    VerdisMetaClassConstants.MC_FORTFUEHRUNG);
+                                    VerdisConstants.MC.FORTFUEHRUNG);
                             fortfuehrungBean.setProperty(
-                                FortfuehrungPropertyConstants.PROP__ALKIS_FFN_ID,
+                                VerdisConstants.PROP.FORTFUEHRUNG.ALKIS_FFN_ID,
                                 selectedFortfuehrungItem.getAnlassId());
                             fortfuehrungBean.setProperty(
-                                FortfuehrungPropertyConstants.PROP__ALKIS_FFN,
+                                VerdisConstants.PROP.FORTFUEHRUNG.ALKIS_FFN,
                                 selectedFortfuehrungItem.getFfn());
                             fortfuehrungBean.setProperty(
-                                FortfuehrungPropertyConstants.PROP__ABGEARBEITET_AM,
+                                VerdisConstants.PROP.FORTFUEHRUNG.ABGEARBEITET_AM,
                                 new Timestamp(new Date().getTime()));
                             fortfuehrungBean.setProperty(
-                                FortfuehrungPropertyConstants.PROP__ABGEARBEITET_VON,
+                                VerdisConstants.PROP.FORTFUEHRUNG.ABGEARBEITET_VON,
                                 SessionManager.getSession().getUser().getName());
                             final CidsBean persisted = fortfuehrungBean.persist();
                             selectedFortfuehrungItem.setFortfuehrungId(persisted.getMetaObject().getId());
                         } else {
                             final MetaClass mc = CidsAppBackend.getInstance()
-                                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_FORTFUEHRUNG);
+                                        .getVerdisMetaClass(VerdisConstants.MC.FORTFUEHRUNG);
                             final CidsBean fortfuehrungBean = CidsAppBackend.getInstance()
                                         .getVerdisMetaObject(selectedFortfuehrungItem.getFortfuehrungId(), mc.getId())
                                         .getBean();

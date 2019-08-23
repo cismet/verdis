@@ -11,8 +11,7 @@ import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.srfronten.SRFrontenTable;
 
@@ -65,10 +64,10 @@ public class FrontenClipboard extends AbstractClipboard {
         }
 
         for (final CidsBean frontBean : getComponent().getAllBeans()) {
-            final int id = (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__ID);
-            final int ownId = (Integer)clipboardFrontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__ID);
+            final int id = (Integer)frontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.ID);
+            final int ownId = (Integer)clipboardFrontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.ID);
             if (id == ownId) {
                 return false;
             }

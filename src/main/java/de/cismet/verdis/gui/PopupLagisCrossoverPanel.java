@@ -50,9 +50,7 @@ import de.cismet.layout.FadingCardLayout;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -673,14 +671,14 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
             final CidsBean currentKassenzeichen = CidsAppBackend.getInstance().getCidsBean();
             if (currentKassenzeichen != null) {
                 final List<CidsBean> kgeoms = (List<CidsBean>)currentKassenzeichen.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
 
                 final List<Geometry> geoms = new ArrayList<Geometry>();
                 for (final CidsBean kgeom : kgeoms) {
                     geoms.add((Geometry)kgeom.getProperty(
-                            KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                            VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                                     + "."
-                                    + GeomPropertyConstants.PROP__GEO_FIELD));
+                                    + VerdisConstants.PROP.GEOM.GEO_FIELD));
                 }
 
                 if (!geoms.isEmpty()) {
@@ -743,7 +741,7 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
                 }
             } catch (Exception ex) {
                 log.error("Fehler beim verarbeiten der Ergebnisse: ", ex);
-                tableModel.updateTableModel(new ArrayList<CidsBean>());
+                tableModel.updateTableModel(new ArrayList<>());
                 lblMessage.setText("<html>Fehler beim abfragen<br/>der Flurstücke.</html>");
                 layout.show(panAll, MESSAGE_CARD_NAME);
             }

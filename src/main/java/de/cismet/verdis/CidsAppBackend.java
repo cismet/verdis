@@ -66,11 +66,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.historybutton.DefaultHistoryModel;
 import de.cismet.tools.gui.historybutton.HistoryModelListener;
 
-import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
@@ -86,8 +82,6 @@ import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
-
-import static de.cismet.verdis.commons.constants.VerdisConstants.DOMAIN;
 
 /**
  * DOCUMENT ME!
@@ -158,7 +152,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private final Map<CidsBean, Collection<Integer>> flaecheToKassenzeichenQuerverweisMap = new HashMap<>();
     private final Map<CidsBean, Collection<Integer>> frontToKassenzeichenQuerverweisMap = new HashMap<>();
     private final Map<CidsBean, Collection<Integer>> befreiungerlaubnisToKassenzeichenQuerverweisMap = new HashMap<>();
-    private String domain = DOMAIN;
+    private String domain = VerdisConstants.DOMAIN;
     private final ConnectionProxy proxy;
     private final AppPreferences appPreferences;
     private CidsBean kassenzeichenBean = null;
@@ -352,12 +346,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public CidsBean loadKassenzeichenByNummer(final int kassenzeichen) throws Exception {
         final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(
-                DOMAIN,
-                VerdisMetaClassConstants.MC_KASSENZEICHEN);
-        final String query = "SELECT " + mcKassenzeichen.getId() + ", " + KassenzeichenPropertyConstants.PROP__ID
-                    + ", " + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER
-                    + " FROM " + VerdisMetaClassConstants.MC_KASSENZEICHEN + " WHERE "
-                    + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
+                VerdisConstants.DOMAIN,
+                VerdisConstants.MC.KASSENZEICHEN);
+        final String query = "SELECT " + mcKassenzeichen.getId() + ", " + VerdisConstants.PROP.KASSENZEICHEN.ID
+                    + ", " + VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER
+                    + " FROM " + VerdisConstants.MC.KASSENZEICHEN + " WHERE "
+                    + VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER + " = " + kassenzeichen + ";";
         final MetaObject[] mos;
         mos = proxy.getMetaObjectByQuery(query, 0);
 
@@ -550,7 +544,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         frontenCrossReferences.clear();
         if (cidsBean != null) {
             final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
             try {
                 final Collection<CrossReference> crossReferences = searchFrontenCrossReferences(kassenzeichenNummer);
                 for (final CrossReference crossReference : crossReferences) {
@@ -573,7 +567,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         befreiungerlaubnisCrossReferences.clear();
         if (cidsBean != null) {
             final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
             try {
                 final Collection<CrossReference> crossReferences = searchBefreiungerlaubnisCrossReferences(
                         kassenzeichenNummer);
@@ -679,7 +673,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         flaechenidToCrossReferences.clear();
         if (cidsBean != null) {
             final int kassenzeichenNummer = (Integer)cidsBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
             try {
                 final Collection<CrossReference> crossReferences = searchFlaechenCrossReferences(kassenzeichenNummer);
                 for (final CrossReference crossReference : crossReferences) {
@@ -881,11 +875,11 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public HistoryObject[] getHistory(final int kassenzeichenId, final int howMuch) {
         try {
             final MetaClass mcKassenzeichen = ClassCacheMultiple.getMetaClass(
-                    DOMAIN,
-                    VerdisMetaClassConstants.MC_KASSENZEICHEN);
+                    VerdisConstants.DOMAIN,
+                    VerdisConstants.MC.KASSENZEICHEN);
             return proxy.getHistory(mcKassenzeichen.getId(),
                     kassenzeichenId,
-                    DOMAIN,
+                    VerdisConstants.DOMAIN,
                     SessionManager.getSession().getUser(),
                     howMuch);
         } catch (ConnectionException ex) {
@@ -904,7 +898,10 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public MetaObject getVerdisMetaObject(final int objectId, final int classtId) {
         try {
-            return proxy.getMetaObject(SessionManager.getSession().getUser(), objectId, classtId, DOMAIN);
+            return proxy.getMetaObject(SessionManager.getSession().getUser(),
+                    objectId,
+                    classtId,
+                    VerdisConstants.DOMAIN);
         } catch (ConnectionException ex) {
             LOG.error("error in retrieving the metaobject " + objectId + " of classid " + classtId, ex);
             return null;
@@ -920,7 +917,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public MetaObject[] getVerdisMetaObject(final String query) {
         try {
-            return proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(), query, DOMAIN);
+            return proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(), query, VerdisConstants.DOMAIN);
         } catch (ConnectionException ex) {
             LOG.error("error in retrieving the metaobject: " + query, ex);
             return null;
@@ -1034,12 +1031,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                 // gesperrt werden sollen das eigentliche Kassenzeichen UND alle
                 // Kassenzeichen mit einem Querverweis zu diesem.
                 allKassenzeichenNummernToLock.add((Integer)kassenzeichenBean.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
                 if (includeCrossReferences) {
                     for (final CrossReference flaechenCrossReference
                                 : searchFlaechenCrossReferences(
                                     (Integer)kassenzeichenBean.getProperty(
-                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER))) {
+                                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER))) {
                         final Integer querverweisKassenzeichennummer =
                             flaechenCrossReference.getEntityToKassenzeichen();
                         crossreferenceFromMap.put(querverweisKassenzeichennummer, kassenzeichenBean);
@@ -1047,7 +1044,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     for (final CrossReference frontenCrossReference
                                 : searchFrontenCrossReferences(
                                     (Integer)kassenzeichenBean.getProperty(
-                                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER))) {
+                                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER))) {
                         final Integer querverweisKassenzeichennummer = frontenCrossReference.getEntityToKassenzeichen();
                         crossreferenceFromMap.put(querverweisKassenzeichennummer, kassenzeichenBean);
                     }
@@ -1063,15 +1060,15 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             final MetaObject[] oldCsLocks = getMetaObject(""
                             + "SELECT " + getVerdisMetaClass("cs_locks").getId() + ", cs_locks.id "
                             + "FROM cs_locks, "
-                            + getVerdisMetaClass(VerdisMetaClassConstants.MC_KASSENZEICHEN).getTableName()
+                            + getVerdisMetaClass(VerdisConstants.MC.KASSENZEICHEN).getTableName()
                             + " AS kassenzeichen "
                             + "WHERE kassenzeichen.id = cs_locks.object_id "
                             + "AND cs_locks.class_id = "
-                            + getVerdisMetaClass(VerdisMetaClassConstants.MC_KASSENZEICHEN).getId()
+                            + getVerdisMetaClass(VerdisConstants.MC.KASSENZEICHEN).getId()
                             + " "
-                            + "AND kassenzeichen." + KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER + " IN ("
+                            + "AND kassenzeichen." + VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER + " IN ("
                             + nummernInString + ")",
-                    DOMAIN);
+                    VerdisConstants.DOMAIN);
             for (final MetaObject oldcsLock : oldCsLocks) {
                 existingLocks.add(oldcsLock.getBean());
             }
@@ -1086,7 +1083,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     final Integer kassenzeichenNummernToLock = allKassenzeichenNummernToLock.get(index);
                     final CidsBean kassenzeichenBeanToLock = loadKassenzeichenByNummer(kassenzeichenNummernToLock);
                     if (kassenzeichenBeanToLock != null) {
-                        final CidsBean newCsLock = CidsBean.createNewCidsBeanFromTableName(DOMAIN, "cs_locks");
+                        final CidsBean newCsLock = CidsBean.createNewCidsBeanFromTableName(
+                                VerdisConstants.DOMAIN,
+                                "cs_locks");
                         newCsLock.setProperty("object_id", kassenzeichenBeanToLock.getMetaObject().getId());
                         newCsLock.setProperty(
                             "class_id",
@@ -1135,13 +1134,15 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     public List<CidsBean> getArbeitspakete() throws ConnectionException {
         final List<CidsBean> allArbeitspakete = new ArrayList<CidsBean>();
         final MetaClass mcArbeitspaket = ClassCacheMultiple.getMetaClass(
-                DOMAIN,
-                VerdisMetaClassConstants.MC_ARBEITSPAKET);
+                VerdisConstants.DOMAIN,
+                VerdisConstants.MC.ARBEITSPAKET);
 
-        final String query = "SELECT " + mcArbeitspaket.getId() + ", " + ArbeitspaketPropertyConstants.PROP__ID
+        final String query = "SELECT " + mcArbeitspaket.getId() + ", " + VerdisConstants.PROP.ARBEITSPAKET.ID
                     + " FROM " + mcArbeitspaket.getTableName() + " ORDER BY ID ASC;";
 
-        final MetaObject[] mos = proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(), query, DOMAIN);
+        final MetaObject[] mos = proxy.getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                query,
+                VerdisConstants.DOMAIN);
 
         for (final MetaObject mo : mos) {
             allArbeitspakete.add(mo.getBean());
@@ -1517,8 +1518,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     private void selectFlaecheByBezeichner(final String bez) {
         for (final CidsBean flaeche
-                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
-            if (((String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG)).equals(bez)) {
+                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
+            if (((String)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG)).equals(bez)) {
                 Main.getInstance().getRegenFlaechenTable().selectCidsBean(flaeche);
                 return;
             }
@@ -1540,8 +1541,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         }
 
         for (final CidsBean front
-                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)) {
-            if (((Integer)front.getProperty(FrontPropertyConstants.PROP__NUMMER)).equals(nummerAsInt)) {
+                    : (Collection<CidsBean>)kassenzeichenBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FRONTEN)) {
+            if (((Integer)front.getProperty(VerdisConstants.PROP.FRONT.NUMMER)).equals(nummerAsInt)) {
                 Main.getInstance().getSRFrontenTable().selectCidsBean(front);
                 return;
             }

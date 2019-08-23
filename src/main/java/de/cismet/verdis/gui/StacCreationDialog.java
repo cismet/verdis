@@ -48,7 +48,6 @@ import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
@@ -578,7 +577,7 @@ public class StacCreationDialog extends JDialog {
                 CreateAStacForKassenzeichenServerAction.Parameter.KASSENZEICHEN.toString(),
                 String.valueOf(
                     Main.getInstance().getCidsBean().getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER)));
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)));
 
         final ServerActionParameter<Timestamp> paramDate;
         final ServerActionParameter<CreateAStacForKassenzeichenServerAction.DurationUnit> paramDurationUnit;

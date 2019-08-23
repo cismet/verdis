@@ -22,7 +22,7 @@ import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTablePanel;
 
@@ -87,13 +87,13 @@ public class KanaldatenPanel extends javax.swing.JPanel implements CidsBeanStore
         setEditable(false);
         try {
             ((DefaultBindableReferenceCombo)cboMKRangeschlossen).setMetaClass(CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+                        .getVerdisMetaClass(VerdisConstants.MC.ANSCHLUSSSTATUS));
             ((DefaultBindableReferenceCombo)cboMKSangeschlossen).setMetaClass(CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+                        .getVerdisMetaClass(VerdisConstants.MC.ANSCHLUSSSTATUS));
             ((DefaultBindableReferenceCombo)cboRKangeschlossen).setMetaClass(CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+                        .getVerdisMetaClass(VerdisConstants.MC.ANSCHLUSSSTATUS));
             ((DefaultBindableReferenceCombo)cboSKangeschlossen).setMetaClass(CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSSTATUS));
+                        .getVerdisMetaClass(VerdisConstants.MC.ANSCHLUSSSTATUS));
         } catch (Exception e) {
             log.error("Comboboxen sind ohne Funktion.", e);
         }

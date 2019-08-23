@@ -36,8 +36,7 @@ import de.cismet.validation.validator.BindingValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.converter.DateToStringConverter;
 
@@ -100,10 +99,10 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
         this.cidsBeanList = cidsList;
 
         if (cidsBean != null) {
-            backupAktenzeichen = (String)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN);
-            backupGueltigBis = (Date)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS);
-            backupAntragVom = (Date)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM);
-            backupNutzung = (CidsBean)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__NUTZUNG);
+            backupAktenzeichen = (String)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN);
+            backupGueltigBis = (Date)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS);
+            backupAntragVom = (Date)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM);
+            backupNutzung = (CidsBean)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.NUTZUNG);
         } else {
             backupAktenzeichen = null;
             backupGueltigBis = null;
@@ -134,12 +133,12 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
 
         final AggregatedValidator aggVal = new AggregatedValidator();
         aggVal.add(new BindingValidator(
-                bindingGroup.getBinding(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN)).attachDisplay(
+                bindingGroup.getBinding(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN)).attachDisplay(
                 EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtAktenzeichen)));
         aggVal.add(new BindingValidator(
-                bindingGroup.getBinding(BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS)).attachDisplay(
+                bindingGroup.getBinding(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS)).attachDisplay(
                 EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtGueltigBis)));
-        aggVal.add(new BindingValidator(bindingGroup.getBinding(BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM))
+        aggVal.add(new BindingValidator(bindingGroup.getBinding(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM))
                     .attachDisplay(
                         EmbeddedValidatorDisplay.getEmbeddedDisplayFor(txtAntragVom)));
         aggVal.add(BefreiungerlaubnisTable.createValidatorAktenzeichen(cidsBean).attachDisplay(
@@ -208,7 +207,7 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.aktenzeichen}"),
                 txtAktenzeichen,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN);
+                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.AKTENZEICHEN);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -237,7 +236,7 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.antrag_vom}"),
                 txtAntragVom,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM);
+                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.ANTRAG_VOM);
         binding.setConverter(new DateToStringConverter());
         bindingGroup.addBinding(binding);
 
@@ -267,7 +266,7 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.gueltig_bis}"),
                 txtGueltigBis,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS);
+                de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.GUELTIG_BIS);
         binding.setConverter(new DateToStringConverter());
         bindingGroup.addBinding(binding);
 
@@ -305,7 +304,7 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(cboNutzung, gridBagConstraints);
         ((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_NUTZUNG));
+                VerdisConstants.MC.BEFREIUNGERLAUBNIS_NUTZUNG));
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 0, 10, 0));
 
@@ -392,10 +391,10 @@ public class NewBefreiungerlaubnisDialog extends javax.swing.JDialog implements 
             }
         } else {
             try {
-                cidsBean.setProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN, backupAktenzeichen);
-                cidsBean.setProperty(BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM, backupAntragVom);
-                cidsBean.setProperty(BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS, backupGueltigBis);
-                cidsBean.setProperty(BefreiungerlaubnisPropertyConstants.PROP__NUTZUNG, backupNutzung);
+                cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN, backupAktenzeichen);
+                cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM, backupAntragVom);
+                cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS, backupGueltigBis);
+                cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.NUTZUNG, backupNutzung);
             } catch (Exception ex) {
                 // LOG.error("error setting backup properties", ex);
             }

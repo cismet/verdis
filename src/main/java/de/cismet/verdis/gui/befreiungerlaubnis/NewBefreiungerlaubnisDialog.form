@@ -62,7 +62,7 @@
             <BindingProperty name="text" source="Form" sourcePath="${cidsBean.aktenzeichen}" target="txtAktenzeichen" targetPath="text" updateStrategy="0" immediately="false">
               <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                <Connection code="de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN" type="code"/>
+                <Connection code="VerdisConstants.MC.BEFREIUNGERLAUBNIS.AKTENZEICHEN" type="code"/>
               </Property>
             </BindingProperty>
           </BindingProperties>
@@ -100,7 +100,7 @@
                 <Connection code="new DateToStringConverter()" type="code"/>
               </Property>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                <Connection code="de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM" type="code"/>
+                <Connection code="VerdisConstants.MC.BEFREIUNGERLAUBNIS.ANTRAG_VOM" type="code"/>
               </Property>
             </BindingProperty>
           </BindingProperties>
@@ -138,7 +138,7 @@
                 <Connection code="new DateToStringConverter()" type="code"/>
               </Property>
               <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                <Connection code="de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS" type="code"/>
+                <Connection code="VerdisConstants.MC.BEFREIUNGERLAUBNIS.GUELTIG_BIS" type="code"/>
               </Property>
             </BindingProperty>
           </BindingProperties>
@@ -173,7 +173,7 @@
             <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.nutzung}" target="cboNutzung" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_NUTZUNG));"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_NUTZUNG));"/>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>

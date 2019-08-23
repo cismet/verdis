@@ -16,7 +16,7 @@ import java.util.List;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
@@ -71,18 +71,18 @@ public class BefreiungerlaubnisTableModel extends AbstractCidsBeanTableModel {
         }
         switch (columnIndex) {
             case 0: {
-                return (String)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN);
+                return (String)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN);
             }
             case 1: {
-                final Date date = (Date)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM);
+                final Date date = (Date)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM);
                 return (date != null) ? DATE_FORMAT.format(date) : date;
             }
             case 2: {
-                final Date date = (Date)cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS);
+                final Date date = (Date)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS);
                 return (date != null) ? DATE_FORMAT.format(date) : date;
             }
             case 3: {
-                return cidsBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__NUTZUNG);
+                return cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.NUTZUNG);
             }
             default: {
                 return null;
@@ -107,34 +107,34 @@ public class BefreiungerlaubnisTableModel extends AbstractCidsBeanTableModel {
         try {
             switch (column) {
                 case 0: {
-                    be.setProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN, value.toString());
+                    be.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN, value.toString());
                 }
                 break;
                 case 1: {
                     try {
                         be.setProperty(
-                            BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM,
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM,
                             new Date(DATE_FORMAT.parse(value.toString()).getTime()));
                     } catch (ParseException e) {
-                        be.setProperty(BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM, null);
+                        be.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM, null);
                     }
                 }
                 break;
                 case 2: {
                     try {
                         be.setProperty(
-                            BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS,
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS,
                             new Date(DATE_FORMAT.parse(value.toString()).getTime()));
                     } catch (ParseException e) {
-                        be.setProperty(BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS, null);
+                        be.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS, null);
                     }
                 }
                 break;
                 case 3: {
                     try {
-                        be.setProperty(BefreiungerlaubnisPropertyConstants.PROP__NUTZUNG, value);
+                        be.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.NUTZUNG, value);
                     } catch (ParseException e) {
-                        be.setProperty(BefreiungerlaubnisPropertyConstants.PROP__NUTZUNG, null);
+                        be.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.NUTZUNG, null);
                     }
                 }
                 break;

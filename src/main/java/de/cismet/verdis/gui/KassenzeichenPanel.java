@@ -43,7 +43,7 @@ import de.cismet.verdis.AppModeListener;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -139,7 +139,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
             chkSperre.setSelected(false);
             multi = null;
         } else {
-            final String asJson = (String)cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG);
+            final String asJson = (String)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG);
             multi = CidsAppBackend.transformMultiBemerkungFromJson(asJson);
             CidsAppBackend.cleanupMultiBemerkung(multi);
         }
@@ -372,7 +372,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.datum_erfassung}"),
                 txtErfassungsdatum,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG);
+                VerdisConstants.PROP.KASSENZEICHEN.DATUM_ERFASSUNG);
         binding.setConverter(new SqlDateToStringConverter());
         bindingGroup.addBinding(binding);
 
@@ -446,7 +446,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"),
                 txtKassenzeichen,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -470,7 +470,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bemerkung_sperre}"),
                 txtSperreBemerkung,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE);
+                VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG_SPERRE);
         bindingGroup.addBinding(binding);
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -745,7 +745,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         StaticSwingTools.showDialog(dialog);
         try {
             getCidsBean().setProperty(
-                KassenzeichenPropertyConstants.PROP__BEMERKUNG,
+                VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG,
                 CidsAppBackend.transformMultiBemerkungToJson(multi));
             jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
         } catch (final Exception ex) {
@@ -940,7 +940,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
      * @return  DOCUMENT ME!
      */
     private static Validator getValidatorKassenzeichenNummer(final CidsBean kassenzeichenBean) {
-        return new CidsBeanValidator(kassenzeichenBean, KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER) {
+        return new CidsBeanValidator(kassenzeichenBean, VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -949,7 +949,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                         return null;
                     }
                     final Integer kassenzeichennummer = (Integer)cidsBean.getProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
 
                     if (kassenzeichennummer == null) {
                         return new ValidatorStateImpl(ValidatorState.Type.ERROR, "Kassenzeichen leer.");

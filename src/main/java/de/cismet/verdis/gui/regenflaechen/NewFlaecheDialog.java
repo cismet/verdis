@@ -29,9 +29,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -85,7 +83,7 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
 
         initComponents();
 
-        final MetaClass faMc = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENART);
+        final MetaClass faMc = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.FLAECHENART);
 
         ((DefaultBindableReferenceCombo)cboArt).setMetaClass(faMc);
         cboArt.addPropertyChangeListener(new PropertyChangeListener() {
@@ -307,14 +305,14 @@ public class NewFlaecheDialog extends javax.swing.JDialog {
                         final CidsBean kassenzeichenBean = CidsAppBackend.getInstance().getCidsBean();
                         if ((kassenzeichenBean != null)
                                     && !kassenzeichenBean.getBeanCollectionProperty(
-                                        KassenzeichenPropertyConstants.PROP__FLAECHEN).isEmpty()) {
+                                        VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN).isEmpty()) {
                             final DefaultComboBoxModel aModel = (DefaultComboBoxModel)evt.getNewValue();
                             Object vvobject = null;
                             for (int index = 0; (index < aModel.getSize()) && (vvobject == null); index++) {
                                 final Object object = aModel.getElementAt(index);
                                 if ((object instanceof CidsBean)
                                             && ((Integer)((CidsBean)object).getProperty(
-                                                    FlaechenartPropertyConstants.PROP__ID)
+                                                    VerdisConstants.PROP.FLAECHENART.ID)
                                                 == VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG)) {
                                     vvobject = object;
                                 }
