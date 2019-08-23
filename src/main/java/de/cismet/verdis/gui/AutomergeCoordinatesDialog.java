@@ -31,7 +31,6 @@ import javax.swing.SwingUtilities;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.tools.PFeatureTools;
 
@@ -41,10 +40,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -439,13 +435,13 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
                     isSelected,
                     cellHasFocus);
             final String tableName = feature.getMetaClass().getTableName();
-            if (VerdisMetaClassConstants.MC_FLAECHE.equalsIgnoreCase(tableName)) {
-                component.setText("Fläche: " + bean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
-            } else if (VerdisMetaClassConstants.MC_FRONT.equalsIgnoreCase(tableName)) {
-                component.setText("Front: " + bean.getProperty(FrontPropertyConstants.PROP__NUMMER));
-            } else if (VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE.equalsIgnoreCase(tableName)) {
+            if (VerdisConstants.MC.FLAECHE.equalsIgnoreCase(tableName)) {
+                component.setText("Fläche: " + bean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG));
+            } else if (VerdisConstants.MC.FRONT.equalsIgnoreCase(tableName)) {
+                component.setText("Front: " + bean.getProperty(VerdisConstants.PROP.FRONT.NUMMER));
+            } else if (VerdisConstants.MC.KASSENZEICHEN_GEOMETRIE.equalsIgnoreCase(tableName)) {
                 component.setText("Allgemeine Geometrie: "
-                            + bean.getProperty(KassenzeichenGeometriePropertyConstants.PROP__NAME));
+                            + bean.getProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME));
             }
             return component;
         }

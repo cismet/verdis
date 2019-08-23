@@ -21,7 +21,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -219,7 +219,7 @@ public class KassenzeichenAddDialog extends javax.swing.JDialog {
                         final CidsBean kassenzeichenBean = get();
                         if (kassenzeichenBean != null) {
                             listener.kassenzeichennummerAdded((Integer)kassenzeichenBean.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
                             jFormattedTextField1.setValue(null);
                         } else {
                             flashSearchField(Color.red);

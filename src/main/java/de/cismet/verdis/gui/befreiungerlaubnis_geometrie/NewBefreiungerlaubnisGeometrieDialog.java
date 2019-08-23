@@ -26,7 +26,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -80,9 +80,8 @@ public class NewBefreiungerlaubnisGeometrieDialog extends javax.swing.JDialog {
         initComponents();
 
         final MetaClass mcTyp = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(versickerung
-                            ? VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG
-                            : VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG);
+                    .getVerdisMetaClass(versickerung ? VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG
+                                                     : VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG);
 
         ((DefaultBindableReferenceCombo)cboTyp).setMetaClass(mcTyp);
         cboTyp.addPropertyChangeListener(new PropertyChangeListener() {

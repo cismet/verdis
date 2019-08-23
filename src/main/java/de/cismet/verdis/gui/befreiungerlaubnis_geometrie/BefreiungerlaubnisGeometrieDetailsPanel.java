@@ -47,7 +47,6 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
 import de.cismet.cids.editors.DefaultCustomObjectEditor;
-import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cids.utils.multibean.EmbeddedMultiBeanDisplay;
 import de.cismet.cids.utils.multibean.MultiBeanHelper;
@@ -61,10 +60,7 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.CrossReference;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanDetailsPanel;
 import de.cismet.verdis.gui.Main;
@@ -138,31 +134,31 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
 
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtDurchfluss,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__DURCHFLUSS,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.DURCHFLUSS,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtFilterkonstante,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__FILTERKONSTANTE,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.FILTERKONSTANTE,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             cboTypEinleitung,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_EINLEITUNG,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_EINLEITUNG,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             cboTypVersickerung,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_VERSICKERUNG,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_VERSICKERUNG,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtGewaessername,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__GEWAESSERNAME,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEWAESSERNAME,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtBemerkung,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__BEMERKUNG,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.BEMERKUNG,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             chkGutachtenVorhanden,
-            BefreiungerlaubnisGeometriePropertyConstants.PROP__GUTACHTEN_VORHANDEN,
+            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GUTACHTEN_VORHANDEN,
             getMultiBeanHelper());
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
@@ -215,10 +211,10 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
      */
     public static Geometry getGeometry(final CidsBean beferBean) {
         if ((beferBean != null)
-                    && (beferBean.getProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)beferBean.getProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
+                    && (beferBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE) != null)) {
+            return (Geometry)beferBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE
                             + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
         } else {
             return null;
         }
@@ -234,15 +230,15 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
      */
     public static void setGeometry(final Geometry geom, final CidsBean cidsBean) throws Exception {
         Main.transformToDefaultCrsNeeded(geom);
-        if (cidsBean.getProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE) == null) {
+        if (cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE) == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                        .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE, emptyGeoBean);
+            cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE, emptyGeoBean);
         }
-        cidsBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE + "."
-                    + GeomPropertyConstants.PROP__GEO_FIELD,
+        cidsBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE + "."
+                    + VerdisConstants.PROP.GEOM.GEO_FIELD,
             geom);
     }
 
@@ -426,7 +422,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboNutzung, gridBagConstraints);
         ((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_NUTZUNG));
+                VerdisConstants.MC.BEFREIUNGERLAUBNIS_NUTZUNG));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
@@ -459,7 +455,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboTypEinleitung, gridBagConstraints);
         ((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG));
+                VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG));
 
         lblTypVersickerung.setText(org.openide.util.NbBundle.getMessage(
                 BefreiungerlaubnisGeometrieDetailsPanel.class,
@@ -485,7 +481,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
         gridBagConstraints.insets = new java.awt.Insets(2, 3, 2, 2);
         bpanRegenFlDetails.add(cboTypVersickerung, gridBagConstraints);
         ((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG));
+                VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG));
 
         lblDurchfluss.setText(org.openide.util.NbBundle.getMessage(
                 BefreiungerlaubnisGeometrieDetailsPanel.class,
@@ -732,8 +728,8 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
         bindingGroup.bind();
 
         final boolean isVersickerung = (parentBean != null)
-                    && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                    && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                    && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                    && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                     .startsWith("747-");
         lblTypVersickerung.setVisible(isVersickerung);
         cboTypVersickerung.setVisible(isVersickerung);
@@ -741,8 +737,8 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
         txtFilterkonstante.setVisible(isVersickerung);
 
         final boolean isEinleitung = (parentBean != null)
-                    && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                    && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                    && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                    && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                     .startsWith("748-");
         lblTypEinleitung.setVisible(isEinleitung);
         cboTypEinleitung.setVisible(isEinleitung);
@@ -759,7 +755,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
 
         try {
             if ((this.cidsBean != null)
-                        && (this.cidsBean.getProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE)
+                        && (this.cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE)
                             != null)) {
                 bpanRegenFlDetails.setBackgroundEnabled(true);
             } else {
@@ -906,7 +902,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
      */
     public static Validator getValidatorDurchfluss(final CidsBean beferBean) {
         final MultiBeanHelper mbh = BefreiungerlaubnisGeometrieDetailsPanel.getInstance().getMultiBeanHelper();
-        return new CidsBeanValidator(beferBean, BefreiungerlaubnisGeometriePropertyConstants.PROP__DURCHFLUSS) {
+        return new CidsBeanValidator(beferBean, VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.DURCHFLUSS) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -924,7 +920,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
      */
     public static Validator getValidatorFilterkonstante(final CidsBean beferBean) {
         final MultiBeanHelper mbh = BefreiungerlaubnisGeometrieDetailsPanel.getInstance().getMultiBeanHelper();
-        return new CidsBeanValidator(beferBean, BefreiungerlaubnisGeometriePropertyConstants.PROP__FILTERKONSTANTE) {
+        return new CidsBeanValidator(beferBean, VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.FILTERKONSTANTE) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -936,15 +932,15 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
     @Override
     public CidsBean createDummyBean() {
         final CidsBean dummyBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE)
+                    .getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
         try {
-            dummyBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE, geomBean);
+            dummyBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE, geomBean);
         } catch (final Exception ex) {
             LOG.error(ex, ex);
         }

@@ -43,8 +43,6 @@ import org.jdesktop.observablecollections.ObservableListListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -63,7 +61,6 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -91,13 +88,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.gui.Main;
 
@@ -728,14 +719,14 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             if (tglShowKassenzeichenGeometrien.isSelected()) {
                 for (final CidsBean kassenzeichenGeometrieBean
                             : kassenzBean.getBeanCollectionProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)) {
+                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)) {
                     final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(
                             kassenzeichenGeometrieBean.getMetaObject());
                     featuresToShow.add(kassenzeichenGeometrieFeature);
                 }
             }
         }
-        showThisFeatures(featuresToShow, VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE);
+        showThisFeatures(featuresToShow, VerdisConstants.MC.KASSENZEICHEN_GEOMETRIE);
     }                                                                                                  //GEN-LAST:event_tglShowKassenzeichenGeometrienActionPerformed
 
     /**
@@ -783,7 +774,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                     if (kassenzBean != null) {
                         final Geometry unionGeom = getKassenzeichenGeometrieUnionGeom(
                                 kassenzBean.getBeanCollectionProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN));
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN));
                         final Collection<CidsBean> alkisLandparcelBeans = searchAlkisLandparcelBeans(unionGeom);
                         return alkisLandparcelBeans;
                     } else {
@@ -854,13 +845,13 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                     if (kassenzBean != null) {
                         for (final CidsBean flaecheBean
                                     : (Collection<CidsBean>)kassenzBean.getBeanCollectionProperty(
-                                        KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                                        VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
                             final Geometry flaecheGeom = (Geometry)flaecheBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                            + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE
                                             + "."
-                                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
                             if (flaecheGeom != null) {
                                 final Geometry bufferedGeom = flaecheGeom.buffer(FLAECHE_GEOM_BUFFER);
                                 if (unionGeom == null) {
@@ -927,15 +918,15 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             final boolean istFrei) throws Exception {
         final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
                 VerdisConstants.DOMAIN,
-                VerdisMetaClassConstants.MC_GEOM);
-        geomBean.setProperty(GeomPropertyConstants.PROP__GEO_FIELD, geometry);
+                VerdisConstants.MC.GEOM);
+        geomBean.setProperty(VerdisConstants.PROP.GEOM.GEO_FIELD, geometry);
 
         final CidsBean kassenzeichenGeometrieBean = CidsBean.createNewCidsBeanFromTableName(
                 VerdisConstants.DOMAIN,
-                VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE);
-        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ISTFREI, istFrei);
-        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE, geomBean);
-        kassenzeichenGeometrieBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__NAME, bezeichnung);
+                VerdisConstants.MC.KASSENZEICHEN_GEOMETRIE);
+        kassenzeichenGeometrieBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ISTFREI, istFrei);
+        kassenzeichenGeometrieBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE, geomBean);
+        kassenzeichenGeometrieBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME, bezeichnung);
 
         kassenzeichenGeometrieBean.getMetaObject().setID(KassenzeichenGeometrienPanel.getNewKassenzeichenGeometrieId());
 
@@ -963,14 +954,14 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         if (kassenzeichenBean != null) {
             final ObservableList<CidsBean> kassenzeichenGeometrieList = (ObservableList<CidsBean>)
                 kassenzeichenBean.getBeanCollectionProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
             kassenzeichenGeometrieList.removeObservableListListener(kassenzeichenGeometrieListListener);
         }
         kassenzeichenBean = cidsBean;
         if (kassenzeichenBean != null) {
             final ObservableList<CidsBean> kassenzeichenGeometrieList = (ObservableList<CidsBean>)
                 kassenzeichenBean.getBeanCollectionProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
             kassenzeichenGeometrieList.addObservableListListener(kassenzeichenGeometrieListListener);
         }
         bindingGroup.bind();
@@ -1001,12 +992,12 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         if (kassenzBean != null) {
             for (final CidsBean flaecheBean
                         : (Collection<CidsBean>)kassenzBean.getBeanCollectionProperty(
-                            KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                            VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
                 if (
                     flaecheBean.getProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE)
+                                + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE)
                             != null) {
                     hasFlaecheGeoms = true;
                     break;
@@ -1014,7 +1005,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             }
             hasAllgGeoms =
                 !((Collection<CidsBean>)kassenzBean.getBeanCollectionProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)).isEmpty();
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)).isEmpty();
         }
 
         cmdAutoCreateGeometries.setEnabled(isEditable && hasFlaecheGeoms && !hasAllgGeoms);
@@ -1041,7 +1032,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             if (addedFeature instanceof CidsFeature) {
                 final CidsFeature addedCidsFeature = (CidsFeature)addedFeature;
                 final String addedMCName = addedCidsFeature.getMetaClass().getTableName();
-                if (addedMCName.equalsIgnoreCase(VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE)) {
+                if (addedMCName.equalsIgnoreCase(VerdisConstants.MC.KASSENZEICHEN_GEOMETRIE)) {
                     final boolean show = tglShowKassenzeichenGeometrien.isSelected();
                     CidsAppBackend.getInstance().getMainMap().getPFeatureHM().get(addedCidsFeature).setVisible(show);
                 }
@@ -1068,7 +1059,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         final CidsBean kassenzBean = getCidsBean();
         if (kassenzBean != null) {
             final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
             final Collection<Feature> removedFeatures = fce.getEventFeatures();
             for (final Feature feature : removedFeatures) {
                 if (feature instanceof CidsFeature) {
@@ -1094,18 +1085,18 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                 if (changedFeature instanceof CidsFeature) {
                     final CidsFeature changedCidsFeature = (CidsFeature)changedFeature;
                     if (changedCidsFeature.getMetaObject().getMetaClass().getTableName().equalsIgnoreCase(
-                                    VerdisMetaClassConstants.MC_KASSENZEICHEN_GEOMETRIE)) {
+                                    VerdisConstants.MC.KASSENZEICHEN_GEOMETRIE)) {
                         try {
                             final CidsBean kassenzeichenGeometrieBean = changedCidsFeature.getMetaObject().getBean();
                             final String alterText = (String)kassenzeichenGeometrieBean.getProperty(
-                                    KassenzeichenGeometriePropertyConstants.PROP__NAME);
+                                    VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME);
                             final Boolean alterIstFrei = (Boolean)kassenzeichenGeometrieBean.getProperty(
-                                    KassenzeichenGeometriePropertyConstants.PROP__ISTFREI);
+                                    VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ISTFREI);
                             kassenzeichenGeometrieBean.setProperty(
-                                KassenzeichenGeometriePropertyConstants.PROP__ISTFREI,
+                                VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ISTFREI,
                                 true);
                             kassenzeichenGeometrieBean.setProperty(
-                                KassenzeichenGeometriePropertyConstants.PROP__NAME,
+                                VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME,
                                 "freie Geometrie");
 
                             if (!refreshNeeded) {
@@ -1151,7 +1142,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         if (kassenzBean != null) {
             final Collection<Feature> selectedFeatures = featureCollection.getSelectedFeatures();
             final List<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
 
             final List<Integer> indicesToSelect = new ArrayList<Integer>();
             if (selectedFeatures != null) {
@@ -1244,9 +1235,9 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         Geometry unionGeom = null;
         for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
             final Geometry geom = (Geometry)kassenzeichenGeometrieBean.getProperty(
-                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                    VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                             + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
             final Geometry bufferedGeom = geom.buffer(ALKIS_LANDPARCEL_GEOM_BUFFER);
             if (unionGeom == null) {
                 unionGeom = (Geometry)bufferedGeom;
@@ -1491,7 +1482,7 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
             final CidsBean bean = (CidsBean)value;
             final Component comp = super.getListCellRendererComponent(
                     list,
-                    bean.getProperty(KassenzeichenGeometriePropertyConstants.PROP__NAME),
+                    bean.getProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME),
                     index,
                     isSelected,
                     cellHasFocus);
@@ -1584,13 +1575,13 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                     final CidsBean kassenzBean = getCidsBean();
                     if (kassenzBean != null) {
                         final List<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
                         for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
                             final Geometry kassenzeichenGeometrieGeom = (Geometry)
                                 kassenzeichenGeometrieBean.getProperty(
-                                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                                    VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                                             + "."
-                                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
 
                             final Geometry alkisLandparcelGeom = (Geometry)alkisLandparcelBean.getProperty(
                                     "geometrie.geo_field");

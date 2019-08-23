@@ -18,7 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 /**
  * DOCUMENT ME!
  *
@@ -142,7 +142,7 @@ public class SummenTableModel extends DefaultTableModel implements CidsBeanStore
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
         final List<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
         for (final CidsBean flaeche : flaechen) {
         }
     }

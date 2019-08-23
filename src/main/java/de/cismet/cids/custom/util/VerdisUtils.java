@@ -24,18 +24,10 @@ import java.util.Collection;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
-import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTable;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
 import de.cismet.verdis.gui.srfronten.SRFrontenTable;
 
@@ -77,13 +69,13 @@ public class VerdisUtils {
             final boolean crossreference) throws Exception {
         final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
         if (!crossreference) {
-            final CidsBean flaecheInfo = (CidsBean)pasteBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO);
+            final CidsBean flaecheInfo = (CidsBean)pasteBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO);
             if (flaecheInfo != null) {
                 flaecheInfo.setProperty("id", -1);
                 flaecheInfo.getMetaObject().setID(-1);
                 flaecheInfo.getMetaObject().forceStatus(MetaObject.NEW);
                 final CidsBean geomBean = (CidsBean)flaecheInfo.getProperty(
-                        FlaecheninfoPropertyConstants.PROP__GEOMETRIE);
+                        VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE);
                 if (geomBean != null) {
                     geomBean.setProperty("id", -1);
                     geomBean.getMetaObject().setID(-1);
@@ -92,27 +84,27 @@ public class VerdisUtils {
             }
         }
 
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__BEMERKUNG, null);
+        pasteBean.setProperty(VerdisConstants.PROP.FLAECHE.BEMERKUNG, null);
         pasteBean.setProperty(
-            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+            VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG,
             getValidFlaechenname(
                 (Integer)clipboardBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                             + "."
-                            + FlaechenartPropertyConstants.PROP__ID),
+                            + VerdisConstants.PROP.FLAECHENART.ID),
                 targetBeansCollection));
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, 1);
         final SimpleDateFormat vDat = new SimpleDateFormat("yy/MM");
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
+        pasteBean.setProperty(VerdisConstants.PROP.FLAECHE.DATUM_VERANLAGUNG, vDat.format(cal.getTime()));
         pasteBean.setProperty(
-            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+            VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG,
             new java.sql.Date(Calendar.getInstance().getTime().getTime()));
 
         final int id = RegenFlaechenTable.getNextNewBeanId();
-        pasteBean.setProperty(FlaechePropertyConstants.PROP__ID, id);
+        pasteBean.setProperty(VerdisConstants.PROP.FLAECHE.ID, id);
         pasteBean.getMetaObject().setID(id);
         pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
 
@@ -136,19 +128,18 @@ public class VerdisUtils {
         final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
 
         final int newNummer = getValidNummer(targetBeansCollection);
-        pasteBean.setProperty(FrontPropertyConstants.PROP__NUMMER, newNummer);
+        pasteBean.setProperty(VerdisConstants.PROP.FRONT.NUMMER, newNummer);
 
-        pasteBean.setProperty(FrontPropertyConstants.PROP__BEARBEITET_DURCH, null);
+        pasteBean.setProperty(VerdisConstants.PROP.FRONT.BEARBEITET_DURCH, null);
 
-        if (clipboardBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO) != null) {
+        if (clipboardBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO) != null) {
             if (!crossreference) {
-                final CidsBean frontInfo = (CidsBean)pasteBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO);
+                final CidsBean frontInfo = (CidsBean)pasteBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO);
                 if (frontInfo != null) {
                     frontInfo.setProperty("id", -1);
                     frontInfo.getMetaObject().setID(-1);
                     frontInfo.getMetaObject().forceStatus(MetaObject.NEW);
-                    final CidsBean geomBean = (CidsBean)frontInfo.getProperty(
-                            FrontinfoPropertyConstants.PROP__GEOMETRIE);
+                    final CidsBean geomBean = (CidsBean)frontInfo.getProperty(VerdisConstants.PROP.FRONTINFO.GEOMETRIE);
                     if (geomBean != null) {
                         geomBean.setProperty("id", -1);
                         geomBean.getMetaObject().setID(-1);
@@ -159,10 +150,10 @@ public class VerdisUtils {
         }
 
         final Calendar cal = Calendar.getInstance();
-        pasteBean.setProperty(FrontPropertyConstants.PROP__ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
+        pasteBean.setProperty(VerdisConstants.PROP.FRONT.ERFASSUNGSDATUM, new Date(cal.getTime().getTime()));
 
         final int id = SRFrontenTable.getNextNewBeanId();
-        pasteBean.setProperty(FrontPropertyConstants.PROP__ID, id);
+        pasteBean.setProperty(VerdisConstants.PROP.FRONT.ID, id);
         pasteBean.getMetaObject().setID(id);
         pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
 
@@ -209,7 +200,7 @@ public class VerdisUtils {
         final CidsBean pasteBean = CidsBeanSupport.deepcloneCidsBean(clipboardBean);
 
         final CidsBean geomBean = (CidsBean)pasteBean.getProperty(
-                KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE);
+                VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE);
         if (geomBean != null) {
             geomBean.setProperty("id", -1);
             geomBean.getMetaObject().setID(-1);
@@ -217,7 +208,7 @@ public class VerdisUtils {
         }
 
         final int id = AbstractCidsBeanTable.getNextNewBeanId();
-        pasteBean.setProperty(KassenzeichenGeometriePropertyConstants.PROP__ID, id);
+        pasteBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ID, id);
         pasteBean.getMetaObject().setID(id);
         pasteBean.getMetaObject().forceStatus(MetaObject.NEW);
 
@@ -239,13 +230,13 @@ public class VerdisUtils {
         for (final CidsBean flaecheBean : flaecheBeans) {
             noFlaeche = false;
             final int a = (Integer)flaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                             + "."
-                            + FlaechenartPropertyConstants.PROP__ID);
+                            + VerdisConstants.PROP.FLAECHENART.ID);
             final String bezeichnung = (String)flaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
             if (bezeichnung == null) {
                 break;
             }
@@ -352,7 +343,7 @@ public class VerdisUtils {
     public static int getValidNummer(final Collection<CidsBean> frontBeans) {
         int highestNummer = 0;
         for (final CidsBean frontBean : frontBeans) {
-            final Integer nummer = (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
+            final Integer nummer = (Integer)frontBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
             if (nummer == null) {
                 break;
             }

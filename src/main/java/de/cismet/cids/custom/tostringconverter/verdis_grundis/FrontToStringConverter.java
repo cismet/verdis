@@ -25,7 +25,7 @@ package de.cismet.cids.custom.tostringconverter.verdis_grundis;
 
 import de.cismet.cids.tools.CustomToStringConverter;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -39,8 +39,7 @@ public class FrontToStringConverter extends CustomToStringConverter {
 
     @Override
     public String createString() {
-        final String result = String.valueOf(cidsBean.getProperty(
-                    FrontPropertyConstants.PROP__NUMMER));
+        final String result = String.valueOf(cidsBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER));
         return result;
     }
 }

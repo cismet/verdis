@@ -48,10 +48,7 @@ import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.utils.VerdisServerResources;
 
@@ -92,13 +89,13 @@ public class FlaechenReportBean extends EBReportBean {
             final boolean fillAbfluss) {
         super(properties, kassenzeichen, fillAbfluss);
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
 
         for (final CidsBean flaeche : flaechen) {
-            final String flaechenart = (String)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
+            final String flaechenart = (String)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
-                            + FlaechenartPropertyConstants.PROP__ART_ABKUERZUNG);
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                            + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
             if (flaechenart.equals("DF") || flaechenart.equals("GDF")) {
                 dachflaechen.add(flaeche);
             } else if (flaechenart.equals("VF") || flaechenart.equals("VFÖ") || flaechenart.equals("VFS")
@@ -170,7 +167,7 @@ public class FlaechenReportBean extends EBReportBean {
     public static Collection<Feature> createFeatures(final CidsBean kassenzeichenBean, final Properties properties) {
         final Collection<Feature> features = new ArrayList<>();
         final List<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
         final FlaecheFeatureRenderer fr = new FlaecheFeatureRenderer();
         final int fontSize = Integer.parseInt(properties.getProperty("annotationFontSize"));
         for (final CidsBean b : flaechen) {
@@ -179,8 +176,8 @@ public class FlaechenReportBean extends EBReportBean {
             } catch (final ConnectionException ex) {
                 LOG.error(ex, ex);
             }
-            final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
+            final Geometry g = (Geometry)b.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE + "." + "geo_field");
             final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
                     null,
                     "",
@@ -201,12 +198,12 @@ public class FlaechenReportBean extends EBReportBean {
             } catch (final ConnectionException ex) {
                 LOG.error(ex, ex);
             }
-            final Geometry g = (Geometry)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
+            final Geometry g = (Geometry)b.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE + "." + "geo_field");
             if (g != null) {
                 final Geometry xg = g.getInteriorPoint();
 
-                final String flaechenbez = (String)b.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                final String flaechenbez = (String)b.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
                 final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
                         null,
                         "",
@@ -246,9 +243,9 @@ public class FlaechenReportBean extends EBReportBean {
         @Override
         public int compare(final CidsBean df1, final CidsBean df2) {
             final Integer df1Name = Integer.parseInt((String)df1.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
+                        VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG));
             final Integer df2Name = Integer.parseInt((String)df2.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
+                        VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG));
 
             return df1Name.compareTo(df2Name);
         }
@@ -265,8 +262,8 @@ public class FlaechenReportBean extends EBReportBean {
 
         @Override
         public int compare(final CidsBean df1, final CidsBean df2) {
-            final String df1Name = (String)df1.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
-            final String df2Name = (String)df2.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+            final String df1Name = (String)df1.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+            final String df2Name = (String)df2.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
 
             return df1Name.compareTo(df2Name);
         }

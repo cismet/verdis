@@ -25,7 +25,7 @@ package de.cismet.cids.custom.tostringconverter.verdis_grundis;
 
 import de.cismet.cids.tools.CustomToStringConverter;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -40,7 +40,7 @@ public class KassenzeichenToStringConverter extends CustomToStringConverter {
     @Override
     public String createString() {
         final String result = String.valueOf(cidsBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
         return result;
     }
 }

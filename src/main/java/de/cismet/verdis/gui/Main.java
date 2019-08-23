@@ -230,23 +230,7 @@ import de.cismet.verdis.FrontenClipboard;
 import de.cismet.verdis.KassenzeichenGeometrienClipboard;
 import de.cismet.verdis.Version;
 
-import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.StrassePropertyConstants;
-import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
-import de.cismet.verdis.commons.constants.VeranlagungPropertyConstants;
-import de.cismet.verdis.commons.constants.VeranlagungseintragPropertyConstants;
-import de.cismet.verdis.commons.constants.VeranlagungsgrundlagePropertyConstants;
-import de.cismet.verdis.commons.constants.VeranlagungsnummerPropertyConstants;
-import de.cismet.verdis.commons.constants.VeranlagungspostenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
@@ -4148,7 +4132,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final Integer kassenzeichennummer8;
         if (getCidsBean() != null) {
             kassenzeichennummer8 = (Integer)getCidsBean().getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
         } else {
             kassenzeichennummer8 = null;
         }
@@ -4298,12 +4282,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                                     final CidsBean dummyKassenzeichenBean = CidsBean.createNewCidsBeanFromTableName(
                                             VerdisConstants.DOMAIN,
-                                            VerdisMetaClassConstants.MC_KASSENZEICHEN,
+                                            VerdisConstants.MC.KASSENZEICHEN,
                                             new HashMap<String, Object>() {
 
                                                 {
-                                                    put(KassenzeichenPropertyConstants.PROP__ID, kassenzeichenId);
-                                                    put(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER,
+                                                    put(VerdisConstants.PROP.KASSENZEICHEN.ID, kassenzeichenId);
+                                                    put(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER,
                                                         kassenzeichenNummer);
                                                 }
                                             });
@@ -4338,8 +4322,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void cmdOpenInD3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOpenInD3ActionPerformed
         if (kassenzeichenBean != null) {
-            final String kz = getCidsBean().getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER).toString();
+            final String kz = getCidsBean().getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)
+                        .toString();
             try {
                 final Runtime rt = Runtime.getRuntime();
                 final Process pr = rt.exec("clink.exe verdis " + kz);
@@ -4388,7 +4372,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final String oldKassenzeichen;
         if (current) {
             oldKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
         } else {
             oldKassenzeichen = JOptionPane.showInputDialog(
                     this,
@@ -4635,31 +4619,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final String veranlagungsdatum = "'" + vDat.format(cal.getTime()) + "'";
 
         final MetaObject kassenzeichenMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_KASSENZEICHEN)
+                    .getVerdisMetaClass(VerdisConstants.MC.KASSENZEICHEN)
                     .getEmptyInstance();
         final MetaObject kanalanschlussMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_KANALANSCHLUSS)
+                    .getVerdisMetaClass(VerdisConstants.MC.KANALANSCHLUSS)
                     .getEmptyInstance();
 
         final CidsBean kassenzeichen = kassenzeichenMo.getBean();
         final CidsBean kanalanschluss = kanalanschlussMo.getBean();
 
-        // TODO sobald die FEBs und DMS auf 8-stellige kassenzeichen umgestellt worden sind, kann diese zeile
-        // rausfliegen
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER_OLD, nummer);
-        // --
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER, nummer);
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS, kanalanschluss);
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__DATUM_VERANLAGUNG, veranlagungsdatum);
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG, erfassungsdatum);
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG, "");
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
-        kassenzeichen.setProperty(KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE, "");
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER, nummer);
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.KANALANSCHLUSS, kanalanschluss);
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.DATUM_VERANLAGUNG, veranlagungsdatum);
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.DATUM_ERFASSUNG, erfassungsdatum);
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG, "");
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.SPERRE, false);
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG_SPERRE, "");
         kassenzeichen.setProperty(
-            KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
+            VerdisConstants.PROP.KASSENZEICHEN.LETZTE_AENDERUNG_TIMESTAMP,
             new Timestamp(new java.util.Date().getTime()));
-        kassenzeichen.setProperty(
-            KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
+        kassenzeichen.setProperty(VerdisConstants.PROP.KASSENZEICHEN.LETZTE_AENDERUNG_USER,
             getUserString());
         return kassenzeichen;
     }
@@ -4714,12 +4693,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                             // kanalanschluss löschen
                             final CidsBean kanalanschlussBean = (CidsBean)kassenzeichenBean.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS);
+                                    VerdisConstants.PROP.KASSENZEICHEN.KANALANSCHLUSS);
                             if (kanalanschlussBean != null) {
                                 // befreiungen und erlaubnisse von kanalanschluss löschen
                                 final Collection<CidsBean> befUndErlBeans = (Collection<CidsBean>)
                                     kanalanschlussBean.getProperty(
-                                        KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
+                                        VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE);
                                 for (final CidsBean befUndErlBean : befUndErlBeans.toArray(new CidsBean[0])) {
                                     befUndErlBeans.remove(befUndErlBean);
                                 }
@@ -4951,15 +4930,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     boolean canAdd = true;
                     if (kassenzeichenBean != null) {
                         final Collection<CidsBean> flaechen = kassenzeichenBean.getBeanCollectionProperty(
-                                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
                         if ((flaechen.size() == 1)
                                     && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         == (Integer)flaechen.iterator().next().getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                             + "."
-                                            + FlaechenartPropertyConstants.PROP__ID))) {
+                                            + VerdisConstants.PROP.FLAECHENART.ID))) {
                             canAdd = false;
                         }
                     }
@@ -5022,11 +5001,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         || CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())));
         if (!b && CidsAppBackend.Mode.REGEN.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
-                        && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN)
+                        && !kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)
                         .isEmpty());
         } else if (!b && CidsAppBackend.Mode.SR.equals(CidsAppBackend.getInstance().getMode())) {
             cmdPdf.setEnabled((kassenzeichenBean != null)
-                        && !kassenzeichenBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__FRONTEN)
+                        && !kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FRONTEN)
                         .isEmpty());
         } else {
             cmdPdf.setEnabled(false);
@@ -5187,13 +5166,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final Map<String, Collection<Integer>> bezeichnungToKassenzeichennummerMap,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedFlaechen = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
         WaitDialog.getInstance().startCreateCrossLinks(savedFlaechen.size());
         for (int index = 0; index < savedFlaechen.size(); index++) {
             WaitDialog.getInstance().progressCreateCrossLinks(index);
             final CidsBean savedFlaeche = savedFlaechen.get(index);
             final String flaechenBezeichnung = (String)savedFlaeche.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
 
             // in der Map schauen ob für die abgespeicherte Flaechen ein Querverweis erzeugt werden soll
             if (bezeichnungToKassenzeichennummerMap.containsKey(flaechenBezeichnung)) {
@@ -5204,13 +5183,13 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     if (querverweisKassenzeichenBean != null) {
                         final Collection<CidsBean> flaechenOfQuerverweisKassenzeichen =
                             querverweisKassenzeichenBean.getBeanCollectionProperty(
-                                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
 
                         // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
                         final CidsBean flaechenartBean = (CidsBean)savedFlaeche.getProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                         + "."
-                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART);
+                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART);
                         final CidsBean querverweisFlaecheBean = RegenFlaechenTable.createNewFlaecheBean(
                                 flaechenartBean,
                                 flaechenOfQuerverweisKassenzeichen,
@@ -5218,8 +5197,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                         // Überschreiben der FlaechenInfo zum Erzeugen des Querverweises auf der neuen Flaeche.
                         querverweisFlaecheBean.setProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO,
-                            savedFlaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO));
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO,
+                            savedFlaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO));
 
                         flaechenOfQuerverweisKassenzeichen.add(querverweisFlaecheBean);
                     } else {
@@ -5242,7 +5221,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void createGeometrieCrosslinkKassenzeichenBeans(final CidsBean kassenzeichenBean,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedGeoms = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
 
         final Collection<CrossReference> crossrefs = CidsAppBackend.getInstance().getFlaechenCrossReferences();
 
@@ -5267,7 +5246,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             crossKassenzeichenList.add(crossKassenzeichen);
             final List<CidsBean> crossGeoms = crossKassenzeichen.getBeanCollectionProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
 
             // selbe Anzahl an KZ-Geometrien vorhanden ?
             boolean allSame = crossGeoms.size() == savedGeoms.size();
@@ -5295,7 +5274,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (answer == JOptionPane.YES_OPTION) {
                 for (final CidsBean crossKassenzeichen : crossKassenzeichenList) {
                     final List<CidsBean> crossGeoms = crossKassenzeichen.getBeanCollectionProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
                     // Querverweis-Kz-Geometrien ersetzen mit KZ-Geometrien
                     crossGeoms.clear();
                     crossGeoms.addAll(savedGeoms);
@@ -5319,13 +5298,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final Map<Integer, Collection<Integer>> nummerToKassenzeichennummerMap,
             final Map<Integer, CidsBean> crosslinkKassenzeichenBeanMap) throws Exception {
         final List<CidsBean> savedFronten = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
         WaitDialog.getInstance().startCreateCrossLinks(savedFronten.size());
         for (int index = 0; index < savedFronten.size(); index++) {
             WaitDialog.getInstance().progressCreateCrossLinks(index);
             final CidsBean savedFront = savedFronten.get(index);
-            final Integer frontNummer = (Integer)savedFront.getProperty(
-                    FrontPropertyConstants.PROP__NUMMER);
+            final Integer frontNummer = (Integer)savedFront.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
 
             // in der Map schauen ob für die abgespeicherte Front ein Querverweis erzeugt werden soll
             if (nummerToKassenzeichennummerMap.containsKey(frontNummer)) {
@@ -5336,21 +5314,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     if (querverweisKassenzeichenBean != null) {
                         final Collection<CidsBean> frontenOfQuerverweisKassenzeichen =
                             querverweisKassenzeichenBean.getBeanCollectionProperty(
-                                KassenzeichenPropertyConstants.PROP__FRONTEN);
+                                VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
 
                         // Neue Flaeche mit der selben Flaechenart wie die gespeicherte Flaeche erstellen.
                         final CidsBean strasseBean = (CidsBean)savedFront.getProperty(
-                                FrontPropertyConstants.PROP__FRONTINFO
+                                VerdisConstants.PROP.FRONT.FRONTINFO
                                         + "."
-                                        + FrontinfoPropertyConstants.PROP__STRASSE);
+                                        + VerdisConstants.PROP.FRONTINFO.STRASSE);
                         final CidsBean lageBean = (CidsBean)savedFront.getProperty(
-                                FrontPropertyConstants.PROP__FRONTINFO
+                                VerdisConstants.PROP.FRONT.FRONTINFO
                                         + "."
-                                        + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                                        + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
                         final CidsBean reinigungBean = (CidsBean)savedFront.getProperty(
-                                FrontPropertyConstants.PROP__FRONTINFO
+                                VerdisConstants.PROP.FRONT.FRONTINFO
                                         + "."
-                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                                        + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR);
                         final CidsBean querverweisFrontBean = SRFrontenTable.createNewFrontBean(
                                 strasseBean,
                                 lageBean,
@@ -5360,8 +5338,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                         // Überschreiben der FrontInfo zum Erzeugen des Querverweises auf der neuen Front.
                         querverweisFrontBean.setProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO,
-                            savedFront.getProperty(FrontPropertyConstants.PROP__FRONTINFO));
+                            VerdisConstants.PROP.FRONT.FRONTINFO,
+                            savedFront.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO));
 
                         frontenOfQuerverweisKassenzeichen.add(querverweisFrontBean);
                     } else {
@@ -5386,14 +5364,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         WaitDialog.getInstance().startSavingKassenzeichen(1);
 
         final Collection<CidsBean> flaecheBeans = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
         // set change date for flaechen
         for (final CidsBean flaecheBean : flaecheBeans) {
             if ((flaecheBean != null)
                         && ((flaecheBean.getMetaObject().getStatus() == MetaObject.MODIFIED)
                             || (flaecheBean.getMetaObject().getStatus() == MetaObject.NEW))) {
                 flaecheBean.setProperty(
-                    FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+                    VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG,
                     new java.sql.Date(Calendar.getInstance().getTime().getTime()));
             }
         }
@@ -5435,7 +5413,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
             if (flaecheBean != null) {
                 // Anteil gesetzt ?
-                allTeileigentum = flaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL) != null;
+                allTeileigentum = flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL) != null;
             }
         }
 
@@ -5500,7 +5478,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final HashMap<String, Collection<Integer>> bezeichnungToKassenzeichennummerMap = new HashMap<>();
         for (final CidsBean unsavedFlaecheBean : flaecheToKassenzeichenQuerverweisMap.keySet()) {
             final String flaechenBezeichnung = (String)unsavedFlaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
             final Collection<Integer> querverweisKassenzeichenNummer = flaecheToKassenzeichenQuerverweisMap.get(
                     unsavedFlaecheBean);
             bezeichnungToKassenzeichennummerMap.put(flaechenBezeichnung, querverweisKassenzeichenNummer);
@@ -5519,8 +5497,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final Map<CidsBean, Collection<Integer>> frontToKassenzeichenQuerverweisMap) {
         final HashMap<Integer, Collection<Integer>> nummerToKassenzeichennummerMap = new HashMap<>();
         for (final CidsBean unsavedFrontBean : frontToKassenzeichenQuerverweisMap.keySet()) {
-            final Integer frontNummer = (Integer)unsavedFrontBean.getProperty(
-                    FrontPropertyConstants.PROP__NUMMER);
+            final Integer frontNummer = (Integer)unsavedFrontBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
             final Collection<Integer> querverweisKassenzeichenNummer = frontToKassenzeichenQuerverweisMap.get(
                     unsavedFrontBean);
             nummerToKassenzeichennummerMap.put(frontNummer, querverweisKassenzeichenNummer);
@@ -5543,122 +5520,98 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final Date veranlagungsdatum,
             final CidsBean kassenzeichenBean) throws Exception {
         final MetaObject veranlagungseintragMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNGSEINTRAG)
+                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSEINTRAG)
                     .getEmptyInstance();
         final MetaObject veranlagungspostenMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNGSPOSTEN)
+                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSPOSTEN)
                     .getEmptyInstance();
 
         final MetaObject veranlagungMo = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNG)
+                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNG)
                     .getEmptyInstance();
         final CidsBean veranlagungBean = veranlagungMo.getBean();
-        veranlagungBean.setProperty(VeranlagungPropertyConstants.PROP__KASSENZEICHEN, kassenzeichenBean);
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__DATUM,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.KASSENZEICHEN, kassenzeichenBean);
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.DATUM,
             new java.sql.Date(datum.getTime()));
         veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__VERANLAGUNGSDATUM,
+            VerdisConstants.PROP.VERANLAGUNG.VERANLAGUNGSDATUM,
             new java.sql.Date(veranlagungsdatum.getTime()));
         veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G_200,
+            VerdisConstants.PROP.VERANLAGUNG.G_200,
             changedVeranlagungSummeMap.get("null--200"));
         veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G_100,
+            VerdisConstants.PROP.VERANLAGUNG.G_100,
             changedVeranlagungSummeMap.get("null--100"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G305,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G305,
             changedVeranlagungSummeMap.get("A1-305"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G306,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G306,
             changedVeranlagungSummeMap.get("Z1-306"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G310,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G310,
             changedVeranlagungSummeMap.get("A1V-310"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G311,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G311,
             changedVeranlagungSummeMap.get("Z1V-311"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G315,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G315,
             changedVeranlagungSummeMap.get("A2-315"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G320,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G320,
             changedVeranlagungSummeMap.get("A2V-320"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G321,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G321,
             changedVeranlagungSummeMap.get("A3-321"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G322,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G322,
             changedVeranlagungSummeMap.get("A3V-322"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G325,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G325,
             changedVeranlagungSummeMap.get("B1-325"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G330,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G330,
             changedVeranlagungSummeMap.get("B1V-330"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G335,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G335,
             changedVeranlagungSummeMap.get("B2-335"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G340,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G340,
             changedVeranlagungSummeMap.get("B2V-340"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G345,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G345,
             changedVeranlagungSummeMap.get("D1-345"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G350,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G350,
             changedVeranlagungSummeMap.get("D2-350"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G361,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G361,
             changedVeranlagungSummeMap.get("P1-361"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G362,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G362,
             changedVeranlagungSummeMap.get("P2-362"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G710,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G710,
             changedVeranlagungSummeMap.get("710-DF"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G715,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G715,
             changedVeranlagungSummeMap.get("715-GDF"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G720,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G720,
             changedVeranlagungSummeMap.get("720-VF"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G725,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G725,
             changedVeranlagungSummeMap.get("725-VFÖ"));
         veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G730,
+            VerdisConstants.PROP.VERANLAGUNG.G730,
             changedVeranlagungSummeMap.get("730-Va-über"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G740,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G740,
             changedVeranlagungSummeMap.get("740-VFS"));
-        veranlagungBean.setProperty(
-            VeranlagungPropertyConstants.PROP__G999,
+        veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G999,
             changedVeranlagungSummeMap.get("999-Rest"));
 
         veranlagungBean.persist();
 
         final CidsBean veranlagungseintragBean = veranlagungseintragMo.getBean();
-        veranlagungseintragBean.setProperty(
-            VeranlagungseintragPropertyConstants.PROP__KASSENZEICHEN,
+        veranlagungseintragBean.setProperty(VerdisConstants.PROP.VERANLAGUNGSEINTRAG.KASSENZEICHEN,
             kassenzeichenBean);
         veranlagungseintragBean.setProperty(
-            VeranlagungseintragPropertyConstants.PROP__DATUM,
+            VerdisConstants.PROP.VERANLAGUNGSEINTRAG.DATUM,
             new java.sql.Date(datum.getTime()));
         veranlagungseintragBean.setProperty(
-            VeranlagungseintragPropertyConstants.PROP__VERANLAGUNGSDATUM,
+            VerdisConstants.PROP.VERANLAGUNGSEINTRAG.VERANLAGUNGSDATUM,
             new java.sql.Date(veranlagungsdatum.getTime()));
 
         for (final String key : changedVeranlagungSummeMap.keySet()) {
             final CidsBean veranlagungspostenBean = veranlagungspostenMo.getBean();
             veranlagungspostenBean.setProperty(
-                VeranlagungspostenPropertyConstants.PROP__VERANLAGUNGSNUMMER,
+                VerdisConstants.PROP.VERANLAGUNGSPOSTEN.VERANLAGUNGSNUMMER,
                 veranlagungsnummern.get(key));
             veranlagungspostenBean.setProperty(
-                VeranlagungspostenPropertyConstants.PROP__WERT,
+                VerdisConstants.PROP.VERANLAGUNGSPOSTEN.WERT,
                 changedVeranlagungSummeMap.get(key));
 
-            veranlagungseintragBean.getBeanCollectionProperty(VeranlagungseintragPropertyConstants.PROP__POSTEN)
+            veranlagungseintragBean.getBeanCollectionProperty(VerdisConstants.PROP.VERANLAGUNGSEINTRAG.POSTEN)
                     .add(veranlagungspostenBean);
         }
 
@@ -5699,11 +5652,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                     savedKassenzeichenBean);
 
                                 savedKassenzeichenBean.setProperty(
-                                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                    VerdisConstants.PROP.KASSENZEICHEN.VERANLAGUNGSZETTEL,
                                     null);
-                                savedKassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, false);
+                                savedKassenzeichenBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN.SPERRE, false);
                                 savedKassenzeichenBean.setProperty(
-                                    KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                    VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG_SPERRE,
                                     "");
                             } catch (Exception ex) {
                                 LOG.error("error while storing veranlagung", ex);
@@ -5712,11 +5665,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             try {
                                 final String veranlagungszettel = assessmentDialog.getZettelHtml();
                                 savedKassenzeichenBean.setProperty(
-                                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL,
+                                    VerdisConstants.PROP.KASSENZEICHEN.VERANLAGUNGSZETTEL,
                                     veranlagungszettel);
-                                savedKassenzeichenBean.setProperty(KassenzeichenPropertyConstants.PROP__SPERRE, true);
+                                savedKassenzeichenBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN.SPERRE, true);
                                 savedKassenzeichenBean.setProperty(
-                                    KassenzeichenPropertyConstants.PROP__BEMERKUNG_SPERRE,
+                                    VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG_SPERRE,
                                     "beim letzten Speichern nicht veranlagt");
                             } catch (Exception ex) {
                                 LOG.error("error while storing veranlagungszettel", ex);
@@ -5771,10 +5724,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private CidsBean persistKassenzeichen(final CidsBean kassenzeichenBean) throws Exception {
         try {
             kassenzeichenBean.setProperty(
-                KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_TIMESTAMP,
+                VerdisConstants.PROP.KASSENZEICHEN.LETZTE_AENDERUNG_TIMESTAMP,
                 new Timestamp(new java.util.Date().getTime()));
-            kassenzeichenBean.setProperty(
-                KassenzeichenPropertyConstants.PROP__LETZTE_AENDERUNG_USER,
+            kassenzeichenBean.setProperty(VerdisConstants.PROP.KASSENZEICHEN.LETZTE_AENDERUNG_USER,
                 getUserString());
         } catch (Exception ex) {
             LOG.error("error while setting letzte aenderung", ex);
@@ -5791,7 +5743,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().setCidsBean(kassenzeichenBean);
 
         final String refreshingKassenzeichen = Integer.toString((Integer)kassenzeichenBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
         if (refreshingKassenzeichen == null) {
             getKassenzeichenPanel().refresh();
         } else {
@@ -6007,23 +5959,23 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void initVeranlagung() {
         final MetaClass veranlagungsgrundlageMc = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNGSGRUNDLAGE);
+                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSGRUNDLAGE);
         final MetaClass veranlagungsnummerMc = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_VERANLAGUNGSNUMMER);
+                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSNUMMER);
         final MetaObject[] veranlagungsgrundlageMos = CidsAppBackend.getInstance()
                     .getMetaObject(""
                         + "SELECT " + veranlagungsgrundlageMc.getId() + ", grundlage."
-                        + VeranlagungsgrundlagePropertyConstants.PROP__ID + " "
+                        + VerdisConstants.PROP.VERANLAGUNGSGRUNDLAGE.ID + " "
                         + "FROM " + veranlagungsgrundlageMc.getTableName() + " AS grundlage, "
                         + veranlagungsnummerMc.getTableName() + " AS nummer "
-                        + "WHERE grundlage." + VeranlagungsgrundlagePropertyConstants.PROP__VERANLAGUNGSNUMMER
-                        + " = nummer." + VeranlagungsnummerPropertyConstants.PROP__ID + " "
-                        + "ORDER BY nummer." + VeranlagungsnummerPropertyConstants.PROP__BEZEICHNER,
+                        + "WHERE grundlage." + VerdisConstants.PROP.VERANLAGUNGSGRUNDLAGE.VERANLAGUNGSNUMMER
+                        + " = nummer." + VerdisConstants.PROP.VERANLAGUNGSNUMMER.ID + " "
+                        + "ORDER BY nummer." + VerdisConstants.PROP.VERANLAGUNGSNUMMER.BEZEICHNER,
                         VerdisConstants.DOMAIN);
 
         final MetaObject[] veranlagungsnummerMos = CidsAppBackend.getInstance()
                     .getMetaObject("SELECT " + veranlagungsnummerMc.getId() + ", "
-                        + VeranlagungsnummerPropertyConstants.PROP__ID + " "
+                        + VerdisConstants.PROP.VERANLAGUNGSNUMMER.ID + " "
                         + "FROM " + veranlagungsnummerMc.getTableName(),
                         VerdisConstants.DOMAIN);
 
@@ -6039,7 +5991,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         for (final MetaObject veranlagungsnummerMo : veranlagungsnummerMos) {
             final CidsBean veranlagungsnummerBean = veranlagungsnummerMo.getBean();
             final String mapKey = (String)veranlagungsnummerBean.getProperty(
-                    VeranlagungsnummerPropertyConstants.PROP__BEZEICHNER);
+                    VerdisConstants.PROP.VERANLAGUNGSNUMMER.BEZEICHNER);
 
             veranlagungsnummern.put(mapKey, veranlagungsnummerBean);
         }
@@ -6068,19 +6020,19 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void fillFlaechenVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap) {
         final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
 
         for (final CidsBean flaeche : flaechen) {
-            final Float anteil = (Float)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
-            final Integer flaechenart = (Integer)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
-                            + FlaechenartPropertyConstants.PROP__ID);
+            final Float anteil = (Float)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL);
+            final Integer flaechenart = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                            + VerdisConstants.PROP.FLAECHENART.ID);
             final Integer anschlussgrad = (Integer)flaeche.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                             + "."
-                            + AnschlussgradPropertyConstants.PROP__ID);
+                            + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
 
             final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
@@ -6097,9 +6049,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (anteil == null) {
                 try {
                     groesse = (Integer)flaeche.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                     + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
                 } catch (final Exception e) {
                     groesse = 0;
                 }
@@ -6126,26 +6078,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void fillFlaechenAnschlussgradSummeMap(final Map<String, Double> flaechenAnschlussgradSummeMap) {
         final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
 
         for (final CidsBean flaeche : flaechen) {
-            final Float anteil = (Float)flaeche.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
-            final Integer flaechenart = (Integer)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
-                            + FlaechenartPropertyConstants.PROP__ID);
+            final Float anteil = (Float)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL);
+            final Integer flaechenart = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                            + VerdisConstants.PROP.FLAECHENART.ID);
             final Integer anschlussgrad = (Integer)flaeche.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                             + "."
-                            + AnschlussgradPropertyConstants.PROP__ID);
+                            + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
             final String anschlussgradKey = (String)flaeche.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                             + "."
-                            + AnschlussgradPropertyConstants.PROP__GRAD_ABKUERZUNG);
+                            + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
 
             final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
             final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
@@ -6154,9 +6106,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final double groesse;
             if (anteil == null) {
                 groesse = (Integer)flaeche.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
             } else {
                 groesse = anteil.doubleValue();
             }
@@ -6186,43 +6138,43 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void fillStrasseSummeMap(final Map<String, Double> strasseSummeMap) {
         final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
 
         for (final CidsBean front : fronten) {
             int laenge;
             try {
-                laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                laenge = (Integer)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
             } catch (final Exception e) {
                 laenge = 0;
             }
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
+                    VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
             final String key;
             final Integer schluessel;
             if (satzung_strassenreinigung == null) {
-                key = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                                + StrassenreinigungPropertyConstants.PROP__KEY);
-                schluessel = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                                + StrassenreinigungPropertyConstants.PROP__SCHLUESSEL);
+                key = (String)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                                + VerdisConstants.PROP.STRASSENREINIGUNG.KEY);
+                schluessel = (Integer)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                                + VerdisConstants.PROP.STRASSENREINIGUNG.SCHLUESSEL);
             } else {
                 key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
                 schluessel = (Integer)satzung_strassenreinigung.getProperty("sr_klasse.schluessel");
             }
-            final String strasseName = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__STRASSE + "." + StrassePropertyConstants.PROP__NAME);
+            final String strasseName = (String)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.STRASSE + "." + VerdisConstants.PROP.STRASSE.NAME);
             final String strasseKeyName;
             if (strasseName == null) {
                 strasseKeyName = "<keine>";
             } else {
-                final Integer strasseKey = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__STRASSE + "."
-                                + StrassePropertyConstants.PROP__SCHLUESSEL);
+                final Integer strasseKey = (Integer)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.STRASSE + "."
+                                + VerdisConstants.PROP.STRASSE.SCHLUESSEL);
                 strasseKeyName = "#" + StringUtils.leftPad(String.valueOf(strasseKey), 4, "0") + "  " + strasseName;
             }
 
@@ -6239,30 +6191,30 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void fillStrassenreinigungSummeMap(final Map<String, Double> srSummeMap) {
         final List<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
 
         for (final CidsBean front : fronten) {
             int laenge;
             try {
-                laenge = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                laenge = (Integer)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
             } catch (final Exception e) {
                 laenge = 0;
             }
 
             final CidsBean satzung_strassenreinigung = (CidsBean)front.getProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
+                    VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
             final String key;
             final Integer schluessel;
             if (satzung_strassenreinigung == null) {
-                key = (String)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                                + StrassenreinigungPropertyConstants.PROP__KEY);
-                schluessel = (Integer)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                                + StrassenreinigungPropertyConstants.PROP__SCHLUESSEL);
+                key = (String)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                                + VerdisConstants.PROP.STRASSENREINIGUNG.KEY);
+                schluessel = (Integer)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                                + VerdisConstants.PROP.STRASSENREINIGUNG.SCHLUESSEL);
             } else {
                 key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
                 schluessel = (Integer)satzung_strassenreinigung.getProperty("sr_klasse.schluessel");

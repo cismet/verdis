@@ -46,13 +46,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.ClipboardListener;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.ArbeitspaketEintragPropertyConstants;
-import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import static de.cismet.verdis.CidsAppBackend.Mode.ALLGEMEIN;
 import static de.cismet.verdis.CidsAppBackend.Mode.REGEN;
@@ -159,9 +153,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                             renderer.setText(
                                 Integer.toString(
                                     (Integer)cidsBean.getProperty(
-                                        ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER)));
+                                        VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER)));
                             final Boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
-                                    ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+                                    VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET);
                             if ((istAbgearbeitet != null) && istAbgearbeitet) {
                                 renderer.setEnabled(false);
                             }
@@ -730,7 +724,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     switch (CidsAppBackend.getInstance().getMode()) {
                         case REGEN: {
                             targetCollection = kassenzeichen.getBeanCollectionProperty(
-                                    KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                                    VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
                             newBean = VerdisUtils.createPastedFlaecheBean(
                                     beanToPaste,
                                     targetCollection,
@@ -739,7 +733,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                         break;
                         case SR: {
                             targetCollection = kassenzeichen.getBeanCollectionProperty(
-                                    KassenzeichenPropertyConstants.PROP__FRONTEN);
+                                    VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
                             newBean = VerdisUtils.createPastedFrontBean(
                                     beanToPaste,
                                     targetCollection,
@@ -750,8 +744,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                             targetCollection = Main.getInstance().getBefreiungerlaubnisTable().getSelectedBeans()
                                         .iterator()
                                         .next()
-                                        .getBeanCollectionProperty(
-                                                BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN);
+                                        .getBeanCollectionProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GEOMETRIEN);
                             newBean = VerdisUtils.createPastedBefreiungerlaubnisGeometrieBean(
                                     beanToPaste,
                                     targetCollection,
@@ -760,7 +753,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                         break;
                         case ALLGEMEIN: {
                             targetCollection = kassenzeichen.getBeanCollectionProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
                             newBean = VerdisUtils.createPastedInfoBean(beanToPaste);
                         }
                         break;
@@ -873,8 +866,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         } else {
             final DefaultListModel tmpModel = new DefaultListModel();
             for (final CidsBean element
-                        : selectedItem.getBeanCollectionProperty(
-                            ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN)) {
+                        : selectedItem.getBeanCollectionProperty(VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN)) {
                 tmpModel.addElement(element);
                 lstKassenzeichen.setModel(tmpModel);
             }
@@ -912,7 +904,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                         final int tmpCount = ++count;
                         final CidsBean kassenzeichenNummer = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
                         kassenzeichenNummer.setProperty(
-                            ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET,
+                            VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET,
                             checked);
                         final CidsBean persistedBean = kassenzeichenNummer.persist();
 
@@ -996,9 +988,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
      */
     private void reloadArbeitsPakete() {
         final String query = "SELECT "
-                    + CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ARBEITSPAKET).getId()
-                    + ", " + VerdisMetaClassConstants.MC_ARBEITSPAKET + ".id "
-                    + "FROM " + VerdisMetaClassConstants.MC_ARBEITSPAKET + " "
+                    + CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.ARBEITSPAKET).getId()
+                    + ", " + VerdisConstants.MC.ARBEITSPAKET + ".id "
+                    + "FROM " + VerdisConstants.MC.ARBEITSPAKET + " "
                     + "WHERE fk_user = " + SessionManager.getSession().getUser().getId() + ";";
         ((DefaultComboBoxModel)jComboBox1.getModel()).removeAllElements();
         ((DefaultComboBoxModel)jComboBox1.getModel()).addElement(null);
@@ -1101,13 +1093,12 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         final List<CidsBean> kassenzeichennummern = new ArrayList<CidsBean>();
         for (final Integer kassenzeichen : kassenzeichenList) {
             final CidsBean newBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(
-                            VerdisMetaClassConstants.MC_ARBEITSPAKET_EINTRAG)
+                        .getVerdisMetaClass(VerdisConstants.MC.ARBEITSPAKET_EINTRAG)
                         .getEmptyInstance()
                         .getBean();
             try {
-                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER, kassenzeichen);
-                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET, false);
+                newBean.setProperty(VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER, kassenzeichen);
+                newBean.setProperty(VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET, false);
             } catch (Exception ex) {
                 LOG.warn(ex, ex);
             }
@@ -1143,7 +1134,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         final CidsBean arbeitspaketEintrag = (CidsBean)lstKassenzeichen.getSelectedValue();
         if (arbeitspaketEintrag != null) {
             final Integer kassenzeichen = (Integer)arbeitspaketEintrag.getProperty(
-                    ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
             if (kassenzeichen != null) {
                 CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
             }
@@ -1182,9 +1173,9 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     @Override
                     public int compare(final CidsBean o1, final CidsBean o2) {
                         final Integer i1 = (Integer)o1.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
                         final Integer i2 = (Integer)o2.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
                         return i1.compareTo(i2);
                     }
                 });
@@ -1216,7 +1207,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         this.cidsBean = cidsBean;
         if (jCheckBox1.isSelected() && (previousBean != null) && !previousBean.equals(cidsBean)) {
             final Integer previousKassenzeichen = (Integer)previousBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
             addOneKassenzeichenToList(previousKassenzeichen);
         }
     }
@@ -1246,7 +1237,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
             final CidsBean cidsBean = (CidsBean)value;
 
             final Boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
-                    ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+                    VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET);
             jToggleButton1.setSelected((istAbgearbeitet != null) && istAbgearbeitet);
         }
 
@@ -1342,12 +1333,12 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                             switch (CidsAppBackend.getInstance().getMode()) {
                                                 case REGEN: {
                                                     infoBeans.add((CidsBean)entity.getProperty(
-                                                            FlaechePropertyConstants.PROP__FLAECHENINFO));
+                                                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO));
                                                 }
                                                 break;
                                                 case SR: {
                                                     infoBeans.add((CidsBean)entity.getProperty(
-                                                            FrontPropertyConstants.PROP__FRONTINFO));
+                                                            VerdisConstants.PROP.FRONT.FRONTINFO));
                                                 }
                                                 break;
                                             }
@@ -1358,10 +1349,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                             case REGEN: {
                                                 for (final CidsBean flaeche
                                                             : kassenzeichenBean.getBeanCollectionProperty(
-                                                                KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                                                                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
                                                     if (infoBeans.contains(
                                                                     (CidsBean)flaeche.getProperty(
-                                                                        FlaechePropertyConstants.PROP__FLAECHENINFO))) {
+                                                                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO))) {
                                                         count++;
                                                     }
                                                 }
@@ -1370,10 +1361,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                             case SR: {
                                                 for (final CidsBean front
                                                             : kassenzeichenBean.getBeanCollectionProperty(
-                                                                KassenzeichenPropertyConstants.PROP__FLAECHEN)) {
+                                                                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
                                                     if (infoBeans.contains(
                                                                     (CidsBean)front.getProperty(
-                                                                        FrontPropertyConstants.PROP__FRONTINFO))) {
+                                                                        VerdisConstants.PROP.FRONT.FRONTINFO))) {
                                                         count++;
                                                     }
                                                 }
@@ -1463,7 +1454,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 final List<Integer> kassenzeichenToLockOrRelease = new ArrayList<Integer>();
                 final Integer mainToLock = (Integer)Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
                             .getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
                 if (visible) {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -1484,7 +1475,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     for (final int index : lstKassenzeichen.getSelectedIndices()) {
                         final CidsBean arbeitspaketEintrag = (CidsBean)lstKassenzeichen.getModel().getElementAt(index);
                         final Integer kassenzeichenNummer = (Integer)arbeitspaketEintrag.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
                         kassenzeichenToLockOrRelease.add(kassenzeichenNummer);
                     }
 
@@ -1493,7 +1484,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     for (int index = 0; index < jList2.getModel().getSize(); index++) {
                         final CidsBean kassenzeichenBean = ((CidsBean)jList2.getModel().getElementAt(index));
                         kassenzeichenToLockOrRelease.add((Integer)kassenzeichenBean.getProperty(
-                                KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
                     }
                     lock(false, mainToLock, kassenzeichenToLockOrRelease);
                 }

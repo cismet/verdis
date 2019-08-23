@@ -160,7 +160,7 @@
                 </BindingProperty>
               </BindingProperties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_NUTZUNG));"/>
+                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboNutzung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_NUTZUNG));"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
               </AuxValues>
               <Constraints>
@@ -195,7 +195,7 @@
                 </BindingProperty>
               </BindingProperties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG));"/>
+                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG));"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
               </AuxValues>
               <Constraints>
@@ -221,7 +221,7 @@
                 <BindingProperty name="selectedItem" source="Form" sourcePath="${cidsBean.typ_versickerung}" target="cboTypVersickerung" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
               </BindingProperties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG));"/>
+                <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="((DefaultBindableReferenceCombo)cboTypEinleitung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG));"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo()"/>
               </AuxValues>
               <Constraints>

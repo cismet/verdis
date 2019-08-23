@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
@@ -64,7 +63,7 @@ import de.cismet.validation.validator.AggregatedValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.*;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanWithGeometryTable;
 import de.cismet.verdis.gui.Main;
@@ -201,19 +200,19 @@ public class BefreiungerlaubnisGeometrieTable extends AbstractCidsBeanWithGeomet
      */
     public static CidsBean createNewBean(final Geometry geom) throws Exception {
         final CidsBean beferBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE)
+                    .getVerdisMetaClass(VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
 
         final int newId = getNextNewBeanId();
-        beferBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__ID, newId);
+        beferBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.ID, newId);
         beferBean.getMetaObject().setID(newId);
 
-        beferBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE, geomBean);
+        beferBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE, geomBean);
 
         if (geom != null) {
             try {
@@ -233,12 +232,12 @@ public class BefreiungerlaubnisGeometrieTable extends AbstractCidsBeanWithGeomet
         final CidsBean parentBean = (Main.getInstance().getBefreiungerlaubnisTable().getSelectedBeans().size() == 1)
             ? Main.getInstance().getBefreiungerlaubnisTable().getSelectedBeans().iterator().next() : null;
         final boolean isVersickerung = (parentBean != null)
-                    && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                    && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                    && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                    && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                     .startsWith("747-");
         final boolean isEinleitung = (parentBean != null)
-                    && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                    && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                    && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                    && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                     .startsWith("748-");
 
         final NewBefreiungerlaubnisGeometrieDialog dialog = new NewBefreiungerlaubnisGeometrieDialog(isVersickerung);
@@ -259,9 +258,9 @@ public class BefreiungerlaubnisGeometrieTable extends AbstractCidsBeanWithGeomet
 
             final CidsBean beferBean = createNewBean(geom);
             if (isVersickerung) {
-                beferBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_VERSICKERUNG, artBean);
+                beferBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_VERSICKERUNG, artBean);
             } else if (isEinleitung) {
-                beferBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_EINLEITUNG, artBean);
+                beferBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_EINLEITUNG, artBean);
             }
             return beferBean;
         } else {
@@ -283,7 +282,7 @@ public class BefreiungerlaubnisGeometrieTable extends AbstractCidsBeanWithGeomet
             if (selectedFeature instanceof CidsFeature) {
                 for (final CidsBean parentBean : befreiungerlaubnisTable.getAllBeans()) {
                     final CidsBean childBean = ((CidsFeature)selectedFeature).getMetaObject().getBean();
-                    if (parentBean.getBeanCollectionProperty(BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN)
+                    if (parentBean.getBeanCollectionProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GEOMETRIEN)
                                 .contains(childBean)) {
                         parentBeans.add(parentBean);
                     }
@@ -312,7 +311,7 @@ public class BefreiungerlaubnisGeometrieTable extends AbstractCidsBeanWithGeomet
         this.cidsBean = cidsBean;
 
         if (cidsBean != null) {
-            setCidsBeans(cidsBean.getBeanCollectionProperty(BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN));
+            setCidsBeans(cidsBean.getBeanCollectionProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GEOMETRIEN));
         } else {
             setCidsBeans(new ArrayList<CidsBean>());
         }

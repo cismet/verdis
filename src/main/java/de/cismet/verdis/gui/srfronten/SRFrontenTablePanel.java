@@ -30,8 +30,7 @@ import de.cismet.tools.NumberStringComparator;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
@@ -299,8 +298,8 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
 
             if (!Objects.equals(oldGrafik, newGrafik)) {
                 try {
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                         newGrafik);
                 } catch (final Exception ex) {
                     LOG.warn(ex, ex);
@@ -308,8 +307,8 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
             }
             if (!Objects.equals(oldKorrektur, newKorrektur)) {
                 try {
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
                         newKorrektur);
                 } catch (final Exception ex) {
                     LOG.warn(ex, ex);
@@ -382,16 +381,16 @@ public class SRFrontenTablePanel extends AbstractCidsBeanTablePanel {
 
             final Geometry geom = sRFrontenTable1.getGeometry(cidsBean);
 
-            final Integer oldGrafik = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
-            final Integer oldKorrektur = (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+            final Integer oldGrafik = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK);
+            final Integer oldKorrektur = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
             final Integer newGrafik = (geom != null) ? (int)geom.getLength() : 0;
             final Integer newKorrektur = (oldKorrektur == oldGrafik) ? newGrafik : oldKorrektur;
 
             switch (columnIndex) {
                 case 0: {
-                    return (Integer)cidsBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
+                    return (Integer)cidsBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
                 }
                 case 1: {
                     return oldGrafik;

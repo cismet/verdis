@@ -27,8 +27,7 @@ import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
 
@@ -92,12 +91,12 @@ public class FlaechenClipboard extends AbstractClipboard {
         }
 
         for (final CidsBean flaecheBean : getComponent().getAllBeans()) {
-            final int id = (Integer)flaecheBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__ID);
+            final int id = (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.ID);
             final int ownId = (Integer)clipboardFlaecheBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__ID);
+                            + VerdisConstants.PROP.FLAECHENINFO.ID);
             if (id == ownId) {
                 return false;
             }
