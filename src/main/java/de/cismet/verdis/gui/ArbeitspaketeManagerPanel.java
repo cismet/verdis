@@ -18,8 +18,6 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Color;
 import java.awt.Component;
 
@@ -54,9 +52,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.ArbeitspaketEintragPropertyConstants;
-import de.cismet.verdis.commons.constants.ArbeitspaketPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.search.KassenzeichenlistSearchStatement;
 
@@ -109,8 +105,8 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
 
                         @Override
                         public void run() {
-                            if (evt.getPropertyName().equals(ArbeitspaketPropertyConstants.PROP__NAME)
-                                        || evt.getPropertyName().equals(ArbeitspaketPropertyConstants.PROP__FK_USER)) {
+                            if (evt.getPropertyName().equals(VerdisConstants.PROP.ARBEITSPAKET.NAME)
+                                        || evt.getPropertyName().equals(VerdisConstants.PROP.ARBEITSPAKET.FK_USER)) {
                                 pakedDataChanged();
                             }
                         }
@@ -164,7 +160,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     private ArbeitspaketeManagerPanel() {
         MetaClass mcArbeitspaket;
         try {
-            mcArbeitspaket = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ARBEITSPAKET);
+            mcArbeitspaket = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.ARBEITSPAKET);
         } catch (final Exception ex) {
             LOG.warn(ex, ex);
             mcArbeitspaket = null;
@@ -174,7 +170,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         MetaClass mcArbeitspaketEintrag;
         try {
             mcArbeitspaketEintrag = CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_ARBEITSPAKET_EINTRAG);
+                        .getVerdisMetaClass(VerdisConstants.MC.ARBEITSPAKET_EINTRAG);
         } catch (final Exception ex) {
             LOG.warn(ex, ex);
             mcArbeitspaketEintrag = null;
@@ -214,9 +210,9 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                         renderer.setText(
                             Integer.toString(
                                 (Integer)cidsBean.getProperty(
-                                    ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER)));
+                                    VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER)));
                         final Boolean istAbgearbeitet = (Boolean)cidsBean.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET);
                         if ((istAbgearbeitet != null) && istAbgearbeitet) {
                             renderer.setEnabled(false);
                         }
@@ -352,11 +348,11 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     final List<CidsBean> coll = CidsAppBackend.getInstance().getArbeitspakete();
                     for (final CidsBean arbeitspaket : coll) {
                         final List<CidsBean> nummern = arbeitspaket.getBeanCollectionProperty(
-                                ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN);
+                                VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN);
                         int countAbgearbeitet = 0;
                         for (final CidsBean nummer : nummern) {
                             final Boolean isAbgearbeitet = (Boolean)nummer.getProperty(
-                                    ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET);
+                                    VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET);
                             if ((isAbgearbeitet != null) && isAbgearbeitet.equals(true)) {
                                 countAbgearbeitet++;
                             }
@@ -960,7 +956,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
      */
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         final List<CidsBean> eintraege = selectedPaket.getBeanCollectionProperty(
-                ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN);
+                VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN);
 
         for (final Object entry : jList2.getSelectedValuesList()) {
             eintraege.remove((CidsBean)entry);
@@ -1103,8 +1099,8 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         for (final Integer kassenzeichen : kassenzeichenList) {
             final CidsBean newBean = mcArbeitspaketEintrag.getEmptyInstance().getBean();
             try {
-                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER, kassenzeichen);
-                newBean.setProperty(ArbeitspaketEintragPropertyConstants.PROP__IST_ABGEARBEITET, false);
+                newBean.setProperty(VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER, kassenzeichen);
+                newBean.setProperty(VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.IST_ABGEARBEITET, false);
             } catch (Exception ex) {
                 LOG.warn(ex, ex);
             }
@@ -1125,7 +1121,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     private int setKassenzeichenList(final List<CidsBean> kassenzeichennummern, final boolean removeOld) {
         int counter = 0;
         final List<CidsBean> eintraege = selectedPaket.getBeanCollectionProperty(
-                ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN);
+                VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN);
         if (removeOld) {
             eintraege.clear();
         }
@@ -1136,9 +1132,9 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     @Override
                     public int compare(final CidsBean o1, final CidsBean o2) {
                         final Integer i1 = (Integer)o1.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
                         final Integer i2 = (Integer)o2.getProperty(
-                                ArbeitspaketEintragPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                                VerdisConstants.PROP.ARBEITSPAKET_EINTRAG.KASSENZEICHENNUMMER);
                         return i1.compareTo(i2);
                     }
                 });
@@ -1208,13 +1204,13 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
             if (cidsBean == null) {
                 return null;
             }
-            final Integer id = (Integer)cidsBean.getProperty(ArbeitspaketPropertyConstants.PROP__ID);
-            final String bezeichnung = (String)cidsBean.getProperty(ArbeitspaketPropertyConstants.PROP__NAME);
-            final CidsBean fkUser = (CidsBean)cidsBean.getProperty(ArbeitspaketPropertyConstants.PROP__FK_USER);
+            final Integer id = (Integer)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.ID);
+            final String bezeichnung = (String)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.NAME);
+            final CidsBean fkUser = (CidsBean)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.FK_USER);
             final String benutzer = (fkUser == null) ? "" : (String)fkUser.getProperty("login_name");
             final Integer countAbgearbeitet = abgearbeitetMap.get(cidsBean);
             final int countGesamt = cidsBean.getBeanCollectionProperty(
-                    ArbeitspaketPropertyConstants.PROP__KASSENZEICHENNUMMERN)
+                    VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN)
                         .size();
             switch (columnIndex) {
                 case 0: {

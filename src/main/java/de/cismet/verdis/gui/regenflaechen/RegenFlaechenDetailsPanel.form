@@ -104,7 +104,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG" type="code"/>
+                    <Connection code="VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -117,8 +117,9 @@
             <Component class="javax.swing.JTextField" name="txtGroesseGrafik">
               <BindingProperties>
                 <BindingProperty name="text" source="Form" sourcePath="${cidsBean.flaecheninfo.groesse_aus_grafik}" target="txtGroesseGrafik" targetPath="text" updateStrategy="0" immediately="false">
+                  <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="FlaechePropertyConstants.PROP__FLAECHENINFO&#xa;                        + &quot;.&quot;&#xa;                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK" type="code"/>
+                    <Connection code="VerdisConstants.PROP.FLAECHE.FLAECHENINFO + &quot;.&quot; + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -138,7 +139,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__FLAECHENINFO + &quot;.&quot; + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR" type="code"/>
+                    <Connection code="VerdisConstants.PROP.FLAECHE.FLAECHENINFO + &quot;.&quot; + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -206,7 +207,7 @@
                     <Connection code="new de.cismet.verdis.gui.converter.EmptyFloatToStringConverter()" type="code"/>
                   </Property>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="de.cismet.verdis.commons.constants.FlaechePropertyConstants.PROP__ANTEIL" type="code"/>
+                    <Connection code="VerdisConstants.PROP.FLAECHE.ANTEIL" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -229,7 +230,7 @@
                     <Connection code="new SqlDateToStringConverter()" type="code"/>
                   </Property>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="KassenzeichenPropertyConstants.PROP__DATUM_ERFASSUNG" type="code"/>
+                    <Connection code="VerdisConstants.PROP.KASSENZEICHEN.DATUM_ERFASSUNG" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -246,7 +247,7 @@
                   <Property name="nullValue" type="java.lang.String" value=""/>
                   <Property name="incompletePathValue" type="java.lang.String" value=""/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="KassenzeichenPropertyConstants.PROP__DATUM_VERANLAGUNG" type="code"/>
+                    <Connection code="VerdisConstants.PROP.KASSENZEICHEN.DATUM_VERANLAGUNG" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>

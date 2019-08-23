@@ -25,7 +25,7 @@ package de.cismet.cids.custom.tostringconverter.verdis_grundis;
 
 import de.cismet.cids.tools.CustomToStringConverter;
 
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -39,8 +39,7 @@ public class KassenzeichenGeometrieToStringConverter extends CustomToStringConve
 
     @Override
     public String createString() {
-        final String result = String.valueOf(cidsBean.getProperty(
-                    KassenzeichenGeometriePropertyConstants.PROP__NAME));
+        final String result = String.valueOf(cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.NAME));
         return result;
     }
 }

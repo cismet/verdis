@@ -25,11 +25,7 @@ import de.cismet.cids.utils.multibean.MultiBeanHelper;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
 
 /**
  * DOCUMENT ME!
@@ -88,23 +84,22 @@ public class Test1 {
 
             final MetaObject mo = proxy.getMetaObject(
                     3736,
-                    CidsBean.getMetaClassFromTableName(
-                        VerdisConstants.DOMAIN,
-                        VerdisMetaClassConstants.MC_KASSENZEICHEN).getID(),
+                    CidsBean.getMetaClassFromTableName(VerdisConstants.DOMAIN,
+                        VerdisConstants.MC.KASSENZEICHEN).getID(),
                     VerdisConstants.DOMAIN);
             final CidsBean cidsBean = mo.getBean();
             LOG.fatal(cidsBean.getMOString());
             final MultiBeanHelper mbh = new MultiBeanHelper();
             mbh.setDummyBean(createDummyBean());
-            final Collection<CidsBean> col = new ArrayList<CidsBean>();
-            col.add(((CidsBean)cidsBean.getProperty(VerdisMetaClassConstants.MC_KANALANSCHLUSS))
-                        .getBeanCollectionProperty(KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE)
-                        .iterator().next().getBeanCollectionProperty(
-                    BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN).iterator().next());
+            final Collection<CidsBean> col = new ArrayList<>();
+            col.add(((CidsBean)cidsBean.getProperty(VerdisConstants.MC.KANALANSCHLUSS)).getBeanCollectionProperty(
+                    VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE).iterator().next()
+                        .getBeanCollectionProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GEOMETRIEN).iterator()
+                        .next());
             mbh.setBeans(col);
             final CidsBean childBean = mbh.getDummyBean();
             childBean.setProperty(
-                BefreiungerlaubnisGeometriePropertyConstants.PROP__BEMERKUNG,
+                VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.BEMERKUNG,
                 "hat sich was verändert ?");
             LOG.fatal(cidsBean.getMOString());
         } catch (final Exception e) {
@@ -124,12 +119,12 @@ public class Test1 {
     public static CidsBean createDummyBean() throws Exception {
         final CidsBean dummyBean = CidsBean.createNewCidsBeanFromTableName(
                 VerdisConstants.DOMAIN,
-                VerdisMetaClassConstants.MC_BEFREIUNGERLAUBNIS_GEOMETRIE);
+                VerdisConstants.MC.BEFREIUNGERLAUBNIS_GEOMETRIE);
         final CidsBean geomBean = CidsBean.createNewCidsBeanFromTableName(
                 VerdisConstants.DOMAIN,
-                VerdisMetaClassConstants.MC_GEOM);
+                VerdisConstants.MC.GEOM);
         try {
-            dummyBean.setProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE, geomBean);
+            dummyBean.setProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE, geomBean);
         } catch (final Exception ex) {
             LOG.error(ex, ex);
         }

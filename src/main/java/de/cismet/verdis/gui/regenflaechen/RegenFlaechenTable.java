@@ -75,7 +75,7 @@ import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.CrossReference;
 
-import de.cismet.verdis.commons.constants.*;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanWithGeometryTable;
 import de.cismet.verdis.gui.Main;
@@ -198,16 +198,16 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                     final int modelIndex = convertRowIndexToModel(displayedIndex);
                     final CidsBean cidsBean = getModel().getCidsBeanByIndex(modelIndex);
                     return ((cidsBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART) != null)
+                                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART) != null)
                                     && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                         != (Integer)cidsBean.getProperty(
-                                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                             + "."
-                                            + FlaechenartPropertyConstants.PROP__ID)))
+                                            + VerdisConstants.PROP.FLAECHENART.ID)))
                                 && (getGeometry(cidsBean) == null);
                 }
             };
@@ -255,11 +255,11 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                 if ((selectedBean != null)
                             && (VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
                                 != (Integer)selectedBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                     + "."
-                                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                     + "."
-                                    + FlaechenartPropertyConstants.PROP__ID))) {
+                                    + VerdisConstants.PROP.FLAECHENART.ID))) {
                     Float oldAnteil = null;
                     double oldArea = 0;
                     double ratio = 0;
@@ -268,7 +268,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                         if (splittedFeature.getSplittedFromPFeature().getFeature() instanceof CidsFeature) {
                             final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
                                             .getFeature()).getMetaObject().getBean();
-                            oldAnteil = (Float)sourceFlaecheBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL);
+                            oldAnteil = (Float)sourceFlaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL);
                             oldArea = (int)splittedFeature.getSplittedFromPFeature().getFeature().getGeometry()
                                         .getArea();
 
@@ -294,18 +294,18 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                                 Main.getMappingComponent().getFeatureCollection().removeFeature(pf.getFeature());
                                 setGeometry(geom, selectedBean);
                                 selectedBean.setProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK,
                                     groesse);
                                 selectedBean.setProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
                                     groesse);
                                 if (oldAnteil != null) {
                                     selectedBean.setProperty(
-                                        FlaechePropertyConstants.PROP__ANTEIL,
+                                        VerdisConstants.PROP.FLAECHE.ANTEIL,
                                         (float)(int)(oldAnteil * ratio));
                                 }
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
@@ -356,21 +356,20 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
             final Collection<CidsBean> otherFlaechenBeans,
             final Geometry geom) throws Exception {
         final CidsBean flaecheBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHE)
+                    .getVerdisMetaClass(VerdisConstants.MC.FLAECHE)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean anschlussgradBean = CidsAppBackend.getInstance()
                     .getVerdisMetaObject(
                             1,
-                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisMetaClassConstants.MC_ANSCHLUSSGRAD)
-                                .getId())
+                            CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.ANSCHLUSSGRAD).getId())
                     .getBean();
         final CidsBean flaecheninfoBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FLAECHENINFO)
+                    .getVerdisMetaClass(VerdisConstants.MC.FLAECHENINFO)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
 
@@ -382,40 +381,40 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
             bezeichnung = null;
         }
 
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__ID, newId);
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.ID, newId);
         flaecheBean.getMetaObject().setID(newId);
 
         flaecheBean.setProperty(
-            FlaechePropertyConstants.PROP__DATUM_AENDERUNG,
+            VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG,
             new java.sql.Date(Calendar.getInstance().getTime().getTime()));
 
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO, flaecheninfoBean);
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                    + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO, flaecheninfoBean);
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE,
             geomBean);
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
             anschlussgradBean);
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                    + FlaecheninfoPropertyConstants.PROP__FLAECHENART,
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
             flaechenartBean);
-        flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG, bezeichnung);
+        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG, bezeichnung);
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, 1);
         flaecheBean.setProperty(
-            FlaechePropertyConstants.PROP__DATUM_VERANLAGUNG,
+            VerdisConstants.PROP.FLAECHE.DATUM_VERANLAGUNG,
             new SimpleDateFormat("yy/MM").format(cal.getTime()));
 
         if (geom != null) {
             try {
                 final int groesse = new Integer((int)(geom.getArea()));
-                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK,
                     groesse);
                 flaecheBean.setProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
                     groesse);
                 RegenFlaechenDetailsPanel.setGeometry(geom, flaecheBean);
             } catch (Exception ex) {
@@ -449,7 +448,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
             double oldArea = 0;
             double ratio = 0;
             if ((VerdisUtils.PROPVAL_ART_VORLAEUFIGEVERANLASSUNG
-                            != (Integer)flaechenartBean.getProperty(FlaechenartPropertyConstants.PROP__ID))
+                            != (Integer)flaechenartBean.getProperty(VerdisConstants.PROP.FLAECHENART.ID))
                         && dialog.isSoleNewChecked()) {
                 if (sole != null) {
                     geom = sole.getFeature().getGeometry();
@@ -463,9 +462,9 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                             final CidsBean sourceFlaecheBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
                                             .getFeature()).getMetaObject().getBean();
                             anschlussgradBean = (CidsBean)sourceFlaecheBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                             + "."
-                                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD);
+                                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD);
                             oldAnteil = lastSplitAnteil;
                             oldArea = (int)splittedFeature.getSplittedFromPFeature().getFeature().getGeometry()
                                         .getArea();
@@ -481,13 +480,11 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                     getAllBeans(),
                     geom);
             if (flaecheSplitted) {
-                flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD,
+                flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
                     anschlussgradBean);
                 if (oldAnteil != null) {
-                    flaecheBean.setProperty(
-                        FlaechePropertyConstants.PROP__ANTEIL,
-                        (float)(int)(oldAnteil * ratio));
+                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.ANTEIL, (float)(int)(oldAnteil * ratio));
                 }
             }
 
@@ -549,7 +546,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
         this.cidsBean = cidsBean;
 
         if ((cidsBean != null)) {
-            setCidsBeans((List<CidsBean>)cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FLAECHEN));
+            setCidsBeans((List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN));
         } else {
             setCidsBeans(new ArrayList<CidsBean>());
         }

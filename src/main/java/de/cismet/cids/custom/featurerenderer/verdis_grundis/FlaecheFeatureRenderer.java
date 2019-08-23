@@ -27,9 +27,7 @@ import java.awt.Paint;
 
 import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -63,11 +61,11 @@ public class FlaecheFeatureRenderer extends CustomCidsFeatureRenderer {
         int art = -1;
         try {
             art = (Integer)super.cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                             + "."
-                            + FlaechenartPropertyConstants.PROP__ID);
+                            + VerdisConstants.PROP.FLAECHENART.ID);
         } catch (Exception e) {
             LOG.error("error during getting the flaechenart", e);
         }

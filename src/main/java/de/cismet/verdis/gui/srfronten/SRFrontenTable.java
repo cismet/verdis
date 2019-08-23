@@ -75,10 +75,7 @@ import de.cismet.validation.validator.AggregatedValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.CrossReference;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanWithGeometryTable;
 import de.cismet.verdis.gui.Main;
@@ -217,7 +214,7 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
         this.cidsBean = cidsBean;
 
         if ((cidsBean != null)) {
-            setCidsBeans((List<CidsBean>)cidsBean.getProperty(KassenzeichenPropertyConstants.PROP__FRONTEN));
+            setCidsBeans((List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FRONTEN));
         } else {
             setCidsBeans(new ArrayList<CidsBean>());
         }
@@ -273,11 +270,11 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
                                 final int laenge = (int)Math.abs(geom.getLength());
                                 Main.getMappingComponent().getFeatureCollection().removeFeature(pf.getFeature());
                                 setGeometry(geom, selectedBean);
-                                selectedBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                selectedBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                            + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                                     laenge);
-                                selectedBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                selectedBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                            + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
                                     laenge);
                                 final CidsFeature cidsFeature = createCidsFeature(selectedBean);
                                 final boolean editable = CidsAppBackend.getInstance().isEditable();
@@ -301,48 +298,47 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
 
     @Override
     public CidsBean createNewBean() throws Exception {
-        final MetaClass srMC = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_STRASSENREINIGUNG);
+        final MetaClass srMC = CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.STRASSENREINIGUNG);
 
         final String srQuery = "SELECT " + srMC.getID() + ", " + srMC.getPrimaryKey() + " FROM " + srMC.getTableName()
                     + " WHERE schluessel = -100;";
 
         final CidsBean frontBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONT)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean frontinfoBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONTINFO)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean strassenreinigungBean = CidsAppBackend.getInstance().getVerdisMetaObject(srQuery)[0].getBean();
 
         final int newId = getNextNewBeanId();
-        frontBean.setProperty(FrontinfoPropertyConstants.PROP__ID,
+        frontBean.setProperty(VerdisConstants.PROP.FRONTINFO.ID,
             newId);
         frontBean.getMetaObject().setID(newId);
 
         // cidsBean.setProperty(PROP__"strasse", strasseBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                    + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO, frontinfoBean);
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                    + VerdisConstants.PROP.FRONTINFO.GEOMETRIE,
             geomBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                    + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR,
             strassenreinigungBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.NUMMER,
             VerdisUtils.getValidNummer(getAllBeans()));
         frontBean.setProperty(
-            FrontPropertyConstants.PROP__ERFASSUNGSDATUM,
+            VerdisConstants.PROP.FRONT.ERFASSUNGSDATUM,
             new Date(Calendar.getInstance().getTime().getTime()));
 
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE,
+                    + VerdisConstants.PROP.FRONTINFO.STRASSE,
             Main.getInstance().getSRFrontenDetailsPanel().getLastStrasseBean());
 
         final PFeature sole = Main.getMappingComponent().getSolePureNewFeature();
@@ -397,17 +393,17 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
                             final CidsBean sourceFrontBean = ((CidsFeature)splittedFeature.getSplittedFromPFeature()
                                             .getFeature()).getMetaObject().getBean();
                             strasse = (CidsBean)sourceFrontBean.getProperty(
-                                    FrontPropertyConstants.PROP__FRONTINFO
+                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                             + "."
-                                            + FrontinfoPropertyConstants.PROP__STRASSE);
+                                            + VerdisConstants.PROP.FRONTINFO.STRASSE);
                             lage = (CidsBean)sourceFrontBean.getProperty(
-                                    FrontPropertyConstants.PROP__FRONTINFO
+                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                             + "."
-                                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
                             reinigung = (CidsBean)sourceFrontBean.getProperty(
-                                    FrontPropertyConstants.PROP__FRONTINFO
+                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                             + "."
-                                            + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR);
+                                            + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR);
                         }
                     }
 
@@ -415,25 +411,24 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
                     final double abs_laenge = Math.abs(geom.getLength());
                     // round to second decimal place
                     final int laenge = (int)Math.round(abs_laenge * 100) / 100;
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                         laenge);
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
                         laenge);
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__STRASSE,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.STRASSE,
                         strasse);
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_SR,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAGE_SR,
                         lage);
-                    frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR,
                         reinigung);
 
                     setGeometry(geom, frontBean);
-                    frontBean.setProperty(
-                        FrontPropertyConstants.PROP__NUMMER,
+                    frontBean.setProperty(VerdisConstants.PROP.FRONT.NUMMER,
                         VerdisUtils.getValidNummer(getAllBeans()));
 
                     // unzugeordnete Geometrie aus Karte entfernen
@@ -465,42 +460,42 @@ public class SRFrontenTable extends AbstractCidsBeanWithGeometryTable {
             final Collection<CidsBean> otherFrontenBeans,
             final Geometry geom) throws Exception {
         final CidsBean frontBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONT)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean frontinfoBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONTINFO)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
 
         final int newId = getNextNewBeanId();
-        frontBean.setProperty(FrontPropertyConstants.PROP__ID, newId);
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.ID, newId);
         frontBean.getMetaObject().setID(newId);
 
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO, frontinfoBean);
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "." + VerdisConstants.PROP.FRONTINFO.GEOMETRIE,
             geomBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__STRASSE,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "." + VerdisConstants.PROP.FRONTINFO.STRASSE,
             strasseBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__LAGE_SR,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "." + VerdisConstants.PROP.FRONTINFO.LAGE_SR,
             lageBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                    + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR,
             reinigungBean);
-        frontBean.setProperty(FrontPropertyConstants.PROP__NUMMER, VerdisUtils.getValidNummer(otherFrontenBeans));
+        frontBean.setProperty(VerdisConstants.PROP.FRONT.NUMMER, VerdisUtils.getValidNummer(otherFrontenBeans));
 
         if (geom != null) {
             try {
                 final int laenge = (int)(geom.getLength());
-                frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                     laenge);
-                frontBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                frontBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                     laenge);
                 SRFrontenDetailsPanel.setGeometry(geom, frontBean);
             } catch (Exception ex) {

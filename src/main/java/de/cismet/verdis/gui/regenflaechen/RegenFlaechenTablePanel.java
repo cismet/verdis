@@ -33,9 +33,7 @@ import de.cismet.tools.NumberStringComparator;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
@@ -308,8 +306,8 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
 
             if (!Objects.equals(oldGrafik, newGrafik)) {
                 try {
-                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK,
                         newGrafik);
                 } catch (final Exception ex) {
                     LOG.warn(ex, ex);
@@ -317,8 +315,8 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
             }
             if (!Objects.equals(oldKorrektur, newKorrektur)) {
                 try {
-                    flaecheBean.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
                         newKorrektur);
                 } catch (final Exception ex) {
                     LOG.warn(ex, ex);
@@ -360,18 +358,18 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
             final CidsBean flaecheBean = regenFlaechenTable1.getModel().getCidsBeanByIndex(sort.getSortedIndex(i));
             if (flaecheBean != null) {
                 final int art = (Integer)flaecheBean.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                 + "."
-                                + FlaechenartPropertyConstants.PROP__ID);
+                                + VerdisConstants.PROP.FLAECHENART.ID);
                 switch (art) {
                     case 1:
                     case 2: {
                         counterInt++;
                         try {
                             flaecheBean.setProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                                VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG,
                                 new Integer(counterInt).toString());
                         } catch (Exception ex) {
                             LOG.error("error while setting flaechenbezeichnung", ex);
@@ -385,8 +383,7 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
                     default: {
                         counterString = VerdisUtils.nextFlBez(counterString);
                         try {
-                            flaecheBean.setProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG,
+                            flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG,
                                 counterString);
                         } catch (Exception ex) {
                             LOG.error("error while setting flaechenbezeichnung", ex);
@@ -450,16 +447,16 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
 
             final Geometry geom = regenFlaechenTable1.getGeometry(cidsBean);
 
-            final Integer oldGrafik = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
-            final Integer oldKorrektur = (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                            + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+            final Integer oldGrafik = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK);
+            final Integer oldKorrektur = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
             final Integer newGrafik = (geom != null) ? (int)geom.getArea() : 0;
             final Integer newKorrektur = (Objects.equals(oldKorrektur, oldGrafik)) ? newGrafik : oldKorrektur;
 
             switch (columnIndex) {
                 case 0: {
-                    return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                    return (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
                 }
                 case 1: {
                     return oldGrafik;

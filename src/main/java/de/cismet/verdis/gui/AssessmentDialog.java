@@ -21,7 +21,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -393,9 +393,9 @@ public class AssessmentDialog extends javax.swing.JDialog {
     private String createZettelHtml(final CidsBean kassenzeichenBean) {
         if (kassenzeichenBean != null) {
             final String kassenzeichennummer = Integer.toString((Integer)kassenzeichenBean.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER));
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
             final String veranlagunsZettel = (String)kassenzeichenBean.getProperty(
-                    KassenzeichenPropertyConstants.PROP__VERANLAGUNGSZETTEL);
+                    VerdisConstants.PROP.KASSENZEICHEN.VERANLAGUNGSZETTEL);
             final String alterZettel = (veranlagunsZettel != null) ? veranlagunsZettel : "";
 
             final StringBuilder zettelSB = new StringBuilder();

@@ -27,7 +27,6 @@ import java.sql.Date;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
@@ -46,9 +45,7 @@ import de.cismet.validation.validator.CidsBeanValidator;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
-import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.Main;
@@ -107,7 +104,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
      * @return  DOCUMENT ME!
      */
     public static Validator createValidatorGueltigbis(final CidsBean befreiungBean) {
-        return new CidsBeanValidator(befreiungBean, BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS) {
+        return new CidsBeanValidator(befreiungBean, VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -116,7 +113,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
                         return null;
                     }
                     final Date gueltigBis = (Date)cidsBean.getProperty(
-                            BefreiungerlaubnisPropertyConstants.PROP__GUELTIG_BIS);
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GUELTIG_BIS);
 
                     if (gueltigBis == null) {
                         return new ValidatorStateImpl(
@@ -137,7 +134,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
      * @return  DOCUMENT ME!
      */
     public static Validator createValidatorAntragVom(final CidsBean befreiungBean) {
-        return new CidsBeanValidator(befreiungBean, BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM) {
+        return new CidsBeanValidator(befreiungBean, VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -146,7 +143,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
                         return null;
                     }
                     final Date gueltigBis = (Date)cidsBean.getProperty(
-                            BefreiungerlaubnisPropertyConstants.PROP__ANTRAG_VOM);
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS.ANTRAG_VOM);
 
                     if (gueltigBis == null) {
                         return new ValidatorStateImpl(
@@ -167,7 +164,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
      * @return  DOCUMENT ME!
      */
     public static Validator createValidatorAktenzeichen(final CidsBean befreiungBean) {
-        return new CidsBeanValidator(befreiungBean, BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) {
+        return new CidsBeanValidator(befreiungBean, VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -176,7 +173,7 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
                         return null;
                     }
                     final String aktenzeichen = (String)cidsBean.getProperty(
-                            BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN);
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN);
 
                     if ((aktenzeichen != null) && aktenzeichen.matches("^[0-9]{3}-[0-9]{3}-[0-9]{4}\\/([0-9]+)$")) {
                         return new ValidatorStateImpl(ValidatorState.Type.VALID);
@@ -237,9 +234,9 @@ public class BefreiungerlaubnisTable extends AbstractCidsBeanTable implements Ci
         Main.getInstance().getBefreiungerlaubnisGeometrieTable().setCidsBean(null);
         if (cidsBean != null) {
             setCidsBeans(cidsBean.getBeanCollectionProperty(
-                    VerdisMetaClassConstants.MC_KANALANSCHLUSS
+                    VerdisConstants.MC.KANALANSCHLUSS
                             + "."
-                            + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE));
+                            + VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE));
         } else {
             setCidsBeans(new ArrayList<CidsBean>());
         }

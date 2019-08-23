@@ -11,7 +11,7 @@ import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.kassenzeichen_geometrie.KassenzeichenGeometrienList;
 
@@ -59,8 +59,8 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
         }
 
         for (final CidsBean geometrieBean : getComponent().getAllBeans()) {
-            final int id = (Integer)geometrieBean.getProperty(KassenzeichenGeometriePropertyConstants.PROP__ID);
-            final int ownId = (Integer)clipboardBean.getProperty(KassenzeichenGeometriePropertyConstants.PROP__ID);
+            final int id = (Integer)geometrieBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ID);
+            final int ownId = (Integer)clipboardBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.ID);
             if (id == ownId) {
                 return false;
             }

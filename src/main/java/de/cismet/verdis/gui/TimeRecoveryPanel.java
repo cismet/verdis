@@ -54,8 +54,7 @@ import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.KanalanschlussPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.history.HistoryComboBox;
 import de.cismet.verdis.gui.history.HistoryComboBoxModel;
@@ -271,12 +270,12 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                                     true,
                                     left.getJsonData());
                             final Collection<String> arrayPropertiesColl = Arrays.asList(
-                                    KassenzeichenPropertyConstants.PROP__FLAECHEN,
-                                    KassenzeichenPropertyConstants.PROP__FRONTEN,
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN,
-                                    KassenzeichenPropertyConstants.PROP__KANALANSCHLUSS
+                                    VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN,
+                                    VerdisConstants.PROP.KASSENZEICHEN.FRONTEN,
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN,
+                                    VerdisConstants.PROP.KASSENZEICHEN.KANALANSCHLUSS
                                             + "."
-                                            + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
+                                            + VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE);
 
                             final Map<String, Map> propertyToMapMap = new HashMap<String, Map>();
                             for (final String arrayProperty : arrayPropertiesColl) {

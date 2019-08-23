@@ -36,9 +36,7 @@ import de.cismet.cids.featurerenderer.CustomCidsFeatureRenderer;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -54,7 +52,7 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
 
     //~ Instance fields --------------------------------------------------------
 
-    private CustomFixedWidthStroke stroke = new CustomFixedWidthStroke(
+    private final CustomFixedWidthStroke stroke = new CustomFixedWidthStroke(
             10f,
             CismapBroker.getInstance().getMappingComponent());
     private String key = null;
@@ -64,13 +62,13 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
     @Override
     public void assign() {
         final CidsBean satzung_strassenreinigung = (CidsBean)cidsBean.getProperty(
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                        + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
         if (satzung_strassenreinigung == null) {
-            key = (String)cidsBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                            + StrassenreinigungPropertyConstants.PROP__KEY);
+            key = (String)cidsBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                            + VerdisConstants.PROP.STRASSENREINIGUNG.KEY);
         } else {
             key = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
         }
@@ -101,7 +99,7 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
         if (MetaObject.NEW == cidsBean.getMetaObject().getStatus()) {
             return "neue Straßenfront";
         } else {
-            return "Straßenfront " + cidsBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
+            return "Straßenfront " + cidsBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
         }
     }
 }

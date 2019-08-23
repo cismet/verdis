@@ -49,9 +49,7 @@ import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.gui.piccolo.CustomFixedWidthStroke;
 import de.cismet.cismap.commons.gui.piccolo.FeatureAnnotationSymbol;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -82,8 +80,7 @@ public class FrontenReportBean extends EBReportBean {
      */
     public FrontenReportBean(final Properties properties, final CidsBean kassenzeichen) {
         super(properties, kassenzeichen, false);
-        this.fronten = (List<CidsBean>)kassenzeichen.getProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+        this.fronten = (List<CidsBean>)kassenzeichen.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
         Collections.sort(this.fronten, new FrontenComparator());
     }
 
@@ -111,7 +108,7 @@ public class FrontenReportBean extends EBReportBean {
         final Collection<Feature> features = new ArrayList<>();
         final FrontFeatureRenderer fr = new FrontFeatureRenderer();
         final Collection<CidsBean> fronten = kassenzeichenBean.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
 
         final int fontSize = Integer.parseInt(properties.getProperty("annotationFontSize"));
         for (final CidsBean b : fronten) {
@@ -121,10 +118,10 @@ public class FrontenReportBean extends EBReportBean {
                 LOG.error(ex, ex);
             }
             fr.assign();
-            final Geometry g = (Geometry)b.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__GEOMETRIE + "." + "geo_field");
+            final Geometry g = (Geometry)b.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.GEOMETRIE + "." + "geo_field");
             if (g != null) {
-                final Integer frontNummer = (Integer)b.getProperty(FrontPropertyConstants.PROP__NUMMER);
+                final Integer frontNummer = (Integer)b.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
                 final DefaultXStyledFeature dsf = new DefaultXStyledFeature(
                         null,
                         "",
@@ -191,8 +188,8 @@ public class FrontenReportBean extends EBReportBean {
 
         @Override
         public int compare(final CidsBean o1, final CidsBean o2) {
-            final Integer frontNr1 = (Integer)o1.getProperty(FrontPropertyConstants.PROP__NUMMER);
-            final Integer frontNr2 = (Integer)o2.getProperty(FrontPropertyConstants.PROP__NUMMER);
+            final Integer frontNr1 = (Integer)o1.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
+            final Integer frontNr2 = (Integer)o2.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
 
             return frontNr1.compareTo(frontNr2);
         }

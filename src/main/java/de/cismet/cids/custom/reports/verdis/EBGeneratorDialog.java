@@ -37,7 +37,6 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.EBReportServerAction;
@@ -534,7 +533,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
             final String jobname = DownloadManagerDialog.getInstance().getJobName();
 
             final int nummer = (Integer)kassenzeichen.getProperty(
-                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
             final String fileName = (Mode.FLAECHEN.equals(mode)) ? ("FEB-" + nummer) : ("STR-" + nummer);
             downloadFromGenerator(type, mapFormat, hints, jobname, fileName);
         }
@@ -604,7 +603,7 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                             EBGenerator.gen(
                                 EBGenerator.getProperties(connectionContext),
                                 (Integer)kassenzeichen.getProperty(
-                                    KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER),
+                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER),
                                 type,
                                 mapFormat,
                                 getSelectedScaleDenominator(),

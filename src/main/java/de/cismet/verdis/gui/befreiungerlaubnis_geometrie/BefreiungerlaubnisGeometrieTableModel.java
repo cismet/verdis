@@ -31,13 +31,9 @@ import javax.swing.Icon;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometrieTypEinleitungPropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisGeometrieTypVersickerungPropertyConstants;
-import de.cismet.verdis.commons.constants.BefreiungerlaubnisPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
-import de.cismet.verdis.gui.Main;
 
 /**
  * DOCUMENT ME!
@@ -94,41 +90,41 @@ public class BefreiungerlaubnisGeometrieTableModel extends AbstractCidsBeanTable
                 return (String)
                     (((MetaObject)cidsBean.getMetaObject().getReferencingObjectAttribute().getParentObject()
                                     .getReferencingObjectAttribute().getParentObject()).getBean()).getProperty(
-                        BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN);
+                        VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN);
             }
             case 2: {
                 final CidsBean parentBean =
                     ((MetaObject)cidsBean.getMetaObject().getReferencingObjectAttribute().getParentObject()
                                 .getReferencingObjectAttribute().getParentObject()).getBean();
                 final boolean isVersickerung = (parentBean != null)
-                            && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                            && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                            && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                            && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                             .startsWith("747-");
                 final boolean isEinleitung = (parentBean != null)
-                            && (parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN) != null)
-                            && ((String)parentBean.getProperty(BefreiungerlaubnisPropertyConstants.PROP__AKTENZEICHEN))
+                            && (parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN) != null)
+                            && ((String)parentBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.AKTENZEICHEN))
                             .startsWith("748-");
 
                 if (isVersickerung) {
                     return (String)cidsBean.getProperty(
-                            BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_VERSICKERUNG
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_VERSICKERUNG
                                     + "."
-                                    + BefreiungerlaubnisGeometrieTypVersickerungPropertyConstants.PROP__NAME);
+                                    + VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_VERSICKERUNG.NAME);
                 } else if (isEinleitung) {
                     return (String)cidsBean.getProperty(
-                            BefreiungerlaubnisGeometriePropertyConstants.PROP__TYP_EINLEITUNG
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.TYP_EINLEITUNG
                                     + "."
-                                    + BefreiungerlaubnisGeometrieTypEinleitungPropertyConstants.PROP__NAME);
+                                    + VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE_TYP_EINLEITUNG.NAME);
                 } else {
                     return "";
                 }
             }
             case 3: {
-                return (Double)cidsBean.getProperty(BefreiungerlaubnisGeometriePropertyConstants.PROP__DURCHFLUSS);
+                return (Double)cidsBean.getProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.DURCHFLUSS);
             }
             case 4: {
                 return (Boolean)cidsBean.getProperty(
-                        BefreiungerlaubnisGeometriePropertyConstants.PROP__GUTACHTEN_VORHANDEN);
+                        VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GUTACHTEN_VORHANDEN);
             }
             default: {
                 return null;

@@ -32,10 +32,7 @@ import javax.swing.ImageIcon;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.AnschlussgradPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
-import de.cismet.verdis.commons.constants.FlaechenartPropertyConstants;
-import de.cismet.verdis.commons.constants.FlaecheninfoPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
@@ -53,11 +50,11 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             RegenFlaechenTableModel.class);
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
-    private static final ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(RegenFlaechenTableModel.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
-    private static final ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(RegenFlaechenTableModel.class.getResource(
                 "/de/cismet/verdis/res/images/table/edited.png"));
-    private static final ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(FlaechePropertyConstants.class.getResource(
+    private static final ImageIcon WARN_IMAGE = new javax.swing.ImageIcon(RegenFlaechenTableModel.class.getResource(
                 "/de/cismet/verdis/res/images/table/warn.png"));
 
     private static final String[] COLUMN_NAMES = {
@@ -101,32 +98,32 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
         }
         switch (columnIndex) {
             case 0: {
-                if (cidsBean.getProperty(FlaechePropertyConstants.PROP__ANTEIL) != null) {
+                if (cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL) != null) {
                     return MULT_IMAGE;
                 }
                 return null;
             }
             case 1: {
                 // Bezeichnungsspalte
-                return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                return (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
             }
             case 2: {
                 // Edit Icon Spalte
                 // hier kommt ein Edit Icon rein wenn die Gr\u00F6\u00DFe von
                 // Hand ge\u00E4ndert wurde
                 if (!((cidsBean.getProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                         + "."
-                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR)
+                                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR)
                                     == null)
                                 || cidsBean.getProperty(
-                                    FlaechePropertyConstants.PROP__FLAECHENINFO
+                                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                     + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR).equals(
+                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR).equals(
                                     cidsBean.getProperty(
-                                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                         + "."
-                                        + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK)))) {
+                                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK)))) {
                     return EDITED_IMAGE;
                 } else {
                     return null;
@@ -136,43 +133,43 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                 // Größe
                 if (
                     cidsBean.getProperty(
-                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR)
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR)
                             != null) {
-                    return (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR);
+                    return (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
                 } else {
-                    return (Integer)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK);
+                    return (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK);
                 }
             }
             case 4: {
                 // Flaechenart
-                return (String)cidsBean.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                + FlaecheninfoPropertyConstants.PROP__FLAECHENART + "."
-                                + FlaechenartPropertyConstants.PROP__ART_ABKUERZUNG);
+                return (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                                + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
             }
             case 5: {
                 // Anschlussgrad
                 return (String)cidsBean.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                 + "."
-                                + AnschlussgradPropertyConstants.PROP__GRAD_ABKUERZUNG);
+                                + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
             }
             case 6: {
                 // Beschreibung
                 return (String)cidsBean.getProperty(
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__BESCHREIBUNG
+                                + VerdisConstants.PROP.FLAECHENINFO.BESCHREIBUNG
                                 + ".beschreibung");
             }
             case 7: {
                 // Änderungsdatum
-                final Date datum_erfassung = (Date)cidsBean.getProperty(FlaechePropertyConstants.PROP__DATUM_AENDERUNG);
+                final Date datum_erfassung = (Date)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG);
                 if (datum_erfassung == null) {
                     return null;
                 } else {

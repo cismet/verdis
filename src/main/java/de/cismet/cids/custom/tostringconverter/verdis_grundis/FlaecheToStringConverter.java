@@ -25,7 +25,7 @@ package de.cismet.cids.custom.tostringconverter.verdis_grundis;
 
 import de.cismet.cids.tools.CustomToStringConverter;
 
-import de.cismet.verdis.commons.constants.FlaechePropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -39,8 +39,7 @@ public class FlaecheToStringConverter extends CustomToStringConverter {
 
     @Override
     public String createString() {
-        final String result = String.valueOf(cidsBean.getProperty(
-                    FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG));
+        final String result = String.valueOf(cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG));
         return result;
     }
 }

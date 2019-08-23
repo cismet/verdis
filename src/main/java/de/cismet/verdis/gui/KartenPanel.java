@@ -99,7 +99,7 @@ import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.CrossReference;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.*;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
@@ -2331,27 +2331,25 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 final CidsFeature cf = (CidsFeature)pf.getFeature();
                 final CidsBean cb = (CidsBean)cf.getMetaObject().getBean();
                 if (cf.getMetaClass().getName().toLowerCase().equals(
-                                VerdisMetaClassConstants.MC_FLAECHE.toLowerCase())) {
+                                VerdisConstants.MC.FLAECHE.toLowerCase())) {
                     final int kassenzeichenNummer = (Integer)getCidsBean().getProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-                    final String bezeichnung = (String)cb.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENBEZEICHNUNG);
+                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
+                    final String bezeichnung = (String)cb.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
 
                     final String anschlussGrad = (String)cb.getProperty(
-                            FlaechePropertyConstants.PROP__FLAECHENINFO
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                     + "."
-                                    + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                     + "."
-                                    + AnschlussgradPropertyConstants.PROP__GRAD);
+                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD);
 
                     lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + bezeichnung
                                 + " - " + anschlussGrad);
                 } else if (cf.getMetaClass().getName().toLowerCase().equals(
-                                VerdisMetaClassConstants.MC_FRONT.toLowerCase())) {
+                                VerdisConstants.MC.FRONT.toLowerCase())) {
                     final int kassenzeichenNummer = (Integer)getCidsBean().getProperty(
-                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
-                    final Integer nummer = (Integer)cb.getProperty(
-                            FrontPropertyConstants.PROP__NUMMER);
+                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
+                    final Integer nummer = (Integer)cb.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
 
                     lblInfo.setText("Kassenzeichen: " + Integer.toString(kassenzeichenNummer) + "::" + nummer);
                 }
@@ -2481,30 +2479,30 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                             return;
                                         }
                                         final int artOne = (Integer)cbOne.getProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                                         + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                                         + "."
-                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.FLAECHENART.ID);
                                         final int artTwo = (Integer)cbTwo.getProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                                         + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__FLAECHENART
+                                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
                                                         + "."
-                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.FLAECHENART.ID);
 
                                         final int gradOne = (Integer)cbOne.getProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                                         + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
                                         final int gradTwo = (Integer)cbTwo.getProperty(
-                                                FlaechePropertyConstants.PROP__FLAECHENINFO
+                                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                                         + "."
-                                                        + FlaecheninfoPropertyConstants.PROP__ANSCHLUSSGRAD
+                                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
 
                                         if ((artOne != artTwo) || (gradOne != gradTwo)) {
                                             JOptionPane.showMessageDialog(StaticSwingTools.getParentFrame(this),
@@ -2516,9 +2514,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         }
 
                                         final Integer anteilOne = (Integer)cbOne.getProperty(
-                                                FlaechePropertyConstants.PROP__ANTEIL);
+                                                VerdisConstants.PROP.FLAECHE.ANTEIL);
                                         final Integer anteilTwo = (Integer)cbTwo.getProperty(
-                                                FlaechePropertyConstants.PROP__ANTEIL);
+                                                VerdisConstants.PROP.FLAECHE.ANTEIL);
 
                                         // Check machen ob eine Fl\u00E4che eine Teilfl\u00E4che ist
                                         if ((anteilOne != null) || (anteilTwo != null)) {
@@ -2535,11 +2533,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         // Eine vorhandene Fl\u00E4che und eine neuangelegt wurden gejoint
                                         RegenFlaechenDetailsPanel.setGeometry(newGeom, cbOne);
                                         final int groesse = (int)newGeom.getArea();
-                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_GRAFIK,
+                                        cbOne.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK,
                                             groesse);
-                                        cbOne.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                                    + FlaecheninfoPropertyConstants.PROP__GROESSE_KORREKTUR,
+                                        cbOne.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
                                             groesse);
                                         if (LOG.isDebugEnabled()) {
                                             LOG.debug("newGeom ist vom Typ:" + newGeom.getGeometryType());
@@ -2562,10 +2560,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
 
                                         final Collection<CrossReference> oneCrossRefs = CidsAppBackend.getInstance()
                                                     .getFrontenCrossReferencesForFrontid((Integer)cbOne.getProperty(
-                                                            FrontPropertyConstants.PROP__ID));
+                                                            VerdisConstants.PROP.FRONT.ID));
                                         final Collection<CrossReference> twoCrossRefs = CidsAppBackend.getInstance()
                                                     .getFrontenCrossReferencesForFrontid((Integer)cbTwo.getProperty(
-                                                            FrontPropertyConstants.PROP__ID));
+                                                            VerdisConstants.PROP.FRONT.ID));
 
                                         final Collection<Integer> oneCrossRefkassenzeichenList =
                                             new ArrayList<Integer>();
@@ -2596,42 +2594,42 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         }
 
                                         final Integer lageOne = (Integer)cbOne.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__LAGE_SR
+                                                        + VerdisConstants.PROP.FRONTINFO.LAGE_SR
                                                         + "."
-                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.FLAECHENART.ID);
                                         final Integer lageTwo = (Integer)cbTwo.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__LAGE_SR
+                                                        + VerdisConstants.PROP.FRONTINFO.LAGE_SR
                                                         + "."
-                                                        + FlaechenartPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.FLAECHENART.ID);
 
                                         final Integer strasseOne = (Integer)cbOne.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__STRASSE
+                                                        + VerdisConstants.PROP.FRONTINFO.STRASSE
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
                                         final Integer strasseTwo = (Integer)cbTwo.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__STRASSE
+                                                        + VerdisConstants.PROP.FRONTINFO.STRASSE
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
                                         final Integer reinigungOne = (Integer)cbOne.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR
+                                                        + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
                                         final Integer reinigungTwo = (Integer)cbTwo.getProperty(
-                                                FrontPropertyConstants.PROP__FRONTINFO
+                                                VerdisConstants.PROP.FRONT.FRONTINFO
                                                         + "."
-                                                        + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR
+                                                        + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR
                                                         + "."
-                                                        + AnschlussgradPropertyConstants.PROP__ID);
+                                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
 
                                         final boolean sameLage = Integer.compare((lageOne != null) ? lageOne : -1,
                                                 (lageTwo != null) ? lageTwo : -1) == 0;
@@ -2655,11 +2653,11 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         // Eine vorhandene Front und eine neuangelegt wurden gejoint
                                         SRFrontenDetailsPanel.setGeometry(newGeom, cbOne);
                                         final int length = (int)newGeom.getLength();
-                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                        cbOne.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                                    + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                                             length);
-                                        cbOne.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                                    + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                        cbOne.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                                    + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
                                             length);
                                     }
                                     one.getFeature().setGeometry(newGeom);
@@ -2783,18 +2781,18 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         final ArrayList<Feature> featureCollection = new ArrayList<>();
 
         final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzeichen.getBeanCollectionProperty(
-                KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
         for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
             final Geometry geom = (Geometry)kassenzeichenGeometrieBean.getProperty(
-                    KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                    VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                             + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
             if (geom != null) {
                 final Feature add = new BeanUpdatingCidsFeature(
                         kassenzeichenGeometrieBean,
-                        KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                        VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                                 + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                                + VerdisConstants.PROP.GEOM.GEO_FIELD);
                 add.setEditable(editable);
                 featureCollection.add(add);
             }
@@ -2815,21 +2813,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private Collection<Feature> fetchFeaturesRegen(final CidsBean kassenzeichen, final boolean editable) {
         final ArrayList<Feature> featureCollection = new ArrayList<>();
         final List<CidsBean> flaechen = (List<CidsBean>)kassenzeichen.getProperty(
-                KassenzeichenPropertyConstants.PROP__FLAECHEN);
+                VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
         for (final CidsBean flaeche : flaechen) {
-            final Geometry geom = (Geometry)flaeche.getProperty(FlaechePropertyConstants.PROP__FLAECHENINFO
+            final Geometry geom = (Geometry)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                             + "."
-                            + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                            + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE
                             + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
             if (geom != null) {
                 final Feature add = new BeanUpdatingCidsFeature(
                         flaeche,
-                        FlaechePropertyConstants.PROP__FLAECHENINFO
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
-                                + FlaecheninfoPropertyConstants.PROP__GEOMETRIE
+                                + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE
                                 + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                                + VerdisConstants.PROP.GEOM.GEO_FIELD);
                 add.setEditable(editable);
                 featureCollection.add(add);
             }
@@ -2847,22 +2845,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      */
     private Collection<Feature> fetchFeaturesESW(final CidsBean cidsBean, final boolean editable) {
         final ArrayList<Feature> featureCollection = new ArrayList<>();
-        final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(
-                KassenzeichenPropertyConstants.PROP__FRONTEN);
+        final List<CidsBean> fronten = (List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FRONTEN);
         for (final CidsBean front : fronten) {
-            final Geometry geom = (Geometry)front.getProperty(FrontPropertyConstants.PROP__FRONTINFO
+            final Geometry geom = (Geometry)front.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__GEOMETRIE
+                            + VerdisConstants.PROP.FRONTINFO.GEOMETRIE
                             + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
             if (geom != null) {
                 final Feature add = new BeanUpdatingCidsFeature(
                         front,
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__GEOMETRIE
+                                + VerdisConstants.PROP.FRONTINFO.GEOMETRIE
                                 + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                                + VerdisConstants.PROP.GEOM.GEO_FIELD);
                 add.setEditable(editable);
                 featureCollection.add(add);
             }
@@ -2881,21 +2878,21 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private Collection<Feature> fetchFeaturesBefreiungerlaubnisGeometrie(final CidsBean cidsBean,
             final boolean editable) {
         final ArrayList<Feature> featureCollection = new ArrayList<>();
-        final List<CidsBean> befers = cidsBean.getBeanCollectionProperty(VerdisMetaClassConstants.MC_KANALANSCHLUSS
-                        + "." + KanalanschlussPropertyConstants.PROP__BEFREIUNGENUNDERLAUBNISSE);
+        final List<CidsBean> befers = cidsBean.getBeanCollectionProperty(VerdisConstants.MC.KANALANSCHLUSS
+                        + "." + VerdisConstants.PROP.KANALANSCHLUSS.BEFREIUNGENUNDERLAUBNISSE);
         for (final CidsBean befer : befers) {
             for (final CidsBean beferGeom
-                        : befer.getBeanCollectionProperty(BefreiungerlaubnisPropertyConstants.PROP__GEOMETRIEN)) {
+                        : befer.getBeanCollectionProperty(VerdisConstants.PROP.BEFREIUNGERLAUBNIS.GEOMETRIEN)) {
                 final Geometry geom = (Geometry)beferGeom.getProperty(
-                        BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
+                        VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE
                                 + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                                + VerdisConstants.PROP.GEOM.GEO_FIELD);
                 if (geom != null) {
                     final Feature add = new BeanUpdatingCidsFeature(
                             beferGeom,
-                            BefreiungerlaubnisGeometriePropertyConstants.PROP__GEOMETRIE
+                            VerdisConstants.PROP.BEFREIUNGERLAUBNIS_GEOMETRIE.GEOMETRIE
                                     + "."
-                                    + GeomPropertyConstants.PROP__GEO_FIELD);
+                                    + VerdisConstants.PROP.GEOM.GEO_FIELD);
                     add.setEditable(editable);
                     featureCollection.add(add);
                 }
@@ -3062,7 +3059,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                                                 && ((kassenzeichenBean == null)
                                                                     || !kassenzeichennummer.equals(
                                                                         (Integer)kassenzeichenBean.getProperty(
-                                                                            KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER)))) {
+                                                                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)))) {
                                                         CidsAppBackend.getInstance()
                                                                     .gotoKassenzeichen(kassenzeichennummer.toString());
                                                     } else {
@@ -3117,22 +3114,22 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     }
                     final CidsFeature cf = (CidsFeature)pf.getFeature();
                     final CidsBean cb = cf.getMetaObject().getBean();
-                    if (VerdisMetaClassConstants.MC_FLAECHE.equalsIgnoreCase(
+                    if (VerdisConstants.MC.FLAECHE.equalsIgnoreCase(
                                     cb.getMetaObject().getMetaClass().getTableName())) {
                         try {
-                            cb.setProperty(FlaechePropertyConstants.PROP__FLAECHENINFO + "."
-                                        + FlaecheninfoPropertyConstants.PROP__GEOMETRIE,
+                            cb.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.GEOMETRIE,
                                 null);
                         } catch (Exception ex) {
                             LOG.error("error while removing geometry", ex);
                         }
 
                         CidsAppBackend.getInstance().setLastSplitFlaecheId(cb.getMetaObject().getId());
-                    } else if (VerdisMetaClassConstants.MC_FRONT.equalsIgnoreCase(
+                    } else if (VerdisConstants.MC.FRONT.equalsIgnoreCase(
                                     cb.getMetaObject().getMetaClass().getTableName())) {
                         try {
-                            cb.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                        + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+                            cb.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                        + VerdisConstants.PROP.FRONTINFO.GEOMETRIE,
                                 null);
                         } catch (Exception ex) {
                             LOG.error("error while removing geometry", ex);

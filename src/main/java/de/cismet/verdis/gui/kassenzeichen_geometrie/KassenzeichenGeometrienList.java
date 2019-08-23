@@ -24,9 +24,7 @@ import de.cismet.cismap.navigatorplugin.CidsFeature;
 
 import de.cismet.verdis.CidsAppBackend;
 
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenGeometriePropertyConstants;
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.CidsBeanComponent;
 import de.cismet.verdis.gui.Main;
@@ -82,17 +80,17 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
             for (final CidsBean kassenzeichenGeometrieBeanToAdd : kassenzeichenGeometrieBeansToAdd) {
                 final Geometry kassenzeichenGeometrieGeomToAdd = (Geometry)kassenzeichenGeometrieBeanToAdd.getProperty(
-                        KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                        VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                                 + "."
-                                + GeomPropertyConstants.PROP__GEO_FIELD);
+                                + VerdisConstants.PROP.GEOM.GEO_FIELD);
                 final Collection<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN);
+                        VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
                 CidsFeature geomAlreadyInMapFeature = null;
                 for (final CidsBean kassenzeichenGeometrieBean : kassenzeichenGeometrieBeans) {
                     final Geometry kassenzeichenGeometrieGeom = (Geometry)kassenzeichenGeometrieBean.getProperty(
-                            KassenzeichenGeometriePropertyConstants.PROP__GEOMETRIE
+                            VerdisConstants.PROP.KASSENZEICHEN_GEOMETRIE.GEOMETRIE
                                     + "."
-                                    + GeomPropertyConstants.PROP__GEO_FIELD);
+                                    + VerdisConstants.PROP.GEOM.GEO_FIELD);
                     if (kassenzeichenGeometrieGeomToAdd.equals(kassenzeichenGeometrieGeom)) {
                         geomAlreadyInMapFeature = new CidsFeature(
                                 kassenzeichenGeometrieBean.getMetaObject());
@@ -113,7 +111,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
                 }
             }
 
-            kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+            kassenzBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)
                     .addAll(beansToAdd);
             Main.getMappingComponent().getFeatureCollection().addFeatures(featuresToAdd);
             Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
@@ -160,7 +158,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
             final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
             final CidsBean kassenzBean = panel.getCidsBean();
             if (kassenzBean != null) {
-                kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+                kassenzBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)
                         .remove(beanToRemove);
                 featureCollection.removeFeature(kassenzeichenGeometrieFeature);
             }
@@ -180,7 +178,7 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
             final FeatureCollection featureCollection = CidsAppBackend.getInstance()
                         .getMainMap()
                         .getFeatureCollection();
-            kassenzBean.getBeanCollectionProperty(KassenzeichenPropertyConstants.PROP__KASSENZEICHEN_GEOMETRIEN)
+            kassenzBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)
                     .remove(beanToRemove);
             final CidsFeature kassenzeichenGeometrieFeature = new CidsFeature(beanToRemove.getMetaObject());
             featureCollection.removeFeature(kassenzeichenGeometrieFeature);

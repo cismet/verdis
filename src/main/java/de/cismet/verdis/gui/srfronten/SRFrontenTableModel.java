@@ -23,13 +23,9 @@
  */
 package de.cismet.verdis.gui.srfronten;
 
-import de.cismet.cids.custom.util.VerdisUtils;
-
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.StrassenreinigungPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
@@ -82,15 +78,15 @@ public class SRFrontenTableModel extends AbstractCidsBeanTableModel {
         }
         if (column == 0) {
             try {
-                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__NUMMER);
+                return (Integer)frontBean.getProperty(VerdisConstants.PROP.FRONT.NUMMER);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1;
             }
         } else if (column == 1) {
             try {
-                return (Integer)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                return (Integer)frontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
             } catch (Exception e) {
                 LOG.warn("exception in tablemodel", e);
                 return -1f;
@@ -98,14 +94,14 @@ public class SRFrontenTableModel extends AbstractCidsBeanTableModel {
         } else if (column == 2) {
             try {
                 final CidsBean satzung_strassenreinigung = (CidsBean)frontBean.getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                                + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
                 final String srKey;
                 if (satzung_strassenreinigung == null) {
-                    srKey = (String)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR + "."
-                                    + StrassenreinigungPropertyConstants.PROP__KEY);
+                    srKey = (String)frontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                                    + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR + "."
+                                    + VerdisConstants.PROP.STRASSENREINIGUNG.KEY);
                 } else {
                     srKey = (String)satzung_strassenreinigung.getProperty("sr_klasse.key");
                 }

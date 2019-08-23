@@ -34,7 +34,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
 
-import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Converter;
 
 import org.openide.util.Exceptions;
@@ -75,11 +74,7 @@ import de.cismet.validation.validator.CidsBeanValidator;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.CrossReference;
 
-import de.cismet.verdis.commons.constants.FrontPropertyConstants;
-import de.cismet.verdis.commons.constants.FrontinfoPropertyConstants;
-import de.cismet.verdis.commons.constants.GeomPropertyConstants;
-import de.cismet.verdis.commons.constants.StrassePropertyConstants;
-import de.cismet.verdis.commons.constants.VerdisMetaClassConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanDetailsPanel;
 import de.cismet.verdis.gui.Main;
@@ -153,9 +148,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         initComponents();
 
         ((DefaultBindableReferenceCombo)cboStrasse).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_STRASSE));
+                VerdisConstants.MC.STRASSE));
         ((DefaultBindableReferenceCombo)cboSR).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
-                VerdisMetaClassConstants.MC_STRASSENREINIGUNG));
+                VerdisConstants.MC.STRASSENREINIGUNG));
 
         cboLageSR.setRenderer(new DefaultListCellRenderer() {
 
@@ -197,57 +192,57 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtNummer,
-            FrontPropertyConstants.PROP__NUMMER,
+            VerdisConstants.PROP.FRONT.NUMMER,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtLaengeGrafik,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                    + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtLaengeKorrektur,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                    + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtBearbeitetDurch,
-            FrontPropertyConstants.PROP__BEARBEITET_DURCH,
+            VerdisConstants.PROP.FRONT.BEARBEITET_DURCH,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtErfassungsdatum,
-            FrontPropertyConstants.PROP__ERFASSUNGSDATUM,
+            VerdisConstants.PROP.FRONT.ERFASSUNGSDATUM,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             cboStrasse,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__STRASSE,
+                    + VerdisConstants.PROP.FRONTINFO.STRASSE,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             cboLageSR,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__LAGE_SR,
+                    + VerdisConstants.PROP.FRONTINFO.LAGE_SR,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             cboSR,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+                    + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtBemSR,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__SR_BEM,
+                    + VerdisConstants.PROP.FRONTINFO.SR_BEM,
             getMultiBeanHelper());
         EmbeddedMultiBeanDisplay.registerComponentForProperty(
             txtVeranlagungSR,
-            FrontPropertyConstants.PROP__FRONTINFO
+            VerdisConstants.PROP.FRONT.FRONTINFO
                     + "."
-                    + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG,
+                    + VerdisConstants.PROP.FRONTINFO.SR_VERANLAGUNG,
             getMultiBeanHelper());
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
@@ -399,7 +394,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.nummer}"),
                 txtNummer,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__NUMMER);
+                VerdisConstants.PROP.FRONT.NUMMER);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -417,9 +412,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.laenge_grafik}"),
                 txtLaengeGrafik,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                        + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -437,9 +432,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.laenge_korrektur}"),
                 txtLaengeKorrektur,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                        + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -457,7 +452,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.bearbeitet_durch}"),
                 txtBearbeitetDurch,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__BEARBEITET_DURCH);
+                VerdisConstants.PROP.FRONT.BEARBEITET_DURCH);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -475,7 +470,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.erfassungsdatum}"),
                 txtErfassungsdatum,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontPropertyConstants.PROP__ERFASSUNGSDATUM);
+                VerdisConstants.PROP.FRONT.ERFASSUNGSDATUM);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         binding.setConverter(new SqlDateToStringConverter());
@@ -627,7 +622,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.sr_veranlagung}"),
                 txtVeranlagungSR,
                 org.jdesktop.beansbinding.BeanProperty.create("text"),
-                FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
+                VerdisConstants.PROP.FRONTINFO.SR_VERANLAGUNG);
         binding.setSourceNullValue("");
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
@@ -659,7 +654,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.garage_stellplatz}"),
                 cbGarageStellplatz,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                FrontinfoPropertyConstants.PROP__GARAGE_STELLPLATZ);
+                VerdisConstants.PROP.FRONTINFO.GARAGE_STELLPLATZ);
         binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
@@ -675,7 +670,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.baulasten}"),
                 cbBaulasten,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                FrontinfoPropertyConstants.PROP__BAULASTEN);
+                VerdisConstants.PROP.FRONTINFO.BAULASTEN);
         binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
@@ -691,7 +686,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.grunddienstbarkeit}"),
                 cbGrunddienstbarkeit,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                FrontinfoPropertyConstants.PROP__GRUNDDIENSTBARKEIT);
+                VerdisConstants.PROP.FRONTINFO.GRUNDDIENSTBARKEIT);
         binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
@@ -707,7 +702,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.anteil}"),
                 cbAnteil,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                FrontinfoPropertyConstants.PROP__ANTEIL);
+                VerdisConstants.PROP.FRONTINFO.ANTEIL);
         binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
@@ -723,7 +718,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.quadratwurzel}"),
                 cbQuadratwurzel,
                 org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                FrontinfoPropertyConstants.PROP__QUADRATWURZEL);
+                VerdisConstants.PROP.FRONTINFO.QUADRATWURZEL);
         binding.setSourceNullValue(false);
         bindingGroup.addBinding(binding);
 
@@ -757,7 +752,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.winkel}"),
                 txtWinkel,
                 org.jdesktop.beansbinding.BeanProperty.create("value"),
-                FrontinfoPropertyConstants.PROP__WINKEL);
+                VerdisConstants.PROP.FRONTINFO.WINKEL);
         binding.setSourceNullValue(null);
         binding.setSourceUnreadableValue(null);
         binding.setConverter(new de.cismet.verdis.gui.converter.DoubleToNumberConverter());
@@ -823,16 +818,16 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private void cboStrasseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboStrasseActionPerformed
         CidsBean strasseBean = null;
         if (frontBean != null) {
-            strasseBean = (CidsBean)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__STRASSE);
+            strasseBean = (CidsBean)frontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.STRASSE);
         }
         if (strasseBean != null) {
-            final int strasseId = (Integer)strasseBean.getProperty(StrassePropertyConstants.PROP__ID);
+            final int strasseId = (Integer)strasseBean.getProperty(VerdisConstants.PROP.STRASSE.ID);
 
-            final String tabSatzung = VerdisMetaClassConstants.MC_SATZUNG;
-            final String tabStrassenreinigung = VerdisMetaClassConstants.MC_STRASSENREINIGUNG;
-            final String tabStrasse = VerdisMetaClassConstants.MC_STRASSE;
-            final String fldId = FrontinfoPropertyConstants.PROP__ID;
+            final String tabSatzung = VerdisConstants.MC.SATZUNG;
+            final String tabStrassenreinigung = VerdisConstants.MC.STRASSENREINIGUNG;
+            final String tabStrasse = VerdisConstants.MC.STRASSE;
+            final String fldId = VerdisConstants.PROP.FRONTINFO.ID;
             final String fldStrasse = "strasse";
             final String fldSrKlasse = "sr_klasse";
 
@@ -874,9 +869,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                             + fldSrKlasse
                             + ";",
                     (CidsBean)getCidsBean().getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_SR)));
+                                + VerdisConstants.PROP.FRONTINFO.LAGE_SR)));
         } else {
             final DefaultComboBoxModel dcmSR = new DefaultComboBoxModel();
             dcmSR.addElement(null);
@@ -891,17 +886,17 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void cboLageSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboLageSRActionPerformed
         try {
-            final CidsBean oldLageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+            final CidsBean oldLageSRBean = (CidsBean)getCidsBean().getProperty(VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
             final CidsBean newLageSRBean = (CidsBean)cboLageSR.getSelectedItem();
 
             if (((oldLageSRBean != null) && !oldLageSRBean.equals(newLageSRBean))
                         || ((newLageSRBean != null) && !newLageSRBean.equals(oldLageSRBean))) {
                 getCidsBean().setProperty(
-                    FrontPropertyConstants.PROP__FRONTINFO
+                    VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR,
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR,
                     cboLageSR.getSelectedItem());
             }
             if ((oldLageSRBean != null) && (newLageSRBean == null)) {
@@ -926,14 +921,14 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private void cboSRActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboSRActionPerformed
         if (getCidsBean() != null) {
             try {
-                final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO
+                final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__LAGE_SR);
+                                + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
                 if (lageSRBean == null) {
                     getCidsBean().setProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR,
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR,
                         cboSR.getSelectedItem());
                 }
             } catch (Exception ex) {
@@ -962,12 +957,12 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Geometry getGeometry(final CidsBean frontBean) {
         if ((frontBean != null)
                     && (frontBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
-            return (Geometry)frontBean.getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__GEOMETRIE + "."
-                            + GeomPropertyConstants.PROP__GEO_FIELD);
+                            + VerdisConstants.PROP.FRONTINFO.GEOMETRIE) != null)) {
+            return (Geometry)frontBean.getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.GEOMETRIE + "."
+                            + VerdisConstants.PROP.GEOM.GEO_FIELD);
         } else {
             return null;
         }
@@ -985,20 +980,20 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         Main.transformToDefaultCrsNeeded(geom);
         if (
             cidsBean.getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__GEOMETRIE)
+                        + VerdisConstants.PROP.FRONTINFO.GEOMETRIE)
                     == null) {
             final CidsBean emptyGeoBean = CidsAppBackend.getInstance()
-                        .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                        .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                         .getEmptyInstance()
                         .getBean();
-            cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                        + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+            cidsBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                        + VerdisConstants.PROP.FRONTINFO.GEOMETRIE,
                 emptyGeoBean);
         }
-        cidsBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "." + FrontinfoPropertyConstants.PROP__GEOMETRIE
-                    + "." + GeomPropertyConstants.PROP__GEO_FIELD,
+        cidsBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "." + VerdisConstants.PROP.FRONTINFO.GEOMETRIE
+                    + "." + VerdisConstants.PROP.GEOM.GEO_FIELD,
             geom);
     }
 
@@ -1032,22 +1027,22 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         try {
             if ((cidsBean != null)
                         && (cidsBean.getProperty(
-                                FrontPropertyConstants.PROP__FRONTINFO
+                                VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__GEOMETRIE) != null)) {
+                                + VerdisConstants.PROP.FRONTINFO.GEOMETRIE) != null)) {
                 bpanSrDetails.setBackgroundEnabled(true);
             } else {
                 bpanSrDetails.setBackgroundEnabled(false);
             }
             if ((cidsBean == null)
                         || (getMultiBeanHelper().isValuesAllEquals(
-                                FrontPropertyConstants.PROP__FRONTINFO
+                                VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__STRASSE)
+                                + VerdisConstants.PROP.FRONTINFO.STRASSE)
                             && (cidsBean.getProperty(
-                                    FrontPropertyConstants.PROP__FRONTINFO
+                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                     + "."
-                                    + FrontinfoPropertyConstants.PROP__STRASSE) == null))) {
+                                    + VerdisConstants.PROP.FRONTINFO.STRASSE) == null))) {
                 cboLageSR.setSelectedItem(null);
             }
         } catch (Exception e) {
@@ -1125,21 +1120,21 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void updateLageSrCbo() {
         if (getCidsBean() != null) {
-            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR);
+            final CidsBean lageSRBean = (CidsBean)getCidsBean().getProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR);
             if (lageSRBean != null) {
                 cboSR.setSelectedItem(lageSRBean.getProperty("sr_klasse"));
             } else {
                 cboSR.setSelectedItem((CidsBean)getCidsBean().getProperty(
-                        FrontPropertyConstants.PROP__FRONTINFO
+                        VerdisConstants.PROP.FRONT.FRONTINFO
                                 + "."
-                                + FrontinfoPropertyConstants.PROP__SR_KLASSE_OR));
+                                + VerdisConstants.PROP.FRONTINFO.SR_KLASSE_OR));
             }
             cboSR.setEnabled(isEnabled() && (lageSRBean == null)
                         && getMultiBeanHelper().isValuesAllEquals(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                             + "."
-                            + FrontinfoPropertyConstants.PROP__LAGE_SR));
+                            + VerdisConstants.PROP.FRONTINFO.LAGE_SR));
         }
     }
 
@@ -1208,7 +1203,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Validator getValidatorNummer(final CidsBean frontBean) {
         return new CidsBeanValidator(
                 frontBean,
-                FrontPropertyConstants.PROP__NUMMER) {
+                VerdisConstants.PROP.FRONT.NUMMER) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1217,8 +1212,8 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                         return null;
                     }
 
-//                final String bezeichnung = (String) cidsBean.getProperty(PROP__"flaechenbezeichnung");
-//                final int art = (cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id") == null) ? 0 : (Integer) cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id");
+//                final String bezeichnung = (String) cidsBean.getProperty("flaechenbezeichnung");
+//                final int art = (cidsBean.getProperty("flaecheninfo.flaechenart.id") == null) ? 0 : (Integer) cidsBean.getProperty("flaecheninfo.flaechenart.id");
 //
 //                final Action action = new AbstractAction() {
 //
@@ -1233,13 +1228,13 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 //                            final CidsBean cidsBean = getCidsBean();
 //                            int art;
 //                            try {
-//                                art = (Integer) cidsBean.getProperty(PROP__"flaecheninfo.flaechenart.id");
+//                                art = (Integer) cidsBean.getProperty("flaecheninfo.flaechenart.id");
 //                            } catch (final NumberFormatException ex) {
 //                                art = 0;
 //                            }
 //                            final String newValue = Main.THIS.getRegenFlaechenTable().getValidFlaechenname(art);
 //                            try {
-//                                cidsBean.setProperty(PROP__"flaechenbezeichnung", newValue);
+//                                cidsBean.setProperty("flaechenbezeichnung", newValue);
 //                            } catch (Exception ex) {
 //                                if (log.isDebugEnabled()) {
 //                                    log.debug("error while setting flaechenbezeichnung", ex);
@@ -1288,12 +1283,12 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Validator getValidatorLaengeGrafik(final CidsBean frontBean) {
         return new CidsBeanValidator(
                 frontBean,
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
-                FrontPropertyConstants.PROP__FRONTINFO
+                        + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__GEOMETRIE) {
+                        + VerdisConstants.PROP.FRONTINFO.GEOMETRIE) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1303,9 +1298,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     }
 
                     final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                                     + "."
-                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                                    + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK);
                     final Geometry geom = SRFrontenDetailsPanel.getGeometry(cidsBean);
                     final Action action = new AbstractAction() {
 
@@ -1325,9 +1320,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                             try {
                                                 final int laenge_grafik = (int)Math.abs(geom.getLength());
                                                 cidsBean.setProperty(
-                                                    FrontPropertyConstants.PROP__FRONTINFO
+                                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                                             + "."
-                                                            + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK,
+                                                            + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1372,9 +1367,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Validator getValidatorLaengeKorrektur(final CidsBean frontBean) {
         return new CidsBeanValidator(
                 frontBean,
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR) {
+                        + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1384,13 +1379,13 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     }
 
                     Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                                     + "."
-                                    + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                                    + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK);
                     final Integer laenge_korrektur = (Integer)cidsBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                                     + "."
-                                    + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR);
+                                    + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR);
                     final Action action = new AbstractAction() {
 
                             @Override
@@ -1408,13 +1403,13 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                         if (answer == JOptionPane.YES_OPTION) {
                                             try {
                                                 final Integer laenge_grafik = (Integer)cidsBean.getProperty(
-                                                        FrontPropertyConstants.PROP__FRONTINFO
+                                                        VerdisConstants.PROP.FRONT.FRONTINFO
                                                                 + "."
-                                                                + FrontinfoPropertyConstants.PROP__LAENGE_GRAFIK);
+                                                                + VerdisConstants.PROP.FRONTINFO.LAENGE_GRAFIK);
                                                 cidsBean.setProperty(
-                                                    FrontPropertyConstants.PROP__FRONTINFO
+                                                    VerdisConstants.PROP.FRONT.FRONTINFO
                                                             + "."
-                                                            + FrontinfoPropertyConstants.PROP__LAENGE_KORREKTUR,
+                                                            + VerdisConstants.PROP.FRONTINFO.LAENGE_KORREKTUR,
                                                     laenge_grafik);
                                             } catch (final Exception ex) {
                                                 if (LOG.isDebugEnabled()) {
@@ -1454,7 +1449,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Validator getValidatorDatumErfassung(final CidsBean frontBean) {
         return new CidsBeanValidator(
                 frontBean,
-                FrontPropertyConstants.PROP__ERFASSUNGSDATUM) {
+                VerdisConstants.PROP.FRONT.ERFASSUNGSDATUM) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1479,9 +1474,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     public static Validator getValidatorVeranlagungSR(final CidsBean frontBean) {
         return new CidsBeanValidator(
                 frontBean,
-                FrontPropertyConstants.PROP__FRONTINFO
+                VerdisConstants.PROP.FRONT.FRONTINFO
                         + "."
-                        + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG) {
+                        + VerdisConstants.PROP.FRONTINFO.SR_VERANLAGUNG) {
 
                 @Override
                 public ValidatorState performValidation() {
@@ -1491,9 +1486,9 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     }
 
                     final String veranlagungsdatum = (String)cidsBean.getProperty(
-                            FrontPropertyConstants.PROP__FRONTINFO
+                            VerdisConstants.PROP.FRONT.FRONTINFO
                                     + "."
-                                    + FrontinfoPropertyConstants.PROP__SR_VERANLAGUNG);
+                                    + VerdisConstants.PROP.FRONTINFO.SR_VERANLAGUNG);
 
                     if (veranlagungsdatum != null) {
                         final boolean matches = Pattern.matches(
@@ -1532,21 +1527,21 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     @Override
     public CidsBean createDummyBean() {
         final CidsBean dummyBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONT)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONT)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean frontinfoBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_FRONTINFO)
+                    .getVerdisMetaClass(VerdisConstants.MC.FRONTINFO)
                     .getEmptyInstance()
                     .getBean();
         final CidsBean geomBean = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisMetaClassConstants.MC_GEOM)
+                    .getVerdisMetaClass(VerdisConstants.MC.GEOM)
                     .getEmptyInstance()
                     .getBean();
         try {
-            dummyBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO, frontinfoBean);
-            dummyBean.setProperty(FrontPropertyConstants.PROP__FRONTINFO + "."
-                        + FrontinfoPropertyConstants.PROP__GEOMETRIE,
+            dummyBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO, frontinfoBean);
+            dummyBean.setProperty(VerdisConstants.PROP.FRONT.FRONTINFO + "."
+                        + VerdisConstants.PROP.FRONTINFO.GEOMETRIE,
                 geomBean);
         } catch (final Exception ex) {
             LOG.error(ex, ex);

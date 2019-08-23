@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.verdis.commons.constants.KassenzeichenPropertyConstants;
+import de.cismet.verdis.commons.constants.VerdisConstants;
 
 /**
  * DOCUMENT ME!
@@ -62,8 +62,7 @@ public abstract class EBReportBean {
     public EBReportBean(final Properties properties, final CidsBean kassenzeichen, final boolean fillAbfluss) {
         this.properties = properties;
         this.kassenzeichen = kassenzeichen;
-        kznr = "" + (Integer)this.kassenzeichen.getProperty(
-                        KassenzeichenPropertyConstants.PROP__KASSENZEICHENNUMMER);
+        kznr = "" + (Integer)this.kassenzeichen.getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
         this.fillAbflusswirksamkeit = fillAbfluss;
         final String letzteAenderungVon = (String)this.kassenzeichen.getProperty("letzte_aenderung_von");
         if ((letzteAenderungVon != null) && !letzteAenderungVon.isEmpty()) {
