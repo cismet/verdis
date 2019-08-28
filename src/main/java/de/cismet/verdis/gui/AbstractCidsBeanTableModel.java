@@ -49,7 +49,7 @@ public abstract class AbstractCidsBeanTableModel extends AbstractTableModel {
     private List<CidsBean> cidsBeans;
     private final String[] columnNames;
     private final Class[] columnClasses;
-    private final List<CidsBean> removedCidsBeans = new ArrayList<CidsBean>();
+    private final List<CidsBean> removedCidsBeans = new ArrayList<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -117,7 +117,7 @@ public abstract class AbstractCidsBeanTableModel extends AbstractTableModel {
      * @return  DOCUMENT ME!
      */
     public Collection<CidsBean> getCidsBeansByIndices(final int[] modelIndices) {
-        final Collection<CidsBean> cidsBeans = new ArrayList<CidsBean>();
+        final Collection<CidsBean> cidsBeans = new ArrayList<>();
         for (int i = 0; i < modelIndices.length; i++) {
             cidsBeans.add(getCidsBeanByIndex(modelIndices[i]));
         }
@@ -197,6 +197,6 @@ public abstract class AbstractCidsBeanTableModel extends AbstractTableModel {
      * @return  DOCUMENT ME!
      */
     public List<CidsBean> getRemovedCidsBeans() {
-        return new ArrayList<CidsBean>(removedCidsBeans);
+        return new ArrayList<>(removedCidsBeans);
     }
 }

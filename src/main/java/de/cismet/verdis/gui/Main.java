@@ -234,6 +234,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTablePanel;
 import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieDetailsPanel;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieTable;
@@ -337,6 +338,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
     private final Icon icoKassenzeichenList = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
+    private final Icon icoAenderungsanfragenTabel = new javax.swing.ImageIcon(getClass().getResource(
+                "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
     private final Icon icoSummen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/sum.png"));
     private final Icon icoKanal = new javax.swing.ImageIcon(getClass().getResource(
@@ -357,6 +360,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
     private View vKassenzeichen;
     private View vKassenzeichenList;
+    private View vAenderungsanfragenTable;
     private View vKanaldaten;
     private View vSummen;
     private View vKarte;
@@ -377,6 +381,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final RegenFlaechenSummenPanel regenSumPanel = new RegenFlaechenSummenPanel();
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
 
+    private final AenderungsanfrageTablePanel aenderungsanfrageTablePanel = new AenderungsanfrageTablePanel();
     private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
     private final KanaldatenPanel kanaldatenPanel = new KanaldatenPanel();
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
@@ -535,6 +540,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfrageTablePanel);
         CidsAppBackend.getInstance().addCidsBeanStore(getSRFrontenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
@@ -795,6 +801,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     .getNormalProperties()
                     .setToolTipText(null);
             viewMap.addView("Kassenzeichen-Liste", vKassenzeichenList);
+
+            vAenderungsanfragenTable = new View(
+                    "Änderungsanfragen",
+                    Static2DTools.borderIcon(icoAenderungsanfragenTabel, 0, 3, 0, 1),
+                    aenderungsanfrageTablePanel);
+            vAenderungsanfragenTable.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
+            viewMap.addView("Änderungsanfragen", vAenderungsanfragenTable);
 
             vSummen = new View("Summen", Static2DTools.borderIcon(icoSummen, 0, 3, 0, 1), regenSumPanel);
             vSummen.getWindowProperties()
@@ -1798,7 +1815,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @return  DOCUMENT ME!
      */
     private SplitWindow createMetaInfoSplitWindow(final View meta) {
-        return new SplitWindow(true, 0.5f, createKassenzeichenSplitWindow(), meta);
+        return new SplitWindow(true, 0.75f, createKassenzeichenSplitWindow(), meta);
     }
 
     /**
@@ -1807,7 +1824,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @return  DOCUMENT ME!
      */
     private SplitWindow createKassenzeichenSplitWindow() {
-        return new SplitWindow(true, 0.62f, vKassenzeichen, vKassenzeichenList);
+        return new SplitWindow(
+                true,
+                0.3f,
+                vKassenzeichen,
+                new SplitWindow(true, 0.35f, vKassenzeichenList, vAenderungsanfragenTable));
     }
 
     /**

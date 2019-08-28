@@ -31,6 +31,7 @@ import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import Sirius.util.collections.MultiMap;
@@ -79,6 +80,7 @@ import de.cismet.verdis.gui.SingleBemerkung;
 import de.cismet.verdis.gui.WaitDialog;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 
+import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
 import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
@@ -1363,6 +1365,61 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     public Map<CidsBean, Collection<Integer>> getBefreiungerlaubnisToKassenzeichenQuerverweisMap() {
         return befreiungerlaubnisToKassenzeichenQuerverweisMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getAenderungsanfrageBeans() {
+        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+        final List<CidsBean> cidsBeanList = new ArrayList<>();
+        try {
+            final Collection<MetaObjectNode> mons = SessionManager.getProxy()
+                        .customServerSearch(SessionManager.getSession().getUser(), search);
+            for (final MetaObjectNode mon : mons) {
+                final MetaObject mo = SessionManager.getProxy()
+                            .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
+                cidsBeanList.add(mo.getBean());
+            }
+        } catch (final ConnectionException ex) {
+            LOG.fatal(ex, ex);
+        }
+        if (!cidsBeanList.isEmpty()) {
+            return cidsBeanList;
+        }
+        return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichennummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean getAenderungsanfrageBean(final Integer kassenzeichennummer) {
+        if (kassenzeichennummer != null) {
+            final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+            search.setKassenzeichennummer(kassenzeichennummer);
+            final List<CidsBean> cidsBeanList = new ArrayList<>();
+            try {
+                final Collection<MetaObjectNode> mons = SessionManager.getProxy()
+                            .customServerSearch(SessionManager.getSession().getUser(), search);
+                for (final MetaObjectNode mon : mons) {
+                    final MetaObject mo = SessionManager.getProxy()
+                                .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
+                    cidsBeanList.add(mo.getBean());
+                }
+            } catch (final ConnectionException ex) {
+                LOG.fatal(ex, ex);
+            }
+            if (!cidsBeanList.isEmpty()) {
+                return cidsBeanList.get(0);
+            }
+        }
+        return null;
     }
 
     /**
