@@ -5752,6 +5752,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (Exception ex) {
             LOG.error("error while setting letzte aenderung", ex);
         }
+        CidsAppBackend.getInstance().persistAenderungsanfrageBean();
         return kassenzeichenBean.persist();
     }
 
