@@ -234,6 +234,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageNachrichtenPanel;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTablePanel;
 import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
 import de.cismet.verdis.gui.befreiungerlaubnis_geometrie.BefreiungerlaubnisGeometrieDetailsPanel;
@@ -338,7 +339,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
     private final Icon icoKassenzeichenList = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
-    private final Icon icoAenderungsanfragenTabel = new javax.swing.ImageIcon(getClass().getResource(
+    private final Icon icoAenderungsanfragenTable = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"));
     private final Icon icoSummen = new javax.swing.ImageIcon(getClass().getResource(
                 "/de/cismet/verdis/res/images/titlebars/sum.png"));
@@ -361,6 +362,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private View vKassenzeichen;
     private View vKassenzeichenList;
     private View vAenderungsanfragenTable;
+    private View vAenderungsanfragenNachrichten;
     private View vKanaldaten;
     private View vSummen;
     private View vKarte;
@@ -382,6 +384,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final KassenzeichenPanel kassenzeichenPanel = new KassenzeichenPanel();
 
     private final AenderungsanfrageTablePanel aenderungsanfrageTablePanel = new AenderungsanfrageTablePanel();
+    private final AenderungsanfrageNachrichtenPanel aenderungsanfragenNachrichtenPanel =
+        new AenderungsanfrageNachrichtenPanel();
+
     private final KassenzeichenListPanel kassenzeichenListPanel = new KassenzeichenListPanel(true, true);
     private final KanaldatenPanel kanaldatenPanel = new KanaldatenPanel();
     private final KassenzeichenGeometrienPanel kassenzeichenGeometrienPanel = new KassenzeichenGeometrienPanel();
@@ -541,6 +546,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfrageTablePanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfragenNachrichtenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(getSRFrontenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
@@ -804,7 +810,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
             vAenderungsanfragenTable = new View(
                     "Änderungsanfragen",
-                    Static2DTools.borderIcon(icoAenderungsanfragenTabel, 0, 3, 0, 1),
+                    Static2DTools.borderIcon(icoAenderungsanfragenTable, 0, 3, 0, 1),
                     aenderungsanfrageTablePanel);
             vAenderungsanfragenTable.getWindowProperties()
                     .getTabProperties()
@@ -812,6 +818,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     .getNormalProperties()
                     .setToolTipText(null);
             viewMap.addView("Änderungsanfragen", vAenderungsanfragenTable);
+
+            vAenderungsanfragenNachrichten = new View(
+                    "Änderungsanfragen-Nachrichten",
+                    Static2DTools.borderIcon(icoAenderungsanfragenTable, 0, 3, 0, 1),
+                    aenderungsanfragenNachrichtenPanel);
+            vAenderungsanfragenNachrichten.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
+            viewMap.addView("Änderungsanfragen - Nachrichten", vAenderungsanfragenNachrichten);
 
             vSummen = new View("Summen", Static2DTools.borderIcon(icoSummen, 0, 3, 0, 1), regenSumPanel);
             vSummen.getWindowProperties()
@@ -1828,7 +1845,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 true,
                 0.3f,
                 vKassenzeichen,
-                new SplitWindow(true, 0.35f, vKassenzeichenList, vAenderungsanfragenTable));
+                new SplitWindow(
+                    true,
+                    0.35f,
+                    vKassenzeichenList,
+                    new SplitWindow(true, 0.5f, vAenderungsanfragenTable, vAenderungsanfragenNachrichten)));
     }
 
     /**
