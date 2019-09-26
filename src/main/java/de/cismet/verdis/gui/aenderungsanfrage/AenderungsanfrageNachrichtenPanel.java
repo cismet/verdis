@@ -12,8 +12,6 @@
  */
 package de.cismet.verdis.gui.aenderungsanfrage;
 
-import Sirius.server.newuser.User;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentAdapter;
@@ -25,12 +23,8 @@ import java.util.List;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.CidsAppBackend;
-
-import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.server.utils.aenderungsanfrage.AnfrageJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.NachrichtJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
 
 /**
  * DOCUMENT ME!
@@ -48,6 +42,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -106,6 +101,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -142,6 +138,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         add(jScrollPane2, gridBagConstraints);
@@ -161,9 +158,28 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(jButton1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(jButton2, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -173,6 +189,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         final NachrichtJson nachrichtJson = new NachrichtJson(
+                false,
                 NachrichtJson.Typ.CLERK,
                 new Date(),
                 jTextArea1.getText(),
@@ -182,6 +199,15 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jTextArea1.setText("");
         refresh();
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+//        CidsAppBackend.getInstance().persistAenderungsanfrageBean();
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -250,7 +276,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
     @Override
     public void setCidsBean(final CidsBean cb) {
-        final AnfrageJson anfrageJson = CidsAppBackend.getInstance().getAenderungsanfrageJson();
+        final AenderungsanfrageJson anfrageJson = AenderungsanfrageHandler.getInstance().getAenderungsanfrageJson();
         setNachrichten((anfrageJson != null) ? anfrageJson.getNachrichten() : null);
     }
 }

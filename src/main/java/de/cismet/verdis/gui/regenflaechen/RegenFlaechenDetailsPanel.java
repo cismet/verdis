@@ -53,9 +53,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -86,13 +88,12 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanDetailsPanel;
 import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
-import de.cismet.verdis.server.utils.aenderungsanfrage.AnfrageJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaechePruefungAnschlussgradJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaechePruefungFlaechenartJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaechePruefungGroesseJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.PruefungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
 
 /**
  * DOCUMENT ME!
@@ -107,15 +108,27 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             RegenFlaechenDetailsPanel.class);
     private static RegenFlaechenDetailsPanel INSTANCE;
-    private static final Icon AENDERUNG_ICON = new javax.swing.ImageIcon(RegenFlaechenDetailsPanel.class.getResource(
-                "/de/cismet/validation/info.png"));
+
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private enum Pruefung {
+
+        //~ Enum constants -----------------------------------------------------
+
+        ACCEPT, REJECT
+    }
 
     //~ Instance fields --------------------------------------------------------
 
     private final CidsBean anschlussgradBean;
 
     private CidsBean flaecheBean;
-    private FlaecheJson flaecheJson;
+    private FlaecheAenderungJson flaecheJson;
     private final Validator bindingValidator;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -148,7 +161,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JLabel lblTeileigentumQuerverweise;
     private javax.swing.JLabel lblVeranlagungsdatum;
     private javax.swing.JPanel pnlAnschlussgrad;
+    private javax.swing.JPanel pnlAnschlussgradAenderung;
     private javax.swing.JPanel pnlFlaechenArt;
+    private javax.swing.JPanel pnlFlaechenartAenderung;
+    private javax.swing.JPanel pnlGroesseAenderung;
     private javax.swing.JPanel pnlGroesseKorrektur;
     private javax.swing.JScrollPane scpBemerkung;
     private javax.swing.JScrollPane scpQuer;
@@ -351,18 +367,82 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param   bezeichnung  DOCUMENT ME!
+     * @param   groesseFrom  DOCUMENT ME!
+     * @param   groesseTo    DOCUMENT ME!
+     * @param   status       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private void acceptAenderungGroesse() {
+    private String createPruefungGroesseMessage(final String bezeichnung,
+            final Integer groesseFrom,
+            final Integer groesseTo,
+            final Pruefung status) {
+        return "GROESSE_" + status + "('" + bezeichnung + "'," + groesseFrom + "," + groesseTo + ")";
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   bezeichnung      DOCUMENT ME!
+     * @param   flaechenartFrom  DOCUMENT ME!
+     * @param   flaechenartTo    DOCUMENT ME!
+     * @param   status           DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String createPruefungFlaechenartMessage(final String bezeichnung,
+            final String flaechenartFrom,
+            final String flaechenartTo,
+            final Pruefung status) {
+        return "FLAECHENART_" + status + "('" + bezeichnung + "','" + flaechenartFrom + "','" + flaechenartTo + "')";
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   bezeichnung        DOCUMENT ME!
+     * @param   anschlussgradFrom  DOCUMENT ME!
+     * @param   anschlussgradTo    DOCUMENT ME!
+     * @param   status             DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String createPruefungAnschlussgradMessage(final String bezeichnung,
+            final String anschlussgradFrom,
+            final String anschlussgradTo,
+            final Pruefung status) {
+        return "ANSCHLUSSGRAD_" + status + "('" + bezeichnung + "','" + anschlussgradFrom + "','" + anschlussgradTo
+                    + "')";
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  status  DOCUMENT ME!
+     */
+    private void pruefungAenderungGroesse(final Pruefung status) {
         try {
-            flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
-                flaecheJson.getGroesse());
-            final PruefungJson pruefungJson = new PruefungJson(
-                    PruefungJson.Status.ACCEPTED,
+            final String bezeichnung = (String)flaecheBean.getProperty(
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+            final Integer groesseFrom = (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
+            final Integer groesseTo = flaecheJson.getGroesse();
+
+            if (Pruefung.ACCEPT.equals(status)) {
+                flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
+                    groesseTo);
+            }
+
+            final PruefungJson.Anschlussgrad.Groesse pruefungJson = new PruefungJson.Anschlussgrad.Groesse(
+                    Pruefung.ACCEPT.equals(status),
+                    flaecheJson.getGroesse(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungJson.Groesse(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setGroesse(pruefungJson);
             }
@@ -373,26 +453,44 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  status  DOCUMENT ME!
      */
-    private void acceptAenderungFlaechenart() {
+    private void pruefungAenderungFlaechenart(final Pruefung status) {
         try {
-            for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
-                final CidsBean flaechenartBean = (CidsBean)cboFlaechenart.getModel().getElementAt(i);
-                if (flaecheJson.getFlaechenart().getArt().equals(
-                                (String)flaechenartBean.getProperty(VerdisConstants.PROP.FLAECHENART.ART))) {
-                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                                + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
-                        flaechenartBean);
+            final String bezeichnung = (String)flaecheBean.getProperty(
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+            final String flaechenartFrom = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                            + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                            + VerdisConstants.PROP.FLAECHENART.ART);
+            final String flaechenartTo = flaecheJson.getFlaechenart().getArt();
 
-                    break;
+            if (Pruefung.ACCEPT.equals(status)) {
+                boolean found = false;
+                for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
+                    final CidsBean flaechenartBean = (CidsBean)cboFlaechenart.getModel().getElementAt(i);
+                    if (flaecheJson.getFlaechenart().getArt().equals(
+                                    (String)flaechenartBean.getProperty(VerdisConstants.PROP.FLAECHENART.ART))) {
+                        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
+                            flaechenartBean);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return;
                 }
             }
-            final PruefungJson pruefungJson = new PruefungJson(
-                    PruefungJson.Status.ACCEPTED,
+
+            final PruefungJson.Anschlussgrad.Flaechenart pruefungJson = new PruefungJson.Anschlussgrad.Flaechenart(
+                    Pruefung.ACCEPT.equals(status),
+                    flaecheJson.getFlaechenart(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungJson.Flaechenart(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setFlaechenart(pruefungJson);
             }
@@ -403,76 +501,49 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  status  DOCUMENT ME!
      */
-    private void acceptAenderungAnschlussgrad() {
+    private void pruefungAenderungAnschlussgrad(final Pruefung status) {
         try {
-            for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
-                final CidsBean anschlussgradBean = (CidsBean)cboAnschlussgrad.getModel().getElementAt(i);
-                if (flaecheJson.getAnschlussgrad().getGrad().equals(
-                                (String)anschlussgradBean.getProperty(VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD))) {
-                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                                + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
-                        anschlussgradBean);
+            final String bezeichnung = (String)flaecheBean.getProperty(
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+            final String anschlussgradFrom = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                            + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
+                            + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD);
+            final String anschlussgradTo = flaecheJson.getAnschlussgrad().getGrad();
 
-                    break;
+            if (Pruefung.ACCEPT.equals(status)) {
+                boolean found = false;
+                for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
+                    final CidsBean anschlussgradBean = (CidsBean)cboAnschlussgrad.getModel().getElementAt(i);
+                    if (flaecheJson.getAnschlussgrad().getGrad().equals(
+                                    (String)anschlussgradBean.getProperty(VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD))) {
+                        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
+                            anschlussgradBean);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return;
                 }
             }
-            final PruefungJson pruefungJson = new PruefungJson(
-                    PruefungJson.Status.ACCEPTED,
+
+            final PruefungJson.Anschlussgrad pruefungJson = new PruefungJson.Anschlussgrad(Pruefung.ACCEPT.equals(
+                        status),
+                    flaecheJson.getAnschlussgrad(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungJson.Anschlussgrad(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setAnschlussgrad(pruefungJson);
             }
         } catch (final Exception ex) {
             LOG.error(ex, ex);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void rejectAenderungGroesse() {
-        final PruefungJson pruefungJson = new PruefungJson(
-                PruefungJson.Status.REJECTED,
-                SessionManager.getSession().getUser().getName(),
-                new Date());
-        if (flaecheJson.getPruefung() == null) {
-            flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
-        } else {
-            flaecheJson.getPruefung().setGroesse(pruefungJson);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void rejectAenderungFlaechenart() {
-        final PruefungJson pruefungJson = new PruefungJson(
-                PruefungJson.Status.REJECTED,
-                SessionManager.getSession().getUser().getName(),
-                new Date());
-        if (flaecheJson.getPruefung() == null) {
-            flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
-        } else {
-            flaecheJson.getPruefung().setFlaechenart(pruefungJson);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void rejectAenderungAnschlussgrad() {
-        final PruefungJson pruefungJson = new PruefungJson(
-                PruefungJson.Status.REJECTED,
-                SessionManager.getSession().getUser().getName(),
-                new Date());
-        if (flaecheJson.getPruefung() == null) {
-            flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
-        } else {
-            flaecheJson.getPruefung().setAnschlussgrad(pruefungJson);
         }
     }
 
@@ -685,92 +756,137 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     /**
      * DOCUMENT ME!
      *
+     * @param  aenderungPanel         DOCUMENT ME!
+     * @param  aenderungLabel         DOCUMENT ME!
+     * @param  aenderungAcceptButton  DOCUMENT ME!
+     * @param  aenderungRejectButton  DOCUMENT ME!
+     * @param  valueOriginal          DOCUMENT ME!
+     * @param  valueAenderung         DOCUMENT ME!
+     * @param  hasPruefung            DOCUMENT ME!
+     * @param  b                      DOCUMENT ME!
+     */
+    private static void doAenderungChanges(
+            final JPanel aenderungPanel,
+            final JLabel aenderungLabel,
+            final JButton aenderungAcceptButton,
+            final JButton aenderungRejectButton,
+            final String valueOriginal,
+            final String valueAenderung,
+            final boolean hasPruefung,
+            final boolean b) {
+        aenderungPanel.setVisible(valueAenderung != null);
+        if (valueAenderung != null) {
+            final boolean isVeraendert = !valueAenderung.equals(valueOriginal);
+            final Boolean isAenderungAccepted = hasPruefung ? (!isVeraendert) : null;
+
+            aenderungLabel.setText(valueAenderung);
+            if (b) {
+                aenderungAcceptButton.setEnabled(isVeraendert && !Boolean.TRUE.equals(isAenderungAccepted));
+                aenderungAcceptButton.setVisible(true);
+
+                aenderungRejectButton.setEnabled(!Boolean.FALSE.equals(isAenderungAccepted));
+                aenderungRejectButton.setVisible(isVeraendert);
+            } else {
+                aenderungAcceptButton.setEnabled(false);
+                aenderungAcceptButton.setVisible(hasPruefung && !isVeraendert);
+
+                aenderungRejectButton.setEnabled(false);
+                aenderungRejectButton.setVisible(hasPruefung && isVeraendert);
+            }
+
+            aenderungAcceptButton.setContentAreaFilled(aenderungAcceptButton.isEnabled());
+            aenderungAcceptButton.setBorderPainted(aenderungAcceptButton.isEnabled());
+
+            aenderungRejectButton.setContentAreaFilled(aenderungRejectButton.isEnabled());
+            aenderungRejectButton.setBorderPainted(aenderungRejectButton.isEnabled());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  b  DOCUMENT ME!
      */
     private void refreshAenderungButtons(final boolean b) {
-        try {
-            final AnfrageJson aenderungsanfrageJson = CidsAppBackend.getInstance().getAenderungsanfrageJson();
-            final String flaechebezeichnung = (flaecheBean != null)
-                ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG) : null;
-            flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
-                                                          : null;
+        final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
+                    .getAenderungsanfrageJson();
+        final String flaechebezeichnung = (flaecheBean != null)
+            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG) : null;
+        flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
+                                                      : null;
 
-            final PruefungJson.Status pruefungGroesseStatus =
-                ((flaecheJson != null) && (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getGroesse() != null))
-                ? flaecheJson.getPruefung().getGroesse().getStatus() : null;
-            final PruefungJson.Status pruefungFlaechenartStatus =
-                ((flaecheJson != null) && (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getFlaechenart() != null))
-                ? flaecheJson.getPruefung().getFlaechenart().getStatus() : null;
-            final PruefungJson.Status pruefungAnschlussgradStatus =
-                ((flaecheJson != null) && (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getAnschlussgrad() != null))
-                ? flaecheJson.getPruefung().getAnschlussgrad().getStatus() : null;
-
-            final boolean isGroesseAccepted = PruefungJson.Status.ACCEPTED.equals(pruefungGroesseStatus);
-            final boolean isGroesseRejected = PruefungJson.Status.REJECTED.equals(pruefungGroesseStatus);
-            final boolean isFlaechenartAccepted = PruefungJson.Status.ACCEPTED.equals(pruefungFlaechenartStatus);
-            final boolean isFlaechenartRejected = PruefungJson.Status.REJECTED.equals(pruefungFlaechenartStatus);
-            final boolean isAnschlussgradAccepted = PruefungJson.Status.ACCEPTED.equals(pruefungAnschlussgradStatus);
-            final boolean isAnschlussgradRejected = PruefungJson.Status.REJECTED.equals(pruefungAnschlussgradStatus);
-
-            lblGroesseAenderung.setVisible((flaecheJson != null) && (flaecheJson.getGroesse() != null));
-            lblFlaechenartAenderung.setVisible((flaecheJson != null) && (flaecheJson.getFlaechenart() != null));
-            lblAnschlussgradAenderung.setVisible((flaecheJson != null) && (flaecheJson.getAnschlussgrad() != null));
-
-            btnGroesseAenderungAccept.setVisible(!isGroesseAccepted && (flaecheJson != null)
-                        && (flaecheJson.getGroesse() != null) && b);
-            btnFlaechenartAenderungAccept.setVisible(!isFlaechenartAccepted && (flaecheJson != null)
-                        && (flaecheJson.getFlaechenart() != null)
-                        && b);
-            btnAnschlussgradAenderungAccept.setVisible(!isAnschlussgradAccepted && (flaecheJson != null)
-                        && (flaecheJson.getAnschlussgrad() != null)
-                        && b);
-            btnGroesseAenderungReject.setVisible(!isGroesseRejected && (flaecheJson != null)
-                        && (flaecheJson.getGroesse() != null) && b);
-            btnFlaechenartAenderungReject.setVisible(!isFlaechenartRejected && (flaecheJson != null)
-                        && (flaecheJson.getFlaechenart() != null)
-                        && b);
-            btnAnschlussgradAenderungReject.setVisible(!isAnschlussgradRejected && (flaecheJson != null)
-                        && (flaecheJson.getAnschlussgrad() != null)
-                        && b);
-
-            lblGroesseAenderung.setText((flaecheJson != null)
-                    ? NumberFormat.getIntegerInstance().format(flaecheJson.getGroesse()) : null);
-            lblFlaechenartAenderung.setText((flaecheJson != null) ? flaecheJson.getFlaechenart().getArtAbkuerzung()
-                                                                  : null);
-            lblAnschlussgradAenderung.setText((flaecheJson != null) ? flaecheJson.getAnschlussgrad()
-                            .getGradAbkuerzung() : null);
-
-            if (flaecheJson != null) {
-                if (PruefungJson.Status.ACCEPTED.equals(pruefungGroesseStatus)) {
-                    lblGroesseAenderung.setIcon(btnGroesseAenderungAccept.getIcon());
-                } else if (PruefungJson.Status.REJECTED.equals(pruefungGroesseStatus)) {
-                    lblGroesseAenderung.setIcon(btnGroesseAenderungReject.getIcon());
-                } else {
-                    lblGroesseAenderung.setIcon(AENDERUNG_ICON);
-                }
-                if (PruefungJson.Status.ACCEPTED.equals(pruefungFlaechenartStatus)) {
-                    lblFlaechenartAenderung.setIcon(btnFlaechenartAenderungAccept.getIcon());
-                } else if (PruefungJson.Status.REJECTED.equals(pruefungFlaechenartStatus)) {
-                    lblFlaechenartAenderung.setIcon(btnFlaechenartAenderungReject.getIcon());
-                } else {
-                    lblFlaechenartAenderung.setIcon(AENDERUNG_ICON);
-                }
-                if (PruefungJson.Status.ACCEPTED.equals(pruefungAnschlussgradStatus)) {
-                    lblAnschlussgradAenderung.setIcon(btnAnschlussgradAenderungAccept.getIcon());
-                } else if (PruefungJson.Status.REJECTED.equals(pruefungAnschlussgradStatus)) {
-                    lblAnschlussgradAenderung.setIcon(btnAnschlussgradAenderungReject.getIcon());
-                } else {
-                    lblAnschlussgradAenderung.setIcon(AENDERUNG_ICON);
-                }
+        if ((flaecheBean != null) && (flaecheJson != null)) {
+            try {
+                final Integer groesse = (flaecheBean != null)
+                    ? (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
+                final Integer groesseAenderung = flaecheJson.getGroesse();
+                final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
+                            && (flaecheJson.getPruefung().getGroesse() != null);
+                doAenderungChanges(
+                    pnlGroesseAenderung,
+                    lblGroesseAenderung,
+                    btnGroesseAenderungAccept,
+                    btnGroesseAenderungReject,
+                    NumberFormat.getIntegerInstance().format(groesse),
+                    NumberFormat.getIntegerInstance().format(groesseAenderung),
+                    hasPruefungGroesse,
+                    b);
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+                pnlGroesseAenderung.setVisible(false);
             }
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-            lblGroesseAenderung.setVisible(false);
-            lblFlaechenartAenderung.setVisible(false);
-            lblAnschlussgradAenderung.setVisible(false);
+
+            try {
+                final String flaechenart = (flaecheBean != null)
+                    ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                                + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG) : null;
+                final String flaechenartAenderung = (flaecheJson.getFlaechenart() != null)
+                    ? flaecheJson.getFlaechenart().getArtAbkuerzung() : null;
+                final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
+                            && (flaecheJson.getPruefung().getFlaechenart() != null);
+                doAenderungChanges(
+                    pnlFlaechenartAenderung,
+                    lblFlaechenartAenderung,
+                    btnFlaechenartAenderungAccept,
+                    btnFlaechenartAenderungReject,
+                    flaechenart,
+                    flaechenartAenderung,
+                    hasPruefungFlaechenart,
+                    b);
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+                pnlFlaechenartAenderung.setVisible(false);
+            }
+
+            try {
+                final String anschlussgrad = (flaecheBean != null)
+                    ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
+                                + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG) : null;
+                final String anschlussgradAenderung = (flaecheJson.getAnschlussgrad() != null)
+                    ? flaecheJson.getAnschlussgrad().getGradAbkuerzung() : null;
+                final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
+                            && (flaecheJson.getPruefung().getAnschlussgrad() != null);
+                doAenderungChanges(
+                    pnlAnschlussgradAenderung,
+                    lblAnschlussgradAenderung,
+                    btnAnschlussgradAenderungAccept,
+                    btnAnschlussgradAenderungReject,
+                    anschlussgrad,
+                    anschlussgradAenderung,
+                    hasPruefungAnschlussgrad,
+                    b);
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+                pnlFlaechenartAenderung.setVisible(false);
+            }
+        } else {
+            flaecheJson = null;
+            pnlGroesseAenderung.setVisible(false);
+            pnlFlaechenartAenderung.setVisible(false);
+            pnlAnschlussgradAenderung.setVisible(false);
         }
     }
 
@@ -1510,20 +1626,23 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jCheckBox1 = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         pnlGroesseKorrektur = new javax.swing.JPanel();
+        txtGroesseKorrektur = new javax.swing.JTextField();
+        pnlGroesseAenderung = new javax.swing.JPanel();
         lblGroesseAenderung = new javax.swing.JLabel();
         btnGroesseAenderungAccept = new javax.swing.JButton();
         btnGroesseAenderungReject = new javax.swing.JButton();
         pnlFlaechenArt = new javax.swing.JPanel();
-        lblFlaechenartAenderung = new javax.swing.JLabel();
         cboFlaechenart = createComboArtForEdit();
-        btnFlaechenartAenderungAccept = new javax.swing.JButton();
+        pnlFlaechenartAenderung = new javax.swing.JPanel();
+        lblFlaechenartAenderung = new javax.swing.JLabel();
         btnFlaechenartAenderungReject = new javax.swing.JButton();
+        btnFlaechenartAenderungAccept = new javax.swing.JButton();
         pnlAnschlussgrad = new javax.swing.JPanel();
-        lblAnschlussgradAenderung = new javax.swing.JLabel();
         cboAnschlussgrad = new DefaultBindableReferenceCombo();
+        pnlAnschlussgradAenderung = new javax.swing.JPanel();
         btnAnschlussgradAenderungAccept = new javax.swing.JButton();
         btnAnschlussgradAenderungReject = new javax.swing.JButton();
-        txtGroesseKorrektur = new javax.swing.JTextField();
+        lblAnschlussgradAenderung = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -1596,7 +1715,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -1621,11 +1740,11 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
         bpanRegenFlDetails.add(txtGroesseGrafik, gridBagConstraints);
 
         lblAnteil.setText(org.openide.util.NbBundle.getMessage(
@@ -1684,7 +1803,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -1707,7 +1826,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -1727,7 +1846,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -1757,7 +1876,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -1785,7 +1904,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -1816,7 +1935,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -1838,7 +1957,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -1856,18 +1975,47 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         pnlGroesseKorrektur.setOpaque(false);
         pnlGroesseKorrektur.setLayout(new java.awt.GridBagLayout());
 
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
+                txtGroesseKorrektur,
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                        + "."
+                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
+        binding.setSourceNullValue("");
+        binding.setSourceUnreadableValue("");
+        bindingGroup.addBinding(binding);
+
+        txtGroesseKorrektur.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(final java.beans.PropertyChangeEvent evt) {
+                    txtGroesseKorrekturPropertyChange(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        pnlGroesseKorrektur.add(txtGroesseKorrektur, gridBagConstraints);
+
+        pnlGroesseAenderung.setOpaque(false);
+        pnlGroesseAenderung.setLayout(new java.awt.GridBagLayout());
+
         lblGroesseAenderung.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/validation/info.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
         lblGroesseAenderung.setText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblGroesseAenderung.text"));     // NOI18N
+                "RegenFlaechenDetailsPanel.lblGroesseAenderung.text"));                    // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        pnlGroesseKorrektur.add(lblGroesseAenderung, gridBagConstraints);
-        lblGroesseAenderung.setVisible(false);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
+        pnlGroesseAenderung.add(lblGroesseAenderung, gridBagConstraints);
 
         btnGroesseAenderungAccept.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
@@ -1877,6 +2025,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         btnGroesseAenderungAccept.setToolTipText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.btnGroesseAenderungAccept.toolTipText"));       // NOI18N
+        btnGroesseAenderungAccept.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/ok.png"))); // NOI18N
         btnGroesseAenderungAccept.setFocusPainted(false);
         btnGroesseAenderungAccept.setMaximumSize(new java.awt.Dimension(24, 24));
         btnGroesseAenderungAccept.setMinimumSize(new java.awt.Dimension(24, 24));
@@ -1893,8 +2043,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlGroesseKorrektur.add(btnGroesseAenderungAccept, gridBagConstraints);
-        btnGroesseAenderungAccept.setVisible(false);
+        pnlGroesseAenderung.add(btnGroesseAenderungAccept, gridBagConstraints);
 
         btnGroesseAenderungReject.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
@@ -1902,6 +2051,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.btnGroesseAenderungReject.text"));                  // NOI18N
         btnGroesseAenderungReject.setToolTipText("Änderung ablehnen");
+        btnGroesseAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
         btnGroesseAenderungReject.setFocusPainted(false);
         btnGroesseAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
         btnGroesseAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
@@ -1918,31 +2069,24 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlGroesseKorrektur.add(btnGroesseAenderungReject, gridBagConstraints);
-        btnGroesseAenderungReject.setVisible(false);
+        pnlGroesseAenderung.add(btnGroesseAenderungReject, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        pnlGroesseKorrektur.add(pnlGroesseAenderung, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
         bpanRegenFlDetails.add(pnlGroesseKorrektur, gridBagConstraints);
 
         pnlFlaechenArt.setOpaque(false);
         pnlFlaechenArt.setLayout(new java.awt.GridBagLayout());
-
-        lblFlaechenartAenderung.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/validation/info.png"))); // NOI18N
-        lblFlaechenartAenderung.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblFlaechenartAenderung.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        pnlFlaechenArt.add(lblFlaechenartAenderung, gridBagConstraints);
-        lblFlaechenartAenderung.setVisible(false);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -1955,38 +2099,26 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         pnlFlaechenArt.add(cboFlaechenart, gridBagConstraints);
 
-        btnFlaechenartAenderungAccept.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
-        btnFlaechenartAenderungAccept.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.btnFlaechenartAenderungAccept.text"));          // NOI18N
-        btnFlaechenartAenderungAccept.setToolTipText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.btnFlaechenartAenderungAccept.toolTipText"));   // NOI18N
-        btnFlaechenartAenderungAccept.setFocusPainted(false);
-        btnFlaechenartAenderungAccept.setMaximumSize(new java.awt.Dimension(24, 24));
-        btnFlaechenartAenderungAccept.setMinimumSize(new java.awt.Dimension(24, 24));
-        btnFlaechenartAenderungAccept.setPreferredSize(new java.awt.Dimension(24, 24));
-        btnFlaechenartAenderungAccept.addActionListener(new java.awt.event.ActionListener() {
+        pnlFlaechenartAenderung.setOpaque(false);
+        pnlFlaechenartAenderung.setLayout(new java.awt.GridBagLayout());
 
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnFlaechenartAenderungAcceptActionPerformed(evt);
-                }
-            });
+        lblFlaechenartAenderung.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
+        lblFlaechenartAenderung.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.lblFlaechenartAenderung.text"));                // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlFlaechenArt.add(btnFlaechenartAenderungAccept, gridBagConstraints);
-        btnFlaechenartAenderungAccept.setVisible(false);
+        pnlFlaechenartAenderung.add(lblFlaechenartAenderung, gridBagConstraints);
 
         btnFlaechenartAenderungReject.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
@@ -1994,6 +2126,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.btnFlaechenartAenderungReject.text"));              // NOI18N
         btnFlaechenartAenderungReject.setToolTipText("Änderung ablehnen");
+        btnFlaechenartAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
         btnFlaechenartAenderungReject.setFocusPainted(false);
         btnFlaechenartAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
         btnFlaechenartAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
@@ -2010,13 +2144,46 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlFlaechenArt.add(btnFlaechenartAenderungReject, gridBagConstraints);
-        btnFlaechenartAenderungReject.setVisible(false);
+        pnlFlaechenartAenderung.add(btnFlaechenartAenderungReject, gridBagConstraints);
+
+        btnFlaechenartAenderungAccept.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
+        btnFlaechenartAenderungAccept.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.btnFlaechenartAenderungAccept.text"));          // NOI18N
+        btnFlaechenartAenderungAccept.setToolTipText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.btnFlaechenartAenderungAccept.toolTipText"));   // NOI18N
+        btnFlaechenartAenderungAccept.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/ok.png"))); // NOI18N
+        btnFlaechenartAenderungAccept.setFocusPainted(false);
+        btnFlaechenartAenderungAccept.setMaximumSize(new java.awt.Dimension(24, 24));
+        btnFlaechenartAenderungAccept.setMinimumSize(new java.awt.Dimension(24, 24));
+        btnFlaechenartAenderungAccept.setPreferredSize(new java.awt.Dimension(24, 24));
+        btnFlaechenartAenderungAccept.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnFlaechenartAenderungAcceptActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
+        pnlFlaechenartAenderung.add(btnFlaechenartAenderungAccept, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        pnlFlaechenArt.add(pnlFlaechenartAenderung, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
@@ -2024,19 +2191,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         pnlAnschlussgrad.setOpaque(false);
         pnlAnschlussgrad.setLayout(new java.awt.GridBagLayout());
-
-        lblAnschlussgradAenderung.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/validation/info.png")));   // NOI18N
-        lblAnschlussgradAenderung.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblAnschlussgradAenderung.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        pnlAnschlussgrad.add(lblAnschlussgradAenderung, gridBagConstraints);
-        lblAnschlussgradAenderung.setVisible(false);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -2049,11 +2203,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         pnlAnschlussgrad.add(cboAnschlussgrad, gridBagConstraints);
+
+        pnlAnschlussgradAenderung.setOpaque(false);
+        pnlAnschlussgradAenderung.setLayout(new java.awt.GridBagLayout());
 
         btnAnschlussgradAenderungAccept.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
@@ -2063,6 +2220,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         btnAnschlussgradAenderungAccept.setToolTipText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.btnAnschlussgradAenderungAccept.toolTipText")); // NOI18N
+        btnAnschlussgradAenderungAccept.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/ok.png"))); // NOI18N
         btnAnschlussgradAenderungAccept.setFocusPainted(false);
         btnAnschlussgradAenderungAccept.setMaximumSize(new java.awt.Dimension(24, 24));
         btnAnschlussgradAenderungAccept.setMinimumSize(new java.awt.Dimension(24, 24));
@@ -2079,8 +2238,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlAnschlussgrad.add(btnAnschlussgradAenderungAccept, gridBagConstraints);
-        btnAnschlussgradAenderungAccept.setVisible(false);
+        pnlAnschlussgradAenderung.add(btnAnschlussgradAenderungAccept, gridBagConstraints);
 
         btnAnschlussgradAenderungReject.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
@@ -2088,6 +2246,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 RegenFlaechenDetailsPanel.class,
                 "RegenFlaechenDetailsPanel.btnAnschlussgradAenderungReject.text"));            // NOI18N
         btnAnschlussgradAenderungReject.setToolTipText("Änderung ablehnen");
+        btnAnschlussgradAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
         btnAnschlussgradAenderungReject.setFocusPainted(false);
         btnAnschlussgradAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
         btnAnschlussgradAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
@@ -2104,38 +2264,34 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlAnschlussgrad.add(btnAnschlussgradAenderungReject, gridBagConstraints);
-        btnAnschlussgradAenderungReject.setVisible(false);
+        pnlAnschlussgradAenderung.add(btnAnschlussgradAenderungReject, gridBagConstraints);
+
+        lblAnschlussgradAenderung.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
+        lblAnschlussgradAenderung.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.lblAnschlussgradAenderung.text"));              // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
+        pnlAnschlussgradAenderung.add(lblAnschlussgradAenderung, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        pnlAnschlussgrad.add(pnlAnschlussgradAenderung, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
         bpanRegenFlDetails.add(pnlAnschlussgrad, gridBagConstraints);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
-                txtGroesseKorrektur,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                        + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 2);
-        bpanRegenFlDetails.add(txtGroesseKorrektur, gridBagConstraints);
 
         jPanel2.add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);
 
@@ -2159,7 +2315,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnGroesseAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnGroesseAenderungAcceptActionPerformed
-        acceptAenderungGroesse();
+        pruefungAenderungGroesse(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
     }                                                                                             //GEN-LAST:event_btnGroesseAenderungAcceptActionPerformed
 
@@ -2169,7 +2325,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnGroesseAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnGroesseAenderungRejectActionPerformed
-        rejectAenderungGroesse();
+        pruefungAenderungGroesse(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
     }                                                                                             //GEN-LAST:event_btnGroesseAenderungRejectActionPerformed
 
@@ -2179,7 +2335,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnFlaechenartAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnFlaechenartAenderungAcceptActionPerformed
-        acceptAenderungFlaechenart();
+        pruefungAenderungFlaechenart(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                 //GEN-LAST:event_btnFlaechenartAenderungAcceptActionPerformed
 
@@ -2189,7 +2345,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnFlaechenartAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnFlaechenartAenderungRejectActionPerformed
-        rejectAenderungFlaechenart();
+        pruefungAenderungFlaechenart(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                 //GEN-LAST:event_btnFlaechenartAenderungRejectActionPerformed
 
@@ -2199,7 +2355,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnAnschlussgradAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnAnschlussgradAenderungRejectActionPerformed
-        rejectAenderungAnschlussgrad();
+        pruefungAenderungAnschlussgrad(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungRejectActionPerformed
 
@@ -2209,7 +2365,18 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void btnAnschlussgradAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnAnschlussgradAenderungAcceptActionPerformed
-        acceptAenderungAnschlussgrad();
+        pruefungAenderungAnschlussgrad(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungAcceptActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void txtGroesseKorrekturPropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_txtGroesseKorrekturPropertyChange
+//        if (flaecheBean != null) {
+//            refreshAenderungButtons(isEnabled());
+//        }
+    } //GEN-LAST:event_txtGroesseKorrekturPropertyChange
 }

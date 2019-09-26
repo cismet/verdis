@@ -78,13 +78,13 @@ import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.MultiBemerkung;
 import de.cismet.verdis.gui.SingleBemerkung;
 import de.cismet.verdis.gui.WaitDialog;
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
 import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
-import de.cismet.verdis.server.utils.aenderungsanfrage.AnfrageJson;
 
 /**
  * DOCUMENT ME!
@@ -159,8 +159,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private final ConnectionProxy proxy;
     private final AppPreferences appPreferences;
     private CidsBean kassenzeichenBean = null;
-    private CidsBean aenderungsanfrageBean = null;
-    private AnfrageJson aenderungsanfrageJson;
     private boolean editable = false;
     private Frame frameToDisplayDialogs = null;
     private MappingComponent mainMap = null;
@@ -397,89 +395,11 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
-        refreshAenderungsanfrageJson();
+        AenderungsanfrageHandler.getInstance().refreshAenderungsanfrageJson();
         for (final CidsBeanStore cbs : beanStores) {
             if (cbs != this) { // Avoid endless loop
                 cbs.setCidsBean(cidsBean);
             }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void refreshAenderungsanfrageJson() {
-        if (kassenzeichenBean != null) {
-            final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
-            if (aenderungsanfrageBean != null) {
-                try {
-                    aenderungsanfrageJson = AnfrageJson.readValue((String)aenderungsanfrageBean.getProperty(
-                                VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON));
-                    return;
-                } catch (final Exception ex) {
-                    LOG.error(ex, ex);
-                }
-            }
-        }
-        aenderungsanfrageJson = null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CidsBean getAenderungsanfrageBean() {
-        return aenderungsanfrageBean;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public AnfrageJson getAenderungsanfrageJson() {
-        return aenderungsanfrageJson;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   cidsBean  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public void updateAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
-        aenderungsanfrageBean = null;
-        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-        search.setKassenzeichennummer((Integer)cidsBean.getProperty(
-                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
-        final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
-                    .executeCustomServerSearch(search);
-        if (mons != null) {
-            for (final MetaObjectNode mon : mons) {
-                final MetaObject mo = CidsAppBackend.getInstance()
-                            .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
-                if (mo != null) {
-                    aenderungsanfrageBean = mo.getBean();
-                }
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public void persistAenderungsanfrageBean() throws Exception {
-        final AnfrageJson anfrageJson = getAenderungsanfrageJson();
-        if ((anfrageJson != null) && (kassenzeichenBean != null)) {
-            final CidsBean aenderungsanfrageBean = CidsAppBackend.getInstance().getAenderungsanfrageBean();
-            aenderungsanfrageBean.setProperty(
-                VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON,
-                MAPPER.writeValueAsString(anfrageJson));
-            aenderungsanfrageBean.persist();
         }
     }
 
@@ -1451,61 +1371,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> searchAenderungsanfrageBeans() {
-        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-        final List<CidsBean> cidsBeanList = new ArrayList<>();
-        try {
-            final Collection<MetaObjectNode> mons = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
-            for (final MetaObjectNode mon : mons) {
-                final MetaObject mo = SessionManager.getProxy()
-                            .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
-                cidsBeanList.add(mo.getBean());
-            }
-        } catch (final ConnectionException ex) {
-            LOG.fatal(ex, ex);
-        }
-        if (!cidsBeanList.isEmpty()) {
-            return cidsBeanList;
-        }
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   kassenzeichennummer  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CidsBean searchAenderungsanfrageBean(final Integer kassenzeichennummer) {
-        if (kassenzeichennummer != null) {
-            final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-            search.setKassenzeichennummer(kassenzeichennummer);
-            final List<CidsBean> cidsBeanList = new ArrayList<>();
-            try {
-                final Collection<MetaObjectNode> mons = SessionManager.getProxy()
-                            .customServerSearch(SessionManager.getSession().getUser(), search);
-                for (final MetaObjectNode mon : mons) {
-                    final MetaObject mo = SessionManager.getProxy()
-                                .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
-                    cidsBeanList.add(mo.getBean());
-                }
-            } catch (final ConnectionException ex) {
-                LOG.fatal(ex, ex);
-            }
-            if (!cidsBeanList.isEmpty()) {
-                return cidsBeanList.get(0);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  kassenzeichen  DOCUMENT ME!
      */
     public void gotoKassenzeichen(final String kassenzeichen) {
@@ -1565,7 +1430,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     protected CidsBean doInBackground() throws Exception {
                         final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
                         updateCrossReferences(cidsBean);
-                        updateAenderungsanfrageBean(cidsBean);
+                        AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(cidsBean);
                         return cidsBean;
                     }
 
@@ -1573,7 +1438,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     protected void done() {
                         try {
                             final CidsBean cidsBean = get();
-
+                            cidsBean.toJSONString(true);
                             setCidsBean(cidsBean);
                             if (cidsBean != null) {
                                 selectCidsBeanByIdentifier(flaechenBez);

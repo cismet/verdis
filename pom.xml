@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>6.8-SNAPSHOT</version>
+                <version>6.9-SNAPSHOT</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -140,7 +140,7 @@
                 <type>jar</type>
             </dependency>      
             <!-- END: managed cids-dependencies -->  
-            
+                    
             <!--
                 See https://cismet.slack.com/files/pascal.dihe/F4C0V99H9/netbeans-visual-diff-standalone
             -->
@@ -492,6 +492,12 @@
         </dependency>
         <!-- BEGIN: runtime dependencies -->
         
+       <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+                
         <!--<dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
@@ -514,6 +520,11 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     

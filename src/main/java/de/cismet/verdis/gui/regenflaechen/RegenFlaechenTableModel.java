@@ -37,7 +37,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
 
 /**
  * DOCUMENT ME!
@@ -84,7 +84,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
 
     //~ Instance fields --------------------------------------------------------
 
-    private Map<String, FlaecheJson> aenderungsanfrageFlaechen = null;
+    private Map<String, FlaecheAenderungJson> aenderungsanfrageFlaechen = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -105,7 +105,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
         }
 
         final String bezeichnung = (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-        final FlaecheJson aenderungsanfrageFlaeche =
+        final FlaecheAenderungJson aenderungsanfrageFlaeche =
             ((aenderungsanfrageFlaechen != null) && aenderungsanfrageFlaechen.containsKey(bezeichnung))
             ? aenderungsanfrageFlaechen.get(bezeichnung) : null;
 
@@ -210,7 +210,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
      *
      * @param  aenderungsanfrageFlaechen  DOCUMENT ME!
      */
-    public void setAenderungsanfrageFlaechen(final Map<String, FlaecheJson> aenderungsanfrageFlaechen) {
+    public void setAenderungsanfrageFlaechen(final Map<String, FlaecheAenderungJson> aenderungsanfrageFlaechen) {
         this.aenderungsanfrageFlaechen = aenderungsanfrageFlaechen;
     }
 }

@@ -18,21 +18,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
-
-import de.cismet.tools.gui.StaticSwingTools;
-
-import de.cismet.verdis.server.utils.aenderungsanfrage.AnfrageJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheAnschlussgradJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheFlaechenartJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheGroesseJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaecheJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.FlaechePruefungJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.NachrichtAnhangJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.NachrichtJson;
-import de.cismet.verdis.server.utils.aenderungsanfrage.PruefungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheFlaechenartJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtAnhangJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
 
 /**
  * DOCUMENT ME!
@@ -125,7 +120,7 @@ public class AenderungsanfrageNachrichtDialog extends javax.swing.JDialog {
                             }
                         });
 
-                    final AnfrageJson anfrageJson = dialog.getComplexAnfrageJson();
+                    final AenderungsanfrageJson anfrageJson = dialog.getComplexAnfrageJson();
                     dialog.aenderungsanfrageNachrichtenPanel1.setNachrichten(anfrageJson.getNachrichten());
                     dialog.setVisible(true);
                 }
@@ -137,69 +132,69 @@ public class AenderungsanfrageNachrichtDialog extends javax.swing.JDialog {
      *
      * @return  DOCUMENT ME!
      */
-    private AnfrageJson getSimpleAnfrageJson() {
-        final Map<String, FlaecheJson> flaechen = new HashMap<>();
-        flaechen.put("5", new FlaecheGroesseJson(12));
-        final AnfrageJson anfrageJson = new AnfrageJson(
+    private AenderungsanfrageJson getComplexAnfrageJson() {
+        final Map<String, FlaecheAenderungJson> flaechen = new HashMap<>();
+        flaechen.put("1", new FlaecheAenderungJson.Groesse(1430));
+        flaechen.put(
+            "2",
+            new FlaecheAenderungJson.Groesse(
+                921,
+                new FlaechePruefungJson.Groesse(new PruefungJson.Groesse(921, "SteinbacherD102", new Date(47110815)))));
+        flaechen.put(
+            "8",
+            new FlaecheAenderungJson.Flaechenart(
+                new FlaecheFlaechenartJson("Gründachfläche", "GDF"),
+                new FlaechePruefungJson.Flaechenart(
+                    new PruefungJson.Flaechenart(
+                        new FlaecheFlaechenartJson("Gründachfläche", "GDF"),
+                        "SteinbacherD102",
+                        new Date(47110815)))));
+
+        final List<NachrichtJson> nachrichten = new ArrayList<>();
+        nachrichten.add(new NachrichtJson(
+                NachrichtJson.Typ.CLERK,
+                new Date(1562059800000L),
+                "Sehr geehrte*r Nutzer*in, hier haben Sie die Möglichkeit Änderungen an Ihren Flächen mitzuteilen.",
+                "verdis"));
+        nachrichten.add(new NachrichtJson(
+                NachrichtJson.Typ.CITIZEN,
+                new Date(1562060700000L),
+                "Fläche B ist kleiner. Sie ist nicht 40 m² groß, sondern nur 37 m². Sie ist auch nicht an dem Kanal angeschlossen, sondern besteht aus Ökopflaster und versickert. Siehe Foto.",
+                "...",
+                Arrays.asList(new NachrichtAnhangJson("Ökopflasterfoto.pdf", "1337"))));
+        nachrichten.add(new NachrichtJson(
+                NachrichtJson.Typ.CLERK,
+                new Date(1562136300000L),
+                "Die Änderung der Fläche werde ich übernehmen. Das Foto ist nicht ausreichend. Bitte übersenden Sie zusätzlich ein Foto der gesamten Fläche. Ökopflaster wird auch nicht als vollständig versickernd angesehen, sondern muss laut Satzung mit 70% seiner Flächen zur Gebührenerhebung herangezogen werden.",
+                "Dirk Steinbacher"));
+        nachrichten.add(new NachrichtJson(
+                new Date(1562136360000L),
+                "SYSTEMMESSAGE({ type: 'changed', flaeche: '1' ,flaechenart:'Dachfläche'})"));
+        nachrichten.add(new NachrichtJson(
+                NachrichtJson.Typ.CITIZEN,
+                new Date(1562179560000L),
+                "Hier das gewünschte Foto. Die Zufahrt entwässert seitlich in die Beete.",
+                "...",
+                Arrays.asList(new NachrichtAnhangJson("Foto2.pdf", "13374"))));
+        nachrichten.add(new NachrichtJson(
+                NachrichtJson.Typ.CLERK,
+                new Date(1562227500000L),
+                "Auf dem 2ten Foto sind Rasenkantensteine und ein Gully zu erkennen. Aus diesem Grund muss ich für diese Fläche 24 m² (70% von 37 m²) zur Veranlagung an das Steueramt weitergeben.",
+                "Dirk Steinbacher"));
+        nachrichten.add(new NachrichtJson(
+                new Date(1562227560000L),
+                "SYSTEMMESSAGE({ type: 'changed', flaeche: '1', flaechenart:'Dachfläche' })"));
+        nachrichten.add(new NachrichtJson(
+                Boolean.TRUE,
+                NachrichtJson.Typ.CITIZEN,
+                new Date(1562486760000L),
+                "So wird eine Nachricht visualisiert, die noch nicht abgesschickt ist.",
+                "..."));
+
+        final AenderungsanfrageJson anfrageJson = new AenderungsanfrageJson(
                 60004629,
                 flaechen,
-                new ArrayList<>(
-                    Arrays.asList(
-                        new NachrichtJson(
-                            NachrichtJson.Typ.CITIZEN,
-                            new Date(47110815),
-                            "Da passt was nicht weil isso, siehe lustiges pdf !",
-                            "Bürger",
-                            new NachrichtAnhangJson("lustiges.pdf", "aaa-bbb-ccc")))));
-        return anfrageJson;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private AnfrageJson getComplexAnfrageJson() {
-        final AnfrageJson anfrageJson = getSimpleAnfrageJson();
-        anfrageJson.getNachrichten()
-                .add(new NachrichtJson(
-                        NachrichtJson.Typ.CLERK,
-                        new Date(47110815),
-                        "Konnte nichts feststellen, alles in Ordnung.",
-                        "Dirk Steinbacher"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(
-                new Date(47110815),
-                "REJECT_GROESSE(5, 12)"));
-        anfrageJson.getNachrichten()
-                .add(new NachrichtJson(
-                        NachrichtJson.Typ.CITIZEN,
-                        new Date(47110815),
-                        "Oh, falsches PDF, siehe richtiges pdf.",
-                        "Bürger",
-                        new NachrichtAnhangJson("richtiges.pdf", "ddd-eee-fff")));
-        anfrageJson.getNachrichten()
-                .add(new NachrichtJson(
-                        NachrichtJson.Typ.CLERK,
-                        new Date(47110815),
-                        "Ach so, verstehe. Alles Klar !",
-                        "Dirk Steinbacher"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(
-                new Date(47110815),
-                "ACCEPT_GROESSE(5, 12)"));
-        anfrageJson.getNachrichten()
-                .add(new NachrichtJson(NachrichtJson.Typ.CITIZEN,
-                        new Date(47110815),
-                        "Geht doch, danke.", "Bürger"));
-
-        anfrageJson.getFlaechen().get("5").setFlaechenart(new FlaecheFlaechenartJson("Gründach", "GDF"));
-        anfrageJson.getFlaechen().get("5").setAnschlussgrad(new FlaecheAnschlussgradJson("versickernd", "vers."));
-        anfrageJson.getFlaechen()
-                .get("5")
-                .setPruefung(new FlaechePruefungJson(
-                        new PruefungJson(PruefungJson.Status.ACCEPTED, "test", new Date(47110815)),
-                        new PruefungJson(PruefungJson.Status.REJECTED, "test", new Date(47110815)),
-                        new PruefungJson(PruefungJson.Status.NONE, "test", new Date(47110815))));
-
+                nachrichten);
         return anfrageJson;
     }
 }

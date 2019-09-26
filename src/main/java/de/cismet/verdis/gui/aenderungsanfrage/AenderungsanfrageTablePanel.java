@@ -19,8 +19,6 @@ import javax.swing.event.ListSelectionListener;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
-import de.cismet.verdis.CidsAppBackend;
-
 /**
  * DOCUMENT ME!
  *
@@ -146,7 +144,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
                 @Override
                 protected List<CidsBean> doInBackground() throws Exception {
-                    return CidsAppBackend.getInstance().searchAenderungsanfrageBeans();
+                    return AenderungsanfrageHandler.getInstance().searchAenderungsanfrageBeans();
                 }
 
                 @Override

@@ -79,8 +79,9 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanWithGeometryTable;
 import de.cismet.verdis.gui.Main;
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
-import de.cismet.verdis.server.utils.aenderungsanfrage.AnfrageJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 
 import static de.cismet.verdis.gui.AbstractCidsBeanTable.getNextNewBeanId;
 
@@ -551,7 +552,8 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
         if ((cidsBean != null)) {
             setCidsBeans((List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN));
 
-            final AnfrageJson aenderungsanfrageJson = CidsAppBackend.getInstance().getAenderungsanfrageJson();
+            final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
+                        .getAenderungsanfrageJson();
             if (aenderungsanfrageJson != null) {
                 ((RegenFlaechenTableModel)getModel()).setAenderungsanfrageFlaechen(aenderungsanfrageJson.getFlaechen());
             } else {

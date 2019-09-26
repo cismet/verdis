@@ -234,6 +234,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.data.AppPreferences;
 
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageNachrichtenPanel;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTablePanel;
 import de.cismet.verdis.gui.befreiungerlaubnis.BefreiungerlaubnisTable;
@@ -5773,7 +5774,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (Exception ex) {
             LOG.error("error while setting letzte aenderung", ex);
         }
-        CidsAppBackend.getInstance().persistAenderungsanfrageBean();
+        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean);
         return kassenzeichenBean.persist();
     }
 
