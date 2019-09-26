@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>6.9-SNAPSHOT</version>
+                <version>6.8.1-changerequest-prerelease-3</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
