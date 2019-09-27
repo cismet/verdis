@@ -101,7 +101,8 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         final String absender = nachrichtJson.getAbsender();
         final Date timestamp = nachrichtJson.getTimestamp();
         final String text = nachrichtJson.getNachricht();
-        final String anhang = (nachrichtJson.getAnhang() != null) ? nachrichtJson.getAnhang().get(0).getName() : null;
+        final String anhang = ((nachrichtJson.getAnhang() != null) && (nachrichtJson.getAnhang().size() > 0))
+            ? nachrichtJson.getAnhang().get(0).getName() : null;
 
         initComponents();
         jTextArea1.setText(text);

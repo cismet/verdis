@@ -166,7 +166,8 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                 final String flaechenart = (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
                                 + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
-                final String flaechenartAenderung = (aenderungsanfrageFlaeche != null)
+                final String flaechenartAenderung =
+                    ((aenderungsanfrageFlaeche != null) && (aenderungsanfrageFlaeche.getFlaechenart() != null))
                     ? aenderungsanfrageFlaeche.getFlaechenart().getArtAbkuerzung() : null;
                 return flaechenart + ((flaechenartAenderung != null) ? (" (" + flaechenartAenderung + ")") : "");
             }
@@ -178,7 +179,8 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                                 + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                 + "."
                                 + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
-                final String anschlussgradAenderung = (aenderungsanfrageFlaeche != null)
+                final String anschlussgradAenderung =
+                    ((aenderungsanfrageFlaeche != null) && (aenderungsanfrageFlaeche.getAnschlussgrad() != null))
                     ? aenderungsanfrageFlaeche.getAnschlussgrad().getGradAbkuerzung() : null;
                 return anschlussgrad + ((anschlussgradAenderung != null) ? (" (" + anschlussgradAenderung + ")") : "");
             }
