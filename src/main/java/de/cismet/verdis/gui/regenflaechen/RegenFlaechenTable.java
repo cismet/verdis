@@ -553,7 +553,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
             setCidsBeans((List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN));
 
             final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
-                        .getAenderungsanfrageJson();
+                        .getAenderungsanfrage();
             if (aenderungsanfrageJson != null) {
                 ((RegenFlaechenTableModel)getModel()).setAenderungsanfrageFlaechen(aenderungsanfrageJson.getFlaechen());
             } else {

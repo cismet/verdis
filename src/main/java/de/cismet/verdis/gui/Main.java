@@ -120,6 +120,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.prefs.Preferences;
@@ -256,6 +257,7 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
+import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -3717,7 +3719,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdOkActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdOkActionPerformed
-        if (checkForDuplicateCoordinates() && changesPending()) {
+        if (checkForDuplicateCoordinates()
+                    && (changesPending() || AenderungsanfrageHandler.getInstance().changesPending())) {
             saveKassenzeichenAndAssessement();
         }
     }                                                                         //GEN-LAST:event_cmdOkActionPerformed

@@ -281,7 +281,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
     @Override
     public void setCidsBean(final CidsBean cb) {
-        final AenderungsanfrageJson anfrageJson = AenderungsanfrageHandler.getInstance().getAenderungsanfrageJson();
+        final AenderungsanfrageJson anfrageJson = AenderungsanfrageHandler.getInstance().getAenderungsanfrage();
         setNachrichten((anfrageJson != null) ? anfrageJson.getNachrichten() : null);
     }
 

@@ -131,6 +131,20 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private FlaecheAenderungJson flaecheJson;
     private final Validator bindingValidator;
 
+    private final PropertyChangeListener flaecheinfoBeanChangeListener = new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(final PropertyChangeEvent evt) {
+                if (VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR.equals(evt.getPropertyName())) {
+                    refreshAenderungButtons(isEnabled());
+                } else if (VerdisConstants.PROP.FLAECHENINFO.FLAECHENART.equals(evt.getPropertyName())) {
+                    refreshAenderungButtons(isEnabled());
+                } else if (VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD.equals(evt.getPropertyName())) {
+                    refreshAenderungButtons(isEnabled());
+                }
+            }
+        };
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanRegenFlDetails;
     private javax.swing.JButton btnAnschlussgradAenderungAccept;
@@ -553,7 +567,18 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             return;
         }
 
+        if ((flaecheBean != null) && (flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO) != null)) {
+            ((CidsBean)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO)).removePropertyChangeListener(
+                flaecheinfoBeanChangeListener);
+        }
+
         flaecheBean = cidsBean;
+
+        if ((cidsBean != null) && (cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO) != null)) {
+            ((CidsBean)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO)).addPropertyChangeListener(
+                flaecheinfoBeanChangeListener);
+        }
+
         setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
@@ -809,7 +834,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void refreshAenderungButtons(final boolean b) {
         final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
-                    .getAenderungsanfrageJson();
+                    .getAenderungsanfrage();
         final String flaechebezeichnung = (flaecheBean != null)
             ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG) : null;
         flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
