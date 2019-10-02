@@ -12,6 +12,7 @@
  */
 package de.cismet.verdis.gui.aenderungsanfrage;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentAdapter;
@@ -23,6 +24,9 @@ import java.util.List;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.EditModeListener;
+
 import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
 
@@ -32,18 +36,18 @@ import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implements CidsBeanStore {
+public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implements CidsBeanStore, EditModeListener {
 
     //~ Instance fields --------------------------------------------------------
 
     private List<NachrichtJson> nachrichtJsons;
-    private final String username;
+    private String username;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
@@ -80,9 +84,30 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                     jPanel1.setPreferredSize(d);
                 }
             });
+
+        addComponentListener(new ComponentAdapter() {
+
+                @Override
+                public void componentResized(final ComponentEvent e) {
+                    for (final Component comp : jPanel1.getComponents()) {
+                        if (comp instanceof AenderungsanfrageNachrichtPanel) {
+                            ((AenderungsanfrageNachrichtPanel)comp).resize(jPanel1);
+                        }
+                    }
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  username  DOCUMENT ME!
+     */
+    public void setUsername(final String username) {
+        this.username = username;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -98,10 +123,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -120,11 +145,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(jScrollPane1, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane2.setMinimumSize(new java.awt.Dimension(19, 82));
 
@@ -137,11 +163,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        add(jScrollPane2, gridBagConstraints);
+        jPanel2.add(jScrollPane2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton1,
@@ -157,29 +182,16 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        add(jButton1, gridBagConstraints);
+        jPanel2.add(jButton1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton2,
-            org.openide.util.NbBundle.getMessage(
-                AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton2.text")); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton2ActionPerformed(evt);
-                }
-            });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        add(jButton2, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(jPanel2, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -188,26 +200,18 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        final NachrichtJson nachrichtJson = new NachrichtJson(
-                false,
-                NachrichtJson.Typ.CLERK,
-                new Date(),
-                jTextArea1.getText(),
-                username);
-        nachrichtJsons.add(nachrichtJson);
-        addNachricht(nachrichtJson);
-        jTextArea1.setText("");
-        refresh();
+        if ((jTextArea1.getText() != null) && !jTextArea1.getText().trim().isEmpty()) {
+            final NachrichtJson nachrichtJson = new NachrichtJson.Sachberarbeiter(
+                    true,
+                    new Date(),
+                    jTextArea1.getText().trim(),
+                    username);
+            nachrichtJsons.add(nachrichtJson);
+            addNachricht(nachrichtJson);
+            jTextArea1.setText("");
+            refresh();
+        }
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
-//        CidsAppBackend.getInstance().persistAenderungsanfrageBean();
-    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -216,13 +220,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         if (nachrichtJsons != null) {
             clear();
             for (final NachrichtJson nachrichtJson : nachrichtJsons) {
-                addNachricht(nachrichtJson);
+                if (!(NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
+                                && Boolean.TRUE.equals(nachrichtJson.getDraft()))) {
+                    addNachricht(nachrichtJson);
+                }
             }
         }
-        jPanel1.revalidate();
-        jPanel1.repaint();
-        jScrollPane1.revalidate();
-        jScrollPane1.repaint();
+        revalidate();
+        repaint();
     }
 
     /**
@@ -278,5 +283,18 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     public void setCidsBean(final CidsBean cb) {
         final AenderungsanfrageJson anfrageJson = AenderungsanfrageHandler.getInstance().getAenderungsanfrageJson();
         setNachrichten((anfrageJson != null) ? anfrageJson.getNachrichten() : null);
+    }
+
+    @Override
+    public void editModeChanged() {
+        setEnabled(CidsAppBackend.getInstance().isEditable()
+                    && (AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean() != null));
+    }
+
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        jPanel2.setVisible(enabled);
+        refresh();
     }
 }

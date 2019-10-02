@@ -19,6 +19,10 @@ import javax.swing.event.ListSelectionListener;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.verdis.CidsAppBackend;
+
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
 /**
  * DOCUMENT ME!
  *
@@ -76,6 +80,13 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         setLayout(new java.awt.GridBagLayout());
 
         aenderungsanfrageTable1.setModel(new AenderungsanfrageTableModel());
+        aenderungsanfrageTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    aenderungsanfrageTable1MouseClicked(evt);
+                }
+            });
         jScrollPane2.setViewportView(aenderungsanfrageTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -116,6 +127,19 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     /**
      * DOCUMENT ME!
      *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void aenderungsanfrageTable1MouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_aenderungsanfrageTable1MouseClicked
+        if (jButton1.isEnabled() && (evt.getClickCount() == 2) && !CidsAppBackend.getInstance().isEditable()) {
+            if (aenderungsanfrageTable1.getSelectedRow() >= 0) {
+                gotoSelectedKassenzeichen();
+            }
+        }
+    }                                                                                       //GEN-LAST:event_aenderungsanfrageTable1MouseClicked
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     public JXTable getTable() {
@@ -134,6 +158,23 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     @Override
     public CidsBean getCidsBean() {
         return cidsBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void gotoSelectedKassenzeichen() {
+        aenderungsanfrageTable1.getSelectedRow();
+        final int rows = aenderungsanfrageTable1.getSelectedRow();
+        final CidsBean aenderungsanfrage = getModel().getCidsBeanByIndex(aenderungsanfrageTable1.convertRowIndexToModel(
+                    rows));
+        if (aenderungsanfrage != null) {
+            final Integer kassenzeichen = (Integer)aenderungsanfrage.getProperty(
+                    VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER);
+            if (kassenzeichen != null) {
+                CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
+            }
+        }
     }
 
     /**

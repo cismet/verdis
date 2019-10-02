@@ -543,6 +543,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         StaticSwingTools.tweakUI();
 
+        aenderungsanfragenNachrichtenPanel.setUsername(SessionManager.getSession().getUser().getName());
+
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
@@ -569,6 +571,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
         CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
+
+        CidsAppBackend.getInstance().addEditModeListener(aenderungsanfragenNachrichtenPanel);
 
         CidsAppBackend.getInstance().addAppModeListener(kartenPanel);
         CidsAppBackend.getInstance().addAppModeListener(this);
@@ -5719,6 +5723,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
+                        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean);
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();
                         return assessedKassenzeichenBean;
@@ -5774,7 +5779,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         } catch (Exception ex) {
             LOG.error("error while setting letzte aenderung", ex);
         }
-        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean);
         return kassenzeichenBean.persist();
     }
 

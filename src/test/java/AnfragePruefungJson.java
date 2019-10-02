@@ -17,11 +17,13 @@ import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -56,60 +58,70 @@ public class AnfragePruefungJson {
     @After
     public void tearDown() {
     }
-        
-    private AenderungsanfrageJson getSimpleAnfrageJson() {                    
-            final Map<String, FlaecheAenderungJson> flaechen = new HashMap<>();
-            flaechen.put("5", new FlaecheAenderungJson.Groesse(12));
-            final AenderungsanfrageJson anfrageJson = new AenderungsanfrageJson(
-                    60004629,
-                    flaechen,
-                    new ArrayList<>(
-                        Arrays.asList(
-                            new NachrichtJson(NachrichtJson.Typ.CITIZEN,
-                                new Date(47110815),
-                                "Da passt was nicht weil isso, siehe lustiges pdf !",
-                                "Bürger",
-                                Arrays.asList(new NachrichtAnhangJson("lustiges.pdf", "aaa-bbb-ccc"))
-                            )
-                        )
-                    )
-            );
-            return anfrageJson;
-    }
 
     private AenderungsanfrageJson getComplexAnfrageJson() {
-        final AenderungsanfrageJson anfrageJson = getSimpleAnfrageJson();        
-        anfrageJson.getNachrichten().add(new NachrichtJson(NachrichtJson.Typ.CLERK,
-            new Date(47110815),
-            "Konnte nichts feststellen, alles in Ordnung.", "Dirk Steinbacher"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(
-            new Date(47110815),
-            "REJECT_GROESSE(5, 12)"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(NachrichtJson.Typ.CITIZEN,
-            new Date(47110815),
-            "Oh, falsches PDF, siehe richtiges pdf.", 
-            "Bürger",
-            Arrays.asList(new NachrichtAnhangJson("richtiges.pdf", "ddd-eee-fff"))));
-        anfrageJson.getNachrichten().add(new NachrichtJson(NachrichtJson.Typ.CLERK,
-            new Date(47110815), 
-            "Ach so, verstehe. Alles Klar !", "Dirk Steinbacher"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(
-            new Date(47110815),
-            "ACCEPT_GROESSE(5, 12)"));
-        anfrageJson.getNachrichten().add(new NachrichtJson(NachrichtJson.Typ.CITIZEN,
-                new Date(47110815), 
-                "Geht doch, danke.", "Bürger"));
+        final Map<String, FlaecheAenderungJson> flaechen = new HashMap<>();
+        flaechen.put("1", new FlaecheAenderungJson.Groesse(1430));            
+        flaechen.put("2", new FlaecheAenderungJson.Groesse(921, 
+                new FlaechePruefungJson.Groesse(new PruefungJson.Groesse(921, "SteinbacherD102", new Date(47110815)))));
+        flaechen.put("8", new FlaecheAenderungJson.Flaechenart(
+                new FlaecheFlaechenartJson("Gründachfläche", "GDF"), 
+                new FlaechePruefungJson.Flaechenart(
+                        new PruefungJson.Flaechenart(new FlaecheFlaechenartJson("Gründachfläche", "GDF"), "SteinbacherD102", new Date(47110815))
+                )
+        ));
 
-        anfrageJson.getFlaechen().get("5").setFlaechenart(new FlaecheFlaechenartJson("Gründach", "GDF"));
-        anfrageJson.getFlaechen().get("5").setAnschlussgrad(new FlaecheAnschlussgradJson("Am Kanal angeschlossen", "angeschl."));
-        anfrageJson.getFlaechen().get("5").setPruefung(new FlaechePruefungJson(
-                new PruefungJson.Groesse(12, "test", new Date(47110815)),
-                new PruefungJson.Flaechenart(new FlaecheFlaechenartJson("Dachfläche", "DGF"), "test", new Date(47110815)),
-                null
-            )
+        final List<NachrichtJson> nachrichten = new ArrayList<>();
+        nachrichten.add(new NachrichtJson.Sachberarbeiter(
+            new Date(1562059800000l),
+            "Sehr geehrte*r Nutzer*in, hier haben Sie die Möglichkeit Änderungen an Ihren Flächen mitzuteilen.",
+            "verdis"
+        ));
+        nachrichten.add(new NachrichtJson.Buerger(
+            new Date(1562060700000l),
+            "Fläche B ist kleiner. Sie ist nicht 40 m² groß, sondern nur 37 m². Sie ist auch nicht an dem Kanal angeschlossen, sondern besteht aus Ökopflaster und versickert. Siehe Foto.",
+            "...",
+            Arrays.asList(new NachrichtAnhangJson("Ökopflasterfoto.pdf", "1337"))                
+        ));
+        nachrichten.add(new NachrichtJson.Sachberarbeiter(
+            new Date(1562136300000l),
+            "Die Änderung der Fläche werde ich übernehmen. Das Foto ist nicht ausreichend. Bitte übersenden Sie zusätzlich ein Foto der gesamten Fläche. Ökopflaster wird auch nicht als vollständig versickernd angesehen, sondern muss laut Satzung mit 70% seiner Flächen zur Gebührenerhebung herangezogen werden.",
+            "Dirk Steinbacher" 
+        ));
+        nachrichten.add(new NachrichtJson.System(
+            new Date(1562136360000l),
+            new NachrichtParameterJson.Anschlussgrad(NachrichtParameterJson.Type.REJECTED, "1", new FlaecheAnschlussgradJson("Dachfläche", "DF")),
+            "Dirk Steinbacher"
+        ));
+        nachrichten.add(new NachrichtJson.Buerger(
+            new Date(1562179560000l),
+            "Hier das gewünschte Foto. Die Zufahrt entwässert seitlich in die Beete.",
+            "...",
+            Arrays.asList(new NachrichtAnhangJson("Foto2.pdf", "13374"))                
+        ));
+        nachrichten.add(new NachrichtJson.Sachberarbeiter(
+            new Date(1562227500000l),
+            "Auf dem 2ten Foto sind Rasenkantensteine und ein Gully zu erkennen. Aus diesem Grund muss ich für diese Fläche 24 m² (70% von 37 m²) zur Veranlagung an das Steueramt weitergeben.",
+            "Dirk Steinbacher" 
+        ));
+        nachrichten.add(new NachrichtJson.System(
+            new Date(1562227560000l),
+            new NachrichtParameterJson.Anschlussgrad(NachrichtParameterJson.Type.CHANGED, "1", new FlaecheAnschlussgradJson("Dachfläche", "DF")),
+            "Dirk Steinbacher"
+        ));
+        nachrichten.add(new NachrichtJson.Buerger(
+            new Date(1562486760000l),
+            "So wird eine Nachricht visualisiert, die noch nicht abgesschickt ist.",
+            "...",
+            true
+        ));
+
+        final AenderungsanfrageJson aenderungsanfrage = new AenderungsanfrageJson(
+                60004629,
+                flaechen,
+                nachrichten
         );
-
-        return anfrageJson;
+        return aenderungsanfrage;
     }
 
     //@Test
