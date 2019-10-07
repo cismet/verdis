@@ -5,8 +5,9 @@
 *              ... and it just works.
 *
 ****************************************************/
-package de.cismet.custom.visualdiff;
+package filestodiff;
 
+import de.cismet.custom.visualdiff.DiffPanel;
 import org.netbeans.api.diff.DiffView;
 
 import org.openide.util.Exceptions;
@@ -38,7 +39,7 @@ import java.io.Reader;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class Testapplication extends javax.swing.JFrame {
+public class java1 extends javax.swing.JFrame {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -77,7 +78,7 @@ public class Testapplication extends javax.swing.JFrame {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public Testapplication() throws Exception {
+    public java1() throws Exception {
         initComponents();
 
         final File file1 = new File(FILENAME1_JSON);
@@ -130,6 +131,7 @@ public class Testapplication extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         pnlControls = new javax.swing.JPanel();
         btnPrevDifference = new javax.swing.JButton();
         btnNextDifference = new javax.swing.JButton();
@@ -140,89 +142,65 @@ public class Testapplication extends javax.swing.JFrame {
         btnDiffTextFiles = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle(org.openide.util.NbBundle.getMessage(Testapplication.class, "Testapplication.title")); // NOI18N
+        setTitle(org.openide.util.NbBundle.getMessage(java1.class, "java1.title")); // NOI18N
 
-        btnPrevDifference.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnPrevDifference.text")); // NOI18N
+        btnPrevDifference.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnPrevDifference.text")); // NOI18N
         btnPrevDifference.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnPrevDifferenceActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrevDifferenceActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnPrevDifference);
 
-        btnNextDifference.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnNextDifference.text")); // NOI18N
+        btnNextDifference.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnNextDifference.text")); // NOI18N
         btnNextDifference.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnNextDifferenceActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNextDifferenceActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnNextDifference);
 
         separator.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         separator.setPreferredSize(new java.awt.Dimension(2, 23));
         pnlControls.add(separator);
 
-        btnDiffHTMLFiles.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnDiffHTMLFiles.text")); // NOI18N
+        btnDiffHTMLFiles.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnDiffHTMLFiles.text")); // NOI18N
         btnDiffHTMLFiles.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnDiffHTMLFilesActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDiffHTMLFilesActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnDiffHTMLFiles);
 
-        btnDiffJavaFiles.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnDiffJavaFiles.text")); // NOI18N
+        btnDiffJavaFiles.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnDiffJavaFiles.text")); // NOI18N
         btnDiffJavaFiles.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnDiffJavaFilesActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDiffJavaFilesActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnDiffJavaFiles);
 
-        btnDiffJSONFiles.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnDiffJSONFiles.text")); // NOI18N
+        btnDiffJSONFiles.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnDiffJSONFiles.text")); // NOI18N
         btnDiffJSONFiles.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnDiffJSONFilesActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDiffJSONFilesActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnDiffJSONFiles);
 
-        btnDiffTextFiles.setText(org.openide.util.NbBundle.getMessage(
-                Testapplication.class,
-                "Testapplication.btnDiffTextFiles.text")); // NOI18N
+        btnDiffTextFiles.setText(org.openide.util.NbBundle.getMessage(java1.class, "java1.btnDiffTextFiles.text")); // NOI18N
         btnDiffTextFiles.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnDiffTextFilesActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDiffTextFilesActionPerformed(evt);
+            }
+        });
         pnlControls.add(btnDiffTextFiles);
 
         getContentPane().add(pnlControls, java.awt.BorderLayout.SOUTH);
 
-        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 729) / 2, (screenSize.height - 706) / 2, 729, 706);
-    } // </editor-fold>//GEN-END:initComponents
+        setSize(new java.awt.Dimension(729, 706));
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * The action handler for the 'next difference' button. Increases the 'current difference' property of the view.
@@ -345,7 +323,7 @@ public class Testapplication extends javax.swing.JFrame {
                 @Override
                 public void run() {
                     try {
-                        new Testapplication().setVisible(true);
+                        new java1().setVisible(true);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

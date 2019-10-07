@@ -1,0 +1,23 @@
+{
+  "kassenzeichen" : 60004629,
+  "flaechen" : {
+    "5" : {
+      "groesse" : 12,
+      "flaechenart" : {
+        "art" : "Gründach",
+        "art_abkuerzung" : "GDF"
+      },
+      "anschlussgrad" : {
+        "grad" : "Am Kanal angeschlossen",
+        "grad_abkuerzung" : "angeschl."
+      },
+      "pruefung" : {
+        "groesse" : {
+          "anfrage" : 63,
+          "von" : "test",
+          "timestamp" : 47110815
+        }
+      }
+    }
+  }
+}

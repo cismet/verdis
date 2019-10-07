@@ -31,6 +31,7 @@ import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import Sirius.util.collections.MultiMap;
@@ -77,8 +78,10 @@ import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.MultiBemerkung;
 import de.cismet.verdis.gui.SingleBemerkung;
 import de.cismet.verdis.gui.WaitDialog;
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 
+import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
 import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
@@ -392,6 +395,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
+        AenderungsanfrageHandler.getInstance().refreshAenderungsanfrageJson();
         for (final CidsBeanStore cbs : beanStores) {
             if (cbs != this) { // Avoid endless loop
                 cbs.setCidsBean(cidsBean);
@@ -456,8 +460,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    public Collection<Object> executeCustomServerSearch(final CidsServerSearch serverSearch)
-            throws ConnectionException {
+    public Collection executeCustomServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
         final Collection collection = getProxy().customServerSearch(getSession().getUser(), serverSearch);
         return collection;
     }
@@ -1401,32 +1404,37 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     private void gotoKassenzeichen(final String kassenzeichen, final boolean edit, final boolean historyEnabled) {
         final String[] test = kassenzeichen.split(":");
+        final String[] testStac = kassenzeichen.split(";");
 
-        final String kassenzeichenNummer;
-        final String flaechenBez;
-        if (test.length > 1) {
-            kassenzeichenNummer = test[0];
-            flaechenBez = test[1];
-        } else {
-            kassenzeichenNummer = kassenzeichen;
-            flaechenBez = "";
-        }
+        String kassenzeichenNummer = (test.length > 1) ? test[0] : kassenzeichen;
+        final String flaechenBez = (test.length > 1) ? test[1] : "";
+
+        kassenzeichenNummer = (testStac.length > 1) ? testStac[0] : kassenzeichenNummer;
+        final Integer stacId = (testStac.length > 1) ? Integer.parseInt(testStac[1]) : null;
 
         if (!Main.getInstance().isInEditMode()) {
             Main.getInstance().disableKassenzeichenCmds();
             Main.getInstance().getKassenzeichenPanel().setSearchStarted();
             GrundbuchblattSucheDialog.getInstance().setEnabled(false);
-            Main.getInstance().getKassenzeichenPanel().setSearchField(kassenzeichen);
+            Main.getInstance()
+                    .getKassenzeichenPanel()
+                    .setSearchField((stacId != null) ? kassenzeichenNummer : kassenzeichen);
 
             WaitDialog.getInstance().showDialog();
             WaitDialog.getInstance().startLoadingKassenzeichen(1);
 
+            final Integer kassenzeichenNummerInt = Integer.parseInt(kassenzeichenNummer);
             new SwingWorker<CidsBean, Void>() {
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
+                        final CidsBean cidsBean = loadKassenzeichenByNummer(kassenzeichenNummerInt);
                         updateCrossReferences(cidsBean);
+                        if (stacId != null) {
+                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(stacId);
+                        } else {
+                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(cidsBean);
+                        }
                         return cidsBean;
                     }
 
@@ -1434,16 +1442,15 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     protected void done() {
                         try {
                             final CidsBean cidsBean = get();
-
+                            cidsBean.toJSONString(true);
+                            setCidsBean(cidsBean);
                             if (cidsBean != null) {
-                                setCidsBean(cidsBean);
                                 selectCidsBeanByIdentifier(flaechenBez);
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.GREEN);
                                 if (historyEnabled) {
                                     historyModel.addToHistory(kassenzeichen);
                                 }
                             } else {
-                                setCidsBean(null);
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
                             }
                         } catch (final Exception ex) {
