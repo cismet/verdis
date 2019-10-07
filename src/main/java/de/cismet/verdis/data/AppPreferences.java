@@ -62,6 +62,7 @@ public class AppPreferences {
     private int lagisCrossoverPort;
     private double flurstueckBuffer = -0.5;
     private boolean veranlagungOnlyForChangedValues = false;
+    private boolean aenderungsanfrageEnabled = false;
 
     private String appbackendDomain = null;
     private String appbackendConnectionclass = null;
@@ -208,6 +209,15 @@ public class AppPreferences {
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
                     log.fatal("Fehler beim parsen von veranlassungOnlyForChangedValues --> benutze default false", e);
+                }
+            }
+
+            try {
+                aenderungsanfrageEnabled = Boolean.parseBoolean(root.getChild("general").getAttribute(
+                            "aenderungsanfrageEnabled").getValue());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.fatal("Fehler beim parsen von aenderungsanfrageEnabled --> benutze default false", e);
                 }
             }
 
