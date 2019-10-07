@@ -1404,33 +1404,37 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      */
     private void gotoKassenzeichen(final String kassenzeichen, final boolean edit, final boolean historyEnabled) {
         final String[] test = kassenzeichen.split(":");
+        final String[] testStac = kassenzeichen.split(";");
 
-        final String kassenzeichenNummer;
-        final String flaechenBez;
-        if (test.length > 1) {
-            kassenzeichenNummer = test[0];
-            flaechenBez = test[1];
-        } else {
-            kassenzeichenNummer = kassenzeichen;
-            flaechenBez = "";
-        }
+        String kassenzeichenNummer = (test.length > 1) ? test[0] : kassenzeichen;
+        final String flaechenBez = (test.length > 1) ? test[1] : "";
+
+        kassenzeichenNummer = (testStac.length > 1) ? testStac[0] : kassenzeichenNummer;
+        final Integer stacId = (testStac.length > 1) ? Integer.parseInt(testStac[1]) : null;
 
         if (!Main.getInstance().isInEditMode()) {
             Main.getInstance().disableKassenzeichenCmds();
             Main.getInstance().getKassenzeichenPanel().setSearchStarted();
             GrundbuchblattSucheDialog.getInstance().setEnabled(false);
-            Main.getInstance().getKassenzeichenPanel().setSearchField(kassenzeichen);
+            Main.getInstance()
+                    .getKassenzeichenPanel()
+                    .setSearchField((stacId != null) ? kassenzeichenNummer : kassenzeichen);
 
             WaitDialog.getInstance().showDialog();
             WaitDialog.getInstance().startLoadingKassenzeichen(1);
 
+            final Integer kassenzeichenNummerInt = Integer.parseInt(kassenzeichenNummer);
             new SwingWorker<CidsBean, Void>() {
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummer));
+                        final CidsBean cidsBean = loadKassenzeichenByNummer(kassenzeichenNummerInt);
                         updateCrossReferences(cidsBean);
-                        AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(cidsBean);
+                        if (stacId != null) {
+                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(stacId);
+                        } else {
+                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(cidsBean);
+                        }
                         return cidsBean;
                     }
 

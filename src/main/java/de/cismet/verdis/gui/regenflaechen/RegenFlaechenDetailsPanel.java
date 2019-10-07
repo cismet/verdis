@@ -57,7 +57,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -175,11 +174,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JLabel lblTeileigentumQuerverweise;
     private javax.swing.JLabel lblVeranlagungsdatum;
     private javax.swing.JPanel pnlAnschlussgrad;
-    private javax.swing.JPanel pnlAnschlussgradAenderung;
-    private javax.swing.JPanel pnlFlaechenArt;
-    private javax.swing.JPanel pnlFlaechenartAenderung;
-    private javax.swing.JPanel pnlGroesseAenderung;
-    private javax.swing.JPanel pnlGroesseKorrektur;
+    private javax.swing.JPanel pnlFlaechenart;
+    private javax.swing.JPanel pnlGroesse;
     private javax.swing.JScrollPane scpBemerkung;
     private javax.swing.JScrollPane scpQuer;
     private javax.swing.JTextField txtAenderungsdatum;
@@ -781,7 +777,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     /**
      * DOCUMENT ME!
      *
-     * @param  aenderungPanel         DOCUMENT ME!
      * @param  aenderungLabel         DOCUMENT ME!
      * @param  aenderungAcceptButton  DOCUMENT ME!
      * @param  aenderungRejectButton  DOCUMENT ME!
@@ -791,7 +786,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  b                      DOCUMENT ME!
      */
     private static void doAenderungChanges(
-            final JPanel aenderungPanel,
             final JLabel aenderungLabel,
             final JButton aenderungAcceptButton,
             final JButton aenderungRejectButton,
@@ -799,7 +793,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             final String valueAenderung,
             final boolean hasPruefung,
             final boolean b) {
-        aenderungPanel.setVisible(valueAenderung != null);
+        aenderungLabel.setVisible(valueAenderung != null);
+        aenderungAcceptButton.setVisible(valueAenderung != null);
+        aenderungRejectButton.setVisible(valueAenderung != null);
         if (valueAenderung != null) {
             final boolean isVeraendert = !valueAenderung.equals(valueOriginal);
             final Boolean isAenderungAccepted = hasPruefung ? (!isVeraendert) : null;
@@ -849,7 +845,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
                             && (flaecheJson.getPruefung().getGroesse() != null);
                 doAenderungChanges(
-                    pnlGroesseAenderung,
                     lblGroesseAenderung,
                     btnGroesseAenderungAccept,
                     btnGroesseAenderungReject,
@@ -859,7 +854,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     b);
             } catch (final Exception ex) {
                 LOG.error(ex, ex);
-                pnlGroesseAenderung.setVisible(false);
+                lblGroesseAenderung.setVisible(false);
+                btnGroesseAenderungAccept.setVisible(false);
+                btnGroesseAenderungReject.setVisible(false);
             }
 
             try {
@@ -872,7 +869,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
                             && (flaecheJson.getPruefung().getFlaechenart() != null);
                 doAenderungChanges(
-                    pnlFlaechenartAenderung,
                     lblFlaechenartAenderung,
                     btnFlaechenartAenderungAccept,
                     btnFlaechenartAenderungReject,
@@ -882,7 +878,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     b);
             } catch (final Exception ex) {
                 LOG.error(ex, ex);
-                pnlFlaechenartAenderung.setVisible(false);
+                lblFlaechenartAenderung.setVisible(false);
+                btnFlaechenartAenderungAccept.setVisible(false);
+                btnFlaechenartAenderungReject.setVisible(false);
             }
 
             try {
@@ -895,7 +893,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
                             && (flaecheJson.getPruefung().getAnschlussgrad() != null);
                 doAenderungChanges(
-                    pnlAnschlussgradAenderung,
                     lblAnschlussgradAenderung,
                     btnAnschlussgradAenderungAccept,
                     btnAnschlussgradAenderungReject,
@@ -905,13 +902,21 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     b);
             } catch (final Exception ex) {
                 LOG.error(ex, ex);
-                pnlFlaechenartAenderung.setVisible(false);
+                lblAnschlussgradAenderung.setVisible(false);
+                btnAnschlussgradAenderungAccept.setVisible(false);
+                btnAnschlussgradAenderungReject.setVisible(false);
             }
         } else {
             flaecheJson = null;
-            pnlGroesseAenderung.setVisible(false);
-            pnlFlaechenartAenderung.setVisible(false);
-            pnlAnschlussgradAenderung.setVisible(false);
+            lblGroesseAenderung.setVisible(false);
+            btnGroesseAenderungAccept.setVisible(false);
+            btnGroesseAenderungReject.setVisible(false);
+            lblFlaechenartAenderung.setVisible(false);
+            btnFlaechenartAenderungAccept.setVisible(false);
+            btnFlaechenartAenderungReject.setVisible(false);
+            lblAnschlussgradAenderung.setVisible(false);
+            btnAnschlussgradAenderungAccept.setVisible(false);
+            btnAnschlussgradAenderungReject.setVisible(false);
         }
     }
 
@@ -1648,26 +1653,23 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         edtQuer = new javax.swing.JEditorPane();
         lblBeschreibung = new javax.swing.JLabel();
         cboBeschreibung = new DefaultBindableReferenceCombo();
-        jCheckBox1 = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
-        pnlGroesseKorrektur = new javax.swing.JPanel();
-        txtGroesseKorrektur = new javax.swing.JTextField();
-        pnlGroesseAenderung = new javax.swing.JPanel();
+        pnlGroesse = new javax.swing.JPanel();
         lblGroesseAenderung = new javax.swing.JLabel();
-        btnGroesseAenderungAccept = new javax.swing.JButton();
         btnGroesseAenderungReject = new javax.swing.JButton();
-        pnlFlaechenArt = new javax.swing.JPanel();
-        cboFlaechenart = createComboArtForEdit();
-        pnlFlaechenartAenderung = new javax.swing.JPanel();
+        btnGroesseAenderungAccept = new javax.swing.JButton();
+        txtGroesseKorrektur = new javax.swing.JTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        pnlFlaechenart = new javax.swing.JPanel();
         lblFlaechenartAenderung = new javax.swing.JLabel();
         btnFlaechenartAenderungReject = new javax.swing.JButton();
         btnFlaechenartAenderungAccept = new javax.swing.JButton();
+        cboFlaechenart = createComboArtForEdit();
         pnlAnschlussgrad = new javax.swing.JPanel();
-        cboAnschlussgrad = new DefaultBindableReferenceCombo();
-        pnlAnschlussgradAenderung = new javax.swing.JPanel();
-        btnAnschlussgradAenderungAccept = new javax.swing.JButton();
-        btnAnschlussgradAenderungReject = new javax.swing.JButton();
         lblAnschlussgradAenderung = new javax.swing.JLabel();
+        btnAnschlussgradAenderungReject = new javax.swing.JButton();
+        btnAnschlussgradAenderungAccept = new javax.swing.JButton();
+        cboAnschlussgrad = new DefaultBindableReferenceCombo();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -1683,7 +1685,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblBezeichnung, gridBagConstraints);
 
         lblGroesseGrafik.setText(org.openide.util.NbBundle.getMessage(
@@ -1693,7 +1695,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblGroesseGrafik, gridBagConstraints);
 
         lblGroesseKorrektur.setText(org.openide.util.NbBundle.getMessage(
@@ -1703,7 +1705,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblGroesseKorrektur, gridBagConstraints);
 
         lblFlaechenart.setText(org.openide.util.NbBundle.getMessage(
@@ -1713,7 +1715,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblFlaechenart, gridBagConstraints);
 
         lblAnschlussgrad.setText(org.openide.util.NbBundle.getMessage(
@@ -1723,7 +1725,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblAnschlussgrad, gridBagConstraints);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -1740,10 +1742,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(txtBezeichnung, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -1769,7 +1770,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(txtGroesseGrafik, gridBagConstraints);
 
         lblAnteil.setText(org.openide.util.NbBundle.getMessage(
@@ -1779,7 +1780,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblAnteil, gridBagConstraints);
 
         lblAenderungsdatum.setText(org.openide.util.NbBundle.getMessage(
@@ -1789,7 +1790,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblAenderungsdatum, gridBagConstraints);
 
         lblVeranlagungsdatum.setText(org.openide.util.NbBundle.getMessage(
@@ -1799,7 +1800,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblVeranlagungsdatum, gridBagConstraints);
 
         lblBemerkung.setText(org.openide.util.NbBundle.getMessage(
@@ -1810,7 +1811,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblBemerkung, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -1828,10 +1829,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(txtAnteil, gridBagConstraints);
 
         txtAenderungsdatum.setEditable(false);
@@ -1851,10 +1851,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(txtAenderungsdatum, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -1871,10 +1870,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(txtVeranlagungsdatum, gridBagConstraints);
 
         scpBemerkung.setMinimumSize(new java.awt.Dimension(23, 70));
@@ -1901,11 +1899,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(scpBemerkung, gridBagConstraints);
 
         lblTeileigentumQuerverweise.setText(org.openide.util.NbBundle.getMessage(
@@ -1916,7 +1913,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 11;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblTeileigentumQuerverweise, gridBagConstraints);
 
         scpQuer.setOpaque(false);
@@ -1929,12 +1926,11 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(scpQuer, gridBagConstraints);
 
         lblBeschreibung.setText(org.openide.util.NbBundle.getMessage(
@@ -1944,7 +1940,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 8, 2, 3);
         bpanRegenFlDetails.add(lblBeschreibung, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
@@ -1960,34 +1956,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(cboBeschreibung, gridBagConstraints);
-
-        jCheckBox1.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.jCheckBox1.text")); // NOI18N
-        jCheckBox1.setContentAreaFilled(false);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.nachgewiesen}"),
-                jCheckBox1,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"));
-        binding.setSourceNullValue(false);
-        binding.setSourceUnreadableValue(false);
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
-        bpanRegenFlDetails.add(jCheckBox1, gridBagConstraints);
 
         jPanel1.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1995,40 +1967,11 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 13;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 0.01;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
         bpanRegenFlDetails.add(jPanel1, gridBagConstraints);
 
-        pnlGroesseKorrektur.setOpaque(false);
-        pnlGroesseKorrektur.setLayout(new java.awt.GridBagLayout());
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
-                txtGroesseKorrektur,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                        + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
-        binding.setSourceNullValue("");
-        binding.setSourceUnreadableValue("");
-        bindingGroup.addBinding(binding);
-
-        txtGroesseKorrektur.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final java.beans.PropertyChangeEvent evt) {
-                    txtGroesseKorrekturPropertyChange(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        pnlGroesseKorrektur.add(txtGroesseKorrektur, gridBagConstraints);
-
-        pnlGroesseAenderung.setOpaque(false);
-        pnlGroesseAenderung.setLayout(new java.awt.GridBagLayout());
+        pnlGroesse.setOpaque(false);
+        pnlGroesse.setLayout(new java.awt.GridBagLayout());
 
         lblGroesseAenderung.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
@@ -2039,8 +1982,36 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 4);
+        pnlGroesse.add(lblGroesseAenderung, gridBagConstraints);
+
+        btnGroesseAenderungReject.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
+        btnGroesseAenderungReject.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.btnGroesseAenderungReject.text"));                  // NOI18N
+        btnGroesseAenderungReject.setToolTipText("Änderung ablehnen");
+        btnGroesseAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
+        btnGroesseAenderungReject.setFocusPainted(false);
+        btnGroesseAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
+        btnGroesseAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
+        btnGroesseAenderungReject.setPreferredSize(new java.awt.Dimension(24, 24));
+        btnGroesseAenderungReject.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnGroesseAenderungRejectActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlGroesseAenderung.add(lblGroesseAenderung, gridBagConstraints);
+        pnlGroesse.add(btnGroesseAenderungReject, gridBagConstraints);
 
         btnGroesseAenderungAccept.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
@@ -2067,71 +2038,71 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlGroesseAenderung.add(btnGroesseAenderungAccept, gridBagConstraints);
+        pnlGroesse.add(btnGroesseAenderungAccept, gridBagConstraints);
 
-        btnGroesseAenderungReject.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
-        btnGroesseAenderungReject.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.btnGroesseAenderungReject.text"));                  // NOI18N
-        btnGroesseAenderungReject.setToolTipText("Änderung ablehnen");
-        btnGroesseAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
-        btnGroesseAenderungReject.setFocusPainted(false);
-        btnGroesseAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
-        btnGroesseAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
-        btnGroesseAenderungReject.setPreferredSize(new java.awt.Dimension(24, 24));
-        btnGroesseAenderungReject.addActionListener(new java.awt.event.ActionListener() {
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.groesse_korrektur}"),
+                txtGroesseKorrektur,
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                        + "."
+                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
+        binding.setSourceNullValue("");
+        binding.setSourceUnreadableValue("");
+        bindingGroup.addBinding(binding);
+
+        txtGroesseKorrektur.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
 
                 @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnGroesseAenderungRejectActionPerformed(evt);
+                public void propertyChange(final java.beans.PropertyChangeEvent evt) {
+                    txtGroesseKorrekturPropertyChange(evt);
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlGroesseAenderung.add(btnGroesseAenderungReject, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        pnlGroesse.add(txtGroesseKorrektur, gridBagConstraints);
+
+        jCheckBox1.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.jCheckBox1.text")); // NOI18N
+        jCheckBox1.setContentAreaFilled(false);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.nachgewiesen}"),
+                jCheckBox1,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        binding.setSourceNullValue(false);
+        binding.setSourceUnreadableValue(false);
+        bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        pnlGroesseKorrektur.add(pnlGroesseAenderung, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        pnlGroesse.add(jCheckBox1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
-        bpanRegenFlDetails.add(pnlGroesseKorrektur, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanRegenFlDetails.add(pnlGroesse, gridBagConstraints);
 
-        pnlFlaechenArt.setOpaque(false);
-        pnlFlaechenArt.setLayout(new java.awt.GridBagLayout());
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.flaechenart}"),
-                cboFlaechenart,
-                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
-        binding.setSourceNullValue(null);
-        binding.setSourceUnreadableValue(null);
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        pnlFlaechenArt.add(cboFlaechenart, gridBagConstraints);
-
-        pnlFlaechenartAenderung.setOpaque(false);
-        pnlFlaechenartAenderung.setLayout(new java.awt.GridBagLayout());
+        pnlFlaechenart.setOpaque(false);
+        pnlFlaechenart.setLayout(new java.awt.GridBagLayout());
 
         lblFlaechenartAenderung.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
@@ -2142,8 +2113,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlFlaechenartAenderung.add(lblFlaechenartAenderung, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 4);
+        pnlFlaechenart.add(lblFlaechenartAenderung, gridBagConstraints);
 
         btnFlaechenartAenderungReject.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
@@ -2168,8 +2140,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlFlaechenartAenderung.add(btnFlaechenartAenderungReject, gridBagConstraints);
+        pnlFlaechenart.add(btnFlaechenartAenderungReject, gridBagConstraints);
 
         btnFlaechenartAenderungAccept.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
@@ -2196,46 +2169,78 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlFlaechenartAenderung.add(btnFlaechenartAenderungAccept, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        pnlFlaechenArt.add(pnlFlaechenartAenderung, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
-        bpanRegenFlDetails.add(pnlFlaechenArt, gridBagConstraints);
-
-        pnlAnschlussgrad.setOpaque(false);
-        pnlAnschlussgrad.setLayout(new java.awt.GridBagLayout());
+        pnlFlaechenart.add(btnFlaechenartAenderungAccept, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.anschlussgrad}"),
-                cboAnschlussgrad,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.flaechenart}"),
+                cboFlaechenart,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         binding.setSourceNullValue(null);
         binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        pnlAnschlussgrad.add(cboAnschlussgrad, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        pnlFlaechenart.add(cboFlaechenart, gridBagConstraints);
 
-        pnlAnschlussgradAenderung.setOpaque(false);
-        pnlAnschlussgradAenderung.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        bpanRegenFlDetails.add(pnlFlaechenart, gridBagConstraints);
+
+        pnlAnschlussgrad.setOpaque(false);
+        pnlAnschlussgrad.setLayout(new java.awt.GridBagLayout());
+
+        lblAnschlussgradAenderung.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
+        lblAnschlussgradAenderung.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.lblAnschlussgradAenderung.text"));              // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 4);
+        pnlAnschlussgrad.add(lblAnschlussgradAenderung, gridBagConstraints);
+
+        btnAnschlussgradAenderungReject.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
+        btnAnschlussgradAenderungReject.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.btnAnschlussgradAenderungReject.text"));            // NOI18N
+        btnAnschlussgradAenderungReject.setToolTipText("Änderung ablehnen");
+        btnAnschlussgradAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
+        btnAnschlussgradAenderungReject.setFocusPainted(false);
+        btnAnschlussgradAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
+        btnAnschlussgradAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
+        btnAnschlussgradAenderungReject.setPreferredSize(new java.awt.Dimension(24, 24));
+        btnAnschlussgradAenderungReject.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnAnschlussgradAenderungRejectActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
+        pnlAnschlussgrad.add(btnAnschlussgradAenderungReject, gridBagConstraints);
 
         btnAnschlussgradAenderungAccept.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/redo.png"))); // NOI18N
@@ -2262,60 +2267,34 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlAnschlussgradAenderung.add(btnAnschlussgradAenderungAccept, gridBagConstraints);
+        pnlAnschlussgrad.add(btnAnschlussgradAenderungAccept, gridBagConstraints);
 
-        btnAnschlussgradAenderungReject.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
-        btnAnschlussgradAenderungReject.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.btnAnschlussgradAenderungReject.text"));            // NOI18N
-        btnAnschlussgradAenderungReject.setToolTipText("Änderung ablehnen");
-        btnAnschlussgradAenderungReject.setDisabledIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/titlebars/cancel.png"))); // NOI18N
-        btnAnschlussgradAenderungReject.setFocusPainted(false);
-        btnAnschlussgradAenderungReject.setMaximumSize(new java.awt.Dimension(24, 24));
-        btnAnschlussgradAenderungReject.setMinimumSize(new java.awt.Dimension(24, 24));
-        btnAnschlussgradAenderungReject.setPreferredSize(new java.awt.Dimension(24, 24));
-        btnAnschlussgradAenderungReject.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnAnschlussgradAenderungRejectActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlAnschlussgradAenderung.add(btnAnschlussgradAenderungReject, gridBagConstraints);
-
-        lblAnschlussgradAenderung.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/images/table/edited.png"))); // NOI18N
-        lblAnschlussgradAenderung.setText(org.openide.util.NbBundle.getMessage(
-                RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.lblAnschlussgradAenderung.text"));              // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-        pnlAnschlussgradAenderung.add(lblAnschlussgradAenderung, gridBagConstraints);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.flaecheninfo.anschlussgrad}"),
+                cboAnschlussgrad,
+                org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
+        bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        pnlAnschlussgrad.add(pnlAnschlussgradAenderung, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        pnlAnschlussgrad.add(cboAnschlussgrad, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(pnlAnschlussgrad, gridBagConstraints);
 
         jPanel2.add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);

@@ -83,7 +83,6 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
-    private javax.swing.Box.Filler filler3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -168,12 +167,12 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
 
         lblCenter.setText(DATE_FORMAT.format(timestamp));
         if (Orientation.LEFT.equals(orientation)) {
-            jPanel1.remove(filler1);
+            jPanel4.remove(filler1);
             lblLeft.setText(absender);
             lblRight.setText("");
             roundedPanel1.setBackground(Boolean.TRUE.equals(nachrichtJson.getDraft()) ? COLOR_LEFT_DRAFT : COLOR_LEFT);
         } else if (Orientation.RIGHT.equals(orientation)) {
-            jPanel1.remove(filler3);
+            jPanel4.remove(filler2);
             lblLeft.setText("");
             lblRight.setText(absender);
             roundedPanel1.setBackground(Boolean.TRUE.equals(nachrichtJson.getDraft()) ? COLOR_RIGHT_DRAFT
@@ -228,19 +227,16 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         lblRight = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0));
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(100, 0),
+                new java.awt.Dimension(100, 0),
+                new java.awt.Dimension(100, 32767));
         roundedPanel1 = new de.cismet.tools.gui.RoundedPanel();
         jPanel2 = new javax.swing.JPanel();
         jTextArea1 = new javax.swing.JTextArea();
         pnlAnhang = new javax.swing.JPanel();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(32767, 0));
-        filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0));
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(100, 0),
+                new java.awt.Dimension(100, 0),
+                new java.awt.Dimension(50, 32767));
 
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
@@ -277,6 +273,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 2, 10);
         add(jPanel3, gridBagConstraints);
 
         jPanel1.setOpaque(false);
@@ -285,11 +282,8 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         jPanel4.setOpaque(false);
         jPanel4.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel4.add(filler2, gridBagConstraints);
+        jPanel4.add(filler1, gridBagConstraints);
 
         roundedPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -326,30 +320,23 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         roundedPanel1.add(jPanel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         jPanel4.add(roundedPanel1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel4.add(filler2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 2.0;
         gridBagConstraints.weighty = 1.0;
         jPanel1.add(jPanel4, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(filler1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(filler3, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

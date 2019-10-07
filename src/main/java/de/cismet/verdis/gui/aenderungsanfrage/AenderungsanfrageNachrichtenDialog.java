@@ -111,8 +111,8 @@ public class AenderungsanfrageNachrichtenDialog extends javax.swing.JDialog {
                             }
                         });
 
-                    final AenderungsanfrageJson anfrageJson = dialog.getComplexAnfrageJson();
-                    dialog.aenderungsanfrageNachrichtenPanel1.setNachrichten(anfrageJson.getNachrichten());
+                    final AenderungsanfrageJson aenderungsanfrage = dialog.getComplexAnfrageJson();
+                    dialog.aenderungsanfrageNachrichtenPanel1.setAenderungsanfrage(aenderungsanfrage);
                     dialog.setVisible(true);
                 }
             });

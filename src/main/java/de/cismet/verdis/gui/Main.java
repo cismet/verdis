@@ -120,7 +120,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.prefs.Preferences;
@@ -256,8 +255,8 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
+import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -1754,7 +1753,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 public void run() {
-                    rootWindow.setWindow(createSplitWindow(vSummen, vTabelleRegen, vDetailsRegen));
+                    final DockingWindow metaWindow =
+                        CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()
+                        ? new TabWindow(new DockingWindow[] { vSummen, vAenderungsanfragenNachrichten }) : vSummen;
+                    rootWindow.setWindow(createSplitWindow(metaWindow, vTabelleRegen, vDetailsRegen));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 }
@@ -1815,7 +1817,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private SplitWindow createMapTableDetailsSplitWindow(final View table, final View details) {
+    private SplitWindow createMapTableDetailsSplitWindow(final DockingWindow table, final DockingWindow details) {
         return new SplitWindow(true, 0.66f,
                 new TabWindow(new DockingWindow[] { vKarte, table }), details);
     }
@@ -1827,7 +1829,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private SplitWindow createMapTableDetailsSplitWindow(final View table) {
+    private SplitWindow createMapTableDetailsSplitWindow(final DockingWindow table) {
         return new SplitWindow(true, 0.66f, vKarte, table);
     }
 
@@ -1838,8 +1840,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private SplitWindow createMetaInfoSplitWindow(final View meta) {
-        return new SplitWindow(true, 0.75f, createKassenzeichenSplitWindow(), meta);
+    private SplitWindow createMetaInfoSplitWindow(final DockingWindow meta) {
+        final float amount = CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled() ? 0.6f
+                                                                                                           : 0.5f;
+        return new SplitWindow(true, amount, createKassenzeichenSplitWindow(), meta);
     }
 
     /**
@@ -1848,15 +1852,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @return  DOCUMENT ME!
      */
     private SplitWindow createKassenzeichenSplitWindow() {
+        final float amount = CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled() ? 0.5f
+                                                                                                           : 0.62f;
+        final DockingWindow rightWindow = CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()
+            ? new TabWindow(new DockingWindow[] { vKassenzeichenList, vAenderungsanfragenTable }) : vKassenzeichenList;
         return new SplitWindow(
                 true,
-                0.3f,
+                amount,
                 vKassenzeichen,
-                new SplitWindow(
-                    true,
-                    0.35f,
-                    vKassenzeichenList,
-                    new SplitWindow(true, 0.5f, vAenderungsanfragenTable, vAenderungsanfragenNachrichten)));
+                rightWindow);
     }
 
     /**
@@ -1868,7 +1872,9 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private SplitWindow createSplitWindow(final View meta, final View table, final View details) {
+    private SplitWindow createSplitWindow(final DockingWindow meta,
+            final DockingWindow table,
+            final DockingWindow details) {
         return new SplitWindow(
                 false,
                 0.4353147f,
@@ -1884,7 +1890,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @return  DOCUMENT ME!
      */
-    private SplitWindow createSplitWindow(final View meta, final View table) {
+    private SplitWindow createSplitWindow(final DockingWindow meta, final DockingWindow table) {
         return new SplitWindow(
                 false,
                 0.4353147f,
@@ -3315,7 +3321,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  v  DOCUMENT ME!
      */
-    private void showOrHideView(final View v) {
+    private void showOrHideView(final DockingWindow v) {
         ///irgendwas besser als Closable ??
         // Problem wenn floating --> close -> open  (muss zweimal open)
 
@@ -3808,12 +3814,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                     @Override
                     protected Boolean doInBackground() throws Exception {
+                        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance()
+                                    .getAenderungsanfrageBean();
                         if (editMode) {              // this is before switching the mode
+                            if (aenderungsanfrageBean != null) {
+                                aenderungsanfrageBean.setProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
+                                    KassenzeichenChangeRequestServerAction.Status.PENDING.toString());
+                                aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
+                            }
                             if (!changesPending()) { // only if no save is needed
                                 releaseLocks();
                                 return false;
                             }
                         } else {
+                            if (aenderungsanfrageBean != null) {
+                                aenderungsanfrageBean.setProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
+                                    KassenzeichenChangeRequestServerAction.Status.PROCESSING.toString());
+                                aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
+                            }
                             if (acquireLocks()) {    // try to acquire
                                 return true;
                             }

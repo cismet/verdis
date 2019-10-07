@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>6.8.1-changerequest-prerelease-6</version>
+                <version>6.9.1</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -374,6 +374,12 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>                
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>    
         <dependency>
             <groupId>edu.umd</groupId>
             <artifactId>piccolo</artifactId>

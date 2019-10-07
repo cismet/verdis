@@ -20,6 +20,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
 import de.cismet.verdis.CidsAppBackend;
+import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
@@ -29,7 +30,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore {
+public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore, EditModeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -42,6 +43,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTable aenderungsanfrageTable1;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
@@ -60,6 +62,8 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 public void valueChanged(final ListSelectionEvent e) {
                 }
             });
+
+        refresh();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -76,6 +80,9 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         jScrollPane2 = new javax.swing.JScrollPane();
         aenderungsanfrageTable1 = new org.jdesktop.swingx.JXTable();
         jButton1 = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -92,10 +99,10 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -111,8 +118,17 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 0);
         add(jButton1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        add(filler1, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -172,7 +188,9 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
             final Integer kassenzeichen = (Integer)aenderungsanfrage.getProperty(
                     VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER);
             if (kassenzeichen != null) {
-                CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen));
+                final Integer stacId = (Integer)aenderungsanfrage.getProperty(
+                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID);
+                CidsAppBackend.getInstance().gotoKassenzeichen(Integer.toString(kassenzeichen) + ";" + stacId);
             }
         }
     }
@@ -204,6 +222,13 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         this.cidsBean = cidsBean;
+        refresh();
+    }
+
+    @Override
+    public void editModeChanged() {
+//        setEnabled(CidsAppBackend.getInstance().isEditable()
+//                    && (AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean() != null));
         refresh();
     }
 }

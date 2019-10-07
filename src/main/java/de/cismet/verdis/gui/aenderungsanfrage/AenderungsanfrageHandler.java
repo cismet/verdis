@@ -107,18 +107,44 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public void updateAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
-        aenderungsanfrageBean = null;
         final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
         search.setKassenzeichennummer((Integer)cidsBean.getProperty(
                 VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
-        final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
-                    .executeCustomServerSearch(search);
-        if (mons != null) {
-            for (final MetaObjectNode mon : mons) {
-                final MetaObject mo = CidsAppBackend.getInstance()
-                            .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
-                if (mo != null) {
-                    aenderungsanfrageBean = mo.getBean();
+        updateAenderungsanfrageBean(search);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   stacId  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void updateAenderungsanfrageBean(final Integer stacId) throws Exception {
+        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+        search.setStacId(stacId);
+        updateAenderungsanfrageBean(search);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   search  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void updateAenderungsanfrageBean(final AenderungsanfrageSearchStatement search) throws Exception {
+        aenderungsanfrageBean = null;
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+            final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
+                        .executeCustomServerSearch(search);
+            if (mons != null) {
+                for (final MetaObjectNode mon : mons) {
+                    final MetaObject mo = CidsAppBackend.getInstance()
+                                .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
+                    if (mo != null) {
+                        aenderungsanfrageBean = mo.getBean();
+                    }
                 }
             }
         }
@@ -291,15 +317,17 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public void persistAenderungsanfrageBean(final CidsBean kassenzeichenBean) throws Exception {
-        final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
-        if (aenderungsanfrageBean != null) {
-            final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-            doPruefung(aenderungsanfrage, kassenzeichenBean);
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+            final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
+            if (aenderungsanfrageBean != null) {
+                final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+                doPruefung(aenderungsanfrage, kassenzeichenBean);
 
-            aenderungsanfrageBean.setProperty(
-                VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON,
-                aenderungsanfrage.toJson());
-            this.aenderungsanfrageBean = aenderungsanfrageBean.persist();
+                aenderungsanfrageBean.setProperty(
+                    VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON,
+                    aenderungsanfrage.toJson());
+                this.aenderungsanfrageBean = aenderungsanfrageBean.persist();
+            }
         }
     }
     /**
@@ -326,18 +354,22 @@ public class AenderungsanfrageHandler {
      * @return  DOCUMENT ME!
      */
     public boolean changesPending() {
-        final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-        final String aenderungsanfrageOrigJson = (String)getAenderungsanfrageBean().getProperty(
-                VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON);
-        AenderungsanfrageJson aenderungsanfrageOrig;
-        try {
-            aenderungsanfrageOrig = (aenderungsanfrageOrigJson != null)
-                ? AenderungsanfrageJson.readValue(aenderungsanfrageOrigJson) : null;
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-            aenderungsanfrageOrig = null;
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+            final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+            final String aenderungsanfrageOrigJson = (String)getAenderungsanfrageBean().getProperty(
+                    VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON);
+            AenderungsanfrageJson aenderungsanfrageOrig;
+            try {
+                aenderungsanfrageOrig = (aenderungsanfrageOrigJson != null)
+                    ? AenderungsanfrageJson.readValue(aenderungsanfrageOrigJson) : null;
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+                aenderungsanfrageOrig = null;
+            }
+            return !Objects.equals(aenderungsanfrage, aenderungsanfrageOrig);
+        } else {
+            return false;
         }
-        return !Objects.equals(aenderungsanfrage, aenderungsanfrageOrig);
     }
 
     /**
@@ -346,36 +378,8 @@ public class AenderungsanfrageHandler {
      * @return  DOCUMENT ME!
      */
     public List<CidsBean> searchAenderungsanfrageBeans() {
-        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-        final List<CidsBean> cidsBeanList = new ArrayList<>();
-        try {
-            final Collection<MetaObjectNode> mons = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
-            for (final MetaObjectNode mon : mons) {
-                final MetaObject mo = SessionManager.getProxy()
-                            .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
-                cidsBeanList.add(mo.getBean());
-            }
-        } catch (final ConnectionException ex) {
-            LOG.fatal(ex, ex);
-        }
-        if (!cidsBeanList.isEmpty()) {
-            return cidsBeanList;
-        }
-        return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   kassenzeichennummer  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public CidsBean searchAenderungsanfrageBean(final Integer kassenzeichennummer) {
-        if (kassenzeichennummer != null) {
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-            search.setKassenzeichennummer(kassenzeichennummer);
             final List<CidsBean> cidsBeanList = new ArrayList<>();
             try {
                 final Collection<MetaObjectNode> mons = SessionManager.getProxy()
@@ -389,7 +393,39 @@ public class AenderungsanfrageHandler {
                 LOG.fatal(ex, ex);
             }
             if (!cidsBeanList.isEmpty()) {
-                return cidsBeanList.get(0);
+                return cidsBeanList;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichennummer  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBean searchAenderungsanfrageBean(final Integer kassenzeichennummer) {
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+            if (kassenzeichennummer != null) {
+                final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+                search.setKassenzeichennummer(kassenzeichennummer);
+                final List<CidsBean> cidsBeanList = new ArrayList<>();
+                try {
+                    final Collection<MetaObjectNode> mons = SessionManager.getProxy()
+                                .customServerSearch(SessionManager.getSession().getUser(), search);
+                    for (final MetaObjectNode mon : mons) {
+                        final MetaObject mo = SessionManager.getProxy()
+                                    .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
+                        cidsBeanList.add(mo.getBean());
+                    }
+                } catch (final ConnectionException ex) {
+                    LOG.fatal(ex, ex);
+                }
+                if (!cidsBeanList.isEmpty()) {
+                    return cidsBeanList.get(0);
+                }
             }
         }
         return null;
