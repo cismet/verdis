@@ -14,6 +14,9 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import org.openide.util.Exceptions;
+
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentAdapter;
@@ -21,7 +24,9 @@ import java.awt.event.ComponentEvent;
 
 import java.util.Date;
 
+import javax.swing.Box;
 import javax.swing.JScrollBar;
+import javax.swing.SwingUtilities;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
@@ -95,19 +100,39 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
         initComponents();
 
-        refresh();
-
         jScrollPane1.addComponentListener(new ComponentAdapter() {
 
                 @Override
                 public void componentResized(final ComponentEvent e) {
-                    final Dimension d = new Dimension(jScrollPane1.getWidth() - 20, jPanel1.getHeight());
-                    jPanel1.setPreferredSize(d);
+                    resize();
                 }
             });
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void resize() {
+        int height = 20;
+        Component filler = null;
+        for (final Component component : jPanel1.getComponents()) {
+            if (!(component instanceof Box.Filler)) {
+                height += 20 + component.getHeight();
+//                LOG.error(height);
+            } else {
+                filler = component;
+            }
+        }
+        final int width = jScrollPane1.getWidth() - 20;
+        if ((filler != null) && (height < jScrollPane1.getHeight())) {
+            filler.setPreferredSize(new Dimension(width, jScrollPane1.getHeight() - height));
+            height = jScrollPane1.getHeight() - 5;
+        }
+//        LOG.fatal(height);
+        jPanel1.setPreferredSize(new Dimension(width, height));
+    }
 
     /**
      * DOCUMENT ME!
@@ -245,6 +270,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jPanel3.add(filler3, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         add(jPanel3, gridBagConstraints);
@@ -372,21 +399,40 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * DOCUMENT ME!
      */
     public final void refresh() {
+        jPanel1.invalidate();
+        clear();
         if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
-            clear();
             for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
                 if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
                             && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
                     continue;
                 }
-                if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp()) && !jToggleButton1.isSelected()) {
+                if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
+                            && !jToggleButton1.isSelected()) {
                     continue;
                 }
                 addNachricht(nachrichtJson);
             }
         }
-        revalidate();
-        repaint();
+        jPanel1.revalidate();
+        try {
+            Thread.sleep(100);
+        } catch (final InterruptedException ex) {
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    resize();
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                scrollToBottom();
+                            }
+                        });
+                }
+            });
     }
 
     /**
@@ -396,7 +442,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     public void setAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage) {
         this.aenderungsanfrage = aenderungsanfrage;
-        refresh();
     }
 
     /**
@@ -405,17 +450,19 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  nachrichtJson  DOCUMENT ME!
      */
     private void addNachricht(final NachrichtJson nachrichtJson) {
-        final AenderungsanfrageNachrichtPanel aenderungsanfrageNachrichtPanel = new AenderungsanfrageNachrichtPanel(
-                nachrichtJson);
-
         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = GridBagConstraints.RELATIVE;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
-        jPanel1.add(aenderungsanfrageNachrichtPanel, gridBagConstraints);
+        jPanel1.add(new AenderungsanfrageNachrichtPanel(nachrichtJson), gridBagConstraints);
+    }
 
+    /**
+     * DOCUMENT ME!
+     */
+    private void scrollToBottom() {
         final JScrollBar verticalScrollbar = jScrollPane1.getVerticalScrollBar();
         verticalScrollbar.setValue(verticalScrollbar.getMaximum());
     }
@@ -424,11 +471,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * DOCUMENT ME!
      */
     private void clear() {
-        jPanel1.removeAll();
         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+
+        jPanel1.removeAll();
         jPanel1.add(new javax.swing.Box.Filler(
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
@@ -480,6 +528,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.EMAIL) : null);
         setAenderungsanfrage(AenderungsanfrageHandler.getInstance().getAenderungsanfrage());
         bindingGroup.bind();
+
+        refresh();
     }
 
     @Override

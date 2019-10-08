@@ -271,8 +271,7 @@ public class AenderungsanfrageHandler {
 
                     final String username = SessionManager.getSession().getUser().getName();
                     final boolean isPruefungGroesseInvalid = (pruefungGroesse != null)
-                                && !groesse.equals(pruefungGroesse.getAnfrage());
-
+                                && !groesse.equals(pruefungGroesse.getValue());
                     if (!Objects.equals(pruefungGroesse, newPruefungGroesse) || isPruefungGroesseInvalid) {
                         addSystemMessage(new NachrichtParameterJson.Groesse(
                                 groesseAenderung.equals(groesse) ? NachrichtParameterJson.Type.CHANGED
@@ -282,7 +281,7 @@ public class AenderungsanfrageHandler {
                             username);
                     }
                     final boolean isPruefungFlaechenartInvalid = (pruefungFlaechenartJson != null)
-                                && !flaechenart.equals(pruefungFlaechenartJson.getAnfrage().getArt());
+                                && !flaechenart.equals(pruefungFlaechenartJson.getValue().getArt());
                     if (!Objects.equals(pruefungFlaechenartJson, newPruefungFlaechenartJson)
                                 || isPruefungFlaechenartInvalid) {
                         addSystemMessage(new NachrichtParameterJson.Flaechenart(
@@ -293,7 +292,7 @@ public class AenderungsanfrageHandler {
                             username);
                     }
                     final boolean isPruefungAnschlussgradInvalid = (pruefungAnschlussgradJson != null)
-                                && !anschlussgrad.equals(pruefungAnschlussgradJson.getAnfrage().getGrad());
+                                && !anschlussgrad.equals(pruefungAnschlussgradJson.getValue().getGrad());
                     if (!Objects.equals(pruefungAnschlussgradJson, newPruefungAnschlussgradJson)
                                 || isPruefungAnschlussgradInvalid) {
                         addSystemMessage(new NachrichtParameterJson.Anschlussgrad(

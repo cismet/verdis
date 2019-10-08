@@ -1653,7 +1653,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         edtQuer = new javax.swing.JEditorPane();
         lblBeschreibung = new javax.swing.JLabel();
         cboBeschreibung = new DefaultBindableReferenceCombo();
-        jPanel1 = new javax.swing.JPanel();
         pnlGroesse = new javax.swing.JPanel();
         lblGroesseAenderung = new javax.swing.JLabel();
         btnGroesseAenderungReject = new javax.swing.JButton();
@@ -1670,6 +1669,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         btnAnschlussgradAenderungReject = new javax.swing.JButton();
         btnAnschlussgradAenderungAccept = new javax.swing.JButton();
         cboAnschlussgrad = new DefaultBindableReferenceCombo();
+        jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -1961,15 +1961,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(cboBeschreibung, gridBagConstraints);
 
-        jPanel1.setOpaque(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 0.01;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
-        bpanRegenFlDetails.add(jPanel1, gridBagConstraints);
-
         pnlGroesse.setOpaque(false);
         pnlGroesse.setLayout(new java.awt.GridBagLayout());
 
@@ -2090,7 +2081,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
         pnlGroesse.add(jCheckBox1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2296,6 +2287,15 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         bpanRegenFlDetails.add(pnlAnschlussgrad, gridBagConstraints);
+
+        jPanel1.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 0.01;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+        bpanRegenFlDetails.add(jPanel1, gridBagConstraints);
 
         jPanel2.add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);
 
