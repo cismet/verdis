@@ -14,8 +14,6 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -40,6 +38,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtSachberarbeiterJson;
 
 /**
  * DOCUMENT ME!
@@ -62,10 +61,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
-    private javax.swing.Box.Filler filler2;
     private javax.swing.Box.Filler filler3;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
@@ -75,7 +73,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleButton1;
-    private org.jdesktop.swingx.JXHyperlink jXHyperlink1;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -154,17 +151,13 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jPanel3 = new javax.swing.JPanel();
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(32767, 0));
-        jXHyperlink1 = new org.jdesktop.swingx.JXHyperlink();
-        jLabel1 = new javax.swing.JLabel();
         jToggleButton1 = new javax.swing.JToggleButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
+        jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
@@ -178,52 +171,22 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         setLayout(new java.awt.GridBagLayout());
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel3.add(filler2, gridBagConstraints);
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${email}"),
-                jXHyperlink1,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
-        bindingGroup.addBinding(binding);
-
-        jXHyperlink1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jXHyperlink1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 0);
-        jPanel3.add(jXHyperlink1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel1,
-            org.openide.util.NbBundle.getMessage(
-                AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 5);
-        jPanel3.add(jLabel1, gridBagConstraints);
-
+        jToggleButton1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/systemmessage_disabled.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jToggleButton1,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jToggleButton1.text")); // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jToggleButton1.text"));                    // NOI18N
+        jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jToggleButton1.toolTipText"));             // NOI18N
+        jToggleButton1.setBorderPainted(false);
+        jToggleButton1.setContentAreaFilled(false);
+        jToggleButton1.setFocusPainted(false);
+        jToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/systemmessage.png")));          // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -232,10 +195,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 0);
+        gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 0);
         jPanel3.add(jToggleButton1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -249,7 +212,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 5);
         jPanel3.add(jLabel2, gridBagConstraints);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ,
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${stacId}"),
@@ -268,6 +231,38 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         jPanel3.add(filler3, gridBagConstraints);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/email.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton2.text"));                                            // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${email}"),
+                jButton2,
+                org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
+        bindingGroup.addBinding(binding);
+
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 3);
+        jPanel3.add(jButton2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -351,7 +346,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         if ((jTextArea1.getText() != null) && !jTextArea1.getText().trim().isEmpty()) {
-            final NachrichtJson nachrichtJson = new NachrichtJson.Sachberarbeiter(
+            final NachrichtJson nachrichtJson = new NachrichtSachberarbeiterJson(
                     true,
                     new Date(),
                     jTextArea1.getText().trim(),
@@ -378,22 +373,22 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink1ActionPerformed
-        try {
-            BrowserLauncher.openURL("mailto:" + email);
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-        }
-    }                                                                                //GEN-LAST:event_jXHyperlink1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
+        refresh();
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
-        refresh();
-    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        try {
+            BrowserLauncher.openURL("mailto:" + email);
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
