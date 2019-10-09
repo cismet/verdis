@@ -43,8 +43,9 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTable aenderungsanfrageTable1;
-    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 
@@ -80,7 +81,8 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         jScrollPane2 = new javax.swing.JScrollPane();
         aenderungsanfrageTable1 = new org.jdesktop.swingx.JXTable();
         jButton1 = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+        jButton2 = new javax.swing.JButton();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
 
@@ -99,17 +101,25 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane2, gridBagConstraints);
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/reload.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton1,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageTablePanel.class,
-                "AenderungsanfrageTablePanel.jButton1.text")); // NOI18N
+                "AenderungsanfrageTablePanel.jButton1.text"));                                                   // NOI18N
+        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton1.toolTipText"));                                            // NOI18N
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -118,17 +128,45 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 0);
-        add(jButton1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 3);
+        add(jButton1, gridBagConstraints);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/kassenzeichen22.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton2.text"));                         // NOI18N
+        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton2.toolTipText"));                  // NOI18N
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setFocusPainted(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(7, 3, 0, 0);
+        add(jButton2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        add(filler1, gridBagConstraints);
+        add(filler2, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -152,6 +190,15 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
             }
         }
     }                                                                                       //GEN-LAST:event_aenderungsanfrageTable1MouseClicked
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        gotoSelectedKassenzeichen();
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!

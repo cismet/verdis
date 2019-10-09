@@ -38,9 +38,17 @@ import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAnschlussgradJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheFlaechenartJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterAnschlussgradJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterFlaechenartJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterGroesseJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtSystemJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungFlaechenartJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungGroesseJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -78,7 +86,8 @@ public class AenderungsanfrageHandler {
         final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
         if (aenderungsanfrageBean != null) {
             try {
-                aenderungsanfrageJson = AenderungsanfrageJson.readValue((String)aenderungsanfrageBean.getProperty(
+                aenderungsanfrageJson = AenderungsanfrageUtils.createAenderungsanfrageJson((String)
+                        aenderungsanfrageBean.getProperty(
                             VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON));
                 return;
             } catch (final Exception ex) {
@@ -96,7 +105,7 @@ public class AenderungsanfrageHandler {
      */
     public void addSystemMessage(final NachrichtParameterJson nachrichtenParameter, final String username) {
         getAenderungsanfrage().getNachrichten()
-                .add(new NachrichtJson.System(new Date(), nachrichtenParameter, username));
+                .add(new NachrichtSystemJson(new Date(), nachrichtenParameter, username));
     }
 
     /**
@@ -178,7 +187,7 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     private void interpretePruefung(final String json) throws Exception {
-        final NachrichtParameterJson parameters = NachrichtParameterJson.readValue(json);
+        final NachrichtParameterJson parameters = AenderungsanfrageUtils.createNachrichtParameterJson(json);
     }
 
     /**
@@ -226,11 +235,11 @@ public class AenderungsanfrageHandler {
                 final Integer groesse = (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
                 final Integer groesseAenderung = flaecheJson.getGroesse();
-                final PruefungJson.Groesse pruefungGroesse = (flaecheJson.getPruefung() != null)
+                final PruefungGroesseJson pruefungGroesse = (flaecheJson.getPruefung() != null)
                     ? flaecheJson.getPruefung().getGroesse() : null;
-                final PruefungJson.Groesse newPruefungGroesse =
+                final PruefungGroesseJson newPruefungGroesse =
                     (isNewPruefungDone(groesse, groesseAenderung, pruefungGroesse))
-                    ? new PruefungJson.Groesse(groesseAenderung, "test", now) : pruefungGroesse;
+                    ? new PruefungGroesseJson(groesseAenderung, "test", now) : pruefungGroesse;
 
                 // identifying flaechenart pruefung
                 final String flaechenart = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
@@ -238,11 +247,11 @@ public class AenderungsanfrageHandler {
                                 + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
                                 + VerdisConstants.PROP.FLAECHENART.ART);
                 final FlaecheFlaechenartJson flaechenartAenderung = flaecheJson.getFlaechenart();
-                final PruefungJson.Flaechenart pruefungFlaechenartJson = (flaecheJson.getPruefung() != null)
+                final PruefungFlaechenartJson pruefungFlaechenartJson = (flaecheJson.getPruefung() != null)
                     ? flaecheJson.getPruefung().getFlaechenart() : null;
-                final PruefungJson.Flaechenart newPruefungFlaechenartJson =
+                final PruefungFlaechenartJson newPruefungFlaechenartJson =
                     (isNewPruefungDone(flaechenart, flaechenartAenderung, pruefungFlaechenartJson))
-                    ? new PruefungJson.Flaechenart(flaecheJson.getFlaechenart(), "test", now) : pruefungFlaechenartJson;
+                    ? new PruefungFlaechenartJson(flaecheJson.getFlaechenart(), "test", now) : pruefungFlaechenartJson;
 
                 // identifying anschlussgrad pruefung
                 final String anschlussgrad = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
@@ -250,11 +259,11 @@ public class AenderungsanfrageHandler {
                                 + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
                                 + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD);
                 final FlaecheAnschlussgradJson anschlussgradAenderung = flaecheJson.getAnschlussgrad();
-                final PruefungJson.Anschlussgrad pruefungAnschlussgradJson = (flaecheJson.getPruefung() != null)
+                final PruefungAnschlussgradJson pruefungAnschlussgradJson = (flaecheJson.getPruefung() != null)
                     ? flaecheJson.getPruefung().getAnschlussgrad() : null;
-                final PruefungJson.Anschlussgrad newPruefungAnschlussgradJson =
+                final PruefungAnschlussgradJson newPruefungAnschlussgradJson =
                     (isNewPruefungDone(anschlussgrad, anschlussgradAenderung, pruefungAnschlussgradJson))
-                    ? new PruefungJson.Anschlussgrad(flaecheJson.getAnschlussgrad(), "test", now)
+                    ? new PruefungAnschlussgradJson(flaecheJson.getAnschlussgrad(), "test", now)
                     : pruefungAnschlussgradJson;
 
                 if ((newPruefungGroesse != null) || (newPruefungFlaechenartJson != null)
@@ -273,7 +282,7 @@ public class AenderungsanfrageHandler {
                     final boolean isPruefungGroesseInvalid = (pruefungGroesse != null)
                                 && !groesse.equals(pruefungGroesse.getValue());
                     if (!Objects.equals(pruefungGroesse, newPruefungGroesse) || isPruefungGroesseInvalid) {
-                        addSystemMessage(new NachrichtParameterJson.Groesse(
+                        addSystemMessage(new NachrichtParameterGroesseJson(
                                 groesseAenderung.equals(groesse) ? NachrichtParameterJson.Type.CHANGED
                                                                  : NachrichtParameterJson.Type.REJECTED,
                                 bezeichnung,
@@ -284,7 +293,7 @@ public class AenderungsanfrageHandler {
                                 && !flaechenart.equals(pruefungFlaechenartJson.getValue().getArt());
                     if (!Objects.equals(pruefungFlaechenartJson, newPruefungFlaechenartJson)
                                 || isPruefungFlaechenartInvalid) {
-                        addSystemMessage(new NachrichtParameterJson.Flaechenart(
+                        addSystemMessage(new NachrichtParameterFlaechenartJson(
                                 flaechenartAenderung.getArt().equals(flaechenart)
                                     ? NachrichtParameterJson.Type.CHANGED : NachrichtParameterJson.Type.REJECTED,
                                 bezeichnung,
@@ -295,7 +304,7 @@ public class AenderungsanfrageHandler {
                                 && !anschlussgrad.equals(pruefungAnschlussgradJson.getValue().getGrad());
                     if (!Objects.equals(pruefungAnschlussgradJson, newPruefungAnschlussgradJson)
                                 || isPruefungAnschlussgradInvalid) {
-                        addSystemMessage(new NachrichtParameterJson.Anschlussgrad(
+                        addSystemMessage(new NachrichtParameterAnschlussgradJson(
                                 anschlussgradAenderung.getGrad().equals(anschlussgrad)
                                     ? NachrichtParameterJson.Type.CHANGED : NachrichtParameterJson.Type.REJECTED,
                                 bezeichnung,
@@ -305,7 +314,7 @@ public class AenderungsanfrageHandler {
                 }
             }
         }
-        return AenderungsanfrageJson.readValue(aenderungsanfrage.toJson());
+        return AenderungsanfrageUtils.createAenderungsanfrageJson(aenderungsanfrage.toJson());
     }
 
     /**
@@ -360,7 +369,7 @@ public class AenderungsanfrageHandler {
             AenderungsanfrageJson aenderungsanfrageOrig;
             try {
                 aenderungsanfrageOrig = (aenderungsanfrageOrigJson != null)
-                    ? AenderungsanfrageJson.readValue(aenderungsanfrageOrigJson) : null;
+                    ? AenderungsanfrageUtils.createAenderungsanfrageJson(aenderungsanfrageOrigJson) : null;
             } catch (final Exception ex) {
                 LOG.error(ex, ex);
                 aenderungsanfrageOrig = null;

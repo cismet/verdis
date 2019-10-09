@@ -17,6 +17,7 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import org.openide.util.Exceptions;
 
 import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -125,7 +126,7 @@ public class AenderungsanfrageNachrichtenDialog extends javax.swing.JDialog {
      */
     private AenderungsanfrageJson getComplexAnfrageJson() {
         try {
-            return AenderungsanfrageJson.readValue("{\n"
+            return AenderungsanfrageUtils.createAenderungsanfrageJson("{\n"
                             + "  \"kassenzeichen\" : 60004629,\n"
                             + "  \"nachrichten\" : [ {\n"
                             + "    \"typ\" : \"CITIZEN\",\n"

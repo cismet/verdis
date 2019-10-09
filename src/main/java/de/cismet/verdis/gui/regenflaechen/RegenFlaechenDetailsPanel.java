@@ -91,8 +91,12 @@ import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
 import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungFlaechenartJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungGroesseJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungFlaechenartJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.PruefungGroesseJson;
 
 /**
  * DOCUMENT ME!
@@ -446,13 +450,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     groesseTo);
             }
 
-            final PruefungJson.Anschlussgrad.Groesse pruefungJson = new PruefungJson.Anschlussgrad.Groesse(
+            final PruefungGroesseJson pruefungJson = new PruefungGroesseJson(
                     Pruefung.ACCEPT.equals(status),
                     flaecheJson.getGroesse(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungJson.Groesse(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setGroesse(pruefungJson);
             }
@@ -494,13 +498,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             }
 
-            final PruefungJson.Anschlussgrad.Flaechenart pruefungJson = new PruefungJson.Anschlussgrad.Flaechenart(
+            final PruefungFlaechenartJson pruefungJson = new PruefungFlaechenartJson(
                     Pruefung.ACCEPT.equals(status),
                     flaecheJson.getFlaechenart(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungJson.Flaechenart(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setFlaechenart(pruefungJson);
             }
@@ -542,13 +546,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             }
 
-            final PruefungJson.Anschlussgrad pruefungJson = new PruefungJson.Anschlussgrad(Pruefung.ACCEPT.equals(
+            final PruefungAnschlussgradJson pruefungJson = new PruefungAnschlussgradJson(Pruefung.ACCEPT.equals(
                         status),
                     flaecheJson.getAnschlussgrad(),
                     SessionManager.getSession().getUser().getName(),
                     new Date());
             if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungJson.Anschlussgrad(pruefungJson));
+                flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
             } else {
                 flaecheJson.getPruefung().setAnschlussgrad(pruefungJson);
             }

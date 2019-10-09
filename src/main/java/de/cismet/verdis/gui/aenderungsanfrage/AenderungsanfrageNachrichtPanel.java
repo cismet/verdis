@@ -41,6 +41,7 @@ import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAnschlussgradJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheFlaechenartJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtAnhangJson;
+import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtBuergerJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
 import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterJson;
 
@@ -101,7 +102,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
      * Creates new form AenderungsanfrageNachrichtPanel.
      */
     public AenderungsanfrageNachrichtPanel() {
-        this(new NachrichtJson.Buerger(
+        this(new NachrichtBuergerJson(
                 new Date(),
                 "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
                 "Dirk Steinbacher",
