@@ -18,6 +18,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -437,6 +439,29 @@ public class AenderungsanfrageHandler {
             }
         }
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   aenderungsanfrageBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getStacIdHash(final CidsBean aenderungsanfrageBean) {
+        if (aenderungsanfrageBean != null) {
+            final String md5 = DigestUtils.md5Hex(
+                    Integer.toString(
+                        (Integer)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER))
+                            + ";"
+                            + Integer.toString(
+                                (Integer)aenderungsanfrageBean.getProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID)));
+            return md5.substring(0, 4);
+        } else {
+            return null;
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------

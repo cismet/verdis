@@ -7,8 +7,6 @@
 ****************************************************/
 package de.cismet.verdis.gui.aenderungsanfrage;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -36,14 +34,12 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     private static final String[] COLUMN_NAMES = {
-            "ID",
             "Kassenzeichen",
             "Status",
             "Letzte Änderung"
         };
 
     private static final Class[] COLUMN_CLASSES = {
-            String.class,
             String.class,
             String.class,
             java.util.Date.class
@@ -72,23 +68,14 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
         }
         switch (columnIndex) {
             case 0: {
-                final String md5 = DigestUtils.md5Hex(
-                        Integer.toString(
-                            (Integer)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER))
-                                + ";"
-                                + Integer.toString(
-                                    (Integer)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID)));
-                return md5.substring(0, 6);
-            }
-            case 1: {
                 return (cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER) != null)
                     ? Integer.toString((Integer)cidsBean.getProperty(
                             VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
             }
-            case 2: {
+            case 1: {
                 return (String)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
             }
-            case 3: {
+            case 2: {
                 final Timestamp timestamp = (Timestamp)cidsBean.getProperty(
                         VerdisConstants.PROP.AENDERUNGSANFRAGE.TIMESTAMP);
                 return (timestamp != null) ? DATE_FORMAT.format(timestamp) : timestamp;

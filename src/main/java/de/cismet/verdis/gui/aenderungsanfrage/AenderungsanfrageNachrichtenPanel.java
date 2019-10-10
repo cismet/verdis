@@ -12,8 +12,6 @@
  */
 package de.cismet.verdis.gui.aenderungsanfrage;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -64,8 +62,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     private javax.swing.Box.Filler filler3;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -152,8 +148,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
         jPanel3 = new javax.swing.JPanel();
         jToggleButton1 = new javax.swing.JToggleButton();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
@@ -195,38 +189,13 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 0);
         jPanel3.add(jToggleButton1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel2,
-            org.openide.util.NbBundle.getMessage(
-                AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 5);
-        jPanel3.add(jLabel2, gridBagConstraints);
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${stacId}"),
-                jLabel3,
-                org.jdesktop.beansbinding.BeanProperty.create("text"));
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 5, 5);
-        jPanel3.add(jLabel3, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -242,7 +211,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jButton2.setContentAreaFilled(false);
         jButton2.setFocusPainted(false);
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${email}"),
@@ -258,7 +227,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 3);
@@ -482,28 +451,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     @Override
     public CidsBean getCidsBean() {
         return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getStacId() {
-        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean();
-        if (aenderungsanfrageBean != null) {
-            final String md5 = DigestUtils.md5Hex(
-                    Integer.toString(
-                        (Integer)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER))
-                            + ";"
-                            + Integer.toString(
-                                (Integer)aenderungsanfrageBean.getProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID)));
-            return md5.substring(0, 6);
-        } else {
-            return null;
-        }
     }
 
     /**
