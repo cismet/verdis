@@ -38,12 +38,12 @@ import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtAnhangJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtBuergerJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterJson;
+import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
+import de.cismet.verdis.server.json.NachrichtAnhangJson;
+import de.cismet.verdis.server.json.NachrichtBuergerJson;
+import de.cismet.verdis.server.json.NachrichtJson;
+import de.cismet.verdis.server.json.NachrichtParameterJson;
 
 /**
  * DOCUMENT ME!

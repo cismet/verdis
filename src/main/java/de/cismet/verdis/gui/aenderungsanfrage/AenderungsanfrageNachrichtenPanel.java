@@ -34,9 +34,9 @@ import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtSachberarbeiterJson;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.NachrichtJson;
+import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
 
 /**
  * DOCUMENT ME!

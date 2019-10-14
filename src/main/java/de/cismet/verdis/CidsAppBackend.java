@@ -31,7 +31,6 @@ import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import Sirius.util.collections.MultiMap;
@@ -81,10 +80,12 @@ import de.cismet.verdis.gui.WaitDialog;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 
-import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
+import de.cismet.verdis.server.json.StacOptionsJson;
 import de.cismet.verdis.server.search.BefreiungerlaubnisCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FlaechenCrossReferencesServerSearch;
 import de.cismet.verdis.server.search.FrontenCrossReferencesServerSearch;
+import de.cismet.verdis.server.search.StacInfoSearchStatement;
+import de.cismet.verdis.server.utils.StacUtils;
 
 /**
  * DOCUMENT ME!
@@ -1396,6 +1397,29 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   stacId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public StacOptionsJson getStacOptions(final Integer stacId) throws Exception {
+        final StacInfoSearchStatement search = new StacInfoSearchStatement(StacInfoSearchStatement.SearchBy.STAC_ID);
+        search.setStacId(stacId);
+
+        final Collection<Map> col = executeCustomServerSearch(search);
+        if ((col != null) && !col.isEmpty()) {
+            final Map stacOptionsMap = (Map)((Map)col.iterator().next()).get(
+                    StacInfoSearchStatement.Fields.STAC_OPTIONS_JSON);
+            return StacUtils.createStacOptionsJson(stacOptionsMap);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * former synchronized method.
      *
      * @param  kassenzeichen   DOCUMENT ME!
@@ -1423,12 +1447,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             WaitDialog.getInstance().showDialog();
             WaitDialog.getInstance().startLoadingKassenzeichen(1);
 
-            final Integer kassenzeichenNummerInt = Integer.parseInt(kassenzeichenNummer);
+            final String kassenzeichenNummerFinal = kassenzeichenNummer;
             new SwingWorker<CidsBean, Void>() {
 
                     @Override
                     protected CidsBean doInBackground() throws Exception {
-                        final CidsBean cidsBean = loadKassenzeichenByNummer(kassenzeichenNummerInt);
+                        final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummerFinal));
                         updateCrossReferences(cidsBean);
                         if (stacId != null) {
                             AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(stacId);
@@ -1442,9 +1466,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     protected void done() {
                         try {
                             final CidsBean cidsBean = get();
-                            cidsBean.toJSONString(true);
-                            setCidsBean(cidsBean);
                             if (cidsBean != null) {
+                                cidsBean.toJSONString(true);
+                                setCidsBean(cidsBean);
                                 selectCidsBeanByIdentifier(flaechenBez);
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.GREEN);
                                 if (historyEnabled) {

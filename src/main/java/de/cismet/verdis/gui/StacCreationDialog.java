@@ -51,6 +51,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
+import de.cismet.verdis.server.json.StacOptionsDurationJson;
 import de.cismet.verdis.server.utils.VerdisServerResources;
 
 /**
@@ -580,12 +581,12 @@ public class StacCreationDialog extends JDialog {
                         VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)));
 
         final ServerActionParameter<Timestamp> paramDate;
-        final ServerActionParameter<CreateAStacForKassenzeichenServerAction.DurationUnit> paramDurationUnit;
+        final ServerActionParameter<StacOptionsDurationJson.Unit> paramDurationUnit;
         final ServerActionParameter<Integer> paramDurationValue;
         if (jRadioButton1.isSelected()) {
             paramDurationUnit = new ServerActionParameter<>(
                     CreateAStacForKassenzeichenServerAction.Parameter.DURATION_UNIT.toString(),
-                    CreateAStacForKassenzeichenServerAction.DurationUnit.DAYS);
+                    StacOptionsDurationJson.Unit.DAYS);
             paramDurationValue = new ServerActionParameter<>(
                     CreateAStacForKassenzeichenServerAction.Parameter.DURATION_VALUE.toString(),
                     2);
@@ -593,7 +594,7 @@ public class StacCreationDialog extends JDialog {
         } else if (jRadioButton2.isSelected()) {
             paramDurationUnit = new ServerActionParameter<>(
                     CreateAStacForKassenzeichenServerAction.Parameter.DURATION_UNIT.toString(),
-                    CreateAStacForKassenzeichenServerAction.DurationUnit.MONTHS);
+                    StacOptionsDurationJson.Unit.MONTHS);
             paramDurationValue = new ServerActionParameter<>(
                     CreateAStacForKassenzeichenServerAction.Parameter.DURATION_VALUE.toString(),
                     2);

@@ -1682,11 +1682,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    public Object searchStacInformations(final CidsBean kassenzeichenBean) throws ConnectionException {
-        final Object o = SessionManager.getProxy()
-                    .customServerSearch(new StacInfoSearchStatement(kassenzeichenBean.getMetaObject().getId()),
-                        ConnectionContext.createDummy());
-        return o;
+    public Map searchStacInfoMap(final CidsBean kassenzeichenBean) throws ConnectionException {
+        final StacInfoSearchStatement search = new StacInfoSearchStatement(
+                StacInfoSearchStatement.SearchBy.KASSENZEICHEN_ID);
+        search.setKassenzeichenId(kassenzeichenBean.getMetaObject().getId());
+        final Collection result = SessionManager.getProxy().customServerSearch(search, ConnectionContext.createDummy());
+        return (Map)result.iterator().next();
     }
 
     /**

@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui.aenderungsanfrage;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.jdesktop.swingx.JXTable;
 
 import java.util.List;
@@ -80,7 +82,9 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
         jScrollPane1 = new javax.swing.JScrollPane();
         aenderungsanfrageTable1 = new de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTable();
         jToggleButton1 = new javax.swing.JToggleButton();
@@ -88,16 +92,24 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         setLayout(new java.awt.GridBagLayout());
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/reload.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(AenderungsanfrageTablePanel.class, "AenderungsanfrageTablePanel.jButton1.text")); // NOI18N
-        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(AenderungsanfrageTablePanel.class, "AenderungsanfrageTablePanel.jButton1.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton1,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton1.text"));                                                   // NOI18N
+        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton1.toolTipText"));                                            // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.setFocusPainted(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -106,18 +118,27 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 3);
         add(jButton1, gridBagConstraints);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/kassenzeichen22.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(AenderungsanfrageTablePanel.class, "AenderungsanfrageTablePanel.jButton2.text")); // NOI18N
-        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(AenderungsanfrageTablePanel.class, "AenderungsanfrageTablePanel.jButton2.toolTipText")); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/kassenzeichen22.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton2,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton2.text"));                         // NOI18N
+        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton2.toolTipText"));                  // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
         jButton2.setEnabled(false);
         jButton2.setFocusPainted(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -132,10 +153,12 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         add(filler2, gridBagConstraints);
 
         aenderungsanfrageTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                aenderungsanfrageTable1MouseClicked(evt);
-            }
-        });
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    aenderungsanfrageTable1MouseClicked(evt);
+                }
+            });
         jScrollPane1.setViewportView(aenderungsanfrageTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -148,60 +171,68 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jToggleButton1, org.openide.util.NbBundle.getMessage(AenderungsanfrageTablePanel.class, "AenderungsanfrageTablePanel.jToggleButton1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jToggleButton1,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jToggleButton1.text")); // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jToggleButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(7, 3, 0, 3);
         add(jToggleButton1, gridBagConstraints);
-        jToggleButton1.setVisible(false);
-    }// </editor-fold>//GEN-END:initComponents
+        // jToggleButton1.setVisible(false);
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         refresh();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         ((AenderungsanfrageTable)aenderungsanfrageTable1).gotoSelectedKassenzeichen();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void aenderungsanfrageTable1MouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aenderungsanfrageTable1MouseClicked
+    private void aenderungsanfrageTable1MouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_aenderungsanfrageTable1MouseClicked
         if (jButton1.isEnabled() && (evt.getClickCount() == 2) && !CidsAppBackend.getInstance().isEditable()) {
             if (aenderungsanfrageTable1.getSelectedRow() >= 0) {
                 ((AenderungsanfrageTable)aenderungsanfrageTable1).gotoSelectedKassenzeichen();
             }
         }
-    }//GEN-LAST:event_aenderungsanfrageTable1MouseClicked
+    }                                                                                       //GEN-LAST:event_aenderungsanfrageTable1MouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
+        final String username = jToggleButton1.isSelected() ? SessionManager.getSession().getUser().getName() : null;
+        aenderungsanfrageTable1.setFilterUsername(username);
         refresh();
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -233,7 +264,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                     final List<CidsBean> aenderungsanfrageBeans;
                     try {
                         aenderungsanfrageBeans = get();
-                        aenderungsanfrageTable1.getModel().setCidsBeans(aenderungsanfrageBeans);
+                        aenderungsanfrageTable1.setCidsBeans(aenderungsanfrageBeans);
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
                     }

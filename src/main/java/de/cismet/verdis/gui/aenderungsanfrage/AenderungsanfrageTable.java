@@ -12,6 +12,8 @@
  */
 package de.cismet.verdis.gui.aenderungsanfrage;
 
+import org.apache.log4j.Logger;
+
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -23,13 +25,25 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import java.sql.Timestamp;
+
+import java.text.SimpleDateFormat;
+
+import java.util.List;
 import java.util.Objects;
+
+import javax.swing.RowFilter;
+import javax.swing.table.TableModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
+
+import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
+
+import de.cismet.verdis.server.json.StacOptionsJson;
 
 /**
  * DOCUMENT ME!
@@ -38,6 +52,27 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
  * @version  $Revision$, $Date$
  */
 public class AenderungsanfrageTable extends JXTable {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    private static final transient Logger LOG = Logger.getLogger(AenderungsanfrageTable.class);
+
+    private static final String[] COLUMN_NAMES = {
+            "Kassenzeichen",
+            "Status",
+            "Letzte Änderung"
+        };
+
+    private static final Class[] COLUMN_CLASSES = {
+            String.class,
+            String.class,
+            java.util.Date.class
+        };
+
+    //~ Instance fields --------------------------------------------------------
+
+    private String filterUsername = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -65,13 +100,27 @@ public class AenderungsanfrageTable extends JXTable {
                 Color.BLACK);
 
         setHighlighters(activeHighlighter);
+        setRowFilter(new AenderungsanfrageRowFilter());
     }
 
     //~ Methods ----------------------------------------------------------------
 
-    @Override
-    public AenderungsanfrageTableModel getModel() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private AenderungsanfrageTableModel getAenderungsanfrageTableModel() {
         return (AenderungsanfrageTableModel)super.getModel();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  filterUsername  DOCUMENT ME!
+     */
+    public void setFilterUsername(final String filterUsername) {
+        this.filterUsername = filterUsername;
     }
 
     @Override
@@ -79,7 +128,8 @@ public class AenderungsanfrageTable extends JXTable {
         final Point p = e.getPoint();
         final int rowIndex = rowAtPoint(p);
         if (rowIndex >= 0) {
-            final CidsBean aenderungsanfrageBean = getModel().getCidsBeanByIndex(convertRowIndexToModel(rowIndex));
+            final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
+                    convertRowIndexToModel(rowIndex));
             if (aenderungsanfrageBean != null) {
                 return "Prüfkennzeichen: "
                             + AenderungsanfrageHandler.getInstance().getStacIdHash(aenderungsanfrageBean);
@@ -91,13 +141,22 @@ public class AenderungsanfrageTable extends JXTable {
     /**
      * DOCUMENT ME!
      *
+     * @param  aenderungsanfrageBeans  DOCUMENT ME!
+     */
+    public void setCidsBeans(final List<CidsBean> aenderungsanfrageBeans) {
+        getAenderungsanfrageTableModel().setCidsBeans(aenderungsanfrageBeans);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   row  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public CidsBean getAenderungsanfrageBeanAtRow(final int row) {
         final int convertedRow = convertRowIndexToModel(row);
-        final CidsBean aenderungsanfrageBean = getModel().getCidsBeanByIndex(
+        final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
                 convertedRow);
         return aenderungsanfrageBean;
     }
@@ -145,6 +204,98 @@ public class AenderungsanfrageTable extends JXTable {
             return kassenzeichenPlusStacId;
         } else {
             return null;
+        }
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class AenderungsanfrageRowFilter extends RowFilter<TableModel, Integer> {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public boolean include(final RowFilter.Entry<? extends TableModel, ? extends Integer> entry) {
+            if (filterUsername != null) {
+                try {
+                    final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
+                            entry.getIdentifier());
+                    final StacOptionsJson stacOptions = CidsAppBackend.getInstance()
+                                .getStacOptions((Integer)aenderungsanfrageBean.getProperty(
+                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID));
+                    return (stacOptions != null) && filterUsername.equals(stacOptions.getCreatorUserName());
+                } catch (final Exception ex) {
+                    LOG.error(ex, ex);
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new AenderungsanfrageTableModel object.
+         */
+        public AenderungsanfrageTableModel() {
+            super(COLUMN_NAMES, COLUMN_CLASSES);
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public Object getValueAt(final int rowIndex, final int columnIndex) {
+            final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
+            if (cidsBean == null) {
+                return null;
+            }
+            switch (columnIndex) {
+                case 0: {
+                    return (cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER) != null)
+                        ? Integer.toString((Integer)cidsBean.getProperty(
+                                VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
+                }
+                case 1: {
+                    return (String)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
+                }
+                case 2: {
+                    final Timestamp timestamp = (Timestamp)cidsBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.TIMESTAMP);
+                    return (timestamp != null) ? DATE_FORMAT.format(timestamp) : timestamp;
+                }
+                default: {
+                    return null;
+                }
+            }
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   row  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public CidsBean getAenderungsanfrageAt(final int row) {
+            return getCidsBeans().get(row);
+        }
+
+        @Override
+        public boolean isCellEditable(final int row, final int column) {
+            return false;
         }
     }
 }

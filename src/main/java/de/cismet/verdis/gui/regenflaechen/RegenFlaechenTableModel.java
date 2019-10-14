@@ -37,7 +37,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.FlaecheAenderungJson;
 
 /**
  * DOCUMENT ME!

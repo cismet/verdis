@@ -16,7 +16,7 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 
 import org.openide.util.Exceptions;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
