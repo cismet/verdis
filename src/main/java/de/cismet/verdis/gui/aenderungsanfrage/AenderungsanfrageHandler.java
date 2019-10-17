@@ -18,6 +18,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -32,21 +34,22 @@ import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterGroesseJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtParameterJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.NachrichtSystemJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungGroesseJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungJson;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
+import de.cismet.verdis.server.json.FlaechePruefungJson;
+import de.cismet.verdis.server.json.NachrichtJson;
+import de.cismet.verdis.server.json.NachrichtParameterAnschlussgradJson;
+import de.cismet.verdis.server.json.NachrichtParameterFlaechenartJson;
+import de.cismet.verdis.server.json.NachrichtParameterGroesseJson;
+import de.cismet.verdis.server.json.NachrichtParameterJson;
+import de.cismet.verdis.server.json.NachrichtSystemJson;
+import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.PruefungFlaechenartJson;
+import de.cismet.verdis.server.json.PruefungGroesseJson;
+import de.cismet.verdis.server.json.PruefungJson;
+import de.cismet.verdis.server.json.StacOptionsJson;
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
@@ -65,6 +68,8 @@ public class AenderungsanfrageHandler {
 
     //~ Instance fields --------------------------------------------------------
 
+    private final Map<Integer, StacOptionsJson> stacOptionsMap = new HashMap();
+    private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
     private CidsBean aenderungsanfrageBean = null;
     private AenderungsanfrageJson aenderungsanfrageJson;
 
@@ -384,27 +389,48 @@ public class AenderungsanfrageHandler {
      * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public List<CidsBean> searchAenderungsanfrageBeans() {
+    public List<CidsBean> searchAenderungsanfrageBeans() throws Exception {
+        aenderungsanfrageBeans.clear();
+        stacOptionsMap.clear();
+
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-            final List<CidsBean> cidsBeanList = new ArrayList<>();
             try {
                 final Collection<MetaObjectNode> mons = SessionManager.getProxy()
                             .customServerSearch(SessionManager.getSession().getUser(), search);
                 for (final MetaObjectNode mon : mons) {
                     final MetaObject mo = SessionManager.getProxy()
                                 .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
-                    cidsBeanList.add(mo.getBean());
+                    aenderungsanfrageBeans.add(mo.getBean());
                 }
             } catch (final ConnectionException ex) {
                 LOG.fatal(ex, ex);
             }
-            if (!cidsBeanList.isEmpty()) {
-                return cidsBeanList;
+            if (!aenderungsanfrageBeans.isEmpty()) {
+                for (final CidsBean aenderungsanfrageBean : aenderungsanfrageBeans) {
+                    final Integer stacId = (Integer)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID);
+                    final StacOptionsJson stacOptions = CidsAppBackend.getInstance().getStacOptions(stacId);
+                    stacOptionsMap.put(stacId, stacOptions);
+                }
+                return aenderungsanfrageBeans;
             }
         }
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   stacId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public StacOptionsJson getStacOptionsFor(final Integer stacId) {
+        return stacOptionsMap.get(stacId);
     }
 
     /**
@@ -437,6 +463,29 @@ public class AenderungsanfrageHandler {
             }
         }
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   aenderungsanfrageBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getStacIdHash(final CidsBean aenderungsanfrageBean) {
+        if (aenderungsanfrageBean != null) {
+            final String md5 = DigestUtils.md5Hex(
+                    Integer.toString(
+                        (Integer)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER))
+                            + ";"
+                            + Integer.toString(
+                                (Integer)aenderungsanfrageBean.getProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID)));
+            return md5.substring(0, 4);
+        } else {
+            return null;
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------

@@ -89,14 +89,14 @@ import de.cismet.verdis.gui.AbstractCidsBeanDetailsPanel;
 import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaecheAenderungJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.FlaechePruefungGroesseJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungAnschlussgradJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungFlaechenartJson;
-import de.cismet.verdis.server.json.aenderungsanfrage.PruefungGroesseJson;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.FlaechePruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaechePruefungFlaechenartJson;
+import de.cismet.verdis.server.json.FlaechePruefungGroesseJson;
+import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
+import de.cismet.verdis.server.json.PruefungFlaechenartJson;
+import de.cismet.verdis.server.json.PruefungGroesseJson;
 
 /**
  * DOCUMENT ME!

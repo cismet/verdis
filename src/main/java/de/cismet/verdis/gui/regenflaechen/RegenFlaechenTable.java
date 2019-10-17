@@ -81,7 +81,7 @@ import de.cismet.verdis.gui.AbstractCidsBeanWithGeometryTable;
 import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
-import de.cismet.verdis.server.json.aenderungsanfrage.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 
 import static de.cismet.verdis.gui.AbstractCidsBeanTable.getNextNewBeanId;
 
