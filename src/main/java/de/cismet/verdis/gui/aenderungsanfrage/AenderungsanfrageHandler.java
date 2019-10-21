@@ -121,10 +121,12 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public void updateAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
-        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-        search.setKassenzeichennummer((Integer)cidsBean.getProperty(
-                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
-        updateAenderungsanfrageBean(search);
+        if (cidsBean != null) {
+            final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+            search.setKassenzeichennummer((Integer)cidsBean.getProperty(
+                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
+            updateAenderungsanfrageBean(search);
+        }
     }
 
     /**
@@ -135,9 +137,11 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public void updateAenderungsanfrageBean(final Integer stacId) throws Exception {
-        final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-        search.setStacId(stacId);
-        updateAenderungsanfrageBean(search);
+        if (stacId != null) {
+            final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+            search.setStacId(stacId);
+            updateAenderungsanfrageBean(search);
+        }
     }
 
     /**
