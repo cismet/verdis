@@ -159,7 +159,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                 }
                 final Integer groesseAenderung = (aenderungsanfrageFlaeche != null)
                     ? aenderungsanfrageFlaeche.getGroesse() : null;
-                return groesse + ((groesseAenderung != null) ? (" (" + groesseAenderung + ")") : "");
+                return ((groesseAenderung != null) ? (groesse + " (" + groesseAenderung + ")") : groesse);
             }
             case 4: {
                 // Flaechenart
