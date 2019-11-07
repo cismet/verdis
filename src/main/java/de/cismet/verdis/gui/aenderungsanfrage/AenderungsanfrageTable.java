@@ -233,7 +233,7 @@ public class AenderungsanfrageTable extends JXTable {
                     return false;
                 }
             } else {
-                return false;
+                return true;
             }
         }
     }

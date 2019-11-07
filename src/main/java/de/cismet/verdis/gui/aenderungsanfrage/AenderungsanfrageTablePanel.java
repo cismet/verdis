@@ -171,11 +171,24 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane1, gridBagConstraints);
 
+        jToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/all_rows.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jToggleButton1,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageTablePanel.class,
-                "AenderungsanfrageTablePanel.jToggleButton1.text")); // NOI18N
+                "AenderungsanfrageTablePanel.jToggleButton1.text"));                                                     // NOI18N
+        jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jToggleButton1.toolTipText"));                                              // NOI18N
+        jToggleButton1.setBorderPainted(false);
+        jToggleButton1.setContentAreaFilled(false);
+        jToggleButton1.setFocusPainted(false);
+        jToggleButton1.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/own_rows.png")));                                          // NOI18N
+        jToggleButton1.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/all_rows.png")));                                          // NOI18N
+        jToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/own_rows.png")));                                          // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
