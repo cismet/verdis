@@ -369,7 +369,7 @@ public class TimeRecoveryPanel extends javax.swing.JPanel implements CidsBeanSto
                                 if (lastDate != null) {
                                     final long diff = Math.abs(lastDate.getTime() - date.getTime());
                                     if (diff < 5000) {
-                                        sMap.remove(lastDate);
+                                        sMap.remove(date);
                                     }
                                 }
                                 lastDate = date;
