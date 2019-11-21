@@ -51,6 +51,7 @@ import de.cismet.verdis.server.json.PruefungGroesseJson;
 import de.cismet.verdis.server.json.PruefungJson;
 import de.cismet.verdis.server.json.StacOptionsJson;
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
+import de.cismet.verdis.server.search.AenderungsanfrageStatusSearchStatement;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -72,6 +73,34 @@ public class AenderungsanfrageHandler {
     private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
     private CidsBean aenderungsanfrageBean = null;
     private AenderungsanfrageJson aenderungsanfrageJson;
+    private Map<AenderungsanfrageUtils.Status, CidsBean> statusBeanMap = new HashMap();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AenderungsanfrageHandler object.
+     */
+    private AenderungsanfrageHandler() {
+        final AenderungsanfrageStatusSearchStatement search = new AenderungsanfrageStatusSearchStatement();
+
+        try {
+            final Collection<MetaObjectNode> mons = CidsAppBackend.getInstance().executeCustomServerSearch(search);
+            if (mons != null) {
+                for (final MetaObjectNode mon : mons) {
+                    final MetaObject mo = CidsAppBackend.getInstance()
+                                .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
+                    if (mo != null) {
+                        final CidsBean statusBean = mo.getBean();
+                        statusBeanMap.put(AenderungsanfrageUtils.Status.valueOf(
+                                (String)statusBean.getProperty("schluessel")),
+                            statusBean);
+                    }
+                }
+            }
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -80,8 +109,100 @@ public class AenderungsanfrageHandler {
      *
      * @return  DOCUMENT ME!
      */
+    public Map<AenderungsanfrageUtils.Status, CidsBean> getStatusBeanMap() {
+        return statusBeanMap;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static AenderungsanfrageHandler getInstance() {
         return LazyInitialiser.INSTANCE;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   valueOrig    DOCUMENT ME!
+     * @param   valueChange  DOCUMENT ME!
+     * @param   hasPruefung  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isPending(final Object valueOrig, final Object valueChange, final boolean hasPruefung) {
+        return !Objects.equals(valueOrig, valueChange) && !hasPruefung;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   flaecheBean  DOCUMENT ME!
+     * @param   flaecheJson  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isPending(final CidsBean flaecheBean, final FlaecheAenderungJson flaecheJson) {
+        final Integer groesse = (flaecheBean != null)
+            ? (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
+        final Integer groesseAenderung = flaecheJson.getGroesse();
+        final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
+                    && (flaecheJson.getPruefung().getGroesse() != null);
+
+        final String flaechenart = (flaecheBean != null)
+            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
+                        + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG) : null;
+        final String flaechenartAenderung = (flaecheJson.getFlaechenart() != null)
+            ? flaecheJson.getFlaechenart().getArtAbkuerzung() : null;
+        final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
+                    && (flaecheJson.getPruefung().getFlaechenart() != null);
+
+        final String anschlussgrad = (flaecheBean != null)
+            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
+                        + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG) : null;
+        final String anschlussgradAenderung = (flaecheJson.getAnschlussgrad() != null)
+            ? flaecheJson.getAnschlussgrad().getGradAbkuerzung() : null;
+        final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
+                    && (flaecheJson.getPruefung().getAnschlussgrad() != null);
+
+        final boolean pendingGroesse = (groesseAenderung != null)
+                    && isPending(groesse, groesseAenderung, hasPruefungGroesse);
+        final boolean pendingFlaechenart = (flaechenartAenderung != null)
+                    && isPending(flaechenart, flaechenartAenderung, hasPruefungFlaechenart);
+        final boolean pendingAnschlussgrad = (anschlussgradAenderung != null)
+                    && isPending(anschlussgrad, anschlussgradAenderung, hasPruefungAnschlussgrad);
+
+        return pendingGroesse || pendingFlaechenart || pendingAnschlussgrad;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isPending(final CidsBean kassenzeichenBean) {
+        final Map<String, CidsBean> flaechenBeans = new HashMap<>();
+        for (final CidsBean flaecheBean
+                    : kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
+            final String bezeichnung = (String)flaecheBean.getProperty(
+                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+            flaechenBeans.put(bezeichnung, flaecheBean);
+        }
+
+        for (final String bezeichnung : getAenderungsanfrage().getFlaechen().keySet()) {
+            final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
+            final FlaecheAenderungJson flaecheJson = getAenderungsanfrage().getFlaechen().get(bezeichnung);
+            if (isPending(flaecheBean, flaecheJson)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

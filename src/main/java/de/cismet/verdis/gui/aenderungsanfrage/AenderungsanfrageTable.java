@@ -233,7 +233,7 @@ public class AenderungsanfrageTable extends JXTable {
                     return false;
                 }
             } else {
-                return false;
+                return true;
             }
         }
     }
@@ -269,7 +269,7 @@ public class AenderungsanfrageTable extends JXTable {
                                 VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
                 }
                 case 1: {
-                    return (String)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
+                    return cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
                 }
                 case 2: {
                     final Timestamp timestamp = (Timestamp)cidsBean.getProperty(

@@ -255,13 +255,13 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
-import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 import de.cismet.verdis.server.search.StacInfoSearchStatement;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -3818,12 +3818,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance()
                                     .getAenderungsanfrageBean();
                         if (editMode) {              // this is before switching the mode
-                            if (aenderungsanfrageBean != null) {
-                                aenderungsanfrageBean.setProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
-                                    KassenzeichenChangeRequestServerAction.Status.PENDING.toString());
-                                aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
-                            }
                             if (!changesPending()) { // only if no save is needed
                                 releaseLocks();
                                 return false;
@@ -3832,7 +3826,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             if (aenderungsanfrageBean != null) {
                                 aenderungsanfrageBean.setProperty(
                                     VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
-                                    KassenzeichenChangeRequestServerAction.Status.PROCESSING.toString());
+                                    AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(
+                                        AenderungsanfrageUtils.Status.PROCESSING));
                                 aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
                             }
                             if (acquireLocks()) {    // try to acquire
@@ -5506,6 +5501,17 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         // Querverweise angelegt werden
         flaecheToCrosslinknummerMap.clear();
         frontToCrosslinknummerMap.clear();
+
+        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean();
+        if (aenderungsanfrageBean != null) {
+            final CidsBean statusBean = AenderungsanfrageHandler.getInstance().isPending(kassenzeichenBean)
+                ? AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(AenderungsanfrageUtils.Status.PENDING)
+                : AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(AenderungsanfrageUtils.Status.NONE);
+            aenderungsanfrageBean.setProperty(
+                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
+                statusBean);
+            aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
+        }
 
         return persistedKassenzeichenBean;
     }
