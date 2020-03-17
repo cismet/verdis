@@ -203,9 +203,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createGeometryCollection(geometries);
         } catch (RuntimeException e) {
-            throw new ParseException(
-                "Could not parse GeometryCollection from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -260,9 +258,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createMultiPolygon(polygons);
         } catch (RuntimeException e) {
-            throw new ParseException(
-                "Could not parse MultiPolygon from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -298,9 +294,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createMultiLineString(lineStrings);
         } catch (RuntimeException e) {
-            throw new ParseException(
-                "Could not parse MultiLineString from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -329,9 +323,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createMultiPoint(coordinates);
         } catch (RuntimeException e) {
-            throw new ParseException(
-                "Could not parse MultiPoint from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -377,8 +369,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createPolygon(outer, inner);
         } catch (RuntimeException e) {
-            throw new ParseException("Could not parse Polygon from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -407,9 +398,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createLineString(coordinates);
         } catch (RuntimeException e) {
-            throw new ParseException(
-                "Could not parse LineString from GeoJson string.",
-                e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -437,7 +426,7 @@ public class GeoJsonReader {
 
             result = geometryFactory.createPoint(coordinate);
         } catch (RuntimeException e) {
-            throw new ParseException("Could not parse Point from GeoJson string.", e);
+            throw new ParseException(e);
         }
 
         return result;
@@ -468,9 +457,7 @@ public class GeoJsonReader {
                 final String epsg = split[1];
                 srid = Integer.valueOf(epsg);
             } catch (RuntimeException e) {
-                throw new ParseException(
-                    "Could not parse SRID from Geojson 'crs' object.",
-                    e);
+                throw new ParseException(e);
             }
         }
 
