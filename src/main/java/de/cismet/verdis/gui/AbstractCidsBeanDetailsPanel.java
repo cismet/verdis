@@ -92,6 +92,14 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
     /**
      * DOCUMENT ME!
      *
+     * @param  geoJsonFeature  DOCUMENT ME!
+     */
+    protected void setAnnotationGeoJsonFeature(final org.geojson.Feature geoJsonFeature) {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     protected MultiBeanHelper getMultiBeanHelper() {
