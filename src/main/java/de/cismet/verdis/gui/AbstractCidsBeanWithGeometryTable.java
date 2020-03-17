@@ -142,9 +142,10 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
                             .getFeatureCollection()
                             .getSelectedFeatures(); // fce.getEventFeatures();
 
-                final Collection<Feature> selectedFeaturesWithoutPostgis = new ArrayList<Feature>();
+                final Collection<Feature> selectedFeaturesWithoutPostgis = new ArrayList<>();
                 for (final Feature feature : selectedFeatures) {
-                    if ((feature instanceof CidsFeature) || (feature instanceof PureNewFeature)) {
+                    if ((feature instanceof CidsFeature) || (feature instanceof PureNewFeature)
+                                || (feature instanceof KartenPanel.AnnotationFeature)) {
                         selectedFeaturesWithoutPostgis.add(feature);
                     }
                 }
@@ -232,6 +233,8 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
     private void featureSelectionChanged_helper(final Collection<Feature> selectedFeatures) {
         clearSelection();
 
+        KartenPanel.AnnotationFeature annotationFeature = null;
+
         for (final Feature selectedFeature : selectedFeatures) {
             if (selectedFeature instanceof CidsFeature) {
                 final int index = getModel().getIndexByCidsBean(((CidsFeature)selectedFeature).getMetaObject()
@@ -240,10 +243,17 @@ public abstract class AbstractCidsBeanWithGeometryTable extends AbstractCidsBean
                     final int viewIndex = convertRowIndexToView(index);
                     getSelectionModel().addSelectionInterval(viewIndex, viewIndex);
                 }
+            } else if (selectedFeature instanceof KartenPanel.AnnotationFeature) {
+                annotationFeature = (KartenPanel.AnnotationFeature)selectedFeature;
+                break;
             }
         }
 
-        setDetailBeans(getSelectedBeans());
+        if (annotationFeature != null) {
+            getSelectedRowListener().setAnnotationGeoJsonFeature(annotationFeature.getGeoJsonFeature());
+        } else {
+            setDetailBeans(getSelectedBeans());
+        }
     }
 
     @Override

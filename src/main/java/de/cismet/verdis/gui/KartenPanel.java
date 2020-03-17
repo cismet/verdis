@@ -28,15 +28,23 @@
  */
 package de.cismet.verdis.gui;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.geojson.GeoJsonReader;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolox.event.PNotification;
 
+import org.geojson.GeoJsonObject;
+
 import org.openide.util.Lookup;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.EventQueue;
@@ -101,6 +109,7 @@ import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
 
@@ -128,6 +137,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private CidsBean kassenzeichenBean = null;
     private final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(KartenPanel.class);
     private boolean isAssignLandparcel = false;
+    private boolean annotationVisible = true;
     private final Action searchAction = new AbstractAction() {
 
             @Override
@@ -292,6 +302,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     private javax.swing.JButton cmdAdd;
     private javax.swing.JToggleButton cmdAddHandle;
     private javax.swing.JButton cmdAngleMeasurement;
+    private javax.swing.JButton cmdAnnotation;
     private javax.swing.JToggleButton cmdAttachPolyToAlphadata;
     private javax.swing.JButton cmdBack;
     private javax.swing.JToggleButton cmdCreateLandparcelGeom;
@@ -495,6 +506,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
         jSeparator9 = new javax.swing.JSeparator();
         cmdWmsBackground = new javax.swing.JToggleButton();
         cmdForeground = new javax.swing.JButton();
+        cmdAnnotation = new javax.swing.JButton();
         cmdSnap = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         jSeparator10 = new javax.swing.JSeparator();
@@ -845,6 +857,31 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 }
             });
         tobVerdis.add(cmdForeground);
+
+        cmdAnnotation.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/annotation.png")));    // NOI18N
+        cmdAnnotation.setToolTipText("Anmerkungen an/aus");
+        cmdAnnotation.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
+        cmdAnnotation.setBorderPainted(false);
+        cmdAnnotation.setContentAreaFilled(false);
+        cmdAnnotation.setFocusPainted(false);
+        cmdAnnotation.setFocusable(false);
+        cmdAnnotation.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cmdAnnotation.setMaximumSize(new java.awt.Dimension(28, 28));
+        cmdAnnotation.setMinimumSize(new java.awt.Dimension(28, 28));
+        cmdAnnotation.setPreferredSize(new java.awt.Dimension(28, 28));
+        cmdAnnotation.setSelected(true);
+        cmdAnnotation.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/toolbar/annotation_on.png"))); // NOI18N
+        cmdAnnotation.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cmdAnnotation.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAnnotationActionPerformed(evt);
+                }
+            });
+        tobVerdis.add(cmdAnnotation);
 
         cmdSnap.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/snap.png")));          // NOI18N
@@ -2001,6 +2038,17 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
     /**
      * DOCUMENT ME!
      *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAnnotationActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAnnotationActionPerformed
+        annotationVisible = !annotationVisible;
+        cmdAnnotation.setSelected(annotationVisible);
+        refreshInMap(false);
+    }                                                                                 //GEN-LAST:event_cmdAnnotationActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  text              DOCUMENT ME!
      * @param  scaleDenominator  DOCUMENT ME!
      */
@@ -2721,6 +2769,23 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                 break;
                 case REGEN: {
                     featureCollection.addFeatures(fetchFeaturesRegen(cidsBean, editable));
+
+                    final Map<String, GeoJsonObject> annotationMap =
+                        (AenderungsanfrageHandler.getInstance().getAenderungsanfrage() != null)
+                        ? AenderungsanfrageHandler.getInstance().getAenderungsanfrage().getGeometrien() : null;
+                    cmdAnnotation.setVisible((annotationMap != null) && !annotationMap.isEmpty());
+                    if (annotationVisible && (annotationMap != null)) {
+                        for (final Map.Entry<String, GeoJsonObject> entry : annotationMap.entrySet()) {
+                            final String key = entry.getKey();
+                            final org.geojson.Feature value = (org.geojson.Feature)entry.getValue();
+
+                            try {
+                                featureCollection.addFeature(new AnnotationFeature(key, value));
+                            } catch (final Exception ex) {
+                                LOG.fatal(ex, ex);
+                            }
+                        }
+                    }
                 }
                 break;
                 case SR: {
@@ -3149,6 +3214,56 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                     cmdAttachPolyToAlphadataActionPerformed(null);
                 }
             }
+        }
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public class AnnotationFeature extends DefaultStyledFeature {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final org.geojson.Feature geoJsonFeature;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new AnnotationFeature object.
+         *
+         * @param   annotation      DOCUMENT ME!
+         * @param   geoJsonFeature  geometry DOCUMENT ME!
+         *
+         * @throws  Exception  DOCUMENT ME!
+         */
+        public AnnotationFeature(final String annotation, final org.geojson.Feature geoJsonFeature) throws Exception {
+            this.geoJsonFeature = geoJsonFeature;
+            final GeoJsonReader reader = new GeoJsonReader(new GeometryFactory(
+                        new PrecisionModel(PrecisionModel.FLOATING),
+                        25832));
+            final Geometry geometry = reader.read(new ObjectMapper().writeValueAsString(geoJsonFeature.getGeometry()));
+            setFillingPaint(new Color(1f, 0f, 0f, 0.5f));
+            setGeometry(geometry);
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public org.geojson.Feature getGeoJsonFeature() {
+            return geoJsonFeature;
+        }
+
+        @Override
+        public boolean isEditable() {
+            return false;
         }
     }
 }
