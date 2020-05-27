@@ -49,7 +49,6 @@ import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
 import de.cismet.verdis.server.json.PruefungFlaechenartJson;
 import de.cismet.verdis.server.json.PruefungGroesseJson;
 import de.cismet.verdis.server.json.PruefungJson;
-import de.cismet.verdis.server.json.StacOptionsJson;
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
 import de.cismet.verdis.server.search.AenderungsanfrageStatusSearchStatement;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
@@ -69,8 +68,6 @@ public class AenderungsanfrageHandler {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final Map<Integer, StacOptionsJson> stacOptionsMap = new HashMap();
-    private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
     private CidsBean aenderungsanfrageBean = null;
     private AenderungsanfrageJson aenderungsanfrageJson;
     private Map<AenderungsanfrageUtils.Status, CidsBean> statusBeanMap = new HashMap();
@@ -518,8 +515,7 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public List<CidsBean> searchAenderungsanfrageBeans() throws Exception {
-        aenderungsanfrageBeans.clear();
-        stacOptionsMap.clear();
+        final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
@@ -535,27 +531,10 @@ public class AenderungsanfrageHandler {
                 LOG.fatal(ex, ex);
             }
             if (!aenderungsanfrageBeans.isEmpty()) {
-                for (final CidsBean aenderungsanfrageBean : aenderungsanfrageBeans) {
-                    final Integer stacId = (Integer)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID);
-                    final StacOptionsJson stacOptions = CidsAppBackend.getInstance().getStacOptions(stacId);
-                    stacOptionsMap.put(stacId, stacOptions);
-                }
                 return aenderungsanfrageBeans;
             }
         }
         return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   stacId  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public StacOptionsJson getStacOptionsFor(final Integer stacId) {
-        return stacOptionsMap.get(stacId);
     }
 
     /**
