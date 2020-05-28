@@ -31,6 +31,8 @@ import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
+import de.cismet.layout.WrapLayout;
+
 import de.cismet.tools.gui.downloadmanager.Download;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
@@ -115,6 +117,9 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
      * @param  nachrichtJson  orientation DOCUMENT ME!
      */
     public AenderungsanfrageNachrichtPanel(final NachrichtJson nachrichtJson) {
+        final String absender = nachrichtJson.getAbsender();
+        final Date timestamp = nachrichtJson.getTimestamp();
+
         final AenderungsanfrageNachrichtPanel.Orientation orientation;
         if (NachrichtJson.Typ.CLERK.equals(nachrichtJson.getTyp())) {
             orientation = AenderungsanfrageNachrichtPanel.Orientation.LEFT;
@@ -123,35 +128,8 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         } else {
             orientation = AenderungsanfrageNachrichtPanel.Orientation.CENTER;
         }
-        final String absender = nachrichtJson.getAbsender();
-        final Date timestamp = nachrichtJson.getTimestamp();
-        final String nachricht = nachrichtJson.getNachricht();
-        final NachrichtParameterJson nachrichtenParameter = nachrichtJson.getNachrichtenParameter();
 
-        final String text;
-        if ((nachrichtenParameter != null) && (nachrichtenParameter.getType() != null)) {
-            final Integer groesse = nachrichtenParameter.getGroesse();
-            final FlaecheFlaechenartJson flaechenart = nachrichtenParameter.getFlaechenart();
-            final FlaecheAnschlussgradJson anschlussgrad = nachrichtenParameter.getAnschlussgrad();
-            final boolean accepted = NachrichtParameterJson.Type.CHANGED.equals(nachrichtenParameter.getType());
-            if (groesse != null) {
-                text = "Die Änderung der Größe der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf " + groesse
-                            + "m² wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
-            } else if (flaechenart != null) {
-                text = "Die Änderung der Flächenart der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
-                            + flaechenart.getArt() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
-            } else if (anschlussgrad != null) {
-                text = "Die Änderung des Anschlussgrads der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
-                            + anschlussgrad.getGrad() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
-            } else {
-                text = null;
-            }
-        } else {
-            text = nachricht;
-        }
+        final String text = createText(nachrichtJson);
 
         initComponents();
         jTextArea1.setText(text);
@@ -187,6 +165,44 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   nachrichtJson  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static String createText(final NachrichtJson nachrichtJson) {
+        final String nachricht = nachrichtJson.getNachricht();
+        final NachrichtParameterJson nachrichtenParameter = nachrichtJson.getNachrichtenParameter();
+
+        final String text;
+        if ((nachrichtenParameter != null) && (nachrichtenParameter.getType() != null)) {
+            final Integer groesse = nachrichtenParameter.getGroesse();
+            final FlaecheFlaechenartJson flaechenart = nachrichtenParameter.getFlaechenart();
+            final FlaecheAnschlussgradJson anschlussgrad = nachrichtenParameter.getAnschlussgrad();
+            final boolean accepted = NachrichtParameterJson.Type.CHANGED.equals(nachrichtenParameter.getType());
+            if (groesse != null) {
+                text = "Die Änderung der Größe der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf " + groesse
+                            + "m² wurde von '" + nachrichtJson.getAbsender() + "' "
+                            + (accepted ? "angenommen" : "abgelehnt.");
+            } else if (flaechenart != null) {
+                text = "Die Änderung der Flächenart der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
+                            + flaechenart.getArt() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
+                            + (accepted ? "angenommen" : "abgelehnt.");
+            } else if (anschlussgrad != null) {
+                text = "Die Änderung des Anschlussgrads der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
+                            + anschlussgrad.getGrad() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
+                            + (accepted ? "angenommen" : "abgelehnt.");
+            } else {
+                text = null;
+            }
+        } else {
+            text = nachricht;
+        }
+        return text;
+    }
 
     /**
      * DOCUMENT ME!
@@ -306,6 +322,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
 
         pnlAnhang.setOpaque(false);
         pnlAnhang.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        pnlAnhang.setLayout(new WrapLayout(WrapLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -376,20 +393,23 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
                     @Override
                     public void actionPerformed(final ActionEvent evt) {
                         try {
-                            final String jobname = DownloadManagerDialog.getInstance().getJobName();
-                            final String filename = nachrichtAnhang.getName();
-                            final Download download = new ByteArrayActionDownload(
-                                    VerdisConstants.DOMAIN,
-                                    DownloadChangeRequestAnhangServerAction.TASK_NAME,
-                                    nachrichtAnhang.toJson(),
-                                    null,
-                                    "Anhang",
-                                    jobname,
-                                    filename,
-                                    filename.substring(filename.lastIndexOf(".")),
-                                    ConnectionContext.createDeprecated());
+                            if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(
+                                            AenderungsanfrageNachrichtPanel.this)) {
+                                final String jobname = DownloadManagerDialog.getInstance().getJobName();
+                                final String filename = nachrichtAnhang.getName();
+                                final Download download = new ByteArrayActionDownload(
+                                        VerdisConstants.DOMAIN,
+                                        DownloadChangeRequestAnhangServerAction.TASK_NAME,
+                                        nachrichtAnhang.toJson(),
+                                        null,
+                                        "Anhang",
+                                        jobname,
+                                        filename,
+                                        filename.substring(filename.lastIndexOf(".")),
+                                        ConnectionContext.createDeprecated());
 
-                            DownloadManager.instance().add(download);
+                                DownloadManager.instance().add(download);
+                            }
                         } catch (final Exception ex) {
                             LOG.error(ex, ex);
                         }

@@ -38,11 +38,16 @@ import Sirius.util.collections.MultiMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
 import java.awt.Color;
 import java.awt.Frame;
+
+import java.sql.Timestamp;
 
 import java.util.*;
 
@@ -1405,15 +1410,18 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public StacOptionsJson getStacOptions(final Integer stacId) throws Exception {
+    public StacOptionsEntry getStacOptionsEntry(final Integer stacId) throws Exception {
         final StacInfoSearchStatement search = new StacInfoSearchStatement(StacInfoSearchStatement.SearchBy.STAC_ID);
         search.setStacId(stacId);
 
         final Collection<Map> col = executeCustomServerSearch(search);
         if ((col != null) && !col.isEmpty()) {
-            final Map stacOptionsMap = (Map)((Map)col.iterator().next()).get(
-                    StacInfoSearchStatement.Fields.STAC_OPTIONS_JSON);
-            return StacUtils.createStacOptionsJson(stacOptionsMap);
+            final Map res = (Map)col.iterator().next();
+            final String baseLoginName = (String)res.get(StacInfoSearchStatement.Fields.BASE_LOGIN_NAME);
+            final StacOptionsJson stacOptionsJson = StacUtils.createStacOptionsJson((Map)res.get(
+                        StacInfoSearchStatement.Fields.STAC_OPTIONS_JSON));
+            final Timestamp timestamp = (Timestamp)res.get(StacInfoSearchStatement.Fields.TIMESTAMP);
+            return new StacOptionsEntry(stacOptionsJson, timestamp, baseLoginName);
         } else {
             return null;
         }
@@ -1638,5 +1646,23 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
 
     @Override
     public void historyActionPerformed() {
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    @Getter
+    @AllArgsConstructor
+    public class StacOptionsEntry {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final StacOptionsJson stacOptionsJson;
+        private final Timestamp timestamp;
+        private final String baseLoginName;
     }
 }

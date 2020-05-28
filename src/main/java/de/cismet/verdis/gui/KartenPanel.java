@@ -2754,7 +2754,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
      *
      * @param  withZoom  true, zooms to the position of the Kassenzeichen
      */
-    private void refreshInMap(final boolean withZoom) {
+    public void refreshInMap(final boolean withZoom) {
         final FeatureCollection featureCollection = mappingComp.getFeatureCollection();
         final boolean editable = CidsAppBackend.getInstance().isEditable();
 
@@ -3246,6 +3246,10 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                         new PrecisionModel(PrecisionModel.FLOATING),
                         25832));
             final Geometry geometry = reader.read(new ObjectMapper().writeValueAsString(geoJsonFeature.getGeometry()));
+            final Boolean abgearbeitet = (Boolean)geoJsonFeature.getProperty("cids.abgearbeitet");
+            if (Boolean.TRUE.equals(abgearbeitet)) {
+                setTransparency(0.25f);
+            }
             setFillingPaint(new Color(1f, 0f, 0f, 0.5f));
             setGeometry(geometry);
         }

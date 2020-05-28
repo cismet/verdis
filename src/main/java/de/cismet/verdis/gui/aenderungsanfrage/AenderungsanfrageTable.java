@@ -12,6 +12,8 @@
  */
 package de.cismet.verdis.gui.aenderungsanfrage;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXTable;
@@ -29,10 +31,14 @@ import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.RowFilter;
+import javax.swing.SwingWorker;
 import javax.swing.table.TableModel;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -57,22 +63,29 @@ public class AenderungsanfrageTable extends JXTable {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final transient Logger LOG = Logger.getLogger(AenderungsanfrageTable.class);
+    private static final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
 
     private static final String[] COLUMN_NAMES = {
             "Kassenzeichen",
+            "Bearbeiter",
             "Status",
-            "Letzte Änderung"
+            "Letzte Änderung",
+            "gültig bis"
         };
 
     private static final Class[] COLUMN_CLASSES = {
             String.class,
             String.class,
-            java.util.Date.class
+            String.class,
+            Timestamp.class,
+            Timestamp.class
         };
 
     //~ Instance fields --------------------------------------------------------
 
-    private String filterUsername = null;
+    private boolean filterUsername = false;
+    private boolean filterKassenzeichen = false;
+    private boolean filterActive = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -107,6 +120,13 @@ public class AenderungsanfrageTable extends JXTable {
 
     /**
      * DOCUMENT ME!
+     */
+    public void update() {
+        ((AenderungsanfrageTableModel)getModel()).fireTableDataChanged();
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -119,8 +139,29 @@ public class AenderungsanfrageTable extends JXTable {
      *
      * @param  filterUsername  DOCUMENT ME!
      */
-    public void setFilterUsername(final String filterUsername) {
+    public void setFilterUsername(final boolean filterUsername) {
         this.filterUsername = filterUsername;
+        update();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  filterKassenzeichen  DOCUMENT ME!
+     */
+    public void setFilterKassenzeichen(final boolean filterKassenzeichen) {
+        this.filterKassenzeichen = filterKassenzeichen;
+        update();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  filterActive  DOCUMENT ME!
+     */
+    public void setFilterActive(final boolean filterActive) {
+        this.filterActive = filterActive;
+        update();
     }
 
     @Override
@@ -145,6 +186,31 @@ public class AenderungsanfrageTable extends JXTable {
      */
     public void setCidsBeans(final List<CidsBean> aenderungsanfrageBeans) {
         getAenderungsanfrageTableModel().setCidsBeans(aenderungsanfrageBeans);
+        new SwingWorker<Map<CidsBean, CidsAppBackend.StacOptionsEntry>, Void>() {
+
+                @Override
+                protected Map<CidsBean, CidsAppBackend.StacOptionsEntry> doInBackground() throws Exception {
+                    final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
+
+                    for (final CidsBean aenderungsanfrageBean : aenderungsanfrageBeans) {
+                        final CidsAppBackend.StacOptionsEntry entry = CidsAppBackend.getInstance()
+                                    .getStacOptionsEntry((Integer)aenderungsanfrageBean.getProperty(
+                                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID));
+                        beanToStacEntryMap.put(aenderungsanfrageBean, entry);
+                    }
+                    return beanToStacEntryMap;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        AenderungsanfrageTable.this.beanToStacEntryMap.clear();
+                        AenderungsanfrageTable.this.beanToStacEntryMap.putAll(get());
+                    } catch (final Exception ex) {
+                    }
+                    update();
+                }
+            }.execute();
     }
 
     /**
@@ -220,21 +286,32 @@ public class AenderungsanfrageTable extends JXTable {
 
         @Override
         public boolean include(final RowFilter.Entry<? extends TableModel, ? extends Integer> entry) {
-            if (filterUsername != null) {
-                try {
-                    final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
-                            entry.getIdentifier());
-                    final StacOptionsJson stacOptions = CidsAppBackend.getInstance()
-                                .getStacOptions((Integer)aenderungsanfrageBean.getProperty(
-                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID));
-                    return (stacOptions != null) && filterUsername.equals(stacOptions.getCreatorUserName());
-                } catch (final Exception ex) {
-                    LOG.error(ex, ex);
-                    return false;
-                }
-            } else {
-                return true;
+            final String username = SessionManager.getSession().getUser().getName();
+            final Integer kassenzeichenNummer = (CidsAppBackend.getInstance().getCidsBean() != null)
+                ? (Integer)CidsAppBackend.getInstance().getCidsBean()
+                        .getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null;
+            final Timestamp now = new Timestamp(new Date().getTime());
+
+            final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
+                    entry.getIdentifier());
+            final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
+            boolean show = true;
+
+            if (filterUsername) {
+                final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
+                show &= (stacOptions != null) && Objects.equals(username, stacOptions.getCreatorUserName());
             }
+            if (filterKassenzeichen) {
+                show &= Objects.equals(
+                        kassenzeichenNummer,
+                        aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER));
+            }
+            if (filterActive) {
+                final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
+                show &= (timestamp != null) && timestamp.after(now);
+            }
+
+            return show;
         }
     }
 
@@ -258,23 +335,35 @@ public class AenderungsanfrageTable extends JXTable {
 
         @Override
         public Object getValueAt(final int rowIndex, final int columnIndex) {
-            final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
-            if (cidsBean == null) {
+            final CidsBean aenderungsanfrageBean = getCidsBeanByIndex(rowIndex);
+            if (aenderungsanfrageBean == null) {
                 return null;
             }
             switch (columnIndex) {
                 case 0: {
-                    return (cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER) != null)
-                        ? Integer.toString((Integer)cidsBean.getProperty(
+                    return
+                        (aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)
+                                    != null)
+                        ? Integer.toString((Integer)aenderungsanfrageBean.getProperty(
                                 VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
                 }
                 case 1: {
-                    return cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
+                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
+                    final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
+                    return (stacOptions != null) ? stacOptions.getCreatorUserName() : null;
                 }
                 case 2: {
-                    final Timestamp timestamp = (Timestamp)cidsBean.getProperty(
+                    return Objects.toString(aenderungsanfrageBean.getProperty(
+                                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
+                }
+                case 3: {
+                    final Timestamp timestamp = (Timestamp)aenderungsanfrageBean.getProperty(
                             VerdisConstants.PROP.AENDERUNGSANFRAGE.TIMESTAMP);
                     return (timestamp != null) ? DATE_FORMAT.format(timestamp) : timestamp;
+                }
+                case 4: {
+                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
+                    return (stacEntry != null) ? stacEntry.getTimestamp() : null;
                 }
                 default: {
                     return null;
