@@ -31,6 +31,8 @@ import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
+import de.cismet.layout.WrapLayout;
+
 import de.cismet.tools.gui.downloadmanager.Download;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
@@ -320,6 +322,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
 
         pnlAnhang.setOpaque(false);
         pnlAnhang.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        pnlAnhang.setLayout(new WrapLayout(WrapLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
