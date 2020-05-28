@@ -151,6 +151,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             }
         };
 
+    private Feature geoJsonFeature;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanRegenFlDetails;
     private javax.swing.JButton btnAnschlussgradAenderungAccept;
@@ -167,6 +169,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JLabel lblAenderungsdatum;
     private javax.swing.JLabel lblAnnotationBetreff;
     private javax.swing.JLabel lblAnnotationName;
@@ -592,6 +595,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         }
 
         setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
+        jToggleButton1.setEnabled(CidsAppBackend.getInstance().isEditable());
+
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
             bindingGroup.unbind();
@@ -1697,6 +1702,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         lblAnnotationText = new javax.swing.JLabel();
         scpAnnotationText = new javax.swing.JScrollPane();
         txtAnnotationText = new javax.swing.JTextArea();
+        jToggleButton1 = new javax.swing.JToggleButton();
 
         setOpaque(false);
         setLayout(new java.awt.BorderLayout());
@@ -2403,6 +2409,23 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel2.add(scpAnnotationText, gridBagConstraints);
 
+        jToggleButton1.setText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.jToggleButton1.text")); // NOI18N
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jToggleButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanel2.add(jToggleButton1, gridBagConstraints);
+
         bpanRegenFlDetails.add(jPanel2, "annotation");
 
         add(bpanRegenFlDetails, java.awt.BorderLayout.CENTER);
@@ -2478,13 +2501,15 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         pruefungAenderungAnschlussgrad(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungAcceptActionPerformed
-
     @Override
     protected void setAnnotationGeoJsonFeature(final Feature geoJsonFeature) {
+        this.geoJsonFeature = geoJsonFeature;
         ((CardLayout)bpanRegenFlDetails.getLayout()).show(bpanRegenFlDetails, "annotation");
         txtAnnotationName.setText((String)geoJsonFeature.getProperty("name"));
         txtAnnotationBetreff.setText((String)geoJsonFeature.getProperty("title"));
         txtAnnotationText.setText((String)geoJsonFeature.getProperty("text"));
+        final Boolean abgearbeitet = (Boolean)geoJsonFeature.getProperty("cids.abgearbeitet");
+        jToggleButton1.setSelected(abgearbeitet);
     }
 
     /**
@@ -2497,4 +2522,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 //            refreshAenderungButtons(isEnabled());
 //        }
     } //GEN-LAST:event_txtGroesseKorrekturPropertyChange
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
+        geoJsonFeature.setProperty("cids.abgearbeitet", jToggleButton1.isSelected());
+        Main.getInstance().getKartenPanel().refreshInMap(false);
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 }
