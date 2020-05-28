@@ -353,7 +353,8 @@ public class AenderungsanfrageTable extends JXTable {
                     return (stacOptions != null) ? stacOptions.getCreatorUserName() : null;
                 }
                 case 2: {
-                    return aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS);
+                    return Objects.toString(aenderungsanfrageBean.getProperty(
+                                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
                 }
                 case 3: {
                     final Timestamp timestamp = (Timestamp)aenderungsanfrageBean.getProperty(

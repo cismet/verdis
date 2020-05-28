@@ -18,23 +18,45 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
+import java.text.DateFormat;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
+import de.cismet.cids.custom.utils.ByteArrayActionDownload;
+
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.tools.BrowserLauncher;
+
+import de.cismet.tools.gui.downloadmanager.AbstractDownload;
+import de.cismet.tools.gui.downloadmanager.BackgroundTaskMultipleDownload;
+import de.cismet.tools.gui.downloadmanager.Download;
+import de.cismet.tools.gui.downloadmanager.DownloadManager;
+import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
 
@@ -51,6 +73,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             AenderungsanfrageNachrichtenPanel.class);
 
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+
     //~ Instance fields --------------------------------------------------------
 
     private AenderungsanfrageJson aenderungsanfrage;
@@ -60,8 +84,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler3;
+    private javax.swing.Box.Filler filler4;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -147,10 +173,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jPanel3 = new javax.swing.JPanel();
-        jToggleButton1 = new javax.swing.JToggleButton();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
+        jToggleButton1 = new javax.swing.JToggleButton();
+        filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
+        jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
@@ -165,6 +195,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         setLayout(new java.awt.GridBagLayout());
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel3.add(filler3, gridBagConstraints);
 
         jToggleButton1.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/systemmessage_disabled.png"))); // NOI18N
@@ -178,6 +213,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 "AenderungsanfrageNachrichtenPanel.jToggleButton1.toolTipText"));             // NOI18N
         jToggleButton1.setBorderPainted(false);
         jToggleButton1.setFocusPainted(false);
+        jToggleButton1.setMaximumSize(new java.awt.Dimension(24, 24));
+        jToggleButton1.setMinimumSize(new java.awt.Dimension(24, 24));
+        jToggleButton1.setPreferredSize(new java.awt.Dimension(24, 24));
         jToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/systemmessage.png")));          // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -188,17 +226,42 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
         jPanel3.add(jToggleButton1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        jPanel3.add(filler3, gridBagConstraints);
+        jPanel3.add(filler4, gridBagConstraints);
+
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/downloadChat.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton3,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton3.text"));                                                   // NOI18N
+        jButton3.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton3.toolTipText"));                                            // NOI18N
+        jButton3.setBorderPainted(false);
+        jButton3.setFocusPainted(false);
+        jButton3.setMaximumSize(new java.awt.Dimension(24, 24));
+        jButton3.setMinimumSize(new java.awt.Dimension(24, 24));
+        jButton3.setPreferredSize(new java.awt.Dimension(24, 24));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton3ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
+        jPanel3.add(jButton3, gridBagConstraints);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/email.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -206,8 +269,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
                 "AenderungsanfrageNachrichtenPanel.jButton2.text"));                                            // NOI18N
+        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton2.toolTipText"));                                     // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setFocusPainted(false);
+        jButton2.setMaximumSize(new java.awt.Dimension(24, 24));
+        jButton2.setMinimumSize(new java.awt.Dimension(24, 24));
+        jButton2.setPreferredSize(new java.awt.Dimension(24, 24));
 
         final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -225,10 +294,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(7, 3, 5, 3);
+        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel3.add(jButton2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -236,6 +304,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jPanel3, gridBagConstraints);
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -256,6 +325,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jScrollPane1, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
@@ -356,6 +426,112 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             LOG.error(ex, ex);
         }
     }                                                                            //GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
+        final StringBuffer sb = new StringBuffer();
+
+        if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
+            final Set<NachrichtAnhangJson> nachrichtAnhaenge = new HashSet<>();
+            for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
+                if (!Boolean.TRUE.equals(nachrichtJson.getDraft())) {
+                    final String anhangString;
+                    if (nachrichtJson.getAnhang() != null) {
+                        final List<String> anhaenge = new ArrayList<>();
+                        for (final NachrichtAnhangJson nachrichtAnhang : nachrichtJson.getAnhang()) {
+                            anhaenge.add(nachrichtAnhang.getName());
+                            nachrichtAnhaenge.add(nachrichtAnhang);
+                        }
+                        if (anhaenge.isEmpty()) {
+                            anhangString = null;
+                        } else {
+                            anhangString = String.join(", ", anhaenge);
+                        }
+                    } else {
+                        anhangString = null;
+                    }
+
+                    final String typ;
+                    if (nachrichtJson.getTyp() != null) {
+                        switch (nachrichtJson.getTyp()) {
+                            case CITIZEN: {
+                                typ = "Bürger";
+                            }
+                            break;
+                            case CLERK: {
+                                typ = "Bearbeiter";
+                            }
+                            break;
+                            case SYSTEM: {
+                                typ = "System";
+                            }
+                            break;
+                            default: {
+                                typ = null;
+                            }
+                        }
+                    } else {
+                        typ = null;
+                    }
+
+                    final String text = AenderungsanfrageNachrichtPanel.createText(nachrichtJson);
+                    sb.append(DATE_FORMAT.format(nachrichtJson.getTimestamp()))
+                            .append(" - ")
+                            .append(typ)
+                            .append(":")
+                            .append((text != null) ? (" " + text) : "")
+                            .append((anhangString != null) ? (" [" + anhangString + "]") : "")
+                            .append("\n");
+                }
+            }
+
+            if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(this)) {
+                final String jobname = DownloadManagerDialog.getInstance().getJobName();
+
+                final BackgroundTaskMultipleDownload.FetchDownloadsTask fetchDownloadsTask =
+                    new BackgroundTaskMultipleDownload.FetchDownloadsTask() {
+
+                        @Override
+                        public Collection<? extends Download> fetchDownloads() throws Exception {
+                            final String directory = ((jobname != null)
+                                    ? (jobname + System.getProperty("file.separator")) : "")
+                                        + aenderungsanfrage.getKassenzeichen()
+                                        + "_"
+                                        + Math.abs(aenderungsanfrage.hashCode());
+                            final Collection<Download> downloads = new ArrayList<>();
+                            downloads.add(new TxtDownload(
+                                    sb.toString(),
+                                    directory,
+                                    "Nachrichten",
+                                    "nachrichten",
+                                    ".txt"));
+                            for (final NachrichtAnhangJson nachrichtAnhang : nachrichtAnhaenge) {
+                                final Download download = new ByteArrayActionDownload(
+                                        VerdisConstants.DOMAIN,
+                                        DownloadChangeRequestAnhangServerAction.TASK_NAME,
+                                        nachrichtAnhang.toJson(),
+                                        null,
+                                        "Anhang",
+                                        directory,
+                                        nachrichtAnhang.getName().substring(
+                                            0,
+                                            nachrichtAnhang.getName().lastIndexOf(".")),
+                                        nachrichtAnhang.getName().substring(nachrichtAnhang.getName().lastIndexOf(".")),
+                                        ConnectionContext.createDeprecated());
+                                downloads.add(download);
+                            }
+                            return downloads;
+                        }
+                    };
+                DownloadManager.instance()
+                        .add(new BackgroundTaskMultipleDownload(null, "Gesprächsprotokoll", fetchDownloadsTask));
+            }
+        }
+    } //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -483,5 +659,79 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         super.setEnabled(enabled);
         jPanel2.setVisible(enabled);
         refresh();
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class TxtDownload extends AbstractDownload {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String content;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new TxtDownload object.
+         *
+         * @param  content    DOCUMENT ME!
+         * @param  directory  DOCUMENT ME!
+         * @param  title      DOCUMENT ME!
+         * @param  filename   DOCUMENT ME!
+         * @param  extension  DOCUMENT ME!
+         */
+        public TxtDownload(
+                final String content,
+                final String directory,
+                final String title,
+                final String filename,
+                final String extension) {
+            this.content = content;
+            this.directory = directory;
+            this.title = title;
+
+            status = Download.State.WAITING;
+
+            determineDestinationFile(filename, extension);
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void run() {
+            if (status != Download.State.WAITING) {
+                return;
+            }
+
+            status = Download.State.RUNNING;
+
+            stateChanged();
+
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new FileWriter(fileToSaveTo, false));
+                writer.write(content);
+            } catch (final Exception ex) {
+                error(ex);
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (final Exception e) {
+                        log.warn("Exception occured while closing file.", e);
+                    }
+                }
+            }
+
+            if (status == Download.State.RUNNING) {
+                status = Download.State.COMPLETED;
+                stateChanged();
+            }
+        }
     }
 }
