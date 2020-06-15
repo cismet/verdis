@@ -627,6 +627,10 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 "KassenzeichenListPanel.jButton8.toolTipText"));                                                         // NOI18N
         jButton8.setBorderPainted(false);
         jButton8.setContentAreaFilled(false);
+        jButton8.setFocusPainted(false);
+        jButton8.setMaximumSize(new java.awt.Dimension(24, 24));
+        jButton8.setMinimumSize(new java.awt.Dimension(24, 24));
+        jButton8.setPreferredSize(new java.awt.Dimension(24, 24));
         jButton8.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
