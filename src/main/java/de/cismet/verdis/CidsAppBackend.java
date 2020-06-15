@@ -1420,7 +1420,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             final String baseLoginName = (String)res.get(StacInfoSearchStatement.Fields.BASE_LOGIN_NAME);
             final StacOptionsJson stacOptionsJson = StacUtils.createStacOptionsJson((Map)res.get(
                         StacInfoSearchStatement.Fields.STAC_OPTIONS_JSON));
-            final Timestamp timestamp = (Timestamp)res.get(StacInfoSearchStatement.Fields.TIMESTAMP);
+            final Timestamp timestamp = (Timestamp)res.get(StacInfoSearchStatement.Fields.EXPIRATION);
             return new StacOptionsEntry(stacOptionsJson, timestamp, baseLoginName);
         } else {
             return null;
