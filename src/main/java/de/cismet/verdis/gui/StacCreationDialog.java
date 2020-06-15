@@ -38,6 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
@@ -51,6 +52,7 @@ import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
+import de.cismet.verdis.server.action.PreExistingStacException;
 import de.cismet.verdis.server.json.StacOptionsDurationJson;
 import de.cismet.verdis.server.utils.VerdisServerResources;
 
@@ -485,7 +487,6 @@ public class StacCreationDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         jPanel6.add(jButton2, gridBagConstraints);
-        jButton2.setVisible(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton1,
@@ -636,36 +637,69 @@ public class StacCreationDialog extends JDialog {
         jRadioButton3.setEnabled(false);
         defaultBindableDateChooser1.setEnabled(false);
 
-        new SwingWorker<String, Void>() {
+        doStac(params);
+    } //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  params  DOCUMENT ME!
+     */
+    private void doStac(final Collection<ServerActionParameter> params) {
+        new SwingWorker<Object, Void>() {
 
                 @Override
-                protected String doInBackground() throws Exception {
-                    final String stac = (String)SessionManager.getProxy()
+                protected Object doInBackground() throws Exception {
+                    final Object ret = SessionManager.getProxy()
                                 .executeTask(
-                                        CreateAStacForKassenzeichenServerAction.TASKNAME,
-                                        VerdisConstants.DOMAIN,
-                                        null,
-                                        ConnectionContext.createDummy(),
-                                        params.toArray(new ServerActionParameter[0]));
-                    return stac;
+                                    CreateAStacForKassenzeichenServerAction.TASKNAME,
+                                    VerdisConstants.DOMAIN,
+                                    null,
+                                    ConnectionContext.createDummy(),
+                                    params.toArray(new ServerActionParameter[0]));
+                    return ret;
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        final String stac = get();
-                        final Boolean shortNotLong;
-                        if (jRadioButton1.isSelected()) {
-                            shortNotLong = true;
-                        } else if (jRadioButton2.isSelected()) {
-                            shortNotLong = false;
-                        } else {
-                            shortNotLong = null;
-                        }
-                        final Date date = jRadioButton2.isSelected() ? defaultBindableDateChooser1.getDate() : null;
+                        final Object ret = get();
+                        if (ret instanceof String) {
+                            final String stac = (String)ret;
+                            final Boolean shortNotLong;
+                            if (jRadioButton1.isSelected()) {
+                                shortNotLong = true;
+                            } else if (jRadioButton2.isSelected()) {
+                                shortNotLong = false;
+                            } else {
+                                shortNotLong = null;
+                            }
+                            final Date date = jRadioButton2.isSelected() ? defaultBindableDateChooser1.getDate() : null;
 
-                        toClipboard(stac, shortNotLong, date);
-                        jTextField1.setText(toDashes(stac));
+                            toClipboard(stac, shortNotLong, date);
+                            jTextField1.setText(toDashes(stac));
+                        } else {
+                            if (ret instanceof PreExistingStacException) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        StacCreationDialog.this,
+                                        "<html>"
+                                                + "Es existiert bereits ein gültiger Zugriffscode für dieses Kassenzeichen.<br>"
+                                                + "Wenn Sie fortfahren, wird der bestehende Zugriffscode ungültig,<br>"
+                                                + "und es wird ein neuer Zugriffscode erzeugt.<br><br>"
+                                                + "Möchten Sie den <b>bestehenden Zugriffscode ungültig machen</b>,<br>und einen neuen Zugriffscode erzeugen ?",
+                                        "Zugriffscode exisitert bereits.",
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE);
+
+                                if (JOptionPane.YES_OPTION == answer) {
+                                    params.add(new ServerActionParameter(
+                                            CreateAStacForKassenzeichenServerAction.Parameter.EXPIRE_PRE_EXISTING
+                                                        .toString(),
+                                            Boolean.TRUE));
+                                    doStac(params);
+                                }
+                            }
+                        }
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
                     } finally {
@@ -686,7 +720,7 @@ public class StacCreationDialog extends JDialog {
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }
 
     /**
      * DOCUMENT ME!
@@ -732,6 +766,5 @@ public class StacCreationDialog extends JDialog {
      * @param  evt  DOCUMENT ME!
      */
     private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
-        jButton2.setVisible(!jCheckBox2.isSelected());
     }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
 }

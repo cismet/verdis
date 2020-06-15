@@ -130,6 +130,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 "AenderungsanfrageTablePanel.jButton1.toolTipText"));                                            // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
+        jButton1.setFocusPainted(false);
         jButton1.setMaximumSize(new java.awt.Dimension(24, 24));
         jButton1.setMinimumSize(new java.awt.Dimension(24, 24));
         jButton1.setPreferredSize(new java.awt.Dimension(24, 24));
