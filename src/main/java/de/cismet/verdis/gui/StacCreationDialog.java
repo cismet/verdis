@@ -674,7 +674,7 @@ public class StacCreationDialog extends JDialog {
                             } else {
                                 shortNotLong = null;
                             }
-                            final Date date = jRadioButton2.isSelected() ? defaultBindableDateChooser1.getDate() : null;
+                            final Date date = jRadioButton3.isSelected() ? defaultBindableDateChooser1.getDate() : null;
 
                             toClipboard(stac, shortNotLong, date);
                             jTextField1.setText(toDashes(stac));
