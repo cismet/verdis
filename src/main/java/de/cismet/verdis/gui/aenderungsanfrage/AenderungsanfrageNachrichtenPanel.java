@@ -485,7 +485,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                             .append(":")
                             .append((text != null) ? (" " + text) : "")
                             .append((anhangString != null) ? (" [" + anhangString + "]") : "")
-                            .append("\n");
+                            .append(System.lineSeparator());
                 }
             }
 
