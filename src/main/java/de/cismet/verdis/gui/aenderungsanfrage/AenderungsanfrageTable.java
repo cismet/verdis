@@ -386,5 +386,10 @@ public class AenderungsanfrageTable extends JXTable {
         public boolean isCellEditable(final int row, final int column) {
             return false;
         }
+
+        @Override
+        public Class getColumnClass(final int column) {
+            return COLUMN_CLASSES[column];
+        }
     }
 }
