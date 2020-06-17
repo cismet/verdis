@@ -46,6 +46,7 @@ import de.cismet.verdis.server.json.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.NachrichtBuergerJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtParameterJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -183,7 +184,30 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
             final FlaecheFlaechenartJson flaechenart = nachrichtenParameter.getFlaechenart();
             final FlaecheAnschlussgradJson anschlussgrad = nachrichtenParameter.getAnschlussgrad();
             final boolean accepted = NachrichtParameterJson.Type.CHANGED.equals(nachrichtenParameter.getType());
-            if (groesse != null) {
+            final AenderungsanfrageUtils.Status status = nachrichtenParameter.getStatus();
+            if (status != null) {
+                switch (status) {
+                    case CLOSED: {
+                        text = "Die Bearbeitung wurde durch '" + nachrichtJson.getAbsender() + "' gesperrt.";
+                    }
+                    break;
+                    case NONE: {
+                        text = "Die Bearbeitung wurde von '" + nachrichtJson.getAbsender() + "' abgeschlossen.";
+                    }
+                    break;
+                    case PROCESSING: {
+                        text = "Die Bearbeitung wurde von '" + nachrichtJson.getAbsender() + "' aufgenommen.";
+                    }
+                    break;
+                    case PENDING: {
+                        text = "Es wurden neue Änderungen eingereicht.";
+                    }
+                    break;
+                    default: {
+                        text = null; // unreachable
+                    }
+                }
+            } else if (groesse != null) {
                 text = "Die Änderung der Größe der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf " + groesse
                             + "m² wurde von '" + nachrichtJson.getAbsender() + "' "
                             + (accepted ? "angenommen" : "abgelehnt.");

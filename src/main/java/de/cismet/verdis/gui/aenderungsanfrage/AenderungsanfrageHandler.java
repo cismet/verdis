@@ -44,6 +44,7 @@ import de.cismet.verdis.server.json.NachrichtParameterAnschlussgradJson;
 import de.cismet.verdis.server.json.NachrichtParameterFlaechenartJson;
 import de.cismet.verdis.server.json.NachrichtParameterGroesseJson;
 import de.cismet.verdis.server.json.NachrichtParameterJson;
+import de.cismet.verdis.server.json.NachrichtParameterStatusJson;
 import de.cismet.verdis.server.json.NachrichtSystemJson;
 import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
 import de.cismet.verdis.server.json.PruefungFlaechenartJson;
@@ -238,7 +239,7 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void updateAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
+    public void loadAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
         if (cidsBean != null) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
             search.setKassenzeichennummer((Integer)cidsBean.getProperty(
@@ -254,7 +255,7 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void updateAenderungsanfrageBean(final Integer stacId) throws Exception {
+    public void loadAenderungsanfrageBean(final Integer stacId) throws Exception {
         if (stacId != null) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
             search.setStacId(stacId);
@@ -448,15 +449,40 @@ public class AenderungsanfrageHandler {
      * DOCUMENT ME!
      *
      * @param   kassenzeichenBean  DOCUMENT ME!
+     * @param   status             DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void persistAenderungsanfrageBean(final CidsBean kassenzeichenBean) throws Exception {
+    public void persistAenderungsanfrageBean(final CidsBean kassenzeichenBean,
+            final AenderungsanfrageUtils.Status status) throws Exception {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
+
             if (aenderungsanfrageBean != null) {
                 final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-                doPruefung(aenderungsanfrage, kassenzeichenBean);
+
+                if (kassenzeichenBean != null) {
+                    doPruefung(aenderungsanfrage, kassenzeichenBean);
+                }
+
+                if (status != null) {
+                    if (AenderungsanfrageUtils.Status.NONE.equals(status)
+                                || AenderungsanfrageUtils.Status.PROCESSING.equals(status)) {
+                        final AenderungsanfrageUtils.Status oldStatus = AenderungsanfrageUtils.Status.valueOf((String)
+                                aenderungsanfrageBean.getProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                            + ".schluessel"));
+
+                        if (!status.equals(oldStatus)) {
+                            final String username = SessionManager.getSession().getUser().getName();
+                            addSystemMessage(new NachrichtParameterStatusJson(status), username);
+                        }
+                    }
+
+                    aenderungsanfrageBean.setProperty(
+                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
+                        AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(status));
+                }
 
                 aenderungsanfrageBean.setProperty(
                     VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON,
@@ -465,6 +491,7 @@ public class AenderungsanfrageHandler {
             }
         }
     }
+
     /**
      * DOCUMENT ME!
      *

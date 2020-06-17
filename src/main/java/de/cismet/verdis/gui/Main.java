@@ -3815,21 +3815,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                     @Override
                     protected Boolean doInBackground() throws Exception {
-                        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance()
-                                    .getAenderungsanfrageBean();
                         if (editMode) {              // this is before switching the mode
                             if (!changesPending()) { // only if no save is needed
                                 releaseLocks();
                                 return false;
                             }
                         } else {
-                            if (aenderungsanfrageBean != null) {
-                                aenderungsanfrageBean.setProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
-                                    AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(
-                                        AenderungsanfrageUtils.Status.PROCESSING));
-                                aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
-                            }
+                            AenderungsanfrageHandler.getInstance()
+                                    .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
                             if (acquireLocks()) {    // try to acquire
                                 return true;
                             }
@@ -5502,16 +5495,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         flaecheToCrosslinknummerMap.clear();
         frontToCrosslinknummerMap.clear();
 
-        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean();
-        if (aenderungsanfrageBean != null) {
-            final CidsBean statusBean = AenderungsanfrageHandler.getInstance().isPending(kassenzeichenBean)
-                ? AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(AenderungsanfrageUtils.Status.PENDING)
-                : AenderungsanfrageHandler.getInstance().getStatusBeanMap().get(AenderungsanfrageUtils.Status.NONE);
-            aenderungsanfrageBean.setProperty(
-                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS,
-                statusBean);
-            aenderungsanfrageBean.persist(ConnectionContext.createDeprecated());
-        }
+        AenderungsanfrageHandler.getInstance()
+                .persistAenderungsanfrageBean(
+                    kassenzeichenBean,
+                    AenderungsanfrageHandler.getInstance().isPending(kassenzeichenBean)
+                        ? AenderungsanfrageUtils.Status.PENDING : AenderungsanfrageUtils.Status.NONE);
 
         return persistedKassenzeichenBean;
     }
@@ -5753,7 +5741,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
-                        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean);
+                        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean, null);
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();
                         return assessedKassenzeichenBean;

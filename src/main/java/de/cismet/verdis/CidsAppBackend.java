@@ -1463,9 +1463,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                         final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummerFinal));
                         updateCrossReferences(cidsBean);
                         if (stacId != null) {
-                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(stacId);
+                            AenderungsanfrageHandler.getInstance().loadAenderungsanfrageBean(stacId);
                         } else {
-                            AenderungsanfrageHandler.getInstance().updateAenderungsanfrageBean(cidsBean);
+                            AenderungsanfrageHandler.getInstance().loadAenderungsanfrageBean(cidsBean);
                         }
                         return cidsBean;
                     }
