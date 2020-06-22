@@ -191,7 +191,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
                         text = "Die Bearbeitung wurde durch '" + nachrichtJson.getAbsender() + "' gesperrt.";
                     }
                     break;
-                    case NONE: {
+                    case NONE: {     // FINISHED
                         text = "Die Bearbeitung wurde von '" + nachrichtJson.getAbsender() + "' abgeschlossen.";
                     }
                     break;
