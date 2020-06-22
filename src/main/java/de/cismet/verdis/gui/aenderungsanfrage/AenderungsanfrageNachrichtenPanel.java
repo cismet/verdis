@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -269,9 +270,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
                 "AenderungsanfrageNachrichtenPanel.jButton2.text"));                                            // NOI18N
-        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(
-                AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton2.toolTipText"));                                     // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setFocusPainted(false);
         jButton2.setMaximumSize(new java.awt.Dimension(24, 24));
@@ -298,6 +296,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel3.add(jButton2, gridBagConstraints);
+        jButton2.setVisible(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -334,9 +333,16 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
+        jTextArea1.setRows(3);
         jTextArea1.setWrapStyleWord(true);
         jTextArea1.setMinimumSize(new java.awt.Dimension(220, 80));
+        jTextArea1.addKeyListener(new java.awt.event.KeyAdapter() {
+
+                @Override
+                public void keyPressed(final java.awt.event.KeyEvent evt) {
+                    jTextArea1KeyPressed(evt);
+                }
+            });
         jScrollPane2.setViewportView(jTextArea1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -378,21 +384,41 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
     /**
      * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void sendMessage() {
+        String text = jTextArea1.getText().trim();
         if ((jTextArea1.getText() != null) && !jTextArea1.getText().trim().isEmpty()) {
+            final int size = aenderungsanfrage.getNachrichten().size();
+            if (size > 0) {
+                final int index = size - 1;
+                final NachrichtJson lastNachricht = aenderungsanfrage.getNachrichten().get(index);
+                if ((lastNachricht.getNachricht() != null) && NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
+                            && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
+                    aenderungsanfrage.getNachrichten().remove(index);
+                    refresh();
+                    text = lastNachricht.getNachricht() + "\n" + text;
+                }
+            }
             final NachrichtJson nachrichtJson = new NachrichtSachberarbeiterJson(
                     true,
                     new Date(),
-                    jTextArea1.getText().trim(),
+                    text,
                     username);
             aenderungsanfrage.getNachrichten().add(nachrichtJson);
+
             addNachricht(nachrichtJson);
             jTextArea1.setText("");
             refresh();
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        sendMessage();
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -532,6 +558,36 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             }
         }
     } //GEN-LAST:event_jButton3ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jTextArea1KeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_jTextArea1KeyPressed
+        if (KeyEvent.VK_UP == evt.getKeyCode()) {
+            redoLastMessage();
+        } else if ((KeyEvent.VK_ENTER == evt.getKeyCode()) && (evt.isControlDown() || evt.isAltDown())) {
+            sendMessage();
+        }
+    }                                                                      //GEN-LAST:event_jTextArea1KeyPressed
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void redoLastMessage() {
+        final int size = aenderungsanfrage.getNachrichten().size();
+        if (size > 0) {
+            final int index = size - 1;
+            final NachrichtJson lastNachricht = aenderungsanfrage.getNachrichten().get(index);
+            if ((lastNachricht.getNachricht() != null) && NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
+                        && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
+                aenderungsanfrage.getNachrichten().remove(index);
+                refresh();
+                jTextArea1.setText(lastNachricht.getNachricht() + "\n");
+            }
+        }
+    }
 
     /**
      * DOCUMENT ME!

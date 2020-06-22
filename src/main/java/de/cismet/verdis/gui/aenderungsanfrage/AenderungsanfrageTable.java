@@ -95,6 +95,14 @@ public class AenderungsanfrageTable extends JXTable {
     public AenderungsanfrageTable() {
         super(new AenderungsanfrageTableModel());
 
+        final HighlightPredicate selectedHighlightPredicate = new HighlightPredicate() {
+
+                @Override
+                public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
+                    return componentAdapter.isSelected();
+                }
+            };
+
         final HighlightPredicate activeHighlightPredicate = new HighlightPredicate() {
 
                 @Override
@@ -107,12 +115,17 @@ public class AenderungsanfrageTable extends JXTable {
                 }
             };
 
-        final Highlighter activeHighlighter = new ColorHighlighter(
-                activeHighlightPredicate,
-                Color.ORANGE,
+        final Highlighter selectedHighlighter = new ColorHighlighter(
+                selectedHighlightPredicate,
+                new Color(207, 210, 221),
                 Color.BLACK);
 
-        setHighlighters(activeHighlighter);
+        final Highlighter activeHighlighter = new ColorHighlighter(
+                activeHighlightPredicate,
+                new Color(132, 162, 217),
+                Color.WHITE);
+
+        setHighlighters(selectedHighlighter, activeHighlighter);
         setRowFilter(new AenderungsanfrageRowFilter());
     }
 
@@ -166,16 +179,16 @@ public class AenderungsanfrageTable extends JXTable {
 
     @Override
     public String getToolTipText(final MouseEvent e) {
-        final Point p = e.getPoint();
-        final int rowIndex = rowAtPoint(p);
-        if (rowIndex >= 0) {
-            final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
-                    convertRowIndexToModel(rowIndex));
-            if (aenderungsanfrageBean != null) {
-                return "Prüfkennzeichen: "
-                            + AenderungsanfrageHandler.getInstance().getStacIdHash(aenderungsanfrageBean);
-            }
-        }
+//        final Point p = e.getPoint();
+//        final int rowIndex = rowAtPoint(p);
+//        if (rowIndex >= 0) {
+//            final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
+//                    convertRowIndexToModel(rowIndex));
+//            if (aenderungsanfrageBean != null) {
+//                return "Prüfkennzeichen: "
+//                            + AenderungsanfrageHandler.getInstance().getStacIdHash(aenderungsanfrageBean);
+//            }
+//        }
         return null;
     }
 
@@ -350,11 +363,20 @@ public class AenderungsanfrageTable extends JXTable {
                 case 1: {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
                     final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
-                    return (stacOptions != null) ? stacOptions.getCreatorUserName() : null;
+                    return (stacOptions != null)
+                        ? (SessionManager.getSession().getUser().getName().equals(stacOptions.getCreatorUserName())
+                            ? stacOptions.getCreatorUserName() : "ich") : null;
                 }
                 case 2: {
-                    return Objects.toString(aenderungsanfrageBean.getProperty(
-                                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
+                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
+                    final Timestamp now = new Timestamp(new Date().getTime());
+                    final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
+                    if ((timestamp != null) && timestamp.after(now)) {
+                        return "abgelaufen";
+                    } else {
+                        return Objects.toString(aenderungsanfrageBean.getProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
+                    }
                 }
                 case 3: {
                     final Timestamp timestamp = (Timestamp)aenderungsanfrageBean.getProperty(

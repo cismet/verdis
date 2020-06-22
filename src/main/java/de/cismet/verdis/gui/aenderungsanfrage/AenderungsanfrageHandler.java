@@ -185,19 +185,22 @@ public class AenderungsanfrageHandler {
      * @return  DOCUMENT ME!
      */
     public boolean isPending(final CidsBean kassenzeichenBean) {
-        final Map<String, CidsBean> flaechenBeans = new HashMap<>();
-        for (final CidsBean flaecheBean
-                    : kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
-            final String bezeichnung = (String)flaecheBean.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-            flaechenBeans.put(bezeichnung, flaecheBean);
-        }
+        if ((getAenderungsanfrage() != null) && (getAenderungsanfrage().getFlaechen() != null)
+                    && (getAenderungsanfrage().getFlaechen().keySet() != null)) {
+            final Map<String, CidsBean> flaechenBeans = new HashMap<>();
+            for (final CidsBean flaecheBean
+                        : kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
+                final String bezeichnung = (String)flaecheBean.getProperty(
+                        VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+                flaechenBeans.put(bezeichnung, flaecheBean);
+            }
 
-        for (final String bezeichnung : getAenderungsanfrage().getFlaechen().keySet()) {
-            final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
-            final FlaecheAenderungJson flaecheJson = getAenderungsanfrage().getFlaechen().get(bezeichnung);
-            if (isPending(flaecheBean, flaecheJson)) {
-                return true;
+            for (final String bezeichnung : getAenderungsanfrage().getFlaechen().keySet()) {
+                final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
+                final FlaecheAenderungJson flaecheJson = getAenderungsanfrage().getFlaechen().get(bezeichnung);
+                if (isPending(flaecheBean, flaecheJson)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -275,13 +278,12 @@ public class AenderungsanfrageHandler {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
                         .executeCustomServerSearch(search);
-            if (mons != null) {
-                for (final MetaObjectNode mon : mons) {
-                    final MetaObject mo = CidsAppBackend.getInstance()
-                                .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
-                    if (mo != null) {
-                        aenderungsanfrageBean = mo.getBean();
-                    }
+            if ((mons != null) && !mons.isEmpty()) {
+                final MetaObjectNode mon = mons.iterator().next();
+                final MetaObject mo = CidsAppBackend.getInstance()
+                            .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
+                if (mo != null) {
+                    aenderungsanfrageBean = mo.getBean();
                 }
             }
         }
