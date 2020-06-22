@@ -372,16 +372,16 @@ public class AenderungsanfrageTable extends JXTable {
                     final Timestamp now = new Timestamp(new Date().getTime());
                     final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
                     if ((timestamp != null) && timestamp.after(now)) {
-                        return "abgelaufen";
-                    } else {
                         return Objects.toString(aenderungsanfrageBean.getProperty(
                                     VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
+                    } else {
+                        return "abgelaufen";
                     }
                 }
                 case 3: {
                     final Timestamp timestamp = (Timestamp)aenderungsanfrageBean.getProperty(
                             VerdisConstants.PROP.AENDERUNGSANFRAGE.TIMESTAMP);
-                    return (timestamp != null) ? DATE_FORMAT.format(timestamp) : timestamp;
+                    return timestamp;
                 }
                 case 4: {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
