@@ -203,22 +203,23 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jPanel3.add(filler3, gridBagConstraints);
 
         jToggleButton1.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/systemmessage_disabled.png"))); // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/hide_system_messages.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jToggleButton1,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jToggleButton1.text"));                    // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jToggleButton1.text"));                  // NOI18N
         jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jToggleButton1.toolTipText"));             // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jToggleButton1.toolTipText"));           // NOI18N
         jToggleButton1.setBorderPainted(false);
+        jToggleButton1.setContentAreaFilled(false);
         jToggleButton1.setFocusPainted(false);
         jToggleButton1.setMaximumSize(new java.awt.Dimension(24, 24));
         jToggleButton1.setMinimumSize(new java.awt.Dimension(24, 24));
         jToggleButton1.setPreferredSize(new java.awt.Dimension(24, 24));
         jToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/verdis/res/systemmessage.png")));          // NOI18N
+                getClass().getResource("/de/cismet/verdis/res/show_system_messages.png"))); // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -237,15 +238,16 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.weightx = 1.0;
         jPanel3.add(filler4, gridBagConstraints);
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/downloadChat.png"))); // NOI18N
+        jButton3.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/download_comments.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton3,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton3.text"));                                                   // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jButton3.text"));                     // NOI18N
         jButton3.setToolTipText(org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton3.toolTipText"));                                            // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jButton3.toolTipText"));              // NOI18N
         jButton3.setBorderPainted(false);
         jButton3.setFocusPainted(false);
         jButton3.setMaximumSize(new java.awt.Dimension(24, 24));
@@ -264,12 +266,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel3.add(jButton3, gridBagConstraints);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/email.png"))); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/send_mail.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton2,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton2.text"));                                            // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jButton2.text"));                                                // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setFocusPainted(false);
         jButton2.setMaximumSize(new java.awt.Dimension(24, 24));
@@ -335,7 +337,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(3);
         jTextArea1.setWrapStyleWord(true);
-        jTextArea1.setMinimumSize(new java.awt.Dimension(220, 80));
         jTextArea1.addKeyListener(new java.awt.event.KeyAdapter() {
 
                 @Override
@@ -352,11 +353,18 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jScrollPane2, gridBagConstraints);
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/send_message.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton1,
             org.openide.util.NbBundle.getMessage(
                 AenderungsanfrageNachrichtenPanel.class,
-                "AenderungsanfrageNachrichtenPanel.jButton1.text")); // NOI18N
+                "AenderungsanfrageNachrichtenPanel.jButton1.text"));                                                   // NOI18N
+        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton1.toolTipText"));                                            // NOI18N
+        jButton1.setMaximumSize(new java.awt.Dimension(48, 48));
+        jButton1.setMinimumSize(new java.awt.Dimension(48, 48));
+        jButton1.setPreferredSize(new java.awt.Dimension(48, 48));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -367,7 +375,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         jPanel2.add(jButton1, gridBagConstraints);
 
@@ -438,6 +447,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         refresh();
+        jToggleButton1.setToolTipText(jToggleButton1.isSelected() ? "Systemnachrichten verbergen"
+                                                                  : "Systemnachrichten anzeigen");
     }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**

@@ -364,7 +364,7 @@ public class AenderungsanfrageTable extends JXTable {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
                     final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
                     return (stacOptions != null)
-                        ? (SessionManager.getSession().getUser().getName().equals(stacOptions.getCreatorUserName())
+                        ? ((!SessionManager.getSession().getUser().getName().equals(stacOptions.getCreatorUserName()))
                             ? stacOptions.getCreatorUserName() : "ich") : null;
                 }
                 case 2: {
