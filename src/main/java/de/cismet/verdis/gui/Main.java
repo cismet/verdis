@@ -3822,8 +3822,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                 return false;
                             }
                         } else {
-                            AenderungsanfrageHandler.getInstance()
-                                    .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
                             if (acquireLocks()) {    // try to acquire
                                 return true;
                             }
@@ -5107,27 +5105,42 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     public void setEditMode(final boolean editMode) {
         CidsAppBackend.getInstance().setEditable(editMode);
-        try {
-            this.editMode = editMode;
+        this.editMode = editMode;
 
-            refreshKassenzeichenButtons();
-            refreshClipboardButtons();
-            refreshItemButtons();
+        if (editMode) {
+            new SwingWorker<Void, Void>() {
 
-            cmdSAPCheck.setEnabled(!editMode);
-            kartenPanel.setEnabled(editMode);
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        AenderungsanfrageHandler.getInstance()
+                                .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
+                        return null;
+                    }
 
-//            final Iterator it = stores.iterator();
-//            while (it.hasNext()) {
-//                final Storable store = (Storable) it.next();
-//                store.enableEditing(b);
-//            }
-            refreshLeftTitleBarColor();
+                    @Override
+                    protected void done() {
+                        try {
+                            refreshKassenzeichenButtons();
+                            refreshClipboardButtons();
+                            refreshItemButtons();
 
-            CidsAppBackend.getInstance().getMainMap().getMemRedo().clear();
-            CidsAppBackend.getInstance().getMainMap().getMemUndo().clear();
-        } catch (Exception e) {
-            LOG.error("Fehler beim Wechseln in den EditMode", e);
+                            cmdSAPCheck.setEnabled(!editMode);
+                            kartenPanel.setEnabled(editMode);
+
+                            // final Iterator it = stores.iterator();
+                            // while (it.hasNext()) {
+                            // final Storable store = (Storable) it.next();
+                            // store.enableEditing(b);
+                            // }
+                            refreshLeftTitleBarColor();
+
+                            CidsAppBackend.getInstance().getMainMap().getMemRedo().clear();
+                            CidsAppBackend.getInstance().getMainMap().getMemUndo().clear();
+                        } catch (Exception e) {
+                            LOG.error("Fehler beim Wechseln in den EditMode", e);
+                        }
+                    }
+                }.execute();
         }
     }
 

@@ -34,6 +34,8 @@ import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.gui.Main;
+
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
 import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
