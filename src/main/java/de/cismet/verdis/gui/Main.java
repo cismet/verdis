@@ -117,6 +117,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -4589,8 +4590,24 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * @param  evt  DOCUMENT ME!
      */
     private void cmdStacActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdStacActionPerformed
+        final Set<Object> names = new HashSet<>();
+        for (final CidsBean flaecheBean : getRegenFlaechenTable().getModel().getCidsBeans()) {
+            if (flaecheBean != null) {
+                if (names.contains(flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG))) {
+                    JOptionPane.showMessageDialog(
+                        Main.this,
+                        "<html>Die Zuweisung der Flächenbezeichnungen ist nicht eindeutig.<br>"
+                                + "Bis dieser Zustand behoben ist, kann kein Zugriffscode erzeugt werden.",
+                        "Doppelt vergebene Flächenbezeichnungen.",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                names.add(flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG));
+            }
+        }
+
         StaticSwingTools.showDialog(StacCreationDialog.getInstance());
-    }                                                                           //GEN-LAST:event_cmdStacActionPerformed
+    } //GEN-LAST:event_cmdStacActionPerformed
 
     /**
      * DOCUMENT ME!
