@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>6.10.11</version>
+    <version>6.10.12</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v6.10.11</tag>
+      <tag>v6.10.12</tag>
   </scm>
 
   <issueManagement>
