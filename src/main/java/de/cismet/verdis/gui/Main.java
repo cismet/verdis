@@ -5106,42 +5106,41 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     public void setEditMode(final boolean editMode) {
         CidsAppBackend.getInstance().setEditable(editMode);
         this.editMode = editMode;
+        new SwingWorker<Void, Void>() {
 
-        if (editMode) {
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    if (editMode) {
                         AenderungsanfrageHandler.getInstance()
                                 .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
-                        return null;
                     }
+                    return null;
+                }
 
-                    @Override
-                    protected void done() {
-                        try {
-                            refreshKassenzeichenButtons();
-                            refreshClipboardButtons();
-                            refreshItemButtons();
+                @Override
+                protected void done() {
+                    try {
+                        refreshKassenzeichenButtons();
+                        refreshClipboardButtons();
+                        refreshItemButtons();
 
-                            cmdSAPCheck.setEnabled(!editMode);
-                            kartenPanel.setEnabled(editMode);
+                        cmdSAPCheck.setEnabled(!editMode);
+                        kartenPanel.setEnabled(editMode);
 
-                            // final Iterator it = stores.iterator();
-                            // while (it.hasNext()) {
-                            // final Storable store = (Storable) it.next();
-                            // store.enableEditing(b);
-                            // }
-                            refreshLeftTitleBarColor();
+                        // final Iterator it = stores.iterator();
+                        // while (it.hasNext()) {
+                        // final Storable store = (Storable) it.next();
+                        // store.enableEditing(b);
+                        // }
+                        refreshLeftTitleBarColor();
 
-                            CidsAppBackend.getInstance().getMainMap().getMemRedo().clear();
-                            CidsAppBackend.getInstance().getMainMap().getMemUndo().clear();
-                        } catch (Exception e) {
-                            LOG.error("Fehler beim Wechseln in den EditMode", e);
-                        }
+                        CidsAppBackend.getInstance().getMainMap().getMemRedo().clear();
+                        CidsAppBackend.getInstance().getMainMap().getMemUndo().clear();
+                    } catch (Exception e) {
+                        LOG.error("Fehler beim Wechseln in den EditMode", e);
                     }
-                }.execute();
-        }
+                }
+            }.execute();
     }
 
     /**
