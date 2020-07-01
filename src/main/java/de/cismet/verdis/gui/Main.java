@@ -257,12 +257,12 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 import de.cismet.verdis.server.search.StacInfoSearchStatement;
-import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -5111,8 +5111,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 @Override
                 protected Void doInBackground() throws Exception {
                     if (editMode) {
-                        AenderungsanfrageHandler.getInstance()
-                                .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
+                        AenderungsanfrageHandler.getInstance().startProcessing();
                     }
                     return null;
                 }
@@ -5524,12 +5523,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         flaecheToCrosslinknummerMap.clear();
         frontToCrosslinknummerMap.clear();
 
-        AenderungsanfrageHandler.getInstance()
-                .persistAenderungsanfrageBean(
-                    kassenzeichenBean,
-                    AenderungsanfrageHandler.getInstance().isPending(kassenzeichenBean)
-                        ? AenderungsanfrageUtils.Status.PENDING : AenderungsanfrageUtils.Status.NONE);
-
         return persistedKassenzeichenBean;
     }
 
@@ -5770,7 +5763,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
-                        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean, null);
+                        AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean);
+
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();
                         return assessedKassenzeichenBean;
