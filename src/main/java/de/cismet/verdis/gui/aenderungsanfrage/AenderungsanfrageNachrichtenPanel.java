@@ -26,7 +26,7 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.swing.Box;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
@@ -78,7 +79,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
 
     //~ Instance fields --------------------------------------------------------
 
-    private AenderungsanfrageJson aenderungsanfrage;
     private String email;
     private String username;
 
@@ -105,19 +105,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * Creates a new AenderungsanfrageNachrichtenPanel object.
      */
     public AenderungsanfrageNachrichtenPanel() {
-        this(null, "Testnutzer");
-    }
-
-    /**
-     * Creates new form AenderungsanfrageDiskussionPanel.
-     *
-     * @param  aenderungsanfrage  nachrichtJsons DOCUMENT ME!
-     * @param  username           DOCUMENT ME!
-     */
-    public AenderungsanfrageNachrichtenPanel(final AenderungsanfrageJson aenderungsanfrage, final String username) {
-        this.aenderungsanfrage = aenderungsanfrage;
-        this.username = username;
-
         initComponents();
 
         jScrollPane1.addComponentListener(new ComponentAdapter() {
@@ -394,9 +381,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     /**
      * DOCUMENT ME!
      */
-    private void sendMessage() {
+    private void sendMessagePressed() {
         String text = jTextArea1.getText().trim();
         if ((jTextArea1.getText() != null) && !jTextArea1.getText().trim().isEmpty()) {
+            final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
             final int size = aenderungsanfrage.getNachrichten().size();
             if (size > 0) {
                 final int index = size - 1;
@@ -404,20 +392,44 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 if ((lastNachricht.getNachricht() != null) && NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
                             && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
                     aenderungsanfrage.getNachrichten().remove(index);
-                    refresh();
+                    refresh(aenderungsanfrage);
                     text = lastNachricht.getNachricht() + "\n" + text;
                 }
             }
+
+            // Nachricht erzeugen und lokal hinzufügen
             final NachrichtJson nachrichtJson = new NachrichtSachberarbeiterJson(
-                    true,
-                    new Date(),
+                    null,
+                    null,
+                    null,
                     text,
-                    username);
+                    username,
+                    true);
             aenderungsanfrage.getNachrichten().add(nachrichtJson);
 
+            // GUI vorab schonmal anpassen
             addNachricht(nachrichtJson);
             jTextArea1.setText("");
-            refresh();
+
+            // nachricht tatsächlich senden
+            new SwingWorker<Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        AenderungsanfrageHandler.getInstance()
+                                .sendAenderungsanfrage(new AenderungsanfrageJson(
+                                        aenderungsanfrage.getKassenzeichen(),
+                                        null,
+                                        null,
+                                        aenderungsanfrage.getNachrichten()));
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        refresh(getAenderungsanfrage());
+                    }
+                }.execute();
         }
     }
 
@@ -427,7 +439,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        sendMessage();
+        sendMessagePressed();
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -446,7 +458,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  evt  DOCUMENT ME!
      */
     private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
-        refresh();
+        refresh(getAenderungsanfrage());
         jToggleButton1.setToolTipText(jToggleButton1.isSelected() ? "Systemnachrichten verbergen"
                                                                   : "Systemnachrichten anzeigen");
     }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
@@ -471,6 +483,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         final StringBuffer sb = new StringBuffer();
+        final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
 
         if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
             final Set<NachrichtAnhangJson> nachrichtAnhaenge = new HashSet<>();
@@ -579,7 +592,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         if (KeyEvent.VK_UP == evt.getKeyCode()) {
             redoLastMessage();
         } else if ((KeyEvent.VK_ENTER == evt.getKeyCode()) && (evt.isControlDown() || evt.isAltDown())) {
-            sendMessage();
+            sendMessagePressed();
         }
     }                                                                      //GEN-LAST:event_jTextArea1KeyPressed
 
@@ -587,27 +600,44 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * DOCUMENT ME!
      */
     private void redoLastMessage() {
-        final int size = aenderungsanfrage.getNachrichten().size();
-        if (size > 0) {
-            final int index = size - 1;
-            final NachrichtJson lastNachricht = aenderungsanfrage.getNachrichten().get(index);
-            if ((lastNachricht.getNachricht() != null) && NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
-                        && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
-                aenderungsanfrage.getNachrichten().remove(index);
-                refresh();
-                jTextArea1.setText(lastNachricht.getNachricht() + "\n");
+        final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+        if ((aenderungsanfrage != null)
+                    && (aenderungsanfrage.getNachrichten() != null)
+                    && !aenderungsanfrage.getNachrichten().isEmpty()) {
+            final List<NachrichtJson> reversedNachrichten = new ArrayList<>(aenderungsanfrage.getNachrichten());
+            Collections.reverse(reversedNachrichten);
+
+            for (final NachrichtJson lastNachricht : reversedNachrichten) {
+                if (NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
+                            && Boolean.TRUE.equals(lastNachricht.getDraft())) {
+                    aenderungsanfrage.getNachrichten().remove(lastNachricht);
+                    refresh(aenderungsanfrage);
+                    jTextArea1.setText(lastNachricht.getNachricht() + "\n");
+                    break;
+                }
             }
         }
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  aenderungsanfrage  DOCUMENT ME!
      */
-    public final void refresh() {
+    private void refresh(final AenderungsanfrageJson aenderungsanfrage) {
+        refresh((aenderungsanfrage != null) ? aenderungsanfrage.getNachrichten() : null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nachrichten  DOCUMENT ME!
+     */
+    public final void refresh(final List<NachrichtJson> nachrichten) {
         jPanel1.invalidate();
         clear();
-        if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
-            for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
+        if (nachrichten != null) {
+            for (final NachrichtJson nachrichtJson : nachrichten) {
                 if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
                             && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
                     continue;
@@ -643,10 +673,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     /**
      * DOCUMENT ME!
      *
-     * @param  aenderungsanfrage  nachrichtJsons DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
-    public void setAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage) {
-        this.aenderungsanfrage = aenderungsanfrage;
+    public AenderungsanfrageJson getAenderungsanfrage() {
+        return AenderungsanfrageHandler.getInstance().getAenderungsanfrage();
     }
 
     /**
@@ -709,10 +739,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean();
         setEmail((aenderungsanfrageBean != null)
                 ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.EMAIL) : null);
-        setAenderungsanfrage(AenderungsanfrageHandler.getInstance().getAenderungsanfrage());
         bindingGroup.bind();
 
-        refresh();
+        refresh(getAenderungsanfrage());
     }
 
     @Override
@@ -725,7 +754,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
         jPanel2.setVisible(enabled);
-        refresh();
+        refresh(getAenderungsanfrage());
     }
 
     //~ Inner Classes ----------------------------------------------------------
