@@ -370,7 +370,8 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
                 @Override
                 protected List<CidsBean> doInBackground() throws Exception {
-                    return AenderungsanfrageHandler.getInstance().searchAenderungsanfrageBeans();
+                    AenderungsanfrageHandler.getInstance().reload();
+                    return AenderungsanfrageHandler.getInstance().searchAll();
                 }
 
                 @Override

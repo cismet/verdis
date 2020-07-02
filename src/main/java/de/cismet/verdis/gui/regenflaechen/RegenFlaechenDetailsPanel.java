@@ -852,7 +852,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
                                                       : null;
 
-        if ((flaecheBean != null) && (flaecheJson != null)) {
+        if ((flaecheBean != null) && ((flaecheJson != null) && !Boolean.TRUE.equals(flaecheJson.getDraft()))) {
             try {
                 final Integer groesse = (flaecheBean != null)
                     ? (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."

@@ -18,8 +18,6 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -50,7 +48,6 @@ import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
 import de.cismet.verdis.server.json.PruefungFlaechenartJson;
 import de.cismet.verdis.server.json.PruefungGroesseJson;
 import de.cismet.verdis.server.search.AenderungsanfrageSearchStatement;
-import de.cismet.verdis.server.search.AenderungsanfrageStatusSearchStatement;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -69,9 +66,9 @@ public class AenderungsanfrageHandler {
     //~ Instance fields --------------------------------------------------------
 
     private Integer stacId = null;
-    private CidsBean aenderungsanfrageBean = null;
-    private AenderungsanfrageJson aenderungsanfrageJson;
-    private Map<AenderungsanfrageUtils.Status, CidsBean> statusBeanMap = new HashMap();
+    private CidsBean cidsBean = null;
+    private AenderungsanfrageJson aenderungsanfrage;
+    private ChangeListenerHandler changeListenerHandler = new ChangeListenerHandler();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -79,25 +76,6 @@ public class AenderungsanfrageHandler {
      * Creates a new AenderungsanfrageHandler object.
      */
     private AenderungsanfrageHandler() {
-        final AenderungsanfrageStatusSearchStatement search = new AenderungsanfrageStatusSearchStatement();
-
-        try {
-            final Collection<MetaObjectNode> mons = CidsAppBackend.getInstance().executeCustomServerSearch(search);
-            if (mons != null) {
-                for (final MetaObjectNode mon : mons) {
-                    final MetaObject mo = CidsAppBackend.getInstance()
-                                .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
-                    if (mo != null) {
-                        final CidsBean statusBean = mo.getBean();
-                        statusBeanMap.put(AenderungsanfrageUtils.Status.valueOf(
-                                (String)statusBean.getProperty("schluessel")),
-                            statusBean);
-                    }
-                }
-            }
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -107,8 +85,8 @@ public class AenderungsanfrageHandler {
      *
      * @return  DOCUMENT ME!
      */
-    public Map<AenderungsanfrageUtils.Status, CidsBean> getStatusBeanMap() {
-        return statusBeanMap;
+    private ChangeListenerHandler getChangeListenerHandler() {
+        return changeListenerHandler;
     }
 
     /**
@@ -180,57 +158,11 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichenBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param  aenderungsanfrage  DOCUMENT ME!
      */
-    public boolean isPending(final CidsBean kassenzeichenBean) {
-        if ((getAenderungsanfrage() != null) && (getAenderungsanfrage().getFlaechen() != null)
-                    && (getAenderungsanfrage().getFlaechen().keySet() != null)) {
-            final Map<String, CidsBean> flaechenBeans = new HashMap<>();
-            for (final CidsBean flaecheBean
-                        : kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
-                final String bezeichnung = (String)flaecheBean.getProperty(
-                        VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-                flaechenBeans.put(bezeichnung, flaecheBean);
-            }
-
-            for (final String bezeichnung : getAenderungsanfrage().getFlaechen().keySet()) {
-                final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
-                final FlaecheAenderungJson flaecheJson = getAenderungsanfrage().getFlaechen().get(bezeichnung);
-                if (isPending(flaecheBean, flaecheJson)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void refreshAenderungsanfrageJson() {
-        final CidsBean aenderungsanfrageBean = getAenderungsanfrageBean();
-        if (aenderungsanfrageBean != null) {
-            try {
-                setAenderungsanfrageJson(AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
-                        (String)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)));
-                return;
-            } catch (final Exception ex) {
-                LOG.error(ex, ex);
-            }
-        }
-        setAenderungsanfrageJson(aenderungsanfrageJson);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  aenderungsanfrageJson  DOCUMENT ME!
-     */
-    public void setAenderungsanfrageJson(final AenderungsanfrageJson aenderungsanfrageJson) {
-        this.aenderungsanfrageJson = aenderungsanfrageJson;
+    private void setAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage) {
+        this.aenderungsanfrage = aenderungsanfrage;
+        changeListenerHandler.aenderungsanfrageChanged(aenderungsanfrage);
     }
 
     /**
@@ -263,7 +195,7 @@ public class AenderungsanfrageHandler {
             final AenderungsanfrageResultJson resultJson = AenderungsanfrageUtils.getInstance()
                         .createAenderungsanfrageResultJson((String)result);
             if (AenderungsanfrageResultJson.ResultStatus.SUCCESS.equals(resultJson.getResultStatus())) {
-                setAenderungsanfrageJson(resultJson.getAenderungsanfrage());
+                setAenderungsanfrage(resultJson.getAenderungsanfrage());
                 return resultJson;
             } else {
                 throw new Exception(resultJson.getErrorMessage());
@@ -278,16 +210,26 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
-     * @param   cidsBean  DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void reload() throws Exception {
+        loadByStacId(getStacId());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenNummer  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void loadAenderungsanfrageBean(final CidsBean cidsBean) throws Exception {
-        if (cidsBean != null) {
+    public void loadByKassenzeichennummer(final Integer kassenzeichenNummer) throws Exception {
+        if (kassenzeichenNummer != null) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-            search.setKassenzeichennummer((Integer)cidsBean.getProperty(
-                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER));
+            search.setKassenzeichennummer(kassenzeichenNummer);
             updateAenderungsanfrageBean(search);
+        } else {
+            updateAenderungsanfrageBean(null);
         }
     }
 
@@ -298,11 +240,13 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void loadAenderungsanfrageBean(final Integer stacId) throws Exception {
+    public void loadByStacId(final Integer stacId) throws Exception {
         if (stacId != null) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
             search.setStacId(stacId);
             updateAenderungsanfrageBean(search);
+        } else {
+            updateAenderungsanfrageBean(null);
         }
     }
 
@@ -314,9 +258,9 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     private void updateAenderungsanfrageBean(final AenderungsanfrageSearchStatement search) throws Exception {
-        setAenderungsanfrageBean(null);
+        setCidsBean(null);
         setStacId(null);
-        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+        if ((search != null) && CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
                         .executeCustomServerSearch(search);
             if ((mons != null) && !mons.isEmpty()) {
@@ -324,10 +268,21 @@ public class AenderungsanfrageHandler {
                 final MetaObject mo = CidsAppBackend.getInstance()
                             .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
                 if (mo != null) {
-                    setAenderungsanfrageBean(mo.getBean());
-                    setStacId((Integer)getAenderungsanfrageBean().getProperty("stac_id"));
+                    setCidsBean(mo.getBean());
+                    setStacId((Integer)getCidsBean().getProperty("stac_id"));
                 }
             }
+        }
+
+        try {
+            setAenderungsanfrage((getCidsBean() != null)
+                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
+                        (String)getCidsBean().getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null);
+            return;
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+            setAenderungsanfrage(null);
         }
     }
 
@@ -549,8 +504,8 @@ public class AenderungsanfrageHandler {
      *
      * @return  DOCUMENT ME!
      */
-    public CidsBean getAenderungsanfrageBean() {
-        return aenderungsanfrageBean;
+    public CidsBean getCidsBean() {
+        return cidsBean;
     }
 
     /**
@@ -558,7 +513,7 @@ public class AenderungsanfrageHandler {
      *
      * @return  DOCUMENT ME!
      */
-    public Integer getStacId() {
+    private Integer getStacId() {
         return stacId;
     }
 
@@ -567,7 +522,7 @@ public class AenderungsanfrageHandler {
      *
      * @param  stacId  DOCUMENT ME!
      */
-    public void setStacId(final Integer stacId) {
+    private void setStacId(final Integer stacId) {
         this.stacId = stacId;
     }
 
@@ -577,16 +532,16 @@ public class AenderungsanfrageHandler {
      * @return  DOCUMENT ME!
      */
     public AenderungsanfrageJson getAenderungsanfrage() {
-        return aenderungsanfrageJson;
+        return aenderungsanfrage;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  aenderungsanfrageBean  DOCUMENT ME!
+     * @param  cidsBean  DOCUMENT ME!
      */
-    public void setAenderungsanfrageBean(final CidsBean aenderungsanfrageBean) {
-        this.aenderungsanfrageBean = aenderungsanfrageBean;
+    public void setCidsBean(final CidsBean cidsBean) {
+        this.cidsBean = cidsBean;
     }
 
     /**
@@ -597,7 +552,7 @@ public class AenderungsanfrageHandler {
     public boolean changesPending() {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-            final String aenderungsanfrageOrigJson = (String)getAenderungsanfrageBean().getProperty(
+            final String aenderungsanfrageOrigJson = (String)getCidsBean().getProperty(
                     VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON);
             AenderungsanfrageJson aenderungsanfrageOrig;
             try {
@@ -621,7 +576,7 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public List<CidsBean> searchAenderungsanfrageBeans() throws Exception {
+    public List<CidsBean> searchAll() throws Exception {
         final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
@@ -647,56 +602,38 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
-     * @param   kassenzeichennummer  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param  changeListener  DOCUMENT ME!
      */
-    public CidsBean searchAenderungsanfrageBean(final Integer kassenzeichennummer) {
-        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
-            if (kassenzeichennummer != null) {
-                final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
-                search.setKassenzeichennummer(kassenzeichennummer);
-                final List<CidsBean> cidsBeanList = new ArrayList<>();
-                try {
-                    final Collection<MetaObjectNode> mons = SessionManager.getProxy()
-                                .customServerSearch(SessionManager.getSession().getUser(), search);
-                    for (final MetaObjectNode mon : mons) {
-                        final MetaObject mo = SessionManager.getProxy()
-                                    .getMetaObject(mon.getObjectId(), mon.getClassId(), VerdisConstants.DOMAIN);
-                        cidsBeanList.add(mo.getBean());
-                    }
-                } catch (final ConnectionException ex) {
-                    LOG.fatal(ex, ex);
-                }
-                if (!cidsBeanList.isEmpty()) {
-                    return cidsBeanList.get(0);
-                }
-            }
-        }
-        return null;
+    public void addChangeListener(final ChangeListener changeListener) {
+        getChangeListenerHandler().getChangeListeners().add(changeListener);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   aenderungsanfrageBean  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param  changeListener  DOCUMENT ME!
      */
-    public String getStacIdHash(final CidsBean aenderungsanfrageBean) {
-        if (aenderungsanfrageBean != null) {
-            final String md5 = DigestUtils.md5Hex(
-                    Integer.toString(
-                        (Integer)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER))
-                            + ";"
-                            + Integer.toString(
-                                (Integer)aenderungsanfrageBean.getProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID)));
-            return md5.substring(0, 4);
-        } else {
-            return null;
-        }
+    public void removeChangeListener(final ChangeListener changeListener) {
+        getChangeListenerHandler().getChangeListeners().remove(changeListener);
+    }
+
+    //~ Inner Interfaces -------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static interface ChangeListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  aenderungsanfrageJson  DOCUMENT ME!
+         */
+        void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson);
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -718,6 +655,36 @@ public class AenderungsanfrageHandler {
          * Creates a new LazyInitialiser object.
          */
         private LazyInitialiser() {
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class ChangeListenerHandler implements ChangeListener {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final Collection<ChangeListener> changeListeners = new ArrayList<>();
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public Collection<ChangeListener> getChangeListeners() {
+            return changeListeners;
+        }
+
+        @Override
+        public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
+            for (final ChangeListener listener : changeListeners) {
+                listener.aenderungsanfrageChanged(aenderungsanfrageJson);
+            }
         }
     }
 }

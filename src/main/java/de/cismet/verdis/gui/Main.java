@@ -257,7 +257,6 @@ import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
-import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
@@ -545,13 +544,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         StaticSwingTools.tweakUI();
 
-        aenderungsanfragenNachrichtenPanel.setUsername(SessionManager.getSession().getUser().getName());
-
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfrageTablePanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfragenNachrichtenPanel);
+//        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfragenNachrichtenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(getSRFrontenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
