@@ -157,6 +157,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
         aggVal.validate();
 
+        mainApp.refreshLeftTitleBarColor();
         Main.getInstance().refreshTitle();
     }
 
@@ -666,7 +667,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 protected void done() {
                     try {
                         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.ALLGEMEIN);
-                        mainApp.refreshLeftTitleBarColor();
                     } catch (Exception e) {
                         LOG.error("Exception in Background Thread", e);
                     }
@@ -691,7 +691,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 protected void done() {
                     try {
                         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.REGEN);
-                        mainApp.refreshLeftTitleBarColor();
                     } catch (Exception e) {
                         LOG.error("Exception in Background Thread", e);
                     }
@@ -716,7 +715,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 protected void done() {
                     try {
                         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.SR);
-                        mainApp.refreshLeftTitleBarColor();
                     } catch (Exception e) {
                         LOG.error("Exception in Background Thread", e);
                     }
@@ -771,7 +769,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 protected void done() {
                     try {
                         CidsAppBackend.getInstance().setMode(CidsAppBackend.Mode.KANALDATEN);
-                        mainApp.refreshLeftTitleBarColor();
                     } catch (Exception e) {
                         LOG.error("Exception in Background Thread", e);
                     }
