@@ -40,6 +40,8 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.BrowserLauncher;
@@ -621,12 +623,18 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  evt  DOCUMENT ME!
      */
     private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
+        jButton1.setEnabled(false);
         new SwingWorker<Void, Void>() {
 
                 @Override
                 protected Void doInBackground() throws Exception {
                     AenderungsanfrageHandler.getInstance().reload();
                     return null;
+                }
+
+                @Override
+                protected void done() {
+                    jButton1.setEnabled(true);
                 }
             }.execute();
     } //GEN-LAST:event_jButton4ActionPerformed
@@ -797,6 +805,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     @Override
     public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrage) {
         refresh(aenderungsanfrage);
+    }
+
+    @Override
+    public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
     }
 
     //~ Inner Classes ----------------------------------------------------------

@@ -7,6 +7,9 @@
 ****************************************************/
 package de.cismet.verdis.gui.aenderungsanfrage;
 
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
+
 import org.jdesktop.swingx.JXTable;
 
 import java.util.List;
@@ -19,8 +22,15 @@ import javax.swing.event.ListSelectionListener;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.cids.servermessage.CidsServerMessageNotifier;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
+
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
+
+import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 
 /**
  * DOCUMENT ME!
@@ -28,7 +38,9 @@ import de.cismet.verdis.EditModeListener;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore, EditModeListener {
+public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore,
+    EditModeListener,
+    AenderungsanfrageHandler.ChangeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -68,7 +80,43 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
 
-        reload();
+        try {
+            if (SessionManager.getConnection().hasConfigAttr(
+                            SessionManager.getSession().getUser(),
+                            "csm://"
+                            + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST)) {
+                CidsServerMessageNotifier.getInstance()
+                        .subscribe(new CidsServerMessageNotifierListener() {
+
+                                @Override
+                                public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
+                                    try {
+                                        final KassenzeichenChangeRequestServerAction.ServerMessage serverMessage =
+                                            (KassenzeichenChangeRequestServerAction.ServerMessage)event
+                                            .getMessage().getContent();
+                                        AenderungsanfrageHandler.getInstance().reloadBeans();
+                                    } catch (final Exception ex) {
+                                        LOG.warn(ex, ex);
+                                    }
+                                }
+                            },
+                            KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST);
+            }
+        } catch (final ConnectionException ex) {
+            LOG.warn("Konnte Rechte an csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST
+                        + " nicht abfragen.",
+                ex);
+        }
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    AenderungsanfrageHandler.getInstance().reloadBeans();
+                    return null;
+                }
+            }.execute();
+
+        AenderungsanfrageHandler.getInstance().addChangeListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -296,8 +344,21 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        reload();
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+        jButton1.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    AenderungsanfrageHandler.getInstance().reloadBeans();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    jButton1.setEnabled(true);
+                }
+            }.execute();
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -362,31 +423,6 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         return cidsBean;
     }
 
-    /**
-     * DOCUMENT ME!
-     */
-    private void reload() {
-        new SwingWorker<List<CidsBean>, Object>() {
-
-                @Override
-                protected List<CidsBean> doInBackground() throws Exception {
-                    AenderungsanfrageHandler.getInstance().reload();
-                    return AenderungsanfrageHandler.getInstance().searchAll();
-                }
-
-                @Override
-                protected void done() {
-                    final List<CidsBean> aenderungsanfrageBeans;
-                    try {
-                        aenderungsanfrageBeans = get();
-                        aenderungsanfrageTable1.setCidsBeans(aenderungsanfrageBeans);
-                    } catch (final Exception ex) {
-                        LOG.error(ex, ex);
-                    }
-                }
-            }.execute();
-    }
-
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         this.cidsBean = cidsBean;
@@ -398,5 +434,14 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 //        setEnabled(CidsAppBackend.getInstance().isEditable()
 //                    && (AenderungsanfrageHandler.getInstance().getAenderungsanfrageBean() != null));
         aenderungsanfrageTable1.update();
+    }
+
+    @Override
+    public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
+    }
+
+    @Override
+    public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
+        aenderungsanfrageTable1.setCidsBeans(aenderungsanfrageBeans);
     }
 }

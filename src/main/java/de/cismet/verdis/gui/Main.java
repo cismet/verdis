@@ -256,6 +256,7 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
+import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
@@ -1091,6 +1092,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         addWindowListener(loadLayoutWhenOpenedAdapter);
 
         initTotd();
+        initAenderungsanfrage();
         initStartupHooks();
 
         isInit = false;
@@ -1135,6 +1137,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         + " nicht abfragen. Keine Titleleiste des Tages !",
                 ex);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initAenderungsanfrage() {
+//        try {
+//            if (SessionManager.getConnection().hasConfigAttr(SessionManager.getSession().getUser(), "csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST)) {
+        CidsServerMessageNotifier.getInstance()
+                .subscribe(new CidsServerMessageNotifierListener() {
+
+                        @Override
+                        public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
+                            try {
+                                final KassenzeichenChangeRequestServerAction.ServerMessage serverMessage =
+                                    (KassenzeichenChangeRequestServerAction.ServerMessage)event
+                                    .getMessage().getContent();
+                                LOG.info(serverMessage.getAenderungsanfrage());
+                            } catch (final Exception ex) {
+                                LOG.warn(ex, ex);
+                            }
+                        }
+                    },
+                    KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST);
+//            }
+//        } catch (final ConnectionException ex) {
+//            LOG.warn("Konnte Rechte an csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST + " nicht abfragen.", ex);
+//        }
     }
 
     /**

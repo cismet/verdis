@@ -30,6 +30,10 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
 
+import de.cismet.cids.servermessage.CidsServerMessageNotifier;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
+
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.verdis.CidsAppBackend;
@@ -69,6 +73,7 @@ public class AenderungsanfrageHandler {
     private CidsBean cidsBean = null;
     private AenderungsanfrageJson aenderungsanfrage;
     private ChangeListenerHandler changeListenerHandler = new ChangeListenerHandler();
+    private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -76,6 +81,42 @@ public class AenderungsanfrageHandler {
      * Creates a new AenderungsanfrageHandler object.
      */
     private AenderungsanfrageHandler() {
+        try {
+            if (SessionManager.getConnection().hasConfigAttr(
+                            SessionManager.getSession().getUser(),
+                            "csm://"
+                            + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST)) {
+                CidsServerMessageNotifier.getInstance()
+                        .subscribe(new CidsServerMessageNotifierListener() {
+
+                                @Override
+                                public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
+                                    try {
+                                        final KassenzeichenChangeRequestServerAction.ServerMessage serverMessage =
+                                            (KassenzeichenChangeRequestServerAction.ServerMessage)event
+                                            .getMessage().getContent();
+
+                                        if ((serverMessage.getStacId() != null)
+                                            && serverMessage.getStacId().equals(getStacId())) {
+                                            if (serverMessage.getAenderungsanfrage() != null) {
+                                                setAenderungsanfrage(
+                                                    AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
+                                                        serverMessage.getAenderungsanfrage()));
+                                            }
+                                        }
+                                        reload();
+                                    } catch (final Exception ex) {
+                                        LOG.warn(ex, ex);
+                                    }
+                                }
+                            },
+                            KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST);
+            }
+        } catch (final ConnectionException ex) {
+            LOG.warn("Konnte Rechte an csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST
+                        + " nicht abfragen.",
+                ex);
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -96,63 +137,6 @@ public class AenderungsanfrageHandler {
      */
     public static AenderungsanfrageHandler getInstance() {
         return LazyInitialiser.INSTANCE;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   valueOrig    DOCUMENT ME!
-     * @param   valueChange  DOCUMENT ME!
-     * @param   hasPruefung  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean isPending(final Object valueOrig, final Object valueChange, final boolean hasPruefung) {
-        return !Objects.equals(valueOrig, valueChange) && !hasPruefung;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   flaecheBean  DOCUMENT ME!
-     * @param   flaecheJson  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean isPending(final CidsBean flaecheBean, final FlaecheAenderungJson flaecheJson) {
-        final Integer groesse = (flaecheBean != null)
-            ? (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
-        final Integer groesseAenderung = flaecheJson.getGroesse();
-        final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
-                    && (flaecheJson.getPruefung().getGroesse() != null);
-
-        final String flaechenart = (flaecheBean != null)
-            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
-                        + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG) : null;
-        final String flaechenartAenderung = (flaecheJson.getFlaechenart() != null)
-            ? flaecheJson.getFlaechenart().getArtAbkuerzung() : null;
-        final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
-                    && (flaecheJson.getPruefung().getFlaechenart() != null);
-
-        final String anschlussgrad = (flaecheBean != null)
-            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
-                        + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG) : null;
-        final String anschlussgradAenderung = (flaecheJson.getAnschlussgrad() != null)
-            ? flaecheJson.getAnschlussgrad().getGradAbkuerzung() : null;
-        final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
-                    && (flaecheJson.getPruefung().getAnschlussgrad() != null);
-
-        final boolean pendingGroesse = (groesseAenderung != null)
-                    && isPending(groesse, groesseAenderung, hasPruefungGroesse);
-        final boolean pendingFlaechenart = (flaechenartAenderung != null)
-                    && isPending(flaechenart, flaechenartAenderung, hasPruefungFlaechenart);
-        final boolean pendingAnschlussgrad = (anschlussgradAenderung != null)
-                    && isPending(anschlussgrad, anschlussgradAenderung, hasPruefungAnschlussgrad);
-
-        return pendingGroesse || pendingFlaechenart || pendingAnschlussgrad;
     }
 
     /**
@@ -214,6 +198,27 @@ public class AenderungsanfrageHandler {
      */
     public void reload() throws Exception {
         loadByStacId(getStacId());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getAenderungsanfrageBeans() {
+        return aenderungsanfrageBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void reloadBeans() throws Exception {
+        final List<CidsBean> aenderungsanfrageBeans = getAenderungsanfrageBeans();
+        aenderungsanfrageBeans.clear();
+        aenderungsanfrageBeans.addAll(searchAll());
+        getChangeListenerHandler().aenderungsanfrageBeansChanged(aenderungsanfrageBeans);
     }
 
     /**
@@ -576,7 +581,7 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public List<CidsBean> searchAll() throws Exception {
+    private List<CidsBean> searchAll() throws Exception {
         final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
@@ -634,6 +639,13 @@ public class AenderungsanfrageHandler {
          * @param  aenderungsanfrageJson  DOCUMENT ME!
          */
         void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson);
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  aenderungsanfrageBeans  DOCUMENT ME!
+         */
+        void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans);
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -684,6 +696,13 @@ public class AenderungsanfrageHandler {
         public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
             for (final ChangeListener listener : changeListeners) {
                 listener.aenderungsanfrageChanged(aenderungsanfrageJson);
+            }
+        }
+
+        @Override
+        public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
+            for (final ChangeListener listener : changeListeners) {
+                listener.aenderungsanfrageBeansChanged(aenderungsanfrageBeans);
             }
         }
     }
