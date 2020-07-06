@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 
 import java.text.DateFormat;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.swing.ImageIcon;
@@ -43,9 +42,9 @@ import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
 import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
 import de.cismet.verdis.server.json.NachrichtAnhangJson;
-import de.cismet.verdis.server.json.NachrichtBuergerJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtParameterJson;
+import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -105,11 +104,13 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
      * Creates new form AenderungsanfrageNachrichtPanel.
      */
     public AenderungsanfrageNachrichtPanel() {
-        this(new NachrichtBuergerJson(
+        this(new NachrichtSachberarbeiterJson(
+                "test-test-test",
                 new Date(),
+                null,
                 "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
                 "Dirk Steinbacher",
-                Arrays.asList(new NachrichtAnhangJson("test.pdf", "xxx-xxx-xxx"))));
+                Boolean.FALSE));
     }
 
     /**
@@ -145,7 +146,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
         }
         roundedPanel1.setAlpha(255);
 
-        lblCenter.setText(DATE_FORMAT.format(timestamp));
+        lblCenter.setText((timestamp != null) ? DATE_FORMAT.format(timestamp) : null);
         if (Orientation.LEFT.equals(orientation)) {
             jPanel4.remove(filler1);
             lblLeft.setText(absender);

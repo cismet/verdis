@@ -256,13 +256,13 @@ import de.cismet.verdis.gui.srfronten.SRFrontenTablePanel;
 import de.cismet.verdis.search.ServerSearchCreateSearchGeometryListener;
 
 import de.cismet.verdis.server.action.CreateAStacForKassenzeichenServerAction;
+import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.action.RenameKassenzeichenServerAction;
 import de.cismet.verdis.server.search.AssignLandparcelGeomSearch;
 import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 import de.cismet.verdis.server.search.StacInfoSearchStatement;
-import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -545,13 +545,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         StaticSwingTools.tweakUI();
 
-        aenderungsanfragenNachrichtenPanel.setUsername(SessionManager.getSession().getUser().getName());
-
         CidsAppBackend.getInstance().addCidsBeanStore(this);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kassenzeichenListPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfrageTablePanel);
-        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfragenNachrichtenPanel);
+//        CidsAppBackend.getInstance().addCidsBeanStore(aenderungsanfragenNachrichtenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(getSRFrontenTable());
         CidsAppBackend.getInstance().addCidsBeanStore(srSummenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(kartenPanel);
@@ -1094,6 +1092,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         addWindowListener(loadLayoutWhenOpenedAdapter);
 
         initTotd();
+        initAenderungsanfrage();
         initStartupHooks();
 
         isInit = false;
@@ -1138,6 +1137,34 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         + " nicht abfragen. Keine Titleleiste des Tages !",
                 ex);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initAenderungsanfrage() {
+//        try {
+//            if (SessionManager.getConnection().hasConfigAttr(SessionManager.getSession().getUser(), "csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST)) {
+        CidsServerMessageNotifier.getInstance()
+                .subscribe(new CidsServerMessageNotifierListener() {
+
+                        @Override
+                        public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
+                            try {
+                                final KassenzeichenChangeRequestServerAction.ServerMessage serverMessage =
+                                    (KassenzeichenChangeRequestServerAction.ServerMessage)event
+                                    .getMessage().getContent();
+                                LOG.info(serverMessage.getAenderungsanfrage());
+                            } catch (final Exception ex) {
+                                LOG.warn(ex, ex);
+                            }
+                        }
+                    },
+                    KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST);
+//            }
+//        } catch (final ConnectionException ex) {
+//            LOG.warn("Konnte Rechte an csm://" + KassenzeichenChangeRequestServerAction.CSM_NEWREQUEST + " nicht abfragen.", ex);
+//        }
     }
 
     /**
@@ -5111,8 +5138,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 @Override
                 protected Void doInBackground() throws Exception {
                     if (editMode) {
-                        AenderungsanfrageHandler.getInstance()
-                                .persistAenderungsanfrageBean(null, AenderungsanfrageUtils.Status.PROCESSING);
+                        AenderungsanfrageHandler.getInstance().startProcessing();
                     }
                     return null;
                 }
@@ -5524,12 +5550,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         flaecheToCrosslinknummerMap.clear();
         frontToCrosslinknummerMap.clear();
 
-        AenderungsanfrageHandler.getInstance()
-                .persistAenderungsanfrageBean(
-                    kassenzeichenBean,
-                    AenderungsanfrageHandler.getInstance().isPending(kassenzeichenBean)
-                        ? AenderungsanfrageUtils.Status.PENDING : AenderungsanfrageUtils.Status.NONE);
-
         return persistedKassenzeichenBean;
     }
 
@@ -5770,7 +5790,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
-                        AenderungsanfrageHandler.getInstance().persistAenderungsanfrageBean(kassenzeichenBean, null);
+                        AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean);
+
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();
                         return assessedKassenzeichenBean;
