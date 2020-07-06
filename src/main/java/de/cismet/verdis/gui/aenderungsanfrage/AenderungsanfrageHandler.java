@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -333,7 +335,8 @@ public class AenderungsanfrageHandler {
                 flaechenBeans.put(bezeichnung, flaecheBean);
             }
 
-            for (final String bezeichnung : aenderungsanfrage.getFlaechen().keySet()) {
+            final Set<String> bezeichnungen = new HashSet<>(aenderungsanfrage.getFlaechen().keySet());
+            for (final String bezeichnung : bezeichnungen) {
                 final FlaecheAenderungJson flaecheJson = aenderungsanfrage.getFlaechen().get(bezeichnung);
                 final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
                 // TODO message => flaechenänderung entfernt
