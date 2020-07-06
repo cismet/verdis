@@ -157,7 +157,8 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                     groesse = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                     + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK);
                 }
-                final Integer groesseAenderung = (aenderungsanfrageFlaeche != null)
+                final Integer groesseAenderung =
+                    ((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
                     ? aenderungsanfrageFlaeche.getGroesse() : null;
                 return ((groesseAenderung != null) ? (groesse + " (" + groesseAenderung + ")") : groesse);
             }
@@ -167,7 +168,8 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                                 + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
                                 + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
                 final String flaechenartAenderung =
-                    ((aenderungsanfrageFlaeche != null) && (aenderungsanfrageFlaeche.getFlaechenart() != null))
+                    (((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
+                                && (aenderungsanfrageFlaeche.getFlaechenart() != null))
                     ? aenderungsanfrageFlaeche.getFlaechenart().getArtAbkuerzung() : null;
                 return flaechenart + ((flaechenartAenderung != null) ? (" (" + flaechenartAenderung + ")") : "");
             }
@@ -180,7 +182,8 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
                                 + "."
                                 + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
                 final String anschlussgradAenderung =
-                    ((aenderungsanfrageFlaeche != null) && (aenderungsanfrageFlaeche.getAnschlussgrad() != null))
+                    (((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
+                                && (aenderungsanfrageFlaeche.getAnschlussgrad() != null))
                     ? aenderungsanfrageFlaeche.getAnschlussgrad().getGradAbkuerzung() : null;
                 return anschlussgrad + ((anschlussgradAenderung != null) ? (" (" + anschlussgradAenderung + ")") : "");
             }

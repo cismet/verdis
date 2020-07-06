@@ -108,8 +108,7 @@ public class AenderungsanfrageTable extends JXTable {
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final CidsBean aenderungsanfrageBean = getAenderungsanfrageBeanAtRow(componentAdapter.row);
-                    final CidsBean activeAenderungsanfrageBean = AenderungsanfrageHandler.getInstance()
-                                .getAenderungsanfrageBean();
+                    final CidsBean activeAenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getCidsBean();
 
                     return Objects.equals(aenderungsanfrageBean, activeAenderungsanfrageBean);
                 }
@@ -365,7 +364,7 @@ public class AenderungsanfrageTable extends JXTable {
                     final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
                     return (stacOptions != null)
                         ? ((!SessionManager.getSession().getUser().getName().equals(stacOptions.getCreatorUserName()))
-                            ? stacOptions.getCreatorUserName() : "ich") : null;
+                            ? "*****" : "ich") : null;
                 }
                 case 2: {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);

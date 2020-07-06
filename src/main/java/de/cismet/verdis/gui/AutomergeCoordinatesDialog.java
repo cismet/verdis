@@ -75,7 +75,7 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JList<Feature> jList1;
+    private javax.swing.JList<CidsFeature> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -115,7 +115,7 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
      */
     public Status display(final Collection<PFeatureTools.PFeatureCoordinateInformation> infos) {
         int numberOfCoordinates = infos.size();
-        ((DefaultListModel<Feature>)jList1.getModel()).clear();
+        ((DefaultListModel<CidsFeature>)jList1.getModel()).clear();
         final Set<Feature> features = new HashSet<>();
         for (final PFeatureTools.PFeatureCoordinateInformation info : infos) {
             numberOfCoordinates += info.getNeighbourInfos().size();
@@ -125,7 +125,9 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
             }
         }
         for (final Feature feature : features) {
-            ((DefaultListModel<Feature>)jList1.getModel()).addElement(feature);
+            if (feature instanceof CidsFeature) {
+                ((DefaultListModel<CidsFeature>)jList1.getModel()).addElement((CidsFeature)feature);
+            }
         }
 
         final String message = org.openide.util.NbBundle.getMessage(
@@ -183,7 +185,7 @@ public class AutomergeCoordinatesDialog extends javax.swing.JDialog {
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        jList1.setModel(new DefaultListModel<Feature>());
+        jList1.setModel(new DefaultListModel<CidsFeature>());
         jList1.setCellRenderer(new ObjectListCellRenderer());
         jList1.addMouseListener(new java.awt.event.MouseAdapter() {
 
