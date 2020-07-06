@@ -28,8 +28,6 @@
  */
 package de.cismet.verdis.gui.regenflaechen;
 
-import Sirius.navigator.connection.SessionManager;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -48,7 +46,6 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -94,6 +91,8 @@ import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
 import de.cismet.verdis.server.json.FlaechePruefungAnschlussgradJson;
 import de.cismet.verdis.server.json.FlaechePruefungFlaechenartJson;
 import de.cismet.verdis.server.json.FlaechePruefungGroesseJson;
@@ -452,23 +451,16 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungGroesse(final Pruefung status) {
         try {
-            final String bezeichnung = (String)flaecheBean.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-            final Integer groesseFrom = (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
-            final Integer groesseTo = flaecheJson.getGroesse();
-
             if (Pruefung.ACCEPT.equals(status)) {
                 flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                             + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
-                    groesseTo);
+                    flaecheJson.getGroesse());
             }
 
-            final PruefungGroesseJson pruefungJson = new PruefungGroesseJson(
-                    Pruefung.ACCEPT.equals(status),
-                    flaecheJson.getGroesse(),
-                    SessionManager.getSession().getUser().getName(),
-                    new Date());
+            final PruefungGroesseJson pruefungJson = new PruefungGroesseJson((Integer)flaecheBean.getProperty(
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR));
             if (flaecheJson.getPruefung() == null) {
                 flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
             } else {
@@ -486,14 +478,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungFlaechenart(final Pruefung status) {
         try {
-            final String bezeichnung = (String)flaecheBean.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-            final String flaechenartFrom = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                            + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
-                            + VerdisConstants.PROP.FLAECHENART.ART);
-            final String flaechenartTo = flaecheJson.getFlaechenart().getArt();
-
             if (Pruefung.ACCEPT.equals(status)) {
                 boolean found = false;
                 for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
@@ -512,11 +496,19 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             }
 
-            final PruefungFlaechenartJson pruefungJson = new PruefungFlaechenartJson(
-                    Pruefung.ACCEPT.equals(status),
-                    flaecheJson.getFlaechenart(),
-                    SessionManager.getSession().getUser().getName(),
-                    new Date());
+            final PruefungFlaechenartJson pruefungJson = new PruefungFlaechenartJson(new FlaecheFlaechenartJson(
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENART.ART),
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG)));
             if (flaecheJson.getPruefung() == null) {
                 flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
             } else {
@@ -534,14 +526,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungAnschlussgrad(final Pruefung status) {
         try {
-            final String bezeichnung = (String)flaecheBean.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-            final String anschlussgradFrom = (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                            + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
-                            + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD);
-            final String anschlussgradTo = flaecheJson.getAnschlussgrad().getGrad();
-
             if (Pruefung.ACCEPT.equals(status)) {
                 boolean found = false;
                 for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
@@ -560,11 +544,19 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             }
 
-            final PruefungAnschlussgradJson pruefungJson = new PruefungAnschlussgradJson(Pruefung.ACCEPT.equals(
-                        status),
-                    flaecheJson.getAnschlussgrad(),
-                    SessionManager.getSession().getUser().getName(),
-                    new Date());
+            final PruefungAnschlussgradJson pruefungJson = new PruefungAnschlussgradJson(new FlaecheAnschlussgradJson(
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                    + "."
+                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD),
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                    + "."
+                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG)));
             if (flaecheJson.getPruefung() == null) {
                 flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
             } else {
@@ -860,14 +852,15 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
                                                       : null;
 
-        if ((flaecheBean != null) && (flaecheJson != null)) {
+        if ((flaecheBean != null) && ((flaecheJson != null) && !Boolean.TRUE.equals(flaecheJson.getDraft()))) {
             try {
                 final Integer groesse = (flaecheBean != null)
                     ? (Integer)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
                 final Integer groesseAenderung = flaecheJson.getGroesse();
                 final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getGroesse() != null);
+                            && ((flaecheJson.getPruefung().getGroesse() != null)
+                                && !Boolean.TRUE.equals(flaecheJson.getPruefung().getGroesse().getPending()));
                 doAenderungChanges(
                     lblGroesseAenderung,
                     btnGroesseAenderungAccept,
@@ -891,7 +884,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final String flaechenartAenderung = (flaecheJson.getFlaechenart() != null)
                     ? flaecheJson.getFlaechenart().getArtAbkuerzung() : null;
                 final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getFlaechenart() != null);
+                            && (flaecheJson.getPruefung().getFlaechenart() != null)
+                            && !Boolean.TRUE.equals(flaecheJson.getPruefung().getFlaechenart().getPending());
                 doAenderungChanges(
                     lblFlaechenartAenderung,
                     btnFlaechenartAenderungAccept,
@@ -915,7 +909,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final String anschlussgradAenderung = (flaecheJson.getAnschlussgrad() != null)
                     ? flaecheJson.getAnschlussgrad().getGradAbkuerzung() : null;
                 final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getAnschlussgrad() != null);
+                            && (flaecheJson.getPruefung().getAnschlussgrad() != null)
+                            && !Boolean.TRUE.equals(flaecheJson.getPruefung().getAnschlussgrad().getPending());
                 doAenderungChanges(
                     lblAnschlussgradAenderung,
                     btnAnschlussgradAenderungAccept,

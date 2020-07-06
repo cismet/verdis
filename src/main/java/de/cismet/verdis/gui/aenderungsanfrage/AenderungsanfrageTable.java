@@ -108,8 +108,7 @@ public class AenderungsanfrageTable extends JXTable {
                 @Override
                 public boolean isHighlighted(final Component renderer, final ComponentAdapter componentAdapter) {
                     final CidsBean aenderungsanfrageBean = getAenderungsanfrageBeanAtRow(componentAdapter.row);
-                    final CidsBean activeAenderungsanfrageBean = AenderungsanfrageHandler.getInstance()
-                                .getAenderungsanfrageBean();
+                    final CidsBean activeAenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getCidsBean();
 
                     return Objects.equals(aenderungsanfrageBean, activeAenderungsanfrageBean);
                 }

@@ -113,7 +113,6 @@ public class AenderungsanfrageNachrichtenDialog extends javax.swing.JDialog {
                         });
 
                     final AenderungsanfrageJson aenderungsanfrage = dialog.getComplexAnfrageJson();
-                    dialog.aenderungsanfrageNachrichtenPanel1.setAenderungsanfrage(aenderungsanfrage);
                     dialog.setVisible(true);
                 }
             });
@@ -126,7 +125,8 @@ public class AenderungsanfrageNachrichtenDialog extends javax.swing.JDialog {
      */
     private AenderungsanfrageJson getComplexAnfrageJson() {
         try {
-            return AenderungsanfrageUtils.createAenderungsanfrageJson("{\n"
+            return AenderungsanfrageUtils.getInstance()
+                        .createAenderungsanfrageJson("{\n"
                             + "  \"kassenzeichen\" : 60004629,\n"
                             + "  \"nachrichten\" : [ {\n"
                             + "    \"typ\" : \"CITIZEN\",\n"

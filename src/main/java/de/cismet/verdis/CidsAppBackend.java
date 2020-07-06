@@ -401,7 +401,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         kassenzeichenBean = cidsBean;
-        AenderungsanfrageHandler.getInstance().refreshAenderungsanfrageJson();
         for (final CidsBeanStore cbs : beanStores) {
             if (cbs != this) { // Avoid endless loop
                 cbs.setCidsBean(cidsBean);
@@ -1463,9 +1462,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                         final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummerFinal));
                         updateCrossReferences(cidsBean);
                         if (stacId != null) {
-                            AenderungsanfrageHandler.getInstance().loadAenderungsanfrageBean(stacId);
+                            AenderungsanfrageHandler.getInstance().loadByStacId(stacId);
                         } else {
-                            AenderungsanfrageHandler.getInstance().loadAenderungsanfrageBean(cidsBean);
+                            AenderungsanfrageHandler.getInstance()
+                                    .loadByKassenzeichennummer((cidsBean != null)
+                                            ? (Integer)cidsBean.getProperty(
+                                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null);
                         }
                         return cidsBean;
                     }
