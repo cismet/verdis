@@ -572,8 +572,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
                     @Override
                     public Collection<? extends Download> fetchDownloads() throws Exception {
-                        final String directory = ((jobname != null) ? (jobname + System.getProperty("file.separator"))
-                                                                    : "")
+                        final String directory = (((jobname != null) && !jobname.trim().isEmpty())
+                                ? (jobname + System.getProperty("file.separator")) : "")
                                     + aenderungsanfrage.getKassenzeichen()
                                     + "_"
                                     + Math.abs(aenderungsanfrage.hashCode());

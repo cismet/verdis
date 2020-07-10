@@ -865,8 +865,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     lblGroesseAenderung,
                     btnGroesseAenderungAccept,
                     btnGroesseAenderungReject,
-                    NumberFormat.getIntegerInstance().format(groesse),
-                    NumberFormat.getIntegerInstance().format(groesseAenderung),
+                    (groesse != null) ? NumberFormat.getIntegerInstance().format(groesse) : null,
+                    (groesseAenderung != null) ? NumberFormat.getIntegerInstance().format(groesseAenderung) : null,
                     hasPruefungGroesse,
                     b);
             } catch (final Exception ex) {
