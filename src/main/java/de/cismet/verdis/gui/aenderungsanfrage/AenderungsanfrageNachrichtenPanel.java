@@ -560,47 +560,50 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 }
             }
 
+            final String jobname;
             if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(this)) {
-                final String jobname = DownloadManagerDialog.getInstance().getJobName();
-
-                final BackgroundTaskMultipleDownload.FetchDownloadsTask fetchDownloadsTask =
-                    new BackgroundTaskMultipleDownload.FetchDownloadsTask() {
-
-                        @Override
-                        public Collection<? extends Download> fetchDownloads() throws Exception {
-                            final String directory = ((jobname != null)
-                                    ? (jobname + System.getProperty("file.separator")) : "")
-                                        + aenderungsanfrage.getKassenzeichen()
-                                        + "_"
-                                        + Math.abs(aenderungsanfrage.hashCode());
-                            final Collection<Download> downloads = new ArrayList<>();
-                            downloads.add(new TxtDownload(
-                                    sb.toString(),
-                                    directory,
-                                    "Nachrichten",
-                                    "nachrichten",
-                                    ".txt"));
-                            for (final NachrichtAnhangJson nachrichtAnhang : nachrichtAnhaenge) {
-                                final Download download = new ByteArrayActionDownload(
-                                        VerdisConstants.DOMAIN,
-                                        DownloadChangeRequestAnhangServerAction.TASK_NAME,
-                                        nachrichtAnhang.toJson(),
-                                        null,
-                                        "Anhang",
-                                        directory,
-                                        nachrichtAnhang.getName().substring(
-                                            0,
-                                            nachrichtAnhang.getName().lastIndexOf(".")),
-                                        nachrichtAnhang.getName().substring(nachrichtAnhang.getName().lastIndexOf(".")),
-                                        ConnectionContext.createDeprecated());
-                                downloads.add(download);
-                            }
-                            return downloads;
-                        }
-                    };
-                DownloadManager.instance()
-                        .add(new BackgroundTaskMultipleDownload(null, "Gesprächsprotokoll", fetchDownloadsTask));
+                jobname = DownloadManagerDialog.getInstance().getJobName();
+            } else {
+                jobname = null;
             }
+
+            final BackgroundTaskMultipleDownload.FetchDownloadsTask fetchDownloadsTask =
+                new BackgroundTaskMultipleDownload.FetchDownloadsTask() {
+
+                    @Override
+                    public Collection<? extends Download> fetchDownloads() throws Exception {
+                        final String directory = ((jobname != null) ? (jobname + System.getProperty("file.separator"))
+                                                                    : "")
+                                    + aenderungsanfrage.getKassenzeichen()
+                                    + "_"
+                                    + Math.abs(aenderungsanfrage.hashCode());
+                        final Collection<Download> downloads = new ArrayList<>();
+                        downloads.add(new TxtDownload(
+                                sb.toString(),
+                                directory,
+                                "Nachrichten",
+                                "nachrichten",
+                                ".txt"));
+                        for (final NachrichtAnhangJson nachrichtAnhang : nachrichtAnhaenge) {
+                            final Download download = new ByteArrayActionDownload(
+                                    VerdisConstants.DOMAIN,
+                                    DownloadChangeRequestAnhangServerAction.TASK_NAME,
+                                    nachrichtAnhang.toJson(),
+                                    null,
+                                    "Anhang",
+                                    directory,
+                                    nachrichtAnhang.getName().substring(
+                                        0,
+                                        nachrichtAnhang.getName().lastIndexOf(".")),
+                                    nachrichtAnhang.getName().substring(nachrichtAnhang.getName().lastIndexOf(".")),
+                                    ConnectionContext.createDeprecated());
+                            downloads.add(download);
+                        }
+                        return downloads;
+                    }
+                };
+            DownloadManager.instance()
+                    .add(new BackgroundTaskMultipleDownload(null, "Gesprächsprotokoll", fetchDownloadsTask));
         }
     } //GEN-LAST:event_jButton3ActionPerformed
 
