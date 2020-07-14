@@ -2780,7 +2780,9 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                             final org.geojson.Feature value = (org.geojson.Feature)entry.getValue();
 
                             try {
-                                featureCollection.addFeature(new AnnotationFeature(key, value));
+                                if (!Boolean.TRUE.equals(value.getProperty("draft"))) {
+                                    featureCollection.addFeature(new AnnotationFeature(key, value));
+                                }
                             } catch (final Exception ex) {
                                 LOG.fatal(ex, ex);
                             }

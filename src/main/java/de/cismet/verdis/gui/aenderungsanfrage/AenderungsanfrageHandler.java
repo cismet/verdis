@@ -18,6 +18,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import org.geojson.Feature;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -481,6 +483,14 @@ public class AenderungsanfrageHandler {
                         }
                         if ((flaeche.getFlaechenart() != null) && (flaeche.getPruefung().getFlaechenart() == null)) {
                             flaeche.getPruefung().setFlaechenart(new PruefungFlaechenartJson());
+                        }
+                    }
+                }
+                for (final String bezeichnung : aenderungsanfrage.getGeometrien().keySet()) {
+                    final Feature feature = (Feature)aenderungsanfrage.getGeometrien().get(bezeichnung);
+                    if ((feature != null) && !Boolean.TRUE.equals(feature.getProperty("draft"))) {
+                        if (feature.getProperty("pruefung") == null) {
+                            feature.setProperty("pruefung", false);
                         }
                     }
                 }

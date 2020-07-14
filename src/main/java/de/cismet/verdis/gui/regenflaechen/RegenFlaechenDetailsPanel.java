@@ -482,8 +482,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 boolean found = false;
                 for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
                     final CidsBean flaechenartBean = (CidsBean)cboFlaechenart.getModel().getElementAt(i);
-                    if (flaecheJson.getFlaechenart().getArt().equals(
-                                    (String)flaechenartBean.getProperty(VerdisConstants.PROP.FLAECHENART.ART))) {
+                    if (flaecheJson.getFlaechenart().getArtAbkuerzung().equals(
+                                    (String)flaechenartBean.getProperty(
+                                        VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG))) {
                         flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                     + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
                             flaechenartBean);
@@ -530,8 +531,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 boolean found = false;
                 for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
                     final CidsBean anschlussgradBean = (CidsBean)cboAnschlussgrad.getModel().getElementAt(i);
-                    if (flaecheJson.getAnschlussgrad().getGrad().equals(
-                                    (String)anschlussgradBean.getProperty(VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD))) {
+                    if (flaecheJson.getAnschlussgrad().getGradAbkuerzung().equals(
+                                    (String)anschlussgradBean.getProperty(
+                                        VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG))) {
                         flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                     + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
                             anschlussgradBean);
@@ -1950,7 +1952,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         edtQuer.setEditable(false);
         edtQuer.setContentType("text/html"); // NOI18N
-        edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2343,7 +2344,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jPanel2.add(lblAnnotationName, gridBagConstraints);
 
         txtAnnotationName.setEditable(false);
-        txtAnnotationName.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -2363,10 +2363,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jPanel2.add(lblAnnotationBetreff, gridBagConstraints);
 
         txtAnnotationBetreff.setEditable(false);
-        txtAnnotationBetreff.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -2397,6 +2397,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -2404,9 +2405,22 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel2.add(scpAnnotationText, gridBagConstraints);
 
+        jToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/16edited.png"))); // NOI18N
         jToggleButton1.setText(org.openide.util.NbBundle.getMessage(
                 RegenFlaechenDetailsPanel.class,
-                "RegenFlaechenDetailsPanel.jToggleButton1.text")); // NOI18N
+                "RegenFlaechenDetailsPanel.jToggleButton1.text"));                                                       // NOI18N
+        jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(
+                RegenFlaechenDetailsPanel.class,
+                "RegenFlaechenDetailsPanel.jToggleButton1.toolTipText"));                                                // NOI18N
+        jToggleButton1.setFocusPainted(false);
+        jToggleButton1.setRequestFocusEnabled(false);
+        jToggleButton1.setRolloverEnabled(false);
+        jToggleButton1.setRolloverIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/ok.png")));                                                // NOI18N
+        jToggleButton1.setRolloverSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/16edited.png")));                                          // NOI18N
+        jToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/ok.png")));                                                // NOI18N
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -2415,8 +2429,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel2.add(jToggleButton1, gridBagConstraints);
@@ -2503,8 +2518,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         txtAnnotationName.setText((String)geoJsonFeature.getProperty("name"));
         txtAnnotationBetreff.setText((String)geoJsonFeature.getProperty("title"));
         txtAnnotationText.setText((String)geoJsonFeature.getProperty("text"));
-        final Boolean abgearbeitet = (Boolean)geoJsonFeature.getProperty("cids.abgearbeitet");
-        jToggleButton1.setSelected(abgearbeitet);
+        final Boolean pruefung = (Boolean)geoJsonFeature.getProperty("pruefung");
+        jToggleButton1.setSelected(Boolean.TRUE.equals(pruefung));
+        jToggleButton1ActionPerformed(null);
     }
 
     /**
@@ -2524,7 +2540,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
-        geoJsonFeature.setProperty("cids.abgearbeitet", jToggleButton1.isSelected());
+        geoJsonFeature.setProperty("pruefung", jToggleButton1.isSelected());
+        jToggleButton1.setToolTipText(jToggleButton1.isSelected() ? "Prüfmarkierung entfernen."
+                                                                  : "Als geprüft markieren.");
+
+        jToggleButton1.setContentAreaFilled(!jToggleButton1.isSelected());
+        jToggleButton1.setBorderPainted(!jToggleButton1.isSelected());
+
         Main.getInstance().getKartenPanel().refreshInMap(false);
-    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
+    } //GEN-LAST:event_jToggleButton1ActionPerformed
 }
