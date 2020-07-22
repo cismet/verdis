@@ -127,6 +127,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * DOCUMENT ME!
      */
     private void resize() {
+        LOG.fatal("resize()", new Exception());
         int height = 20;
         Component filler = null;
         for (final Component component : jPanel1.getComponents()) {
@@ -419,7 +420,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                             && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
                     aenderungsanfrage.getNachrichten().remove(index);
                     refresh();
-                    text = lastNachricht.getNachricht() + "\n" + text;
+                    text = lastNachricht.getNachricht() + "\n\n" + text;
                 }
             }
 
@@ -687,7 +688,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  nachrichten  DOCUMENT ME!
      */
     private void refresh(final List<NachrichtJson> nachrichten) {
-        jPanel1.invalidate();
         clear();
         if (nachrichten != null) {
             for (final NachrichtJson nachrichtJson : nachrichten) {
@@ -702,25 +702,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 addNachricht(nachrichtJson);
             }
         }
-        jPanel1.revalidate();
-        try {
-            Thread.sleep(100);
-        } catch (final InterruptedException ex) {
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    resize();
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                scrollToBottom();
-                            }
-                        });
-                }
-            });
+        validate();
     }
 
     /**
