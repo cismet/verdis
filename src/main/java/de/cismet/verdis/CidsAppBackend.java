@@ -1442,7 +1442,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
 
         kassenzeichenNummer = (testStac.length > 1) ? testStac[0] : kassenzeichenNummer;
         final Integer stacId = (testStac.length > 1) ? Integer.parseInt(testStac[1]) : null;
-
+        final Integer currentKassenzeichenNummer = (CidsAppBackend.getInstance().getCidsBean() != null)
+            ? (Integer)CidsAppBackend.getInstance().getCidsBean()
+                    .getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null;
+        if (Objects.equals(kassenzeichenNummer, currentKassenzeichenNummer)) {
+            return;
+        }
         if (!Main.getInstance().isInEditMode()) {
             Main.getInstance().disableKassenzeichenCmds();
             Main.getInstance().getKassenzeichenPanel().setSearchStarted();
