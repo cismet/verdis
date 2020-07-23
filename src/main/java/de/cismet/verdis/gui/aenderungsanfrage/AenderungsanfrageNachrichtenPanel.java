@@ -14,15 +14,22 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
+import io.socket.thread.EventThread;
+
+import org.openide.util.Exceptions;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -34,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.Box;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -127,24 +135,26 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * DOCUMENT ME!
      */
     private void resize() {
-        LOG.fatal("resize()", new Exception());
+        final int width = jScrollPane1.getWidth() - 20;
+
         int height = 20;
         Component filler = null;
         for (final Component component : jPanel1.getComponents()) {
-            if (!(component instanceof Box.Filler)) {
-                height += 20 + component.getHeight();
-//                LOG.error(height);
-            } else {
+            if (component instanceof Box.Filler) {
                 filler = component;
+            } else {
+                LOG.fatal("comp: " + component.getSize());
+                height += 20 + component.getPreferredSize().getHeight();
             }
         }
-        final int width = jScrollPane1.getWidth() - 20;
         if ((filler != null) && (height < jScrollPane1.getHeight())) {
             filler.setPreferredSize(new Dimension(width, jScrollPane1.getHeight() - height));
             height = jScrollPane1.getHeight() - 5;
         }
-//        LOG.fatal(height);
+
         jPanel1.setPreferredSize(new Dimension(width, height));
+        jScrollPane1.revalidate();
+        jScrollPane1.repaint();
     }
 
     /**
@@ -169,7 +179,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
+        jPanel1 = new myPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
@@ -688,21 +698,46 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  nachrichten  DOCUMENT ME!
      */
     private void refresh(final List<NachrichtJson> nachrichten) {
-        clear();
-        if (nachrichten != null) {
-            for (final NachrichtJson nachrichtJson : nachrichten) {
-                if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
-                            && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
-                    continue;
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        refresh(nachrichten);
+                    }
+                });
+        } else {
+            jPanel1.setPreferredSize(new Dimension(0, 0));
+            clear();
+
+            if (nachrichten != null) {
+                for (final NachrichtJson nachrichtJson : nachrichten) {
+                    if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
+                                && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
+                        continue;
+                    }
+                    if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
+                                && !jToggleButton1.isSelected()) {
+                        continue;
+                    }
+                    addNachricht(nachrichtJson);
                 }
-                if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
-                            && !jToggleButton1.isSelected()) {
-                    continue;
-                }
-                addNachricht(nachrichtJson);
             }
+
+            new SwingWorker<Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        jScrollPane1.revalidate();
+                        scrollToBottom();
+                    }
+                }.execute();
         }
-        validate();
     }
 
     /**
@@ -726,7 +761,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
-        jPanel1.add(new AenderungsanfrageNachrichtPanel(nachrichtJson), gridBagConstraints);
+        final AenderungsanfrageNachrichtPanel panel = new AenderungsanfrageNachrichtPanel(nachrichtJson);
+        jPanel1.add(panel, gridBagConstraints);
     }
 
     /**
@@ -797,6 +833,21 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class myPanel extends JPanel {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void setPreferredSize(final Dimension preferredSize) {
+            super.setPreferredSize(preferredSize); // To change body of generated methods, choose Tools | Templates.
+        }
+    }
 
     /**
      * DOCUMENT ME!

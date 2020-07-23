@@ -133,7 +133,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     private final CidsBean anschlussgradBean;
 
     private CidsBean flaecheBean;
-    private FlaecheAenderungJson flaecheJson;
     private final Validator bindingValidator;
 
     private final PropertyChangeListener flaecheinfoBeanChangeListener = new PropertyChangeListener() {
@@ -395,53 +394,16 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     /**
      * DOCUMENT ME!
      *
-     * @param   bezeichnung  DOCUMENT ME!
-     * @param   groesseFrom  DOCUMENT ME!
-     * @param   groesseTo    DOCUMENT ME!
-     * @param   status       DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
-    private String createPruefungGroesseMessage(final String bezeichnung,
-            final Integer groesseFrom,
-            final Integer groesseTo,
-            final Pruefung status) {
-        return "GROESSE_" + status + "('" + bezeichnung + "'," + groesseFrom + "," + groesseTo + ")";
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   bezeichnung      DOCUMENT ME!
-     * @param   flaechenartFrom  DOCUMENT ME!
-     * @param   flaechenartTo    DOCUMENT ME!
-     * @param   status           DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private String createPruefungFlaechenartMessage(final String bezeichnung,
-            final String flaechenartFrom,
-            final String flaechenartTo,
-            final Pruefung status) {
-        return "FLAECHENART_" + status + "('" + bezeichnung + "','" + flaechenartFrom + "','" + flaechenartTo + "')";
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   bezeichnung        DOCUMENT ME!
-     * @param   anschlussgradFrom  DOCUMENT ME!
-     * @param   anschlussgradTo    DOCUMENT ME!
-     * @param   status             DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private String createPruefungAnschlussgradMessage(final String bezeichnung,
-            final String anschlussgradFrom,
-            final String anschlussgradTo,
-            final Pruefung status) {
-        return "ANSCHLUSSGRAD_" + status + "('" + bezeichnung + "','" + anschlussgradFrom + "','" + anschlussgradTo
-                    + "')";
+    private FlaecheAenderungJson getFlaecheJson() {
+        final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
+                    .getAenderungsanfrage();
+        final String flaechebezeichnung = (flaecheBean != null)
+            ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG) : null;
+        final FlaecheAenderungJson flaecheJson = (aenderungsanfrageJson != null)
+            ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung) : null;
+        return flaecheJson;
     }
 
     /**
@@ -451,20 +413,23 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungGroesse(final Pruefung status) {
         try {
-            if (Pruefung.ACCEPT.equals(status)) {
-                flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
-                    flaecheJson.getGroesse());
-            }
+            final FlaecheAenderungJson flaecheJson = getFlaecheJson();
+            if (flaecheJson != null) {
+                if (Pruefung.ACCEPT.equals(status)) {
+                    flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR,
+                        flaecheJson.getGroesse());
+                }
 
-            final PruefungGroesseJson pruefungJson = new PruefungGroesseJson((Integer)flaecheBean.getProperty(
-                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                + "."
-                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR));
-            if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
-            } else {
-                flaecheJson.getPruefung().setGroesse(pruefungJson);
+                final PruefungGroesseJson pruefungJson = new PruefungGroesseJson((Integer)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR));
+                if (flaecheJson.getPruefung() == null) {
+                    flaecheJson.setPruefung(new FlaechePruefungGroesseJson(pruefungJson));
+                } else {
+                    flaecheJson.getPruefung().setGroesse(pruefungJson);
+                }
             }
         } catch (final Exception ex) {
             LOG.error(ex, ex);
@@ -478,42 +443,45 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungFlaechenart(final Pruefung status) {
         try {
-            if (Pruefung.ACCEPT.equals(status)) {
-                boolean found = false;
-                for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
-                    final CidsBean flaechenartBean = (CidsBean)cboFlaechenart.getModel().getElementAt(i);
-                    if (flaecheJson.getFlaechenart().getArtAbkuerzung().equals(
-                                    (String)flaechenartBean.getProperty(
-                                        VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG))) {
-                        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
-                            flaechenartBean);
-                        found = true;
-                        break;
+            final FlaecheAenderungJson flaecheJson = getFlaecheJson();
+            if (flaecheJson != null) {
+                if (Pruefung.ACCEPT.equals(status)) {
+                    boolean found = false;
+                    for (int i = 0; i < cboFlaechenart.getModel().getSize(); i++) {
+                        final CidsBean flaechenartBean = (CidsBean)cboFlaechenart.getModel().getElementAt(i);
+                        if (flaecheJson.getFlaechenart().getArtAbkuerzung().equals(
+                                        (String)flaechenartBean.getProperty(
+                                            VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG))) {
+                            flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART,
+                                flaechenartBean);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        return;
                     }
                 }
-                if (!found) {
-                    return;
-                }
-            }
 
-            final PruefungFlaechenartJson pruefungJson = new PruefungFlaechenartJson(new FlaecheFlaechenartJson(
-                        (String)flaecheBean.getProperty(
-                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENART.ART),
-                        (String)flaecheBean.getProperty(
-                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG)));
-            if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
-            } else {
-                flaecheJson.getPruefung().setFlaechenart(pruefungJson);
+                final PruefungFlaechenartJson pruefungJson = new PruefungFlaechenartJson(new FlaecheFlaechenartJson(
+                            (String)flaecheBean.getProperty(
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENART.ART),
+                            (String)flaecheBean.getProperty(
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG)));
+                if (flaecheJson.getPruefung() == null) {
+                    flaecheJson.setPruefung(new FlaechePruefungFlaechenartJson(pruefungJson));
+                } else {
+                    flaecheJson.getPruefung().setFlaechenart(pruefungJson);
+                }
             }
         } catch (final Exception ex) {
             LOG.error(ex, ex);
@@ -527,42 +495,46 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      */
     private void pruefungAenderungAnschlussgrad(final Pruefung status) {
         try {
-            if (Pruefung.ACCEPT.equals(status)) {
-                boolean found = false;
-                for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
-                    final CidsBean anschlussgradBean = (CidsBean)cboAnschlussgrad.getModel().getElementAt(i);
-                    if (flaecheJson.getAnschlussgrad().getGradAbkuerzung().equals(
-                                    (String)anschlussgradBean.getProperty(
-                                        VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG))) {
-                        flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
-                            anschlussgradBean);
-                        found = true;
-                        break;
+            final FlaecheAenderungJson flaecheJson = getFlaecheJson();
+            if (flaecheJson != null) {
+                if (Pruefung.ACCEPT.equals(status)) {
+                    boolean found = false;
+                    for (int i = 0; i < cboAnschlussgrad.getModel().getSize(); i++) {
+                        final CidsBean anschlussgradBean = (CidsBean)cboAnschlussgrad.getModel().getElementAt(i);
+                        if (flaecheJson.getAnschlussgrad().getGradAbkuerzung().equals(
+                                        (String)anschlussgradBean.getProperty(
+                                            VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG))) {
+                            flaecheBean.setProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD,
+                                anschlussgradBean);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        return;
                     }
                 }
-                if (!found) {
-                    return;
-                }
-            }
 
-            final PruefungAnschlussgradJson pruefungJson = new PruefungAnschlussgradJson(new FlaecheAnschlussgradJson(
-                        (String)flaecheBean.getProperty(
-                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
-                                    + "."
-                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD),
-                        (String)flaecheBean.getProperty(
-                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
-                                    + "."
-                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG)));
-            if (flaecheJson.getPruefung() == null) {
-                flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
-            } else {
-                flaecheJson.getPruefung().setAnschlussgrad(pruefungJson);
+                final PruefungAnschlussgradJson pruefungJson = new PruefungAnschlussgradJson(
+                        new FlaecheAnschlussgradJson(
+                            (String)flaecheBean.getProperty(
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                        + "."
+                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD),
+                            (String)flaecheBean.getProperty(
+                                VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                        + "."
+                                        + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG)));
+                if (flaecheJson.getPruefung() == null) {
+                    flaecheJson.setPruefung(new FlaechePruefungAnschlussgradJson(pruefungJson));
+                } else {
+                    flaecheJson.getPruefung().setAnschlussgrad(pruefungJson);
+                }
             }
         } catch (final Exception ex) {
             LOG.error(ex, ex);
@@ -851,8 +823,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     .getAenderungsanfrage();
         final String flaechebezeichnung = (flaecheBean != null)
             ? (String)flaecheBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG) : null;
-        flaecheJson = (aenderungsanfrageJson != null) ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung)
-                                                      : null;
+        final FlaecheAenderungJson flaecheJson = (aenderungsanfrageJson != null)
+            ? aenderungsanfrageJson.getFlaechen().get(flaechebezeichnung) : null;
 
         if ((flaecheBean != null) && ((flaecheJson != null) && !Boolean.TRUE.equals(flaecheJson.getDraft()))) {
             try {
@@ -928,7 +900,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 btnAnschlussgradAenderungReject.setVisible(false);
             }
         } else {
-            flaecheJson = null;
             lblGroesseAenderung.setVisible(false);
             btnGroesseAenderungAccept.setVisible(false);
             btnGroesseAenderungReject.setVisible(false);
@@ -2414,7 +2385,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 "RegenFlaechenDetailsPanel.jToggleButton1.toolTipText"));                                                // NOI18N
         jToggleButton1.setFocusPainted(false);
         jToggleButton1.setRequestFocusEnabled(false);
-        jToggleButton1.setRolloverEnabled(false);
         jToggleButton1.setRolloverIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/ok.png")));                                                // NOI18N
         jToggleButton1.setRolloverSelectedIcon(new javax.swing.ImageIcon(
