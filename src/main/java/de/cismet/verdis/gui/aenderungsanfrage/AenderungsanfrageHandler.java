@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.swing.SwingWorker;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
@@ -169,7 +171,7 @@ public class AenderungsanfrageHandler {
                 aenderungsanfrage.toJson());
         final ServerActionParameter<Integer> paramStacId = new ServerActionParameter<>(
                 KassenzeichenChangeRequestServerAction.Parameter.STAC_ID.toString(),
-                AenderungsanfrageHandler.getInstance().getStacId());
+                getStacId());
 
         final Object result = SessionManager.getConnection()
                     .executeTask(SessionManager.getSession().getUser(),
@@ -269,30 +271,47 @@ public class AenderungsanfrageHandler {
     private void updateAenderungsanfrageBean(final AenderungsanfrageSearchStatement search) throws Exception {
         setCidsBean(null);
         setStacId(null);
-        if ((search != null) && CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
-            final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
-                        .executeCustomServerSearch(search);
-            if ((mons != null) && !mons.isEmpty()) {
-                final MetaObjectNode mon = mons.iterator().next();
-                final MetaObject mo = CidsAppBackend.getInstance()
-                            .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
-                if (mo != null) {
-                    setCidsBean(mo.getBean());
-                    setStacId((Integer)getCidsBean().getProperty("stac_id"));
-                }
-            }
-        }
+        new SwingWorker<CidsBean, Void>() {
 
-        try {
-            setAenderungsanfrage((getCidsBean() != null)
-                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
-                        (String)getCidsBean().getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null);
-            return;
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-            setAenderungsanfrage(null);
-        }
+                @Override
+                protected CidsBean doInBackground() throws Exception {
+                    if ((search != null)
+                                && CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+                        final Collection<MetaObjectNode> mons = (Collection)CidsAppBackend.getInstance()
+                                    .executeCustomServerSearch(search);
+                        if ((mons != null) && !mons.isEmpty()) {
+                            final MetaObjectNode mon = mons.iterator().next();
+                            final MetaObject mo = CidsAppBackend.getInstance()
+                                        .getVerdisMetaObject(mon.getObjectId(), mon.getClassId());
+                            if (mo != null) {
+                                return mo.getBean();
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final CidsBean cidsBean = get();
+                        setCidsBean(cidsBean);
+                        setStacId((Integer)getCidsBean().getProperty("stac_id"));
+
+                        try {
+                            setAenderungsanfrage((getCidsBean() != null)
+                                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
+                                        (String)getCidsBean().getProperty(
+                                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null);
+                        } catch (final Exception ex) {
+                            LOG.error(ex, ex);
+                            setAenderungsanfrage(null);
+                        }
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    }
+                }
+            }.execute();
     }
 
     /**
