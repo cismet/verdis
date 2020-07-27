@@ -14,22 +14,15 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
-import io.socket.thread.EventThread;
-
-import org.openide.util.Exceptions;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-
-import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -45,6 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
@@ -125,7 +120,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     resize();
                 }
             });
-
         AenderungsanfrageHandler.getInstance().addChangeListener(this);
     }
 
@@ -143,7 +137,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
             if (component instanceof Box.Filler) {
                 filler = component;
             } else {
-                LOG.fatal("comp: " + component.getSize());
                 height += 20 + component.getPreferredSize().getHeight();
             }
         }
@@ -179,7 +172,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new myPanel();
+        jPanel1 = createNewPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
@@ -331,8 +324,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jPanel3, gridBagConstraints);
-
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -707,8 +698,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     }
                 });
         } else {
-            jPanel1.setPreferredSize(new Dimension(0, 0));
+            jScrollPane1.setViewportView(jPanel1 = createNewPanel());
+
             clear();
+            jScrollPane1.getViewport().doLayout();
 
             if (nachrichten != null) {
                 for (final NachrichtJson nachrichtJson : nachrichten) {
@@ -724,19 +717,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 }
             }
 
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        jScrollPane1.revalidate();
-                        scrollToBottom();
-                    }
-                }.execute();
+            jPanel1.doLayout();
+            jScrollPane1.getViewport().doLayout();
+            jScrollPane1.doLayout();
+            revalidate();
+            scrollToBottom();
         }
     }
 
@@ -763,6 +748,20 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
         final AenderungsanfrageNachrichtPanel panel = new AenderungsanfrageNachrichtPanel(nachrichtJson);
         jPanel1.add(panel, gridBagConstraints);
+        jScrollPane1.getViewport().doLayout();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private JPanel createNewPanel() {
+        final JPanel panel = new myPanel();
+        panel.setBackground(new java.awt.Color(255, 255, 255));
+        panel.setLayout(new java.awt.GridBagLayout());
+        panel.doLayout();
+        return panel;
     }
 
     /**
@@ -785,8 +784,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         jPanel1.removeAll();
         jPanel1.add(new javax.swing.Box.Filler(
                 new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 32767)),
+                new java.awt.Dimension(new Double(jScrollPane1.getViewportBorderBounds().getWidth()).intValue(), 0),
+                new java.awt.Dimension(0, Integer.MAX_VALUE)),
             gridBagConstraints);
     }
 

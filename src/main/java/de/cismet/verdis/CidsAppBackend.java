@@ -172,6 +172,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     private Integer lastSplitFlaecheId;
     private Integer lastSplitFrontId;
 
+    private String currentKassenzeichen;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -1425,6 +1427,23 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             return null;
         }
     }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String getCurrentKassenzeichen() {
+        return currentKassenzeichen;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  currentKassenzeichen  DOCUMENT ME!
+     */
+    private void setCurrentKassenzeichen(final String currentKassenzeichen) {
+        this.currentKassenzeichen = currentKassenzeichen;
+    }
 
     /**
      * former synchronized method.
@@ -1442,9 +1461,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
 
         kassenzeichenNummer = (testStac.length > 1) ? testStac[0] : kassenzeichenNummer;
         final Integer stacId = (testStac.length > 1) ? Integer.parseInt(testStac[1]) : null;
-        final Integer currentKassenzeichenNummer = (CidsAppBackend.getInstance().getCidsBean() != null)
-            ? (Integer)CidsAppBackend.getInstance().getCidsBean()
-                    .getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null;
+        final Integer currentKassenzeichenNummer = (getCidsBean() != null)
+            ? (Integer)getCidsBean().getProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null;
         if (Objects.equals(kassenzeichenNummer, currentKassenzeichenNummer)) {
             return;
         }
@@ -1466,14 +1484,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     protected CidsBean doInBackground() throws Exception {
                         final CidsBean cidsBean = loadKassenzeichenByNummer(Integer.parseInt(kassenzeichenNummerFinal));
                         updateCrossReferences(cidsBean);
-                        if (stacId != null) {
-                            AenderungsanfrageHandler.getInstance().loadByStacId(stacId);
-                        } else {
-                            AenderungsanfrageHandler.getInstance()
-                                    .loadByKassenzeichennummer((cidsBean != null)
-                                            ? (Integer)cidsBean.getProperty(
-                                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null);
-                        }
                         return cidsBean;
                     }
 
@@ -1486,11 +1496,20 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                                 setCidsBean(cidsBean);
                                 selectCidsBeanByIdentifier(flaechenBez);
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.GREEN);
+                                setCurrentKassenzeichen(kassenzeichen);
                                 if (historyEnabled) {
                                     historyModel.addToHistory(kassenzeichen);
                                 }
                             } else {
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
+                            }
+                            if (stacId != null) {
+                                AenderungsanfrageHandler.getInstance().loadByStacId(stacId);
+                            } else {
+                                AenderungsanfrageHandler.getInstance()
+                                        .loadByKassenzeichennummer((cidsBean != null)
+                                                ? (Integer)cidsBean.getProperty(
+                                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null);
                             }
                         } catch (final Exception ex) {
                             setCidsBean(null);
@@ -1548,11 +1567,11 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @param  identifier  DOCUMENT ME!
      */
     private void selectCidsBeanByIdentifier(final String identifier) {
-        if (mode.equals(CidsAppBackend.Mode.REGEN)) {
+        if (mode.equals(Mode.REGEN)) {
             selectFlaecheByBezeichner(identifier);
-        } else if (mode.equals(CidsAppBackend.Mode.SR)) {
+        } else if (mode.equals(Mode.SR)) {
             selectFrontByNummer(identifier);
-        } else if (mode.equals(CidsAppBackend.Mode.ALLGEMEIN)) {
+        } else if (mode.equals(Mode.ALLGEMEIN)) {
             // do nothing
         }
     }
@@ -1638,7 +1657,9 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
             }
             if (historyModel.getCurrentElement() != null) {
                 final String kassenzeichenText = historyModel.getCurrentElement().toString();
-                gotoKassenzeichenWithoutHistory(kassenzeichenText);
+                if (historyModel.getCurrentElement() != getCurrentKassenzeichen()) {
+                    gotoKassenzeichenWithoutHistory(kassenzeichenText);
+                }
             }
         }
     }
