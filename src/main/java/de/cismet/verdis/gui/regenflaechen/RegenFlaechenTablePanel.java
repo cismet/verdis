@@ -39,6 +39,9 @@ import de.cismet.verdis.gui.AbstractCidsBeanTable;
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 import de.cismet.verdis.gui.AbstractCidsBeanTablePanel;
 import de.cismet.verdis.gui.TableSorter;
+import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
+
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 
 /**
  * DOCUMENT ME!
@@ -274,6 +277,33 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
         jxtOverview1.getColumnModel().getColumn(4).setPreferredWidth(50);
 
         jxtOverview1.getColumnExt(0).setComparator(new NumberStringComparator());
+
+        AenderungsanfrageHandler.getInstance().addChangeListener(new AenderungsanfrageHandler.ChangeListener() {
+
+                @Override
+                public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
+                    if (aenderungsanfrageJson != null) {
+                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
+                            aenderungsanfrageJson.getFlaechen());
+                    } else {
+                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(null);
+                    }
+                    getTable().getModel().fireTableDataChanged();
+                }
+
+                @Override
+                public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
+                    final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
+                                .getAenderungsanfrage();
+                    if (aenderungsanfrageJson != null) {
+                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
+                            aenderungsanfrageJson.getFlaechen());
+                    } else {
+                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(null);
+                    }
+//                    getTable().getModel().fireTableDataChanged();
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------

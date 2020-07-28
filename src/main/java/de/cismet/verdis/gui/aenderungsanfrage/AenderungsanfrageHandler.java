@@ -296,19 +296,17 @@ public class AenderungsanfrageHandler {
                     try {
                         final CidsBean cidsBean = get();
                         setCidsBean(cidsBean);
-                        setStacId((Integer)getCidsBean().getProperty("stac_id"));
+                        setStacId((cidsBean != null) ? (Integer)cidsBean.getProperty("stac_id") : null);
 
-                        try {
-                            setAenderungsanfrage((getCidsBean() != null)
-                                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
-                                        (String)getCidsBean().getProperty(
-                                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null);
-                        } catch (final Exception ex) {
-                            LOG.error(ex, ex);
-                            setAenderungsanfrage(null);
-                        }
+                        setAenderungsanfrage((getCidsBean() != null)
+                                ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(
+                                    (String)getCidsBean().getProperty(
+                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null);
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
+                        setCidsBean(null);
+                        setStacId(null);
+                        setAenderungsanfrage(null);
                     }
                 }
             }.execute();

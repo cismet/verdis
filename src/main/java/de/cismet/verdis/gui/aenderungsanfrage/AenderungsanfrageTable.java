@@ -24,7 +24,6 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import java.sql.Timestamp;
@@ -49,7 +48,10 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.StacOptionsJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -308,6 +310,26 @@ public class AenderungsanfrageTable extends JXTable {
                     entry.getIdentifier());
             final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
             boolean show = true;
+
+            try {
+                final AenderungsanfrageJson aenderungsAnfrage = (aenderungsanfrageBean != null)
+                    ? AenderungsanfrageUtils.getInstance()
+                            .createAenderungsanfrageJson((String)aenderungsanfrageBean.getProperty(
+                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null;
+                if ((aenderungsAnfrage != null) && (aenderungsAnfrage.getNachrichten() != null)) {
+                    boolean atLeastOneIsNoDraft = false;
+                    for (final NachrichtJson nachricht : aenderungsAnfrage.getNachrichten()) {
+                        if (!Boolean.TRUE.equals(nachricht.getDraft())) {
+                            atLeastOneIsNoDraft = true;
+                            break;
+                        }
+                    }
+                    show &= atLeastOneIsNoDraft;
+                }
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+                show = false;
+            }
 
             if (filterUsername) {
                 final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
