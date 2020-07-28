@@ -438,6 +438,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
     @Override
     public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
+        aenderungsanfrageTable1.update();
     }
 
     @Override

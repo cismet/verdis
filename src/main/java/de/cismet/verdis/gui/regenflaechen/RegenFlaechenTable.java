@@ -551,17 +551,8 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
 
         if ((cidsBean != null)) {
             setCidsBeans((List<CidsBean>)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN));
-
-            final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
-                        .getAenderungsanfrage();
-            if (aenderungsanfrageJson != null) {
-                ((RegenFlaechenTableModel)getModel()).setAenderungsanfrageFlaechen(aenderungsanfrageJson.getFlaechen());
-            } else {
-                ((RegenFlaechenTableModel)getModel()).setAenderungsanfrageFlaechen(null);
-            }
         } else {
             setCidsBeans(new ArrayList<CidsBean>());
-            ((RegenFlaechenTableModel)getModel()).setAenderungsanfrageFlaechen(null);
         }
     }
 
