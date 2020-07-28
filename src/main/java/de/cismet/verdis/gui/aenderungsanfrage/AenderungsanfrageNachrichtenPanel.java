@@ -38,8 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 

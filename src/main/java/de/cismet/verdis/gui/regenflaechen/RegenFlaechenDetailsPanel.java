@@ -46,6 +46,7 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -279,6 +280,19 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             getMultiBeanHelper());
 
         bindingValidator = BindingValidationSupport.attachBindingValidationToAllTargets(bindingGroup);
+
+        AenderungsanfrageHandler.getInstance().addChangeListener(new AenderungsanfrageHandler.ChangeListener() {
+
+                @Override
+                public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
+                    refreshAenderungButtons(isEnabled());
+                }
+
+                @Override
+                public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
+                    refreshAenderungButtons(isEnabled());
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------
