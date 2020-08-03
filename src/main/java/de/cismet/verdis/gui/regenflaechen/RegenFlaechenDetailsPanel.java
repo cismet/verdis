@@ -285,12 +285,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
                 @Override
                 public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
-                    refreshAenderungButtons(isEnabled());
+                    if (CidsAppBackend.getInstance().isEditable()) {
+                        refreshAenderungButtons(isEnabled());
+                    }
                 }
 
                 @Override
                 public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
-                    refreshAenderungButtons(isEnabled());
                 }
             });
     }

@@ -3283,6 +3283,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Loading Layout successfull");
             }
+            refreshLeftTitleBarColor();
         }
     }
     // Inserting Docking Window functionalty (Sebastian) 24.07.07
@@ -3325,7 +3326,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
                 final FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
                 final ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
-                setLeftTitleBarColor(myBlue);
                 rootWindow.write(out);
                 out.flush();
                 out.close();
