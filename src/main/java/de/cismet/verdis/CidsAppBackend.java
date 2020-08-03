@@ -664,7 +664,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
         if (multiBemerkung != null) {
             final List<SingleBemerkung> orig = multiBemerkung.getBemerkungen();
             final List<SingleBemerkung> copy = new ArrayList<SingleBemerkung>(orig);
-            for (int index = 0; index < orig.size(); index++) {
+            for (int index = 0; index < copy.size(); index++) {
                 final SingleBemerkung single = copy.get(index);
                 final Date verfallsDatum = single.getVerfallsDatum();
                 if ((verfallsDatum != null) && (new Date().getTime() > verfallsDatum.getTime())) {

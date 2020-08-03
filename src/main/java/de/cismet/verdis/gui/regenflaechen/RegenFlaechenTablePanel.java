@@ -33,6 +33,8 @@ import de.cismet.tools.NumberStringComparator;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
+import de.cismet.verdis.CidsAppBackend;
+
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTable;
@@ -282,26 +284,19 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
 
                 @Override
                 public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
-                    if (aenderungsanfrageJson != null) {
-                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
-                            aenderungsanfrageJson.getFlaechen());
-                    } else {
-                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(null);
+                    if (CidsAppBackend.getInstance().isEditable()) {
+                        if (aenderungsanfrageJson != null) {
+                            ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
+                                aenderungsanfrageJson.getFlaechen());
+                        } else {
+                            ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(null);
+                        }
+                        getTable().getModel().fireTableDataChanged();
                     }
-                    getTable().getModel().fireTableDataChanged();
                 }
 
                 @Override
                 public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
-                    final AenderungsanfrageJson aenderungsanfrageJson = AenderungsanfrageHandler.getInstance()
-                                .getAenderungsanfrage();
-                    if (aenderungsanfrageJson != null) {
-                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
-                            aenderungsanfrageJson.getFlaechen());
-                    } else {
-                        ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(null);
-                    }
-//                    getTable().getModel().fireTableDataChanged();
                 }
             });
     }
