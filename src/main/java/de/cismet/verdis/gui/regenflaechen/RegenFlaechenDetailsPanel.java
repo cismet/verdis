@@ -788,7 +788,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  valueOriginal          DOCUMENT ME!
      * @param  valueAenderung         DOCUMENT ME!
      * @param  hasPruefung            DOCUMENT ME!
-     * @param  b                      DOCUMENT ME!
+     * @param  editable               DOCUMENT ME!
      */
     private static void doAenderungChanges(
             final JLabel aenderungLabel,
@@ -797,7 +797,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             final String valueOriginal,
             final String valueAenderung,
             final boolean hasPruefung,
-            final boolean b) {
+            final boolean editable) {
         aenderungLabel.setVisible(valueAenderung != null);
         aenderungAcceptButton.setVisible(valueAenderung != null);
         aenderungRejectButton.setVisible(valueAenderung != null);
@@ -806,19 +806,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             final Boolean isAenderungAccepted = hasPruefung ? (!isVeraendert) : null;
 
             aenderungLabel.setText(valueAenderung);
-            if (b) {
-                aenderungAcceptButton.setEnabled(isVeraendert && !Boolean.TRUE.equals(isAenderungAccepted));
-                aenderungAcceptButton.setVisible(true);
 
-                aenderungRejectButton.setEnabled(!Boolean.FALSE.equals(isAenderungAccepted));
-                aenderungRejectButton.setVisible(isVeraendert);
-            } else {
-                aenderungAcceptButton.setEnabled(false);
-                aenderungAcceptButton.setVisible(hasPruefung && !isVeraendert);
+            aenderungAcceptButton.setEnabled(editable
+                        && (!hasPruefung || (isVeraendert && !Boolean.TRUE.equals(isAenderungAccepted))));
+            aenderungRejectButton.setEnabled(editable && !Boolean.FALSE.equals(isAenderungAccepted));
 
-                aenderungRejectButton.setEnabled(false);
-                aenderungRejectButton.setVisible(hasPruefung && isVeraendert);
-            }
+            aenderungAcceptButton.setVisible(editable || (hasPruefung && !isVeraendert));
+            aenderungRejectButton.setVisible((editable && isVeraendert) || (hasPruefung && isVeraendert));
 
             aenderungAcceptButton.setContentAreaFilled(aenderungAcceptButton.isEnabled());
             aenderungAcceptButton.setBorderPainted(aenderungAcceptButton.isEnabled());
