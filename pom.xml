@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>6.11.8</version>
+    <version>6.11.9</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v6.11.8</tag>
+      <tag>v6.11.9</tag>
   </scm>
 
   <issueManagement>
@@ -58,7 +58,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-commons</artifactId>
-              <version>6.5.2</version>
+              <version>6.5.6</version>
               <type>jar</type>
               <scope>compile</scope>
           </dependency>
@@ -74,7 +74,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>6.5.7</version>
+                <version>6.6.5</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -82,14 +82,14 @@
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp.server</groupId>
                 <artifactId>cids-custom-server-wuppertal</artifactId>
-                <version>6.17.3</version>
+                <version>6.20.22</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp</groupId>
                 <artifactId>cids-custom-wuppertal</artifactId>
-                <version>6.16</version>
+                <version>6.22.9</version>
                 <type>jar</type>
             </dependency>
                                     
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>6.11.5</version>
+                <version>6.11.8</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
