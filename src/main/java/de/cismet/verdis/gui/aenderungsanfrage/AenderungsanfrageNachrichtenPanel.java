@@ -890,7 +890,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     && AenderungsanfrageUtils.Status.NEW_CITIZEN_MESSAGE.toString()
                     .equals((String)AenderungsanfrageHandler.getInstance().getCidsBean().getProperty(
                                 "status.schluessel"));
-        jButton5.setEnabled(isEnabled() && isNewCitizenMessage);
+        jButton5.setEnabled(!isEnabled() && isNewCitizenMessage);
     }
 
     @Override
