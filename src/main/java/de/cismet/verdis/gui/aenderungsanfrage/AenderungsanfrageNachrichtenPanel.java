@@ -14,6 +14,8 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -63,6 +65,7 @@ import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -93,6 +96,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -160,6 +164,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
         jPanel3 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
@@ -211,6 +216,36 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
         jPanel3.add(jButton4, gridBagConstraints);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/read.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton5,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton5.text"));                                           // NOI18N
+        jButton5.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton5.toolTipText"));                                    // NOI18N
+        jButton5.setBorderPainted(false);
+        jButton5.setContentAreaFilled(false);
+        jButton5.setEnabled(false);
+        jButton5.setFocusPainted(false);
+        jButton5.setMaximumSize(new java.awt.Dimension(24, 24));
+        jButton5.setMinimumSize(new java.awt.Dimension(24, 24));
+        jButton5.setPreferredSize(new java.awt.Dimension(24, 24));
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton5ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+        jPanel3.add(jButton5, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -644,6 +679,34 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    AenderungsanfrageHandler.getInstance()
+                            .sendAenderungsanfrage(AenderungsanfrageHandler.getInstance().getAenderungsanfrage());
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                        jButton5.setEnabled(false);
+                        AenderungsanfrageHandler.getInstance().reloadBeans();
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_jButton5ActionPerformed
+
+    /**
+     * DOCUMENT ME!
      */
     private void redoLastMessage() {
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
@@ -823,6 +886,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     @Override
     public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrage) {
         refresh(aenderungsanfrage);
+        final boolean isNewCitizenMessage = (AenderungsanfrageHandler.getInstance().getCidsBean() != null)
+                    && AenderungsanfrageUtils.Status.NEW_CITIZEN_MESSAGE.toString()
+                    .equals((String)AenderungsanfrageHandler.getInstance().getCidsBean().getProperty(
+                                "status.schluessel"));
+        jButton5.setEnabled(isEnabled() && isNewCitizenMessage);
     }
 
     @Override
