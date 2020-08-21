@@ -284,7 +284,7 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
 
                 @Override
                 public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrageJson) {
-                    if (CidsAppBackend.getInstance().isEditable()) {
+                    if (!CidsAppBackend.getInstance().isEditable()) {
                         if (aenderungsanfrageJson != null) {
                             ((RegenFlaechenTableModel)getTable().getModel()).setAenderungsanfrageFlaechen(
                                 aenderungsanfrageJson.getFlaechen());
