@@ -46,6 +46,8 @@ import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.gui.Main;
+
 import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.AenderungsanfrageResultJson;
@@ -308,6 +310,7 @@ public class AenderungsanfrageHandler {
                         setStacId(null);
                         setAenderungsanfrage(null);
                     }
+                    Main.getInstance().getKartenPanel().refreshInMap(true);
                 }
             }.execute();
     }
