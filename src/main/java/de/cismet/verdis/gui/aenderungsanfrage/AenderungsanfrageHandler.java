@@ -310,7 +310,10 @@ public class AenderungsanfrageHandler {
                         setStacId(null);
                         setAenderungsanfrage(null);
                     }
-                    Main.getInstance().getKartenPanel().refreshInMap(true);
+                    Main.getInstance()
+                            .getKartenPanel()
+                            .refreshInMap(!Main.getInstance().isFixMapExtent()
+                                && !Main.getInstance().isFixMapExtentMode());
                 }
             }.execute();
     }
