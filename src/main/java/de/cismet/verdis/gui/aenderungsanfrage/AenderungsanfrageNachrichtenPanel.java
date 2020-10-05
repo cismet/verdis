@@ -14,8 +14,6 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -26,22 +24,15 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-import java.text.DateFormat;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-
-import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -50,7 +41,6 @@ import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.tools.BrowserLauncher;
 
 import de.cismet.tools.gui.downloadmanager.AbstractDownload;
-import de.cismet.tools.gui.downloadmanager.BackgroundTaskMultipleDownload;
 import de.cismet.tools.gui.downloadmanager.Download;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
@@ -58,11 +48,7 @@ import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
-import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
-import de.cismet.verdis.server.json.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
@@ -81,8 +67,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             AenderungsanfrageNachrichtenPanel.class);
-
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -538,63 +522,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  evt  DOCUMENT ME!
      */
     private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
-        final StringBuffer sb = new StringBuffer();
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
 
         if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
-            final Set<NachrichtAnhangJson> nachrichtAnhaenge = new HashSet<>();
-            for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
-                if (!Boolean.TRUE.equals(nachrichtJson.getDraft())) {
-                    final String anhangString;
-                    if (nachrichtJson.getAnhang() != null) {
-                        final List<String> anhaenge = new ArrayList<>();
-                        for (final NachrichtAnhangJson nachrichtAnhang : nachrichtJson.getAnhang()) {
-                            anhaenge.add(nachrichtAnhang.getName());
-                            nachrichtAnhaenge.add(nachrichtAnhang);
-                        }
-                        if (anhaenge.isEmpty()) {
-                            anhangString = null;
-                        } else {
-                            anhangString = String.join(", ", anhaenge);
-                        }
-                    } else {
-                        anhangString = null;
-                    }
-
-                    final String typ;
-                    if (nachrichtJson.getTyp() != null) {
-                        switch (nachrichtJson.getTyp()) {
-                            case CITIZEN: {
-                                typ = "Bürger";
-                            }
-                            break;
-                            case CLERK: {
-                                typ = "Bearbeiter";
-                            }
-                            break;
-                            case SYSTEM: {
-                                typ = "System";
-                            }
-                            break;
-                            default: {
-                                typ = null;
-                            }
-                        }
-                    } else {
-                        typ = null;
-                    }
-
-                    final String text = AenderungsanfrageNachrichtPanel.createText(nachrichtJson);
-                    sb.append(DATE_FORMAT.format(nachrichtJson.getTimestamp()))
-                            .append(" - ")
-                            .append(typ)
-                            .append(":")
-                            .append((text != null) ? (" " + text) : "")
-                            .append((anhangString != null) ? (" [" + anhangString + "]") : "")
-                            .append(System.lineSeparator());
-                }
-            }
-
             final String jobname;
             if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(this)) {
                 jobname = DownloadManagerDialog.getInstance().getJobName();
@@ -602,43 +532,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 jobname = null;
             }
 
-            final BackgroundTaskMultipleDownload.FetchDownloadsTask fetchDownloadsTask =
-                new BackgroundTaskMultipleDownload.FetchDownloadsTask() {
-
-                    @Override
-                    public Collection<? extends Download> fetchDownloads() throws Exception {
-                        final String directory = (((jobname != null) && !jobname.trim().isEmpty())
-                                ? (jobname + System.getProperty("file.separator")) : "")
-                                    + aenderungsanfrage.getKassenzeichen()
-                                    + "_"
-                                    + Math.abs(aenderungsanfrage.hashCode());
-                        final Collection<Download> downloads = new ArrayList<>();
-                        downloads.add(new TxtDownload(
-                                sb.toString(),
-                                directory,
-                                "Nachrichten",
-                                "nachrichten",
-                                ".txt"));
-                        for (final NachrichtAnhangJson nachrichtAnhang : nachrichtAnhaenge) {
-                            final Download download = new ByteArrayActionDownload(
-                                    VerdisConstants.DOMAIN,
-                                    DownloadChangeRequestAnhangServerAction.TASK_NAME,
-                                    nachrichtAnhang.toJson(),
-                                    null,
-                                    "Anhang",
-                                    directory,
-                                    nachrichtAnhang.getName().substring(
-                                        0,
-                                        nachrichtAnhang.getName().lastIndexOf(".")),
-                                    nachrichtAnhang.getName().substring(nachrichtAnhang.getName().lastIndexOf(".")),
-                                    ConnectionContext.createDeprecated());
-                            downloads.add(download);
-                        }
-                        return downloads;
-                    }
-                };
             DownloadManager.instance()
-                    .add(new BackgroundTaskMultipleDownload(null, "Gesprächsprotokoll", fetchDownloadsTask));
+                    .add(new AenderungsanfrageDownload(
+                            jobname,
+                            aenderungsanfrage,
+                            ConnectionContext.createDeprecated()));
         }
     } //GEN-LAST:event_jButton3ActionPerformed
 
