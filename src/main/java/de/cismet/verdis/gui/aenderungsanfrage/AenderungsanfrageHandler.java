@@ -312,7 +312,7 @@ public class AenderungsanfrageHandler {
                     }
                     Main.getInstance()
                             .getKartenPanel()
-                            .refreshInMap(!Main.getInstance().isFixMapExtent()
+                            .refreshInMap(!Main.getInstance().isInEditMode() && !Main.getInstance().isFixMapExtent()
                                 && !Main.getInstance().isFixMapExtentMode());
                 }
             }.execute();
