@@ -91,11 +91,16 @@ public class AenderungsanfrageDownload extends AbstractCancellableDownload imple
         status = State.RUNNING;
         stateChanged();
 
-        if (!downloadFuture.isCancelled()) {
-            createZip();
+        try {
+            if (!downloadFuture.isCancelled()) {
+                createZip();
+            }
+            status = State.COMPLETED;
+            stateChanged();
+        } catch (final Exception ex) {
+            log.warn("Couldn't write downloaded content to file '" + fileToSaveTo + "'.", ex);
+            error(ex);
         }
-        status = State.COMPLETED;
-        stateChanged();
     }
 
     /**
@@ -161,16 +166,33 @@ public class AenderungsanfrageDownload extends AbstractCancellableDownload imple
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    private void createZip() {
+    private void createZip() throws Exception {
         try(final FileOutputStream fos = new FileOutputStream(getFileToSaveTo());
                     final ZipOutputStream zos = new ZipOutputStream(fos)) {
             final String nachrichten = getProtokoll();
             zos.putNextEntry(new ZipEntry("nachrichten.txt"));
             zos.write(nachrichten.getBytes());
             zos.closeEntry();
+
+            final Set<String> entryNames = new HashSet<>();
             for (final NachrichtAnhangJson nachrichtAnhang : nachrichtAnhaenge) {
-                zos.putNextEntry(new ZipEntry(nachrichtAnhang.getName()));
+                final String fileName = nachrichtAnhang.getName();
+
+                final int indexOfExtension = fileName.lastIndexOf(".");
+                final String basename = (indexOfExtension >= 0) ? fileName.substring(0, indexOfExtension) : fileName;
+                final String extension = (indexOfExtension >= 0) ? fileName.substring(indexOfExtension) : "";
+
+                int fileCounter = 0;
+                String entryName = fileName;
+                while (entryNames.contains(entryName)) {
+                    entryName = String.format("%s (%d)%s", basename, ++fileCounter, extension);
+                }
+                entryNames.add(entryName);
+
+                zos.putNextEntry(new ZipEntry(entryName));
                 zos.write((byte[])SessionManager.getProxy().executeTask(
                         DownloadChangeRequestAnhangServerAction.TASK_NAME,
                         VerdisConstants.DOMAIN,
@@ -178,9 +200,6 @@ public class AenderungsanfrageDownload extends AbstractCancellableDownload imple
                         getConnectionContext()));
                 zos.closeEntry();
             }
-        } catch (final Exception ex) {
-            log.warn("Couldn't write downloaded content to file '" + fileToSaveTo + "'.", ex);
-            error(ex);
         }
     }
 
