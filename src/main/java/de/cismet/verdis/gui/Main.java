@@ -3852,9 +3852,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         } else {
                             if (acquireLocks()) {    // try to acquire
+                                final int kassenzeichenNummer = Integer.parseInt(kassenzeichenPanel.getSearchField());
+                                CidsAppBackend.getInstance()
+                                        .setCidsBean(CidsAppBackend.getInstance().loadKassenzeichenByNummer(
+                                                kassenzeichenNummer));
                                 return true;
+                            } else {
+                                releaseLocks();      // release if acquire failed
                             }
-                            releaseLocks();          // release if acquire failed
                         }
                         return null;
                     }

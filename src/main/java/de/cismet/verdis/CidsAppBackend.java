@@ -340,15 +340,6 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     */
-    public boolean lock() {
-        return false;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param   kassenzeichen  DOCUMENT ME! // * @param lightweight DOCUMENT ME!
      *
      * @return  DOCUMENT ME!

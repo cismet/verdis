@@ -20,6 +20,8 @@ import Sirius.server.middleware.types.MetaObjectNode;
 
 import org.geojson.Feature;
 
+import java.sql.Timestamp;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -321,16 +323,21 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
-     * @param  aenderungsanfrage  DOCUMENT ME!
+     * @param   aenderungsanfrage  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public void doUndraft(final AenderungsanfrageJson aenderungsanfrage) {
+    public boolean doUndraft(final AenderungsanfrageJson aenderungsanfrage) {
+        boolean anyChanges = false;
         if (aenderungsanfrage != null) {
             for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
                 if (NachrichtJson.Typ.CLERK.equals(nachricht.getTyp())) {
                     nachricht.setDraft(null);
+                    anyChanges = true;
                 }
             }
         }
+        return anyChanges;
     }
 
     /**
@@ -350,6 +357,9 @@ public class AenderungsanfrageHandler {
         if (aenderungsanfrage == null) {
             return null;
         }
+        final AenderungsanfrageJson aenderungsanfragePruefung = AenderungsanfrageUtils.getInstance()
+                    .createAenderungsanfrageJson(aenderungsanfrage.toJson());
+
         if (kassenzeichenBean != null) {
             // preparing flaecheBeanMap
             final Map<String, CidsBean> flaechenBeans = new HashMap<>();
@@ -360,13 +370,13 @@ public class AenderungsanfrageHandler {
                 flaechenBeans.put(bezeichnung, flaecheBean);
             }
 
-            final Set<String> bezeichnungen = new HashSet<>(aenderungsanfrage.getFlaechen().keySet());
+            final Set<String> bezeichnungen = new HashSet<>(aenderungsanfragePruefung.getFlaechen().keySet());
             for (final String bezeichnung : bezeichnungen) {
-                final FlaecheAenderungJson flaecheJson = aenderungsanfrage.getFlaechen().get(bezeichnung);
+                final FlaecheAenderungJson flaecheJson = aenderungsanfragePruefung.getFlaechen().get(bezeichnung);
                 final CidsBean flaecheBean = flaechenBeans.get(bezeichnung);
                 // TODO message => flaechenänderung entfernt
                 if (flaecheBean == null) {
-                    aenderungsanfrage.getFlaechen().remove(bezeichnung);
+                    aenderungsanfragePruefung.getFlaechen().remove(bezeichnung);
                     continue;
                 }
 
@@ -477,7 +487,7 @@ public class AenderungsanfrageHandler {
                 }
             }
         }
-        return AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(aenderungsanfrage.toJson());
+        return aenderungsanfragePruefung;
     }
 
     /**
@@ -488,24 +498,32 @@ public class AenderungsanfrageHandler {
     public void startProcessing() throws Exception {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-
-            // create empty draft pruefung for signaling start of processing
-            if (aenderungsanfrage != null) {
+            final Integer stacId = (aenderungsanfrage != null) ? getStacId() : null;
+            final CidsAppBackend.StacOptionsEntry stacEntry = (stacId != null)
+                ? CidsAppBackend.getInstance().getStacOptionsEntry(stacId) : null;
+            final Timestamp expiratonDate = (stacEntry != null) ? stacEntry.getTimestamp() : null;
+            boolean anyChanges = false;
+            if ((expiratonDate != null) && expiratonDate.after(new Date())) {
+                // create empty draft pruefung for signaling start of processing
                 for (final String bezeichnung : aenderungsanfrage.getFlaechen().keySet()) {
                     final FlaecheAenderungJson flaeche = aenderungsanfrage.getFlaechen().get(bezeichnung);
                     if (flaeche != null) {
                         if (flaeche.getPruefung() == null) {
                             flaeche.setPruefung(new FlaechePruefungJson(null, null, null));
+                            anyChanges = true;
                         }
                         if ((flaeche.getGroesse() != null) && (flaeche.getPruefung().getGroesse() == null)) {
                             flaeche.getPruefung().setGroesse(new PruefungGroesseJson());
+                            anyChanges = true;
                         }
                         if ((flaeche.getAnschlussgrad() != null)
                                     && (flaeche.getPruefung().getAnschlussgrad() == null)) {
                             flaeche.getPruefung().setAnschlussgrad(new PruefungAnschlussgradJson());
+                            anyChanges = true;
                         }
                         if ((flaeche.getFlaechenart() != null) && (flaeche.getPruefung().getFlaechenart() == null)) {
                             flaeche.getPruefung().setFlaechenart(new PruefungFlaechenartJson());
+                            anyChanges = true;
                         }
                     }
                 }
@@ -514,11 +532,14 @@ public class AenderungsanfrageHandler {
                     if ((feature != null) && !Boolean.TRUE.equals(feature.getProperty("draft"))) {
                         if (feature.getProperty("pruefung") == null) {
                             feature.setProperty("pruefung", false);
+                            anyChanges = true;
                         }
                     }
                 }
             }
-            sendAenderungsanfrage(aenderungsanfrage);
+            if (anyChanges) {
+                sendAenderungsanfrage(aenderungsanfrage);
+            }
         }
     }
 
@@ -532,10 +553,17 @@ public class AenderungsanfrageHandler {
     public void finishProcessing(final CidsBean kassenzeichenBean) throws Exception {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-            if ((kassenzeichenBean != null) && (aenderungsanfrage != null)) {
+            final Integer stacId = (aenderungsanfrage != null) ? getStacId() : null;
+            final CidsAppBackend.StacOptionsEntry stacEntry = (stacId != null)
+                ? CidsAppBackend.getInstance().getStacOptionsEntry(stacId) : null;
+            final Timestamp expiratonDate = (stacEntry != null) ? stacEntry.getTimestamp() : null;
+            if ((kassenzeichenBean != null) && (expiratonDate != null) && expiratonDate.after(new Date())) {
                 doUndraft(aenderungsanfrage);
-                doPruefung(aenderungsanfrage, kassenzeichenBean, new Date());
-                sendAenderungsanfrage(aenderungsanfrage);
+                final AenderungsanfrageJson gepruefteAenderungsanfrage = doPruefung(
+                        aenderungsanfrage,
+                        kassenzeichenBean,
+                        new Date());
+                sendAenderungsanfrage(gepruefteAenderungsanfrage);
             }
         }
     }
