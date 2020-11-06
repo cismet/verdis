@@ -621,8 +621,14 @@ public class AenderungsanfrageHandler {
     public boolean changesPending() {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+            for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
+                if (NachrichtJson.Typ.CLERK.equals(nachricht.getTyp()) && Boolean.TRUE.equals(nachricht.getDraft())) {
+                    return true;
+                }
+            }
             final String aenderungsanfrageOrigJson = (String)getCidsBean().getProperty(
                     VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON);
+
             AenderungsanfrageJson aenderungsanfrageOrig;
             try {
                 aenderungsanfrageOrig = (aenderungsanfrageOrigJson != null)
