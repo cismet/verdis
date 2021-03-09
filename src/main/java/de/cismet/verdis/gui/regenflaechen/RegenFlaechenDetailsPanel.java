@@ -581,7 +581,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
             bindingGroup.unbind();
-            ((DefaultBindableReferenceCombo)cboFlaechenart).reload(false);
+            ((DefaultBindableReferenceCombo)cboFlaechenart).reload();
             bindingGroup.bind();
         } else {
             bindingGroup.unbind();
@@ -1492,7 +1492,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
                                 @Override
                                 public void run() {
-                                    ((DefaultBindableReferenceCombo)cboFlaechenart).reload(true);
+                                    ((DefaultBindableReferenceCombo)cboFlaechenart).reload();
                                 }
                             });
 
