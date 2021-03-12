@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.cismet.cids</groupId>
         <artifactId>cids-parent</artifactId>
-         <version>6.0</version>
+         <version>7.0</version>
     </parent>
 
     <groupId>de.cismet.verdis</groupId>
@@ -49,7 +49,7 @@
           <dependency>
               <groupId>de.cismet</groupId>
               <artifactId>cismet-ext-bom</artifactId>
-              <version>6.0</version>
+              <version>7.0</version>
               <type>pom</type>
               <scope>import</scope>
           </dependency>
@@ -58,7 +58,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-commons</artifactId>
-              <version>6.5.7</version>
+              <version>7.0</version>
               <type>jar</type>
               <scope>compile</scope>
           </dependency>
@@ -66,7 +66,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-gui-commons</artifactId>
-              <version>6.2.7</version>
+              <version>7.0</version>
               <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -74,7 +74,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>6.6.10</version>
+                <version>7.0</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -82,21 +82,21 @@
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp.server</groupId>
                 <artifactId>cids-custom-server-wuppertal</artifactId>
-                <version>6.26.3</version>
+                <version>7.0</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp</groupId>
                 <artifactId>cids-custom-wuppertal</artifactId>
-                <version>6.26.5</version>
+                <version>7.0</version>
                 <type>jar</type>
             </dependency>
                                     
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.5</version>
+                <version>7.0</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>de.cismet.verdis</groupId>
                 <artifactId>verdis-server</artifactId>
-                <version>6.11.11</version>
+                <version>7.0</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>de.cismet.cids.navigator</groupId>
                 <artifactId>cids-navigator</artifactId>
-                <version>6.6.1</version>
+                <version>7.0</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>de.cismet.cismap</groupId>
                 <artifactId>cismap-plugin</artifactId>
-                <version>6.1.10</version>
+                <version>7.0</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -128,25 +128,26 @@
             <dependency>
                 <groupId>de.cismet.custom</groupId>
                 <artifactId>netbeans-visual-diff-standalone</artifactId>
-                <version>6.0</version>
+                <version>7.0</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.custom</groupId>
                 <artifactId>beansbinding</artifactId>
-                <version>6.0</version>
+                <version>7.0</version>
                 <scope>compile</scope>
                 <type>jar</type>
             </dependency>      
             
+            <!-- END: managed cids-dependencies -->  
+                    
             <dependency>
                <groupId>com.googlecode.json-simple</groupId>
                <artifactId>json-simple</artifactId>
                <version>1.1</version>
             </dependency>            
-            <!-- END: managed cids-dependencies -->  
-                    
+
             <!--
                 See https://cismet.slack.com/files/pascal.dihe/F4C0V99H9/netbeans-visual-diff-standalone
             -->
