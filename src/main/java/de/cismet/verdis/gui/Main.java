@@ -19,7 +19,6 @@ import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
-import Sirius.navigator.downloadmanager.CsvExportSearchDownload;
 import Sirius.navigator.event.CatalogueSelectionListener;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.resource.PropertyManager;
@@ -151,6 +150,7 @@ import de.cismet.cids.custom.commons.searchgeometrylistener.RissNodesSearchCreat
 import de.cismet.cids.custom.navigatorstartuphooks.MotdStartUpHook;
 import de.cismet.cids.custom.reports.verdis.EBGeneratorDialog;
 import de.cismet.cids.custom.util.VerdisUtils;
+import de.cismet.cids.custom.utils.ByteArrayActionDownload;
 import de.cismet.cids.custom.wunda_blau.startuphooks.MotdWundaStartupHook;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -161,8 +161,8 @@ import de.cismet.cids.navigatorstartuphooks.CidsServerMessageStartUpHook;
 import de.cismet.cids.search.QuerySearchResultsAction;
 import de.cismet.cids.search.QuerySearchResultsActionDialog;
 
+import de.cismet.cids.server.actions.CsvExportServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
@@ -663,32 +663,60 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                         @Override
                         public void doAction() {
-                            final String title = getMetaClass().getName();
+                            final String title = abfrageDialog.getQuerySearchResultsActionPanel()
+                                            .getMetaClass()
+                                            .getName();
 
                             if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(Main.this)) {
-                                final List<String> header = new ArrayList<>(getAttributeNames().size());
-                                final List<String> fields = new ArrayList<>(getAttributeNames().size());
-                                for (final String attrKey : getAttributeKeys()) {
-                                    final MemberAttributeInfo mai = (MemberAttributeInfo)getMetaClass()
-                                                    .getMemberAttributeInfos().get(attrKey);
-                                    header.add(getAttributeNames().get(attrKey));
+                                final List<String> columnNames = new ArrayList<>(
+                                        abfrageDialog.getQuerySearchResultsActionPanel().getAttributeNames().size());
+                                final List<String> fields = new ArrayList<>(
+                                        abfrageDialog.getQuerySearchResultsActionPanel().getAttributeNames().size());
+                                for (final String attrKey
+                                            : abfrageDialog.getQuerySearchResultsActionPanel().getAttributeKeys()) {
+                                    final MemberAttributeInfo mai = (MemberAttributeInfo)
+                                        abfrageDialog.getQuerySearchResultsActionPanel().getMetaClass()
+                                                    .getMemberAttributeInfos()
+                                                    .get(attrKey);
+                                    columnNames.add(
+                                        abfrageDialog.getQuerySearchResultsActionPanel().getAttributeNames().get(
+                                            attrKey));
                                     fields.add(mai.getFieldName());
                                 }
-                                final CsvExportSearchStatement search = new CsvExportSearchStatement(
-                                        getMetaClass().getTableName(),
-                                        VerdisConstants.DOMAIN,
-                                        fields,
-                                        getWhereCause());
-                                search.setDateFormat("dd.MM.yyyy");
-                                search.setBooleanFormat(new String[] { "nein", "ja" });
+
+                                final ServerActionParameter[] params = new ServerActionParameter[] {
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.COLUMN_NAMES.toString(),
+                                            columnNames),
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.FIELDS.toString(),
+                                            fields),
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.WHERE.toString(),
+                                            abfrageDialog.getQuerySearchResultsActionPanel().getWhereCause()),
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.DATE_FORMAT.toString(),
+                                            "dd.MM.yy"),
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.BOOLEAN_YES.toString(),
+                                            "ja"),
+                                        new ServerActionParameter<>(
+                                            CsvExportServerAction.ParameterType.BOOLEAN_NO.toString(),
+                                            "nein"),
+                                    };
                                 DownloadManager.instance()
                                             .add(
-                                                new CsvExportSearchDownload(
-                                                    search,
+                                                new ByteArrayActionDownload(
+                                                    VerdisConstants.DOMAIN,
+                                                    CsvExportServerAction.TASKNAME,
+                                                    abfrageDialog.getQuerySearchResultsActionPanel().getMetaClass()
+                                                        .getTableName(),
+                                                    params,
                                                     title,
                                                     DownloadManagerDialog.getInstance().getJobName(),
                                                     title,
-                                                    header));
+                                                    ".csv",
+                                                    ConnectionContext.createDeprecated()));
                                 final DownloadManagerDialog downloadManagerDialog = DownloadManagerDialog.getInstance();
                                 downloadManagerDialog.pack();
                                 StaticSwingTools.showDialog(Main.this, downloadManagerDialog, true);
