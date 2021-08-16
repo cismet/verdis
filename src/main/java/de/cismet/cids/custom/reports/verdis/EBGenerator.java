@@ -95,6 +95,7 @@ import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -280,7 +281,7 @@ public class EBGenerator {
                     .createConnection(
                         RESTfulConnection.class.getCanonicalName(),
                         info.getCallserverURL(),
-                        Proxy.fromPreferences(),
+                        ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         connectionContext);
         final ConnectionSession session = ConnectionFactory.getFactory()
