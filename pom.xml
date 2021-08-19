@@ -58,7 +58,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-commons</artifactId>
-              <version>7.1.1-proxyfix-prerelease-1</version>
+              <version>7.1.1-proxyfix-prerelease-4</version>
               <type>jar</type>
               <scope>compile</scope>
           </dependency>
@@ -66,7 +66,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-gui-commons</artifactId>
-              <version>7.1-proxyfix-prerelease-1</version>
+              <version>7.1-proxyfix-prerelease-4</version>
               <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -74,7 +74,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>7.0.5</version>
+                <version>7.0.6</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -96,7 +96,7 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.5.7-proxyfix-prerelease-1</version>
+                <version>7.5.7-proxyfix-prerelease-3</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>de.cismet.cids.navigator</groupId>
                 <artifactId>cids-navigator</artifactId>
-                <version>7.3.1</version>
+                <version>7.5.2-proxyfix-prerelease-5</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>

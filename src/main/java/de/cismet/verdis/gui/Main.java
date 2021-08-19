@@ -199,6 +199,10 @@ import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
+import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
+import de.cismet.netutil.ProxyProperties;
+
 import de.cismet.remote.RESTRemoteControlStarter;
 
 import de.cismet.tools.Static2DTools;
@@ -6572,7 +6576,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         //~ Instance fields ----------------------------------------------------
 
         private final AppPreferences appPreferences;
-        private ConnectionProxy proxy = null;
+        private ConnectionProxy connectionProxy = null;
         private boolean readOnly = true;
         private String userString = null;
 
@@ -6595,7 +6599,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
          * @return  DOCUMENT ME!
          */
         public ConnectionProxy getProxy() {
-            return proxy;
+            return connectionProxy;
         }
 
         /**
@@ -6641,8 +6645,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final String connectionclass = appPreferences.getAppbackendConnectionclass();
 
             try {
+                final ProxyProperties proxyProperties = appPreferences.getProxyProperties();
+                final Proxy proxy = ProxyHandler.getInstance().init(proxyProperties);
                 final Connection connection = ConnectionFactory.getFactory()
-                            .createConnection(connectionclass, callServerURL, appPreferences.isCompressionEnabled());
+                            .createConnection(
+                                connectionclass,
+                                callServerURL,
+                                proxy,
+                                appPreferences.isCompressionEnabled());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
@@ -6650,16 +6660,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 connectionInfo.setUsergroup(usergroup);
                 connectionInfo.setUsergroupDomain(domain);
                 connectionInfo.setUsername(username);
-                final ConnectionSession session = ConnectionFactory.getFactory()
+                final ConnectionSession connectionSession = ConnectionFactory.getFactory()
                             .createSession(connection, connectionInfo, true);
-                proxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, session);
+                connectionProxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, connectionSession);
 
-                final User user = session.getUser();
-                if (proxy.hasConfigAttr(user, "grundis.access.readwrite")) {
+                final User user = connectionSession.getUser();
+                if (connectionProxy.hasConfigAttr(user, "grundis.access.readwrite")) {
                     userString = name;
                     readOnly = false;
                     return true;
-                } else if (proxy.hasConfigAttr(user, "grundis.access.read")) {
+                } else if (connectionProxy.hasConfigAttr(user, "grundis.access.read")) {
                     readOnly = true;
                     userString = name;
                     return true;
