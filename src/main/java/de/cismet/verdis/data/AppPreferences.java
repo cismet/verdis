@@ -20,13 +20,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import java.net.URI;
 import java.net.URL;
+
+import java.nio.file.Paths;
 
 import java.util.*;
 
 import de.cismet.cismap.commons.preferences.CismapPreferences;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
+
+import de.cismet.netutil.ProxyProperties;
 
 /**
  * DOCUMENT ME!
@@ -69,6 +74,7 @@ public class AppPreferences {
     private String appbackendCallserverurl = null;
     private boolean compressionEnabled = false;
     private Integer nachgewiesenFalseThreshold = 10;
+    private final ProxyProperties proxyProperties = new ProxyProperties();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -89,21 +95,7 @@ public class AppPreferences {
             log.warn("Fehler beim Lesen der Einstellungen (InputStream)", e);
         }
     }
-    /**
-     * Creates a new AppPreferences object.
-     *
-     * @param  url  DOCUMENT ME!
-     */
-    public AppPreferences(final URL url) {
-        try {
-            final SAXBuilder builder = new SAXBuilder(false);
-            final Document doc = builder.build(url);
-            final Element prefs = doc.getRootElement();
-            readFromAppPreferences(prefs);
-        } catch (Exception e) {
-            log.warn("Fehler beim Lesen der Einstellungen (" + url.toString() + ")", e);
-        }
-    }
+
     /**
      * Creates a new AppPreferences object.
      *
@@ -132,6 +124,25 @@ public class AppPreferences {
     public void setAlbUrl(final String albUrl) {
         this.albUrl = albUrl;
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   from  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private static InputStream getInputStreamFrom(final String from) throws Exception {
+        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
+                    || (from.indexOf("file:/") == 0)) {
+            return new URL(from).openStream();
+        } else {
+            return new BufferedInputStream(new FileInputStream(from));
+        }
+    }
+
     /**
      * DOCUMENT ME!
      *
@@ -234,18 +245,19 @@ public class AppPreferences {
 
         final String cfgFile = JnlpSystemPropertyHelper.getProperty("configFile");
         if (cfgFile != null) {
-            final AppProperties appProperties;
             try {
-                if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
-                            || (cfgFile.indexOf("file:/") == 0)) {
-                    appProperties = new AppProperties(new URL(cfgFile));
-                } else {
-                    appProperties = new AppProperties(new File(cfgFile));
-                }
+                final AppProperties appProperties = new AppProperties(getInputStreamFrom(cfgFile));
                 appbackendCallserverurl = appProperties.getCallserverUrl();
                 compressionEnabled = appProperties.isCompressionEnabled();
                 appbackendDomain = appProperties.getDomain();
                 appbackendConnectionclass = appProperties.getConnectionClass();
+
+                final String cfgFileName = Paths.get(new URI(cfgFile).getPath()).getFileName().toString();
+                final String cfgDirname = cfgFile.substring(0, cfgFile.lastIndexOf(cfgFileName));
+                final String proxyConfig = appProperties.getProxyConfig();
+                final String cfgProxy = (proxyConfig != null) ? (cfgDirname + proxyConfig) : null;
+
+                proxyProperties.load(getInputStreamFrom(cfgProxy));
             } catch (final Exception ex) {
                 log.fatal("Error while reading config file", ex);
                 System.exit(2);
@@ -338,23 +350,12 @@ public class AppPreferences {
         /**
          * Creates a new AppProperties object.
          *
-         * @param   url  DOCUMENT ME!
+         * @param   is  url DOCUMENT ME!
          *
          * @throws  Exception  DOCUMENT ME!
          */
-        public AppProperties(final URL url) throws Exception {
-            super(url.openStream());
-        }
-
-        /**
-         * Creates a new AppProperties object.
-         *
-         * @param   file  DOCUMENT ME!
-         *
-         * @throws  Exception  DOCUMENT ME!
-         */
-        public AppProperties(final File file) throws Exception {
-            super(new BufferedInputStream(new FileInputStream(file)));
+        public AppProperties(final InputStream is) throws Exception {
+            super(is);
         }
 
         //~ Methods ------------------------------------------------------------
@@ -366,6 +367,15 @@ public class AppPreferences {
          */
         public String getCallserverUrl() {
             return getString("callserverUrl");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyConfig() {
+            return getString("proxy.config");
         }
 
         /**
