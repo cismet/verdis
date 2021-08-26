@@ -13,6 +13,7 @@
 package de.cismet.verdis.gui;
 
 import Sirius.navigator.DefaultNavigatorExceptionHandler;
+import Sirius.navigator.ProxyCredentials;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -6663,6 +6664,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 final ConnectionSession connectionSession = ConnectionFactory.getFactory()
                             .createSession(connection, connectionInfo, true);
                 connectionProxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, connectionSession);
+
+                ProxyCredentials.initFromConfAttr("proxy.credentials", ConnectionContext.createDeprecated());
 
                 final User user = connectionSession.getUser();
                 if (connectionProxy.hasConfigAttr(user, "grundis.access.readwrite")) {
