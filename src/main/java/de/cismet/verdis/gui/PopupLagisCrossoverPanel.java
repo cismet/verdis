@@ -353,18 +353,18 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         closeDialog();
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
+    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
         loadSelectedFlurstueck();
-    }                                                                                             //GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
+    }//GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
     /**
      * ToDo ugly.
      */
@@ -643,10 +643,10 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
                         + "WHERE "
                         + "   geom.id = alkis_landparcel.geometrie "
                         + "   AND not ST_IsEmpty(geom.geo_field)"
-                        + "   AND intersects(geom.geo_field, "
+                        + "   AND st_intersects(geom.geo_field, "
                         + "                    st_buffer(st_buffer("
                         + "st_transform( "
-                        + "   geomFromText('" + geom.toText() + "'," + geom.getSRID() + ")"
+                        + "   st_geomFromText('" + geom.toText() + "'," + geom.getSRID() + ")"
                         + "," + ALKIS_LANDPARCEL_GEOM_SRID + "), "
                         + buffer + "), 0))";
 
