@@ -255,7 +255,8 @@ public class AppPreferences {
                 final String cfgFileName = Paths.get(new URI(cfgFile).getPath()).getFileName().toString();
                 final String cfgDirname = cfgFile.substring(0, cfgFile.lastIndexOf(cfgFileName));
                 final String proxyConfig = appProperties.getProxyConfig();
-                final String cfgProxy = (proxyConfig != null && !proxyConfig.isEmpty()) ? (cfgDirname + proxyConfig) : null;
+                final String cfgProxy = ((proxyConfig != null) && !proxyConfig.isEmpty()) ? (cfgDirname + proxyConfig)
+                                                                                          : null;
 
                 proxyProperties.load(getInputStreamFrom(cfgProxy));
             } catch (final Exception ex) {

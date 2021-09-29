@@ -50,19 +50,20 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
 
     @Override
     public void addBean(final CidsBean cidsBean) {
-        addKassenzeichenGeometrieBean(cidsBean);
+        addKassenzeichenGeometrieBean(cidsBean, true);
     }
 
     /**
      * DOCUMENT ME!
      *
      * @param  kassenzeichenGeometrieBeanToAdd  DOCUMENT ME!
+     * @param  select                           DOCUMENT ME!
      */
-    public void addKassenzeichenGeometrieBean(final CidsBean kassenzeichenGeometrieBeanToAdd) {
+    public void addKassenzeichenGeometrieBean(final CidsBean kassenzeichenGeometrieBeanToAdd, final boolean select) {
         if (kassenzeichenGeometrieBeanToAdd != null) {
             final Collection<CidsBean> kassenzeichenGeometrieBeanToAdds = new ArrayList<CidsBean>();
             kassenzeichenGeometrieBeanToAdds.add(kassenzeichenGeometrieBeanToAdd);
-            addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeanToAdds);
+            addKassenzeichenGeometrieBeans(kassenzeichenGeometrieBeanToAdds, select);
         }
     }
 
@@ -70,13 +71,15 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
      * DOCUMENT ME!
      *
      * @param  kassenzeichenGeometrieBeansToAdd  DOCUMENT ME!
+     * @param  select                            DOCUMENT ME!
      */
-    public void addKassenzeichenGeometrieBeans(final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd) {
+    public void addKassenzeichenGeometrieBeans(final Collection<CidsBean> kassenzeichenGeometrieBeansToAdd,
+            final boolean select) {
         final CidsBean kassenzBean = panel.getCidsBean();
         if (kassenzBean != null) {
-            final Collection<Feature> featuresToSelect = new ArrayList<Feature>();
-            final Collection<Feature> featuresToAdd = new ArrayList<Feature>();
-            final Collection<CidsBean> beansToAdd = new ArrayList<CidsBean>();
+            final Collection<Feature> featuresToSelect = new ArrayList<>();
+            final Collection<Feature> featuresToAdd = new ArrayList<>();
+            final Collection<CidsBean> beansToAdd = new ArrayList<>();
 
             for (final CidsBean kassenzeichenGeometrieBeanToAdd : kassenzeichenGeometrieBeansToAdd) {
                 final Geometry kassenzeichenGeometrieGeomToAdd = (Geometry)kassenzeichenGeometrieBeanToAdd.getProperty(
@@ -114,7 +117,10 @@ public class KassenzeichenGeometrienList extends JList<CidsBean> implements Cids
             kassenzBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN)
                     .addAll(beansToAdd);
             Main.getMappingComponent().getFeatureCollection().addFeatures(featuresToAdd);
-            Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
+
+            if (select) {
+                Main.getMappingComponent().getFeatureCollection().select(featuresToSelect);
+            }
         }
     }
 
