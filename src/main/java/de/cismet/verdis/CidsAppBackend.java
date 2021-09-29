@@ -1503,9 +1503,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                                                     VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER) : null);
                             }
                         } catch (final Exception ex) {
-                            setCidsBean(null);
                             LOG.error("Exception in Background Thread", ex);
                             Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.RED);
+                            try {
+                                setCidsBean(null);
+                            } catch (final Exception ex2) {
+                            }
                             showError("Fehler beim Laden", "Kassenzeichen konnte nicht geladen werden", ex);
                         }
                         Main.getInstance().getKassenzeichenPanel().setSearchFinished();

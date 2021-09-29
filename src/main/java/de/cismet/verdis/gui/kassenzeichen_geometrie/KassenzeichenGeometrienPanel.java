@@ -891,7 +891,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                             kassenzeichenGeometrieBeansToAdd.add(kassenzeichenGeometrieBean);
                         }
                         ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).addKassenzeichenGeometrieBeans(
-                            kassenzeichenGeometrieBeansToAdd);
+                            kassenzeichenGeometrieBeansToAdd,
+                            false);
                     } catch (final Exception ex) {
                         LOG.error("error while creating kassenzeichenGeometrie beans", ex);
                     } finally {
@@ -1133,38 +1134,46 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
      */
     @Override
     public void featureSelectionChanged(final FeatureCollectionEvent fce) {
-        if (fce.getEventFeatures() == null) {
-            return;
-        }
-        final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
+        SwingUtilities.invokeLater(new Runnable() {
 
-        final CidsBean kassenzBean = getCidsBean();
-        if (kassenzBean != null) {
-            final Collection<Feature> selectedFeatures = featureCollection.getSelectedFeatures();
-            final List<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
-                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
+                @Override
+                public void run() {
+                    if (fce.getEventFeatures() == null) {
+                        return;
+                    }
+                    final FeatureCollection featureCollection = CidsAppBackend.getInstance()
+                                .getMainMap()
+                                .getFeatureCollection();
 
-            final List<Integer> indicesToSelect = new ArrayList<Integer>();
-            if (selectedFeatures != null) {
-                for (final Feature selectedFeature : selectedFeatures) {
-                    if (selectedFeature instanceof CidsFeature) {
-                        final CidsFeature selectedCidsFeature = (CidsFeature)selectedFeature;
-                        final int indexToSelect = kassenzeichenGeometrieBeans.indexOf(
-                                selectedCidsFeature.getMetaObject().getBean());
-                        if (indexToSelect >= 0) {
-                            indicesToSelect.add(indexToSelect);
+                    final CidsBean kassenzBean = getCidsBean();
+                    if (kassenzBean != null) {
+                        final Collection<Feature> selectedFeatures = featureCollection.getSelectedFeatures();
+                        final List<CidsBean> kassenzeichenGeometrieBeans = kassenzBean.getBeanCollectionProperty(
+                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHEN_GEOMETRIEN);
+
+                        final List<Integer> indicesToSelect = new ArrayList<Integer>();
+                        if (selectedFeatures != null) {
+                            for (final Feature selectedFeature : selectedFeatures) {
+                                if (selectedFeature instanceof CidsFeature) {
+                                    final CidsFeature selectedCidsFeature = (CidsFeature)selectedFeature;
+                                    final int indexToSelect = kassenzeichenGeometrieBeans.indexOf(
+                                            selectedCidsFeature.getMetaObject().getBean());
+                                    if (indexToSelect >= 0) {
+                                        indicesToSelect.add(indexToSelect);
+                                    }
+                                }
+                            }
                         }
+                        final int[] indicesArr = new int[indicesToSelect.size()];
+                        for (int index = 0; index < indicesArr.length; index++) {
+                            indicesArr[index] = indicesToSelect.get(index);
+                        }
+
+                        lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
+                        Main.getInstance().selectionChanged();
                     }
                 }
-            }
-            final int[] indicesArr = new int[indicesToSelect.size()];
-            for (int index = 0; index < indicesArr.length; index++) {
-                indicesArr[index] = indicesToSelect.get(index);
-            }
-
-            lstKassenzeichenGeometrien.setSelectedIndices(indicesArr);
-            Main.getInstance().selectionChanged();
-        }
+            });
     }
 
     /**
@@ -1202,7 +1211,8 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
                             "freie Geometrie",
                             true);
                     ((KassenzeichenGeometrienList)lstKassenzeichenGeometrien).addKassenzeichenGeometrieBean(
-                        kassenzeichenGeometrieBean);
+                        kassenzeichenGeometrieBean,
+                        true);
                     Main.getMappingComponent().getFeatureCollection().removeFeature(pFeatureToAttach.getFeature());
                 } catch (Exception ex) {
                     LOG.error("error while attaching feature", ex);
