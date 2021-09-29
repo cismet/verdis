@@ -148,7 +148,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         aggVal.clear();
         aggVal.add(bindingValidator);
 
-        bindingGroup.unbind();
+        try {
+            bindingGroup.unbind();
+        } catch (final Exception ex) {
+            LOG.warn("error while unbinding", ex);
+        }
         kassenzeichenBean = cidsBean;
         bindingGroup.bind();
 

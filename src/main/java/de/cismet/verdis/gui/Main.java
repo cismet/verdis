@@ -1514,8 +1514,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                                     bezeichnung,
                                                     false);
                                             kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList()
-                                                    .addKassenzeichenGeometrieBean(
-                                                        kassenzeichenGeometrieBean);
+                                                    .addKassenzeichenGeometrieBean(kassenzeichenGeometrieBean, false);
                                         } catch (Exception ex) {
                                             LOG.fatal("", ex);
                                         }
