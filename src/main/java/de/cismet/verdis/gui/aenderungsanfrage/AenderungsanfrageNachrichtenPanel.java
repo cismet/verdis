@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
@@ -50,7 +51,10 @@ import de.cismet.verdis.EditModeListener;
 
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtJson;
+import de.cismet.verdis.server.json.NachrichtParameterJson;
+import de.cismet.verdis.server.json.NachrichtParameterNotifyJson;
 import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
+import de.cismet.verdis.server.json.NachrichtSystemJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -81,6 +85,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -146,6 +151,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         java.awt.GridBagConstraints gridBagConstraints;
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        jButton6 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -167,6 +173,19 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton6,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jButton6.text")); // NOI18N
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton6ActionPerformed(evt);
+                }
+            });
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -605,6 +624,40 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
+        final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+
+        final NachrichtJson nachrichtJson = new NachrichtSystemJson(
+                null,
+                null,
+                null,
+                new NachrichtParameterNotifyJson(false),
+                SessionManager.getSession().getUser().getName());
+        aenderungsanfrage.getNachrichten().add(nachrichtJson);
+        addNachricht(nachrichtJson);
+        jPanel1.remove(jButton6);
+
+        // nachricht tatsächlich senden
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    AenderungsanfrageHandler.getInstance()
+                            .sendAenderungsanfrage(new AenderungsanfrageJson(
+                                    aenderungsanfrage.getKassenzeichen(),
+                                    null,
+                                    null,
+                                    aenderungsanfrage.getNachrichten()));
+                    return null;
+                }
+            }.execute();
+    } //GEN-LAST:event_jButton6ActionPerformed
+
+    /**
+     * DOCUMENT ME!
      */
     private void redoLastMessage() {
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
@@ -663,6 +716,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
             jScrollPane1.getViewport().doLayout();
 
             if (nachrichten != null) {
+                NachrichtJson lastNachrichtJson = null;
                 for (final NachrichtJson nachrichtJson : nachrichten) {
                     if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
                                 && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
@@ -673,6 +727,24 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                         continue;
                     }
                     addNachricht(nachrichtJson);
+                    lastNachrichtJson = nachrichtJson;
+                }
+                if (!CidsAppBackend.getInstance().isEditable() && (lastNachrichtJson != null)) {
+                    if (NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
+                                && (lastNachrichtJson.getNachrichtenParameter() != null)
+                                && NachrichtParameterJson.Type.NOTIFY.equals(
+                                    lastNachrichtJson.getNachrichtenParameter().getType())) {
+                        // Narchricht bereits gesendet.
+                    } else {
+                        final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = GridBagConstraints.RELATIVE;
+                        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
+                        jPanel1.add(jButton6, gridBagConstraints);
+                        jScrollPane1.getViewport().doLayout();
+                    }
                 }
             }
 
