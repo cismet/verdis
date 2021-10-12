@@ -181,6 +181,7 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
             final Integer groesse = nachrichtenParameter.getGroesse();
             final FlaecheFlaechenartJson flaechenart = nachrichtenParameter.getFlaechenart();
             final FlaecheAnschlussgradJson anschlussgrad = nachrichtenParameter.getAnschlussgrad();
+            final Boolean benachrichtigt = nachrichtenParameter.getBenachrichtigt();
             final boolean accepted = NachrichtParameterJson.Type.CHANGED.equals(nachrichtenParameter.getType());
             final AenderungsanfrageUtils.Status status = nachrichtenParameter.getStatus();
             if (status != null) {
@@ -206,17 +207,31 @@ public class AenderungsanfrageNachrichtPanel extends javax.swing.JPanel {
                     }
                 }
             } else if (groesse != null) {
-                text = "Die Änderung der Größe der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf " + groesse
-                            + "m² wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
+                text = String.format(
+                        "Die Änderung der Größe der Fläche '%s' auf %dm² wurde von '%s' %s.",
+                        nachrichtenParameter.getFlaeche(),
+                        groesse,
+                        nachrichtJson.getAbsender(),
+                        accepted ? "angenommen" : "abgelehnt");
             } else if (flaechenart != null) {
-                text = "Die Änderung der Flächenart der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
-                            + flaechenart.getArt() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
+                text = String.format(
+                        "Die Änderung der Flächenart der Fläche '%s' auf '%s' wurde von '%s' %s.",
+                        nachrichtenParameter.getFlaeche(),
+                        flaechenart.getArt(),
+                        nachrichtJson.getAbsender(),
+                        accepted ? "angenommen" : "abgelehnt");
             } else if (anschlussgrad != null) {
-                text = "Die Änderung des Anschlussgrads der Fläche '" + nachrichtenParameter.getFlaeche() + "' auf '"
-                            + anschlussgrad.getGrad() + "' wurde von '" + nachrichtJson.getAbsender() + "' "
-                            + (accepted ? "angenommen" : "abgelehnt.");
+                text = String.format(
+                        "Die Änderung des Anschlussgrads der Fläche '%s' auf '%s' wurde von '%s' %s.",
+                        nachrichtenParameter.getFlaeche(),
+                        anschlussgrad.getGrad(),
+                        nachrichtJson.getAbsender(),
+                        accepted ? "angenommen" : "abgelehnt");
+            } else if (benachrichtigt != null) {
+                text = String.format(
+                        "Eine Änderungs-Benachrichtigung von '%s' wurde %s.",
+                        nachrichtJson.getAbsender(),
+                        benachrichtigt ? "versandt" : "angefordet");
             } else {
                 text = null;
             }
