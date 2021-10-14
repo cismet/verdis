@@ -497,9 +497,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         sendMessagePressed();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -516,31 +516,31 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         refresh();
         jToggleButton1.setToolTipText(jToggleButton1.isSelected() ? "Systemnachrichten verbergen"
                                                                   : "Systemnachrichten anzeigen");
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         try {
             BrowserLauncher.openURL("mailto:" + email);
         } catch (final Exception ex) {
             LOG.error(ex, ex);
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
 
         if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)) {
@@ -557,27 +557,27 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                             aenderungsanfrage,
                             ConnectionContext.createDeprecated()));
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    } //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jTextArea1KeyPressed(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea1KeyPressed
+    private void jTextArea1KeyPressed(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_jTextArea1KeyPressed
         if (KeyEvent.VK_UP == evt.getKeyCode()) {
             redoLastMessage();
         } else if ((KeyEvent.VK_ENTER == evt.getKeyCode()) && (evt.isControlDown() || evt.isAltDown())) {
             sendMessagePressed();
         }
-    }//GEN-LAST:event_jTextArea1KeyPressed
+    }                                                                      //GEN-LAST:event_jTextArea1KeyPressed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         jButton1.setEnabled(false);
         new SwingWorker<Void, Void>() {
 
@@ -592,14 +592,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     jButton1.setEnabled(true);
                 }
             }.execute();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    } //GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -620,14 +620,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    } //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
 
         final NachrichtJson nachrichtJson = new NachrichtSystemJson(
@@ -654,7 +654,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     return null;
                 }
             }.execute();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    } //GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -701,7 +701,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     }
                 });
         } else {
-            final List<NachrichtJson> nachrichten = (getAenderungsanfrage() != null) ? aenderungsanfrage.getNachrichten() : null;
+            final List<NachrichtJson> nachrichten = (getAenderungsanfrage() != null)
+                ? aenderungsanfrage.getNachrichten() : null;
             jScrollPane1.setViewportView(jPanel1 = createNewPanel());
 
             clear();
@@ -721,17 +722,20 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     addNachricht(nachrichtJson);
                     lastNachrichtJson = nachrichtJson;
                 }
-                
-                if (lastNachrichtJson != null && !CidsAppBackend.getInstance().isEditable()) {  // to ensure that all we don't send notifications before changes are undrafted
+
+                if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
                     final boolean notificationAlreadySent = NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
                                 && (lastNachrichtJson.getNachrichtenParameter() != null)
                                 && NachrichtParameterJson.Type.NOTIFY.equals(
                                     lastNachrichtJson.getNachrichtenParameter().getType());
-                    final boolean showButton 
-                            = !notificationAlreadySent
-                            && aenderungsanfrage.getEmailAdresse() != null && Boolean.TRUE.equals(aenderungsanfrage.getEmailVerifiziert()) // only if validated adress exists
-                            && SessionManager.getSession().getUser().getName().equals(lastNachrichtJson.getAbsender()) // only if last message was from "me"
-                        ;
+                    final boolean showButton = !notificationAlreadySent
+                                && (aenderungsanfrage.getEmailAdresse() != null)
+                                && Boolean.TRUE.equals(aenderungsanfrage.getEmailVerifiziert())     // only if validated adress exists
+                                && SessionManager.getSession()
+                                .getUser()
+                                .getName()
+                                .equals(lastNachrichtJson.getAbsender())                            // only if last message was from "me"
+                    ;
                     if (showButton) {
                         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                         gridBagConstraints.gridx = 0;
