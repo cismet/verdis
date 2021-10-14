@@ -692,24 +692,17 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  aenderungsanfrage  DOCUMENT ME!
      */
     private void refresh(final AenderungsanfrageJson aenderungsanfrage) {
-        refresh((getAenderungsanfrage() != null) ? aenderungsanfrage.getNachrichten() : null);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  nachrichten  DOCUMENT ME!
-     */
-    private void refresh(final List<NachrichtJson> nachrichten) {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        refresh(nachrichten);
+                        refresh(aenderungsanfrage);
                     }
                 });
         } else {
+            final List<NachrichtJson> nachrichten = (getAenderungsanfrage() != null)
+                ? aenderungsanfrage.getNachrichten() : null;
             jScrollPane1.setViewportView(jPanel1 = createNewPanel());
 
             clear();
@@ -729,13 +722,21 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     addNachricht(nachrichtJson);
                     lastNachrichtJson = nachrichtJson;
                 }
-                if (!CidsAppBackend.getInstance().isEditable() && (lastNachrichtJson != null)) {
-                    if (NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
+
+                if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
+                    final boolean notificationAlreadySent = NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
                                 && (lastNachrichtJson.getNachrichtenParameter() != null)
                                 && NachrichtParameterJson.Type.NOTIFY.equals(
-                                    lastNachrichtJson.getNachrichtenParameter().getType())) {
-                        // Narchricht bereits gesendet.
-                    } else {
+                                    lastNachrichtJson.getNachrichtenParameter().getType());
+                    final boolean showButton = !notificationAlreadySent
+                                && (aenderungsanfrage.getEmailAdresse() != null)
+                                && Boolean.TRUE.equals(aenderungsanfrage.getEmailVerifiziert())     // only if validated adress exists
+                                && SessionManager.getSession()
+                                .getUser()
+                                .getName()
+                                .equals(lastNachrichtJson.getAbsender())                            // only if last message was from "me"
+                    ;
+                    if (showButton) {
                         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                         gridBagConstraints.gridx = 0;
                         gridBagConstraints.gridy = GridBagConstraints.RELATIVE;
