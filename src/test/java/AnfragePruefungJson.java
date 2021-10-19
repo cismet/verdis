@@ -148,6 +148,8 @@ public class AnfragePruefungJson {
 
         final AenderungsanfrageJson aenderungsanfrage = new AenderungsanfrageJson(
                 60004629,
+                null,
+                null,
                 flaechen,
                 null,
                 nachrichten

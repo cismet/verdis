@@ -483,6 +483,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                         AenderungsanfrageHandler.getInstance()
                                 .sendAenderungsanfrage(new AenderungsanfrageJson(
                                         aenderungsanfrage.getKassenzeichen(),
+                                        aenderungsanfrage.getEmailAdresse(),
+                                        null,
+                                        aenderungsanfrage.getEmailVerifiziert(),
                                         null,
                                         null,
                                         aenderungsanfrage.getNachrichten()));
@@ -648,6 +651,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     AenderungsanfrageHandler.getInstance()
                             .sendAenderungsanfrage(new AenderungsanfrageJson(
                                     aenderungsanfrage.getKassenzeichen(),
+                                    aenderungsanfrage.getEmailAdresse(),
+                                    null,
+                                    aenderungsanfrage.getEmailVerifiziert(),
                                     null,
                                     null,
                                     aenderungsanfrage.getNachrichten()));
@@ -711,6 +717,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
             if (nachrichten != null) {
                 NachrichtJson lastNachrichtJson = null;
                 for (final NachrichtJson nachrichtJson : nachrichten) {
+                    lastNachrichtJson = nachrichtJson;
                     if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
                                 && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
                         continue;
@@ -720,7 +727,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                         continue;
                     }
                     addNachricht(nachrichtJson);
-                    lastNachrichtJson = nachrichtJson;
                 }
 
                 if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
