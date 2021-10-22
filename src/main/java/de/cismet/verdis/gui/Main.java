@@ -5796,7 +5796,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     @Override
                     protected CidsBean doInBackground() throws Exception {
                         final CidsBean savedKassenzeichenBean = saveKassenzeichen(kassenzeichenBean);
-                        if (returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT) {
+                        final boolean veranlagt = returnType == AssessmentDialog.RETURN_WITH_ASSESSEMENT;
+                        if (veranlagt) {
                             try {
                                 saveAssessement(
                                     changedVeranlagungSummeMap,
@@ -5829,7 +5830,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
-                        AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean);
+                        AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean, veranlagt);
 
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();

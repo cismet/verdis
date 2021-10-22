@@ -6,10 +6,7 @@
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.FlaecheAenderungFlaechenartJson;
 import de.cismet.verdis.server.json.FlaecheAenderungGroesseJson;
@@ -33,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -157,14 +153,4 @@ public class AnfragePruefungJson {
         return aenderungsanfrage;
     }
 
-    //@Test
-    public void testAenderungsanfragePruefung() throws JsonProcessingException, Exception {        
-            final AenderungsanfrageJson anfrageJson = getComplexAnfrageJson();
-            final CidsBean kassenzeichenBean = CidsBean.createNewCidsBeanFromJSON(
-                true, 
-                IOUtils.toString(getClass().getClassLoader().getResourceAsStream("kassenzeichen60004629.json"), "UTF-8")
-            );            
-            
-            AenderungsanfrageHandler.getInstance().doPruefung(anfrageJson, kassenzeichenBean, new Date());            
-    }
 }
