@@ -730,18 +730,24 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 }
 
                 if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
-                    final boolean notificationAlreadySent = NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
+                    final boolean lastMessageIsNotification =
+                        NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
                                 && (lastNachrichtJson.getNachrichtenParameter() != null)
                                 && NachrichtParameterJson.Type.NOTIFY.equals(
                                     lastNachrichtJson.getNachrichtenParameter().getType());
-                    final boolean showButton = !notificationAlreadySent
-                                && (aenderungsanfrage.getEmailAdresse() != null)
-                                && Boolean.TRUE.equals(aenderungsanfrage.getEmailVerifiziert())     // only if validated adress exists
-                                && SessionManager.getSession()
+                    final boolean lastMessageIsStatusDone = (lastNachrichtJson.getNachrichtenParameter() != null)
+                                && AenderungsanfrageUtils.Status.NONE.equals(lastNachrichtJson.getNachrichtenParameter()
+                                    .getStatus());
+                    final boolean lastMessageWasFromMe = SessionManager.getSession()
                                 .getUser()
                                 .getName()
-                                .equals(lastNachrichtJson.getAbsender())                            // only if last message was from "me"
-                    ;
+                                .equals(lastNachrichtJson.getAbsender());
+                    final boolean hasVerifiedEmail = (aenderungsanfrage.getEmailAdresse() != null)
+                                && Boolean.TRUE.equals(aenderungsanfrage.getEmailVerifiziert());
+                    final boolean showButton = hasVerifiedEmail
+                                && lastMessageWasFromMe
+                                && !lastMessageIsNotification
+                                && !lastMessageIsStatusDone;
                     if (showButton) {
                         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                         gridBagConstraints.gridx = 0;
