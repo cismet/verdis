@@ -474,24 +474,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
             // GUI vorab schonmal anpassen
             addNachricht(nachrichtJson);
             jTextArea1.setText("");
-
-            // nachricht tatsächlich senden
-            new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        AenderungsanfrageHandler.getInstance()
-                                .sendAenderungsanfrage(new AenderungsanfrageJson(
-                                        aenderungsanfrage.getKassenzeichen(),
-                                        aenderungsanfrage.getEmailAdresse(),
-                                        null,
-                                        aenderungsanfrage.getEmailVerifiziert(),
-                                        null,
-                                        null,
-                                        aenderungsanfrage.getNachrichten()));
-                        return null;
-                    }
-                }.execute();
         }
     }
 

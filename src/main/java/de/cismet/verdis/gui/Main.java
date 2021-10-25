@@ -3852,6 +3852,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    AenderungsanfrageHandler.getInstance().cancelProcessing();
                     releaseLocks();
                     return null;
                 }
