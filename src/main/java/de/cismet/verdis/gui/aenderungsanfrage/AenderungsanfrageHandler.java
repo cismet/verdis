@@ -18,6 +18,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import com.sun.org.apache.bcel.internal.generic.ANEWARRAY;
+
 import org.geojson.Feature;
 
 import java.sql.Timestamp;
@@ -25,7 +27,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.SwingWorker;
@@ -49,7 +54,12 @@ import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.AenderungsanfrageResultJson;
+import de.cismet.verdis.server.json.FlaecheAenderungAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaecheAenderungFlaechenartJson;
+import de.cismet.verdis.server.json.FlaecheAenderungGroesseJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
+import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
+import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
 import de.cismet.verdis.server.json.FlaechePruefungJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
@@ -346,7 +356,6 @@ public class AenderungsanfrageHandler {
             final CidsAppBackend.StacOptionsEntry stacEntry = (stacId != null)
                 ? CidsAppBackend.getInstance().getStacOptionsEntry(stacId) : null;
             final Timestamp expiratonDate = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-            boolean anyChanges = false;
             if ((expiratonDate != null) && expiratonDate.after(new Date())) {
                 // create empty draft pruefung for signaling start of processing
                 for (final String bezeichnung : aenderungsanfrage.getFlaechen().keySet()) {
@@ -354,20 +363,6 @@ public class AenderungsanfrageHandler {
                     if (flaeche != null) {
                         if (flaeche.getPruefung() == null) {
                             flaeche.setPruefung(new FlaechePruefungJson(null, null, null));
-                            anyChanges = true;
-                        }
-                        if ((flaeche.getGroesse() != null) && (flaeche.getPruefung().getGroesse() == null)) {
-                            flaeche.getPruefung().setGroesse(new PruefungGroesseJson());
-                            anyChanges = true;
-                        }
-                        if ((flaeche.getAnschlussgrad() != null)
-                                    && (flaeche.getPruefung().getAnschlussgrad() == null)) {
-                            flaeche.getPruefung().setAnschlussgrad(new PruefungAnschlussgradJson());
-                            anyChanges = true;
-                        }
-                        if ((flaeche.getFlaechenart() != null) && (flaeche.getPruefung().getFlaechenart() == null)) {
-                            flaeche.getPruefung().setFlaechenart(new PruefungFlaechenartJson());
-                            anyChanges = true;
                         }
                     }
                 }
@@ -376,13 +371,9 @@ public class AenderungsanfrageHandler {
                     if ((feature != null) && !Boolean.TRUE.equals(feature.getProperty("draft"))) {
                         if (feature.getProperty("pruefung") == null) {
                             feature.setProperty("pruefung", false);
-                            anyChanges = true;
                         }
                     }
                 }
-            }
-            if (anyChanges) {
-                sendAenderungsanfrage(aenderungsanfrage);
             }
         }
     }
@@ -398,13 +389,131 @@ public class AenderungsanfrageHandler {
     public void finishProcessing(final CidsBean kassenzeichenBean, final boolean veranlagt) throws Exception {
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-            final Integer stacId = (aenderungsanfrage != null) ? getStacId() : null;
-            final CidsAppBackend.StacOptionsEntry stacEntry = (stacId != null)
-                ? CidsAppBackend.getInstance().getStacOptionsEntry(stacId) : null;
-            final Timestamp expiratonDate = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-            if ((kassenzeichenBean != null) && (expiratonDate != null) && expiratonDate.after(new Date())) {
-                sendAenderungsanfrage(aenderungsanfrage, veranlagt);
+            for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
+                if ((nachricht != null) && NachrichtJson.Typ.CLERK.equals(nachricht.getTyp())
+                            && Boolean.TRUE.equals(nachricht.getDraft())) {
+                    nachricht.setDraft(null);
+                }
             }
+
+            final Map<String, CidsBean> existingFlaechen = new HashMap<>();
+            for (final CidsBean flaecheBean
+                        : kassenzeichenBean.getBeanCollectionProperty(VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN)) {
+                final String flaechenBezeichnung = (String)flaecheBean.getProperty(
+                        VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+                if (flaechenBezeichnung != null) {
+                    existingFlaechen.put(flaechenBezeichnung.toUpperCase(), flaecheBean);
+                }
+            }
+
+            for (final String bezeichnung : aenderungsanfrage.getFlaechen().keySet()) {
+                final FlaecheAenderungJson flaeche = aenderungsanfrage.getFlaechen().get(bezeichnung);
+                final FlaechePruefungJson pruefung = (flaeche != null) ? flaeche.getPruefung() : null;
+                final PruefungGroesseJson pruefungGroesse = (pruefung != null) ? pruefung.getGroesse() : null;
+                final PruefungFlaechenartJson pruefungFlaechenart = (pruefung != null) ? pruefung.getFlaechenart()
+                                                                                       : null;
+                final PruefungAnschlussgradJson pruefungAnschlussgrad = (pruefung != null) ? pruefung
+                                .getAnschlussgrad() : null;
+
+                final CidsBean flaecheBean = existingFlaechen.get(bezeichnung);
+                final Integer groesseCids = (flaecheBean != null)
+                    ? (Integer)flaecheBean.getProperty(
+                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                + "."
+                                + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
+                final FlaecheFlaechenartJson flaechenartCids =
+                    ((flaecheBean != null)
+                                && (flaecheBean.getProperty(
+                                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART) != null))
+                    ? new FlaecheFlaechenartJson((String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENART.ART),
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG)) : null;
+                final FlaecheAnschlussgradJson anschlussgradCids =
+                    ((flaecheBean != null)
+                                && (flaecheBean.getProperty(
+                                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                        + "."
+                                        + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD) != null))
+                    ? new FlaecheAnschlussgradJson((String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                    + "."
+                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD),
+                        (String)flaecheBean.getProperty(
+                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
+                                    + "."
+                                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
+                                    + "."
+                                    + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG)) : null;
+
+                if ((pruefungGroesse != null) && !Objects.equals(pruefungGroesse, groesseCids)) {
+                    pruefungGroesse.setValue(groesseCids);
+                    pruefungGroesse.setPending(Boolean.TRUE);
+                }
+                if ((pruefungFlaechenart != null) && !Objects.equals(pruefungFlaechenart, flaechenartCids)) {
+                    pruefungFlaechenart.setValue(flaechenartCids);
+                    pruefungFlaechenart.setPending(Boolean.TRUE);
+                }
+                if ((pruefungAnschlussgrad != null) && !Objects.equals(pruefungAnschlussgrad, anschlussgradCids)) {
+                    pruefungAnschlussgrad.setValue(anschlussgradCids);
+                    pruefungAnschlussgrad.setPending(Boolean.TRUE);
+                }
+            }
+
+            sendAenderungsanfrage(aenderungsanfrage, veranlagt);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void cancelProcessing() throws Exception {
+        if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
+            final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
+
+            final Collection<NachrichtJson> nachrichtenToRemove = new HashSet<>();
+            for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
+                if ((nachricht != null) && NachrichtJson.Typ.CLERK.equals(nachricht.getTyp())
+                            && Boolean.TRUE.equals(nachricht.getDraft())) {
+                    nachrichtenToRemove.add(nachricht);
+                }
+            }
+            aenderungsanfrage.getNachrichten().removeAll(nachrichtenToRemove);
+
+            for (final FlaecheAenderungJson flaeche : aenderungsanfrage.getFlaechen().values()) {
+                if (flaeche != null) {
+                    final FlaechePruefungJson pruefung = flaeche.getPruefung();
+                    if (pruefung != null) {
+                        if ((pruefung.getFlaechenart() != null)
+                                    && Boolean.TRUE.equals(pruefung.getFlaechenart().getPending())) {
+                            pruefung.setFlaechenart(null);
+                        }
+                        if ((pruefung.getAnschlussgrad() != null)
+                                    && Boolean.TRUE.equals(pruefung.getAnschlussgrad().getPending())) {
+                            pruefung.setAnschlussgrad(null);
+                        }
+                        if ((pruefung.getGroesse() != null)
+                                    && Boolean.TRUE.equals(pruefung.getGroesse().getPending())) {
+                            pruefung.setGroesse(null);
+                        }
+                    }
+                }
+            }
+            sendAenderungsanfrage(aenderungsanfrage);
         }
     }
 
