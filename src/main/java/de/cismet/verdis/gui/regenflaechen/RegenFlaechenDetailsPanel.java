@@ -842,8 +842,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                                 + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR) : null;
                 final Integer groesseAenderung = flaecheJson.getGroesse();
                 final boolean hasPruefungGroesse = (flaecheJson.getPruefung() != null)
-                            && ((flaecheJson.getPruefung().getGroesse() != null)
-                                && !Boolean.TRUE.equals(flaecheJson.getPruefung().getGroesse().getPending()));
+                            && (flaecheJson.getPruefung().getGroesse() != null);
                 doAenderungChanges(
                     lblGroesseAenderung,
                     btnGroesseAenderungAccept,
@@ -867,8 +866,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final String flaechenartAenderung = (flaecheJson.getFlaechenart() != null)
                     ? flaecheJson.getFlaechenart().getArtAbkuerzung() : null;
                 final boolean hasPruefungFlaechenart = (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getFlaechenart() != null)
-                            && !Boolean.TRUE.equals(flaecheJson.getPruefung().getFlaechenart().getPending());
+                            && (flaecheJson.getPruefung().getFlaechenart() != null);
                 doAenderungChanges(
                     lblFlaechenartAenderung,
                     btnFlaechenartAenderungAccept,
@@ -892,8 +890,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 final String anschlussgradAenderung = (flaecheJson.getAnschlussgrad() != null)
                     ? flaecheJson.getAnschlussgrad().getGradAbkuerzung() : null;
                 final boolean hasPruefungAnschlussgrad = (flaecheJson.getPruefung() != null)
-                            && (flaecheJson.getPruefung().getAnschlussgrad() != null)
-                            && !Boolean.TRUE.equals(flaecheJson.getPruefung().getAnschlussgrad().getPending());
+                            && (flaecheJson.getPruefung().getAnschlussgrad() != null);
                 doAenderungChanges(
                     lblAnschlussgradAenderung,
                     btnAnschlussgradAenderungAccept,
@@ -2057,13 +2054,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         binding.setSourceUnreadableValue("");
         bindingGroup.addBinding(binding);
 
-        txtGroesseKorrektur.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final java.beans.PropertyChangeEvent evt) {
-                    txtGroesseKorrekturPropertyChange(evt);
-                }
-            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -2490,6 +2480,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         pruefungAenderungAnschlussgrad(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
     }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungAcceptActionPerformed
+
     @Override
     protected void setAnnotationGeoJsonFeature(final Feature geoJsonFeature) {
         this.geoJsonFeature = geoJsonFeature;
@@ -2501,17 +2492,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jToggleButton1.setSelected(Boolean.TRUE.equals(pruefung));
         jToggleButton1ActionPerformed(null);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void txtGroesseKorrekturPropertyChange(final java.beans.PropertyChangeEvent evt) { //GEN-FIRST:event_txtGroesseKorrekturPropertyChange
-//        if (flaecheBean != null) {
-//            refreshAenderungButtons(isEnabled());
-//        }
-    } //GEN-LAST:event_txtGroesseKorrekturPropertyChange
 
     /**
      * DOCUMENT ME!
