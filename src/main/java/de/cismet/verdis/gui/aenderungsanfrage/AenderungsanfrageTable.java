@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableModel;
 
@@ -136,7 +137,17 @@ public class AenderungsanfrageTable extends JXTable {
      * DOCUMENT ME!
      */
     public void update() {
-        ((AenderungsanfrageTableModel)getModel()).fireTableDataChanged();
+        SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        ((AenderungsanfrageTableModel)getModel()).fireTableDataChanged();
+                    } catch (final Exception ex) {
+                        LOG.warn("could not update AenderungsanfrageTableModel", ex);
+                    }
+                }
+            });
     }
 
     /**
