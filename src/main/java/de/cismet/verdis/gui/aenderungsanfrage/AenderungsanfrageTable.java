@@ -323,14 +323,15 @@ public class AenderungsanfrageTable extends JXTable {
             boolean show = true;
 
             try {
-                final AenderungsanfrageJson aenderungsAnfrage = (aenderungsanfrageBean != null)
-                    ? AenderungsanfrageUtils.getInstance()
-                            .createAenderungsanfrageJson((String)aenderungsanfrageBean.getProperty(
-                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)) : null;
-                if ((aenderungsAnfrage != null) && (aenderungsAnfrage.getNachrichten() != null)
-                            && !aenderungsAnfrage.getNachrichten().isEmpty()) {
+                final String aenderungsanfrageJson = (aenderungsanfrageBean != null)
+                    ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)
+                    : null;
+                final AenderungsanfrageJson aenderungsanfrage = (aenderungsanfrageJson != null)
+                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(aenderungsanfrageJson) : null;
+                if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)
+                            && !aenderungsanfrage.getNachrichten().isEmpty()) {
                     boolean atLeastOneIsNoDraft = false;
-                    for (final NachrichtJson nachricht : aenderungsAnfrage.getNachrichten()) {
+                    for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
                         if (!Boolean.TRUE.equals(nachricht.getDraft())) {
                             atLeastOneIsNoDraft = true;
                             break;
@@ -344,8 +345,9 @@ public class AenderungsanfrageTable extends JXTable {
             }
 
             if (filterUsername) {
-                final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
-                show &= (stacOptions != null) && Objects.equals(username, stacOptions.getCreatorUserName());
+                final String clerkUsername = (String)aenderungsanfrageBean.getProperty(
+                        VerdisConstants.PROP.AENDERUNGSANFRAGE.CLERK_USERNAME);
+                show &= (clerkUsername != null) && Objects.equals(username, clerkUsername);
             }
             if (filterKassenzeichen) {
                 show &= Objects.equals(
@@ -394,11 +396,12 @@ public class AenderungsanfrageTable extends JXTable {
                                 VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
                 }
                 case 1: {
-                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
-                    final StacOptionsJson stacOptions = (stacEntry != null) ? stacEntry.getStacOptionsJson() : null;
-                    return (stacOptions != null)
-                        ? ((!SessionManager.getSession().getUser().getName().equals(stacOptions.getCreatorUserName()))
-                            ? "*****" : "ich") : null;
+                    final String clerkUsername = (String)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CLERK_USERNAME);
+                    return
+                        (((clerkUsername != null)
+                                        && (SessionManager.getSession().getUser().getName().equals(clerkUsername)))
+                            ? "ich" : "*****");
                 }
                 case 2: {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
