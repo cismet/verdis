@@ -281,6 +281,7 @@ public class EBGenerator {
                     .createConnection(
                         RESTfulConnection.class.getCanonicalName(),
                         info.getCallserverURL(),
+                        // EBGenerator.class.getSimpleName(),
                         ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         connectionContext);

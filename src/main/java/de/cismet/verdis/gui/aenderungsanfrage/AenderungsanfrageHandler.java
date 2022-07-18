@@ -18,7 +18,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 
-import com.sun.org.apache.bcel.internal.generic.ANEWARRAY;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.geojson.Feature;
 
@@ -54,9 +55,6 @@ import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.AenderungsanfrageResultJson;
-import de.cismet.verdis.server.json.FlaecheAenderungAnschlussgradJson;
-import de.cismet.verdis.server.json.FlaecheAenderungFlaechenartJson;
-import de.cismet.verdis.server.json.FlaecheAenderungGroesseJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
 import de.cismet.verdis.server.json.FlaecheAnschlussgradJson;
 import de.cismet.verdis.server.json.FlaecheFlaechenartJson;
@@ -89,6 +87,9 @@ public class AenderungsanfrageHandler {
     private ChangeListenerHandler changeListenerHandler = new ChangeListenerHandler();
     private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
+    @Getter private boolean filterActive = true;
+    @Getter private boolean filterOwn = true;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -118,7 +119,7 @@ public class AenderungsanfrageHandler {
                                                         serverMessage.getAenderungsanfrage()));
                                             }
                                         }
-                                        reload();
+                                        reloadCurrentAnfrage();
                                     } catch (final Exception ex) {
                                         LOG.warn(ex, ex);
                                     }
@@ -230,7 +231,7 @@ public class AenderungsanfrageHandler {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public void reload() throws Exception {
+    public void reloadCurrentAnfrage() throws Exception {
         loadByStacId(getStacId());
     }
 
@@ -246,13 +247,40 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
-     * @throws  Exception  DOCUMENT ME!
+     * @param  newAenderungsanfrageBeans  DOCUMENT ME!
      */
-    public void reloadBeans() throws Exception {
+    public void setAenderungsanfrageBeans(final List<CidsBean> newAenderungsanfrageBeans) {
         final List<CidsBean> aenderungsanfrageBeans = getAenderungsanfrageBeans();
         aenderungsanfrageBeans.clear();
-        aenderungsanfrageBeans.addAll(searchAll());
+        aenderungsanfrageBeans.addAll(newAenderungsanfrageBeans);
         getChangeListenerHandler().aenderungsanfrageBeansChanged(aenderungsanfrageBeans);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void reloadAenderungsanfrageBeans() throws Exception {
+        final List<CidsBean> aenderungsanfrageBeans = getAenderungsanfrageBeans();
+        changeListenerHandler.loadingStarted();
+        new SwingWorker<List<CidsBean>, Void>() {
+
+                @Override
+                protected List<CidsBean> doInBackground() throws Exception {
+                    return searchAll();
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        setAenderungsanfrageBeans(get());
+                        changeListenerHandler.loadingFinished();
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    }
+                }
+            }.execute();
     }
 
     /**
@@ -602,6 +630,36 @@ public class AenderungsanfrageHandler {
     /**
      * DOCUMENT ME!
      *
+     * @param  filterActive  DOCUMENT ME!
+     */
+    public void setFilterActive(final boolean filterActive) {
+        this.filterActive = filterActive;
+        if (!filterActive) {
+            try {
+                reloadAenderungsanfrageBeans();
+            } catch (final Exception exception) {
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  filterOwn  DOCUMENT ME!
+     */
+    public void setFilterOwn(final boolean filterOwn) {
+        this.filterOwn = filterOwn;
+        if (!filterOwn) {
+            try {
+                reloadAenderungsanfrageBeans();
+            } catch (final Exception exception) {
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -611,6 +669,16 @@ public class AenderungsanfrageHandler {
 
         if (CidsAppBackend.getInstance().getAppPreferences().isAenderungsanfrageEnabled()) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
+            if (isFilterActive()) {
+                search.setActive(Boolean.TRUE);
+            } else {
+                search.setActive(null);
+            }
+
+            if (isFilterOwn()) {
+                search.setClerk(SessionManager.getSession().getUser().getName());
+            }
+
             try {
                 final Collection<MetaObjectNode> mons = SessionManager.getProxy()
                             .customServerSearch(SessionManager.getSession().getUser(), search);
@@ -657,6 +725,16 @@ public class AenderungsanfrageHandler {
     public static interface ChangeListener {
 
         //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         */
+        void loadingStarted();
+
+        /**
+         * DOCUMENT ME!
+         */
+        void loadingFinished();
 
         /**
          * DOCUMENT ME!
@@ -715,6 +793,20 @@ public class AenderungsanfrageHandler {
          */
         public Collection<ChangeListener> getChangeListeners() {
             return changeListeners;
+        }
+
+        @Override
+        public void loadingStarted() {
+            for (final ChangeListener listener : changeListeners) {
+                listener.loadingStarted();
+            }
+        }
+
+        @Override
+        public void loadingFinished() {
+            for (final ChangeListener listener : changeListeners) {
+                listener.loadingFinished();
+            }
         }
 
         @Override

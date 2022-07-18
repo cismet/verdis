@@ -15,7 +15,6 @@ import org.jdesktop.swingx.JXTable;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -57,7 +56,9 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     private javax.swing.Box.Filler filler3;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
@@ -94,7 +95,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                                         final KassenzeichenChangeRequestServerAction.ServerMessage serverMessage =
                                             (KassenzeichenChangeRequestServerAction.ServerMessage)event
                                             .getMessage().getContent();
-                                        AenderungsanfrageHandler.getInstance().reloadBeans();
+                                        AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
                                     } catch (final Exception ex) {
                                         LOG.warn(ex, ex);
                                     }
@@ -107,16 +108,13 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                         + " nicht abfragen.",
                 ex);
         }
-        new SwingWorker<Void, Void>() {
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    AenderungsanfrageHandler.getInstance().reloadBeans();
-                    return null;
-                }
-            }.execute();
-
         AenderungsanfrageHandler.getInstance().addChangeListener(this);
+
+        try {
+            AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -130,8 +128,6 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        aenderungsanfrageTable1 = new de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTable();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
@@ -144,26 +140,12 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
         jButton2 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        aenderungsanfrageTable1 = new de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTable();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
-
-        aenderungsanfrageTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-
-                @Override
-                public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                    aenderungsanfrageTable1MouseClicked(evt);
-                }
-            });
-        jScrollPane1.setViewportView(aenderungsanfrageTable1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jScrollPane1, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -336,6 +318,37 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jPanel1, gridBagConstraints);
+
+        aenderungsanfrageTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    aenderungsanfrageTable1MouseClicked(evt);
+                }
+            });
+        jScrollPane1.setViewportView(aenderungsanfrageTable1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        add(jScrollPane1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jLabel1.text")); // NOI18N
+        jPanel2.add(jLabel1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(jPanel2, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -344,21 +357,31 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     */
+
+    @Override
+    public void loadingStarted() {
         jButton1.setEnabled(false);
-        new SwingWorker<Void, Void>() {
+        jPanel2.setVisible(true);
+        jLabel1.setText("Anfragen werden neu geladen ...");
+        refreshFilterButtons();
+    }
 
-                @Override
-                protected Void doInBackground() throws Exception {
-                    AenderungsanfrageHandler.getInstance().reloadBeans();
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    jButton1.setEnabled(true);
-                }
-            }.execute();
-    } //GEN-LAST:event_jButton1ActionPerformed
+    @Override
+    public void loadingFinished() {
+        jButton1.setEnabled(true);
+        jPanel2.setVisible(false);
+        refreshFilterButtons();
+    }
 
     /**
      * DOCUMENT ME!
@@ -389,6 +412,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
      */
     private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         aenderungsanfrageTable1.setFilterUsername(jToggleButton1.isSelected());
+        AenderungsanfrageHandler.getInstance().setFilterOwn(jToggleButton1.isSelected());
     }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
@@ -407,6 +431,7 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
      */
     private void jToggleButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton3ActionPerformed
         aenderungsanfrageTable1.setFilterActive(jToggleButton3.isSelected());
+        AenderungsanfrageHandler.getInstance().setFilterActive(jToggleButton3.isSelected());
     }                                                                                  //GEN-LAST:event_jToggleButton3ActionPerformed
 
     /**
@@ -444,5 +469,13 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     @Override
     public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
         aenderungsanfrageTable1.setCidsBeans(aenderungsanfrageBeans);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void refreshFilterButtons() {
+        jToggleButton3.setSelected(AenderungsanfrageHandler.getInstance().isFilterActive());
+        jToggleButton1.setSelected(AenderungsanfrageHandler.getInstance().isFilterOwn());
     }
 }

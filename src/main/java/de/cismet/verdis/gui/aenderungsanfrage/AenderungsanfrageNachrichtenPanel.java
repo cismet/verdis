@@ -865,6 +865,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
     }
 
+    @Override
+    public void loadingStarted() {
+    }
+
+    @Override
+    public void loadingFinished() {
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
