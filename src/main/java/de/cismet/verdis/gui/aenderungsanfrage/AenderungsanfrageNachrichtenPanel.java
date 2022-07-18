@@ -568,7 +568,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
                 @Override
                 protected Void doInBackground() throws Exception {
-                    AenderungsanfrageHandler.getInstance().reload();
+                    AenderungsanfrageHandler.getInstance().reloadCurrentAnfrage();
                     return null;
                 }
 
@@ -599,7 +599,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     try {
                         get();
                         jButton5.setEnabled(false);
-                        AenderungsanfrageHandler.getInstance().reloadBeans();
+                        AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
                     }
@@ -863,6 +863,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
     @Override
     public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
+    }
+
+    @Override
+    public void loadingStarted() {
+    }
+
+    @Override
+    public void loadingFinished() {
     }
 
     //~ Inner Classes ----------------------------------------------------------
