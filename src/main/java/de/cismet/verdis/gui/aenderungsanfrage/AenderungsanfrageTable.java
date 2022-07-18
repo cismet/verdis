@@ -28,8 +28,6 @@ import java.awt.event.MouseEvent;
 
 import java.sql.Timestamp;
 
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +49,6 @@ import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtJson;
-import de.cismet.verdis.server.json.StacOptionsJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -64,7 +61,6 @@ public class AenderungsanfrageTable extends JXTable {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final transient Logger LOG = Logger.getLogger(AenderungsanfrageTable.class);
     private static final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
 
@@ -355,8 +351,13 @@ public class AenderungsanfrageTable extends JXTable {
                         aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER));
             }
             if (filterActive) {
-                final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-                show &= (timestamp != null) && timestamp.after(now);
+                final String status = (String)aenderungsanfrageBean.getProperty(
+                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                + "."
+                                + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL);
+                show &= !Objects.equals(
+                        status,
+                        AenderungsanfrageUtils.Status.ARCHIVED.toString());
             }
 
             return show;
@@ -407,9 +408,17 @@ public class AenderungsanfrageTable extends JXTable {
                     final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
                     final Timestamp now = new Timestamp(new Date().getTime());
                     final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-                    if ((timestamp != null) && timestamp.after(now)) {
+                    if (
+                        AenderungsanfrageUtils.Status.ARCHIVED.toString().equals(
+                                    aenderungsanfrageBean.getProperty(
+                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                        + "."
+                                        + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL))
+                                || ((timestamp != null) && timestamp.after(now))) {
                         return Objects.toString(aenderungsanfrageBean.getProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS));
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                            + "."
+                                            + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.NAME));
                     } else {
                         return "abgelaufen";
                     }

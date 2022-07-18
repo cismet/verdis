@@ -293,6 +293,14 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 @Override
                 public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
                 }
+
+                @Override
+                public void loadingStarted() {
+                }
+
+                @Override
+                public void loadingFinished() {
+                }
             });
     }
 
