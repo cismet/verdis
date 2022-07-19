@@ -12,9 +12,16 @@ import Sirius.navigator.exception.ConnectionException;
 
 import org.jdesktop.swingx.JXTable;
 
+import org.openide.util.Exceptions;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -28,8 +35,13 @@ import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
 import de.cismet.verdis.server.action.KassenzeichenChangeRequestServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.NachrichtParameterProlongJson;
+import de.cismet.verdis.server.json.NachrichtSystemJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -54,8 +66,11 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     private de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTable aenderungsanfrageTable1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.Box.Filler filler3;
+    private javax.swing.Box.Filler filler4;
+    private javax.swing.Box.Filler filler5;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -73,11 +88,21 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     public AenderungsanfrageTablePanel() {
         initComponents();
 
+        jButton7.setVisible(false);
         aenderungsanfrageTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
                 @Override
                 public void valueChanged(final ListSelectionEvent e) {
                     jButton2.setEnabled(aenderungsanfrageTable1.getSelectedAenderungsanfrageBean() != null);
+
+                    final CidsBean aenderungsanfrageBean = aenderungsanfrageTable1.getSelectedAenderungsanfrageBean();
+                    final String status = (aenderungsanfrageBean != null)
+                        ? (String)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                    + "."
+                                    + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL) : null;
+
+                    jButton7.setVisible(AenderungsanfrageUtils.Status.ARCHIVED.toString().equals(status));
                 }
             });
 
@@ -139,7 +164,14 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
+        jButton7 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
+        filler5 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
         jScrollPane1 = new javax.swing.JScrollPane();
         aenderungsanfrageTable1 = new de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageTable();
         jPanel2 = new javax.swing.JPanel();
@@ -172,13 +204,15 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
         jPanel1.add(jButton1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         jPanel1.add(filler3, gridBagConstraints);
@@ -209,7 +243,8 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel1.add(jToggleButton1, gridBagConstraints);
@@ -241,7 +276,8 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel1.add(jToggleButton2, gridBagConstraints);
@@ -273,16 +309,45 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         jPanel1.add(jToggleButton3, gridBagConstraints);
         // jToggleButton1.setVisible(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         jPanel1.add(filler2, gridBagConstraints);
+
+        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/verdis/res/prolongation.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton7,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton7.text"));                                                         // NOI18N
+        jButton7.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageTablePanel.class,
+                "AenderungsanfrageTablePanel.jButton7.toolTipText"));                                                  // NOI18N
+        jButton7.setBorderPainted(false);
+        jButton7.setContentAreaFilled(false);
+        jButton7.setFocusPainted(false);
+        jButton7.setMaximumSize(new java.awt.Dimension(24, 24));
+        jButton7.setMinimumSize(new java.awt.Dimension(24, 24));
+        jButton7.setPreferredSize(new java.awt.Dimension(24, 24));
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton7ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 1;
+        jPanel1.add(jButton7, gridBagConstraints);
 
         jButton2.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/kassenzeichen22.png"))); // NOI18N
@@ -308,10 +373,25 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
         jPanel1.add(jButton2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(filler4, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(filler5, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -372,15 +452,12 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     public void loadingStarted() {
         jButton1.setEnabled(false);
         jPanel2.setVisible(true);
-        jLabel1.setText("Anfragen werden neu geladen ...");
+        jLabel1.setText("Änderungsanfragen werden neu geladen ...");
         refreshFilterButtons();
     }
 
     @Override
     public void loadingFinished() {
-        jButton1.setEnabled(true);
-        jPanel2.setVisible(false);
-        refreshFilterButtons();
     }
 
     /**
@@ -437,6 +514,51 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
     /**
      * DOCUMENT ME!
      *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
+        jButton7.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    final CidsBean aenderungsanfrageBean = aenderungsanfrageTable1.getSelectedAenderungsanfrageBean();
+                    final String aenderungsanfrageJson = (aenderungsanfrageBean != null)
+                        ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)
+                        : null;
+                    final AenderungsanfrageJson aenderungsanfrage = (aenderungsanfrageJson != null)
+                        ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(aenderungsanfrageJson)
+                        : null;
+                    final Integer stacId = (Integer)aenderungsanfrageBean.getProperty(
+                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID);
+                    aenderungsanfrage.getNachrichten()
+                            .add(new NachrichtSystemJson(
+                                    null,
+                                    null,
+                                    null,
+                                    new NachrichtParameterProlongJson(Boolean.FALSE),
+                                    SessionManager.getSession().getUser().getName()));
+                    AenderungsanfrageHandler.getInstance().sendAenderungsanfrage(aenderungsanfrage, stacId);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                        AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    } finally {
+                        jButton7.setEnabled(true);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_jButton7ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     public JXTable getTable() {
@@ -468,7 +590,34 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
 
     @Override
     public void aenderungsanfrageBeansChanged(final List<CidsBean> aenderungsanfrageBeans) {
-        aenderungsanfrageTable1.setCidsBeans(aenderungsanfrageBeans);
+        new SwingWorker<Map<CidsBean, CidsAppBackend.StacOptionsEntry>, Void>() {
+
+                @Override
+                protected Map<CidsBean, CidsAppBackend.StacOptionsEntry> doInBackground() throws Exception {
+                    final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new LinkedHashMap<>();
+
+                    for (final CidsBean aenderungsanfrageBean : aenderungsanfrageBeans) {
+                        final CidsAppBackend.StacOptionsEntry entry = CidsAppBackend.getInstance()
+                                    .getStacOptionsEntry((Integer)aenderungsanfrageBean.getProperty(
+                                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID));
+                        beanToStacEntryMap.put(aenderungsanfrageBean, entry);
+                    }
+                    return beanToStacEntryMap;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        aenderungsanfrageTable1.setCidsBeans(get());
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    } finally {
+                        jButton1.setEnabled(true);
+                        jPanel2.setVisible(false);
+                        refreshFilterButtons();
+                    }
+                }
+            }.execute();
     }
 
     /**

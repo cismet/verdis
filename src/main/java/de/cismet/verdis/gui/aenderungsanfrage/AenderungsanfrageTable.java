@@ -28,15 +28,14 @@ import java.awt.event.MouseEvent;
 
 import java.sql.Timestamp;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.table.TableModel;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -44,8 +43,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
-
-import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtJson;
@@ -62,23 +59,6 @@ public class AenderungsanfrageTable extends JXTable {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(AenderungsanfrageTable.class);
-    private static final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
-
-    private static final String[] COLUMN_NAMES = {
-            "Kassenzeichen",
-            "Bearbeiter",
-            "Status",
-            "Letzte Änderung",
-            "gültig bis"
-        };
-
-    private static final Class[] COLUMN_CLASSES = {
-            String.class,
-            String.class,
-            String.class,
-            Timestamp.class,
-            Timestamp.class
-        };
 
     //~ Instance fields --------------------------------------------------------
 
@@ -203,35 +183,17 @@ public class AenderungsanfrageTable extends JXTable {
     /**
      * DOCUMENT ME!
      *
-     * @param  aenderungsanfrageBeans  DOCUMENT ME!
+     * @param  beanToStacEntryMap  DOCUMENT ME!
      */
-    public void setCidsBeans(final List<CidsBean> aenderungsanfrageBeans) {
-        getAenderungsanfrageTableModel().setCidsBeans(aenderungsanfrageBeans);
-        new SwingWorker<Map<CidsBean, CidsAppBackend.StacOptionsEntry>, Void>() {
+    public void setCidsBeans(final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap) {
+        final CidsBean selectedBean = getSelectedAenderungsanfrageBean();
 
-                @Override
-                protected Map<CidsBean, CidsAppBackend.StacOptionsEntry> doInBackground() throws Exception {
-                    final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
+        getAenderungsanfrageTableModel().getBeanToStacEntryMap().clear();
+        getAenderungsanfrageTableModel().getBeanToStacEntryMap().putAll(beanToStacEntryMap);
+        getAenderungsanfrageTableModel().setCidsBeans(Arrays.asList(
+                beanToStacEntryMap.keySet().toArray(new CidsBean[0])));
 
-                    for (final CidsBean aenderungsanfrageBean : aenderungsanfrageBeans) {
-                        final CidsAppBackend.StacOptionsEntry entry = CidsAppBackend.getInstance()
-                                    .getStacOptionsEntry((Integer)aenderungsanfrageBean.getProperty(
-                                            VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID));
-                        beanToStacEntryMap.put(aenderungsanfrageBean, entry);
-                    }
-                    return beanToStacEntryMap;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        AenderungsanfrageTable.this.beanToStacEntryMap.clear();
-                        AenderungsanfrageTable.this.beanToStacEntryMap.putAll(get());
-                    } catch (final Exception ex) {
-                    }
-                    update();
-                }
-            }.execute();
+        setSelectedAenderungsanfrageBean(selectedBean);
     }
 
     /**
@@ -261,6 +223,17 @@ public class AenderungsanfrageTable extends JXTable {
             final CidsBean aenderungsanfrageBean = getAenderungsanfrageBeanAtRow(row);
             return aenderungsanfrageBean;
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public void setSelectedAenderungsanfrageBean(final CidsBean cidsBean) {
+        getSelectionModel().clearSelection();
+        final int index = getAenderungsanfrageTableModel().getIndexByCidsBean(cidsBean);
+        getSelectionModel().addSelectionInterval(index, index);
     }
 
     /**
@@ -315,7 +288,6 @@ public class AenderungsanfrageTable extends JXTable {
 
             final CidsBean aenderungsanfrageBean = getAenderungsanfrageTableModel().getCidsBeanByIndex(
                     entry.getIdentifier());
-            final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
             boolean show = true;
 
             try {
@@ -361,102 +333,6 @@ public class AenderungsanfrageTable extends JXTable {
             }
 
             return show;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private static class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new AenderungsanfrageTableModel object.
-         */
-        public AenderungsanfrageTableModel() {
-            super(COLUMN_NAMES, COLUMN_CLASSES);
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public Object getValueAt(final int rowIndex, final int columnIndex) {
-            final CidsBean aenderungsanfrageBean = getCidsBeanByIndex(rowIndex);
-            if (aenderungsanfrageBean == null) {
-                return null;
-            }
-            switch (columnIndex) {
-                case 0: {
-                    return
-                        (aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)
-                                    != null)
-                        ? Integer.toString((Integer)aenderungsanfrageBean.getProperty(
-                                VerdisConstants.PROP.AENDERUNGSANFRAGE.KASSENZEICHEN_NUMMER)) : null;
-                }
-                case 1: {
-                    final String clerkUsername = (String)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.CLERK_USERNAME);
-                    return
-                        (((clerkUsername != null)
-                                        && (SessionManager.getSession().getUser().getName().equals(clerkUsername)))
-                            ? "ich" : "*****");
-                }
-                case 2: {
-                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
-                    final Timestamp now = new Timestamp(new Date().getTime());
-                    final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-                    if (
-                        AenderungsanfrageUtils.Status.ARCHIVED.toString().equals(
-                                    aenderungsanfrageBean.getProperty(
-                                        VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
-                                        + "."
-                                        + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL))
-                                || ((timestamp != null) && timestamp.after(now))) {
-                        return Objects.toString(aenderungsanfrageBean.getProperty(
-                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
-                                            + "."
-                                            + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.NAME));
-                    } else {
-                        return "abgelaufen";
-                    }
-                }
-                case 3: {
-                    final Timestamp timestamp = (Timestamp)aenderungsanfrageBean.getProperty(
-                            VerdisConstants.PROP.AENDERUNGSANFRAGE.TIMESTAMP);
-                    return timestamp;
-                }
-                case 4: {
-                    final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
-                    return (stacEntry != null) ? stacEntry.getTimestamp() : null;
-                }
-                default: {
-                    return null;
-                }
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param   row  DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public CidsBean getAenderungsanfrageAt(final int row) {
-            return getCidsBeans().get(row);
-        }
-
-        @Override
-        public boolean isCellEditable(final int row, final int column) {
-            return false;
-        }
-
-        @Override
-        public Class getColumnClass(final int column) {
-            return COLUMN_CLASSES[column];
         }
     }
 }
