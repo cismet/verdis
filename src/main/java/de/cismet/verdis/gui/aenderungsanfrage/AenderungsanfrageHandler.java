@@ -168,6 +168,21 @@ public class AenderungsanfrageHandler {
      * DOCUMENT ME!
      *
      * @param   aenderungsanfrage  DOCUMENT ME!
+     * @param   stacId             DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public AenderungsanfrageResultJson sendAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage,
+            final Integer stacId) throws Exception {
+        return sendAenderungsanfrage(aenderungsanfrage, stacId, null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   aenderungsanfrage  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
@@ -175,7 +190,7 @@ public class AenderungsanfrageHandler {
      */
     public AenderungsanfrageResultJson sendAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage)
             throws Exception {
-        return sendAenderungsanfrage(aenderungsanfrage, null);
+        return sendAenderungsanfrage(aenderungsanfrage, getStacId(), null);
     }
 
     /**
@@ -190,12 +205,29 @@ public class AenderungsanfrageHandler {
      */
     public AenderungsanfrageResultJson sendAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage,
             final Boolean speichernMitOderOhneVeranlagung) throws Exception {
+        return sendAenderungsanfrage(aenderungsanfrage, getStacId(), speichernMitOderOhneVeranlagung);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   aenderungsanfrage                DOCUMENT ME!
+     * @param   stacId                           DOCUMENT ME!
+     * @param   speichernMitOderOhneVeranlagung  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public AenderungsanfrageResultJson sendAenderungsanfrage(final AenderungsanfrageJson aenderungsanfrage,
+            final Integer stacId,
+            final Boolean speichernMitOderOhneVeranlagung) throws Exception {
         final ServerActionParameter<String> paramAenderungsanfrage = new ServerActionParameter<>(
                 KassenzeichenChangeRequestServerAction.Parameter.CHANGEREQUEST_JSON.toString(),
                 aenderungsanfrage.toJson());
         final ServerActionParameter<Integer> paramStacId = new ServerActionParameter<>(
                 KassenzeichenChangeRequestServerAction.Parameter.STAC_ID.toString(),
-                getStacId());
+                stacId);
         final ServerActionParameter<Boolean> paramSpeichern = new ServerActionParameter<>(
                 KassenzeichenChangeRequestServerAction.Parameter.CLERK_IS_SAVING.toString(),
                 speichernMitOderOhneVeranlagung);
