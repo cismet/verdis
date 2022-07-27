@@ -302,13 +302,13 @@
               <SubComponents>
                 <Component class="javax.swing.JComboBox" name="jComboBox1">
                   <BindingProperties>
-                    <BindingProperty name="selectedItem" source="Form" sourcePath="${selectedPaket.fk_user}" target="jComboBox1" targetPath="selectedItem" updateStrategy="0" immediately="false">
+                    <BindingProperty name="selectedItem" source="Form" sourcePath="${selectedPaket.login_name}" target="jComboBox1" targetPath="selectedItem" updateStrategy="0" immediately="false">
                       <Property name="nullValue" type="java.lang.Object" value="null"/>
                       <Property name="incompletePathValue" type="java.lang.Object" value="null"/>
                     </BindingProperty>
                   </BindingProperties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DefaultBindableReferenceCombo(mcCsUsr, true, false)"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox(csUsrsModel)"/>
                   </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

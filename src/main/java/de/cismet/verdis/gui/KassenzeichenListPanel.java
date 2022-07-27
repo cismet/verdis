@@ -995,7 +995,8 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                     + CidsAppBackend.getInstance().getVerdisMetaClass(VerdisConstants.MC.ARBEITSPAKET).getId()
                     + ", " + VerdisConstants.MC.ARBEITSPAKET + ".id "
                     + "FROM " + VerdisConstants.MC.ARBEITSPAKET + " "
-                    + "WHERE fk_user = " + SessionManager.getSession().getUser().getId() + ";";
+                    + "WHERE " + VerdisConstants.PROP.ARBEITSPAKET.LOGIN_NAME + " = '"
+                    + SessionManager.getSession().getUser().getName() + "';";
         ((DefaultComboBoxModel)jComboBox1.getModel()).removeAllElements();
         ((DefaultComboBoxModel)jComboBox1.getModel()).addElement(null);
         jComboBox1.getModel().setSelectedItem(null);
