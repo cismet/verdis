@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.exception.ConnectionException;
+
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
@@ -34,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -46,14 +50,13 @@ import javax.swing.event.ListSelectionListener;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cids.editors.DefaultBindableReferenceCombo;
-
 import de.cismet.tools.gui.StaticSwingTools;
 
 import de.cismet.verdis.CidsAppBackend;
 
 import de.cismet.verdis.commons.constants.VerdisConstants;
 
+import de.cismet.verdis.server.search.CsUsrSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenlistSearchStatement;
 
 /**
@@ -93,7 +96,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     private Map<CidsBean, Integer> abgearbeitetMap = new HashMap<CidsBean, Integer>();
     private final MetaClass mcArbeitspaket;
     private final MetaClass mcArbeitspaketEintrag;
-    private final MetaClass mcCsUsr;
+    private final ComboBoxModel<String> csUsrsModel;
 
     private CidsBean selectedPaket = null;
 
@@ -106,7 +109,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                         @Override
                         public void run() {
                             if (evt.getPropertyName().equals(VerdisConstants.PROP.ARBEITSPAKET.NAME)
-                                        || evt.getPropertyName().equals(VerdisConstants.PROP.ARBEITSPAKET.FK_USER)) {
+                                        || evt.getPropertyName().equals(VerdisConstants.PROP.ARBEITSPAKET.LOGIN_NAME)) {
                                 pakedDataChanged();
                             }
                         }
@@ -177,15 +180,15 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         }
         this.mcArbeitspaketEintrag = mcArbeitspaketEintrag;
 
-        MetaClass mcCsUsr;
+        ComboBoxModel<String> csUsrsModel = null;
         try {
-            mcCsUsr = CidsAppBackend.getInstance().getVerdisMetaClass("cs_usr");
-        } catch (final Exception ex) {
-            LOG.warn(ex, ex);
-            mcCsUsr = null;
+            final Collection<String> csUsrs = CidsAppBackend.getInstance()
+                        .executeCustomServerSearch(new CsUsrSearchStatement());
+            csUsrsModel = new DefaultComboBoxModel<>(csUsrs.toArray(new String[0]));
+        } catch (final ConnectionException ex) {
+            LOG.error(ex, ex);
         }
-        this.mcCsUsr = mcCsUsr;
-
+        this.csUsrsModel = csUsrsModel;
         initComponents();
 
         StaticSwingTools.decorateWithFixedAutoCompleteDecorator(jComboBox1);
@@ -439,7 +442,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         jButton3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
-        jComboBox1 = new DefaultBindableReferenceCombo(mcCsUsr, true, false);
+        jComboBox1 = new javax.swing.JComboBox(csUsrsModel);
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -655,7 +658,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
-                org.jdesktop.beansbinding.ELProperty.create("${selectedPaket.fk_user}"),
+                org.jdesktop.beansbinding.ELProperty.create("${selectedPaket.login_name}"),
                 jComboBox1,
                 org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         binding.setSourceNullValue(null);
@@ -1206,8 +1209,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
             }
             final Integer id = (Integer)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.ID);
             final String bezeichnung = (String)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.NAME);
-            final CidsBean fkUser = (CidsBean)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.FK_USER);
-            final String benutzer = (fkUser == null) ? "" : (String)fkUser.getProperty("login_name");
+            final String benutzer = (String)cidsBean.getProperty(VerdisConstants.PROP.ARBEITSPAKET.LOGIN_NAME);
             final Integer countAbgearbeitet = abgearbeitetMap.get(cidsBean);
             final int countGesamt = cidsBean.getBeanCollectionProperty(
                     VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN)
