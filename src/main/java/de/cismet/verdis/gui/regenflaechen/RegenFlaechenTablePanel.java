@@ -20,9 +20,11 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
 import de.cismet.cids.custom.util.VerdisUtils;
@@ -56,6 +58,28 @@ public class RegenFlaechenTablePanel extends AbstractCidsBeanTablePanel {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTable.class);
+
+    private static final String[] COLUMN_NAMES = {
+            "",
+            "Bezeichnung",
+            "",
+            "Größe in m²",
+            "Flächenart",
+            "Anschlußgrad",
+            "Beschreibung",
+            "Erfassungsdatum"
+        };
+
+    private static final Class[] COLUMN_CLASSES = {
+            Icon.class,
+            String.class,
+            Icon.class,
+            Integer.class,
+            String.class,
+            String.class,
+            String.class,
+            Date.class
+        };
 
     private static final String[] PREVIEW_COLUMN_NAMES = {
             "Bezeichnung",

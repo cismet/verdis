@@ -37,6 +37,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
 
 /**
@@ -51,8 +52,6 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
 
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             RegenFlaechenTableModel.class);
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-
     private static final ImageIcon MULT_IMAGE = new javax.swing.ImageIcon(RegenFlaechenTableModel.class.getResource(
                 "/de/cismet/verdis/res/images/table/mult.png"));
     private static final ImageIcon EDITED_IMAGE = new javax.swing.ImageIcon(RegenFlaechenTableModel.class.getResource(
@@ -79,7 +78,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             String.class,
             String.class,
             String.class,
-            String.class
+            Date.class
         };
 
     //~ Instance fields --------------------------------------------------------
@@ -97,6 +96,24 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   row  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public FlaecheAenderungJson getFlaecheAenderungAt(final int row) {
+        final CidsBean cidsBean = getCidsBeanByIndex(row);
+        if (cidsBean == null) {
+            return null;
+        }
+
+        final String bezeichnung = (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
+        return ((getAenderungsanfrageFlaechen() != null) && getAenderungsanfrageFlaechen().containsKey(bezeichnung))
+            ? getAenderungsanfrageFlaechen().get(bezeichnung) : null;
+    }
+
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
         final CidsBean cidsBean = getCidsBeanByIndex(rowIndex);
@@ -104,10 +121,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             return null;
         }
 
-        final String bezeichnung = (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
-        final FlaecheAenderungJson aenderungsanfrageFlaeche =
-            ((aenderungsanfrageFlaechen != null) && aenderungsanfrageFlaechen.containsKey(bezeichnung))
-            ? aenderungsanfrageFlaechen.get(bezeichnung) : null;
+        final FlaecheAenderungJson aenderungsanfrageFlaeche = getFlaecheAenderungAt(rowIndex);
 
         switch (columnIndex) {
             case 0: {
@@ -118,7 +132,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             }
             case 1: {
                 // Bezeichnungsspalte
-                return bezeichnung;
+                return (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENBEZEICHNUNG);
             }
             case 2: {
                 // Edit Icon Spalte
@@ -144,48 +158,33 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             }
             case 3: {
                 // Größe
-                final Integer groesse;
                 if (
                     cidsBean.getProperty(
                                 VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR)
                             != null) {
-                    groesse = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    return (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                     + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
                 } else {
-                    groesse = (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    return (Integer)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                     + VerdisConstants.PROP.FLAECHENINFO.GROESSE_GRAFIK);
                 }
-                final Integer groesseAenderung =
-                    ((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
-                    ? aenderungsanfrageFlaeche.getGroesse() : null;
-                return ((groesseAenderung != null) ? (groesse + " (" + groesseAenderung + ")") : groesse);
             }
             case 4: {
                 // Flaechenart
-                final String flaechenart = (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                return (String)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
                                 + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
-                final String flaechenartAenderung =
-                    (((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
-                                && (aenderungsanfrageFlaeche.getFlaechenart() != null))
-                    ? aenderungsanfrageFlaeche.getFlaechenart().getArtAbkuerzung() : null;
-                return flaechenart + ((flaechenartAenderung != null) ? (" (" + flaechenartAenderung + ")") : "");
             }
             case 5: {
                 // Anschlussgrad
-                final String anschlussgrad = (String)cidsBean.getProperty(
+                return (String)cidsBean.getProperty(
                         VerdisConstants.PROP.FLAECHE.FLAECHENINFO
                                 + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
                                 + "."
                                 + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
-                final String anschlussgradAenderung =
-                    (((aenderungsanfrageFlaeche != null) && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
-                                && (aenderungsanfrageFlaeche.getAnschlussgrad() != null))
-                    ? aenderungsanfrageFlaeche.getAnschlussgrad().getGradAbkuerzung() : null;
-                return anschlussgrad + ((anschlussgradAenderung != null) ? (" (" + anschlussgradAenderung + ")") : "");
             }
             case 6: {
                 // Beschreibung
@@ -197,12 +196,7 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
             }
             case 7: {
                 // Änderungsdatum
-                final Date datum_erfassung = (Date)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG);
-                if (datum_erfassung == null) {
-                    return null;
-                } else {
-                    return (String)DATE_FORMAT.format(datum_erfassung);
-                }
+                return (Date)cidsBean.getProperty(VerdisConstants.PROP.FLAECHE.DATUM_AENDERUNG);
             }
             default: {
                 return null;
@@ -217,5 +211,14 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
      */
     public void setAenderungsanfrageFlaechen(final Map<String, FlaecheAenderungJson> aenderungsanfrageFlaechen) {
         this.aenderungsanfrageFlaechen = aenderungsanfrageFlaechen;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<String, FlaecheAenderungJson> getAenderungsanfrageFlaechen() {
+        return aenderungsanfrageFlaechen;
     }
 }
