@@ -326,6 +326,7 @@ public class AenderungsanfrageHandler {
         if (kassenzeichenNummer != null) {
             final AenderungsanfrageSearchStatement search = new AenderungsanfrageSearchStatement();
             search.setKassenzeichennummer(kassenzeichenNummer);
+            search.setActive(Boolean.TRUE);
             updateAenderungsanfrageBean(search);
         } else {
             updateAenderungsanfrageBean(null);
