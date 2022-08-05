@@ -36,6 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import edu.umd.cs.piccolox.event.PNotification;
 
 import org.jdesktop.swingx.decorator.*;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -45,11 +46,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 
@@ -82,6 +86,7 @@ import de.cismet.verdis.gui.Main;
 import de.cismet.verdis.gui.aenderungsanfrage.AenderungsanfrageHandler;
 
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
+import de.cismet.verdis.server.json.FlaecheAenderungJson;
 
 import static de.cismet.verdis.gui.AbstractCidsBeanTable.getNextNewBeanId;
 
@@ -96,6 +101,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RegenFlaechenTable.class);
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -219,10 +225,131 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
 
         setHighlighters(changedHighlighter, warningHighlighter, noGeometryHighlighter, errorHighlighter);
 
-        getColumnModel().getColumn(0).setCellRenderer(getDefaultRenderer(Icon.class));
-        getColumnModel().getColumn(2).setCellRenderer(getDefaultRenderer(Icon.class));
-        getColumnModel().getColumn(3).setCellRenderer(getDefaultRenderer(Number.class));
-        // getColumnModel().getColumn(3).setCellRenderer(new RegenFlaechenGroesseCellRenderer());
+        // getColumnModel().getColumn(0).setCellRenderer(getDefaultRenderer(Icon.class));
+        // getColumnModel().getColumn(2).setCellRenderer(getDefaultRenderer(Icon.class));
+        getColumnModel().getColumn(3).setCellRenderer(new DefaultTableRenderer() {
+
+                @Override
+                public Component getTableCellRendererComponent(final JTable table,
+                        final Object value,
+                        final boolean isSelected,
+                        final boolean hasFocus,
+                        final int row,
+                        final int column) {
+                    final Component comp = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column);
+                    if ((comp instanceof JLabel) && (value instanceof Integer)) {
+                        final FlaecheAenderungJson aenderungsanfrageFlaeche = ((RegenFlaechenTableModel)getModel())
+                                    .getFlaecheAenderungAt(convertRowIndexToModel(row));
+
+                        final Integer groesse = (Integer)value;
+                        final Integer groesseAenderung =
+                            ((aenderungsanfrageFlaeche != null)
+                                        && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
+                            ? aenderungsanfrageFlaeche.getGroesse() : null;
+
+                        ((JLabel)comp).setText(
+                            (groesseAenderung != null) ? (groesse + " (" + groesseAenderung + ")")
+                                                       : Integer.toString(groesse));
+                    }
+                    return comp;
+                }
+            });
+        getColumnModel().getColumn(4).setCellRenderer(new DefaultTableRenderer() {
+
+                @Override
+                public Component getTableCellRendererComponent(final JTable table,
+                        final Object value,
+                        final boolean isSelected,
+                        final boolean hasFocus,
+                        final int row,
+                        final int column) {
+                    final Component comp = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column);
+                    if ((comp instanceof JLabel) && (value instanceof Integer)) {
+                        final FlaecheAenderungJson aenderungsanfrageFlaeche = ((RegenFlaechenTableModel)getModel())
+                                    .getFlaecheAenderungAt(convertRowIndexToModel(row));
+
+                        final String flaechenart = (String)value;
+                        final String flaechenartAenderung =
+                            (((aenderungsanfrageFlaeche != null)
+                                            && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
+                                        && (aenderungsanfrageFlaeche.getFlaechenart() != null))
+                            ? aenderungsanfrageFlaeche.getFlaechenart().getArtAbkuerzung() : null;
+                        ((JLabel)comp).setText(
+                            flaechenart
+                                    + ((flaechenartAenderung != null) ? (" (" + flaechenartAenderung + ")") : ""));
+                    }
+                    return comp;
+                }
+            });
+        getColumnModel().getColumn(5).setCellRenderer(new DefaultTableRenderer() {
+
+                @Override
+                public Component getTableCellRendererComponent(final JTable table,
+                        final Object value,
+                        final boolean isSelected,
+                        final boolean hasFocus,
+                        final int row,
+                        final int column) {
+                    final Component comp = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column);
+                    if ((comp instanceof JLabel) && (value instanceof Integer)) {
+                        final FlaecheAenderungJson aenderungsanfrageFlaeche = ((RegenFlaechenTableModel)getModel())
+                                    .getFlaecheAenderungAt(convertRowIndexToModel(row));
+
+                        final String anschlussgrad = (String)value;
+                        final String anschlussgradAenderung =
+                            (((aenderungsanfrageFlaeche != null)
+                                            && !Boolean.TRUE.equals(aenderungsanfrageFlaeche.getDraft()))
+                                        && (aenderungsanfrageFlaeche.getAnschlussgrad() != null))
+                            ? aenderungsanfrageFlaeche.getAnschlussgrad().getGradAbkuerzung() : null;
+
+                        ((JLabel)comp).setText(
+                            anschlussgrad
+                                    + ((anschlussgradAenderung != null) ? (" (" + anschlussgradAenderung + ")")
+                                                                        : ""));
+                    }
+                    return comp;
+                }
+            });
+        getColumnModel().getColumn(7).setCellRenderer(new DefaultTableRenderer() {
+
+                @Override
+                public Component getTableCellRendererComponent(final JTable table,
+                        final Object value,
+                        final boolean isSelected,
+                        final boolean hasFocus,
+                        final int row,
+                        final int column) {
+                    final Component comp = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column);
+                    if ((comp instanceof JLabel) && (value instanceof Date)) {
+                        ((JLabel)comp).setText((String)DATE_FORMAT.format((Date)value));
+                    }
+                    return comp;
+                }
+            });
 
         getColumnExt(1).setComparator(new NumberStringComparator());
 
