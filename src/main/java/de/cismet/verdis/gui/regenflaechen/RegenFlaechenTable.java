@@ -276,7 +276,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                             hasFocus,
                             row,
                             column);
-                    if ((comp instanceof JLabel) && (value instanceof Integer)) {
+                    if ((comp instanceof JLabel) && (value instanceof String)) {
                         final FlaecheAenderungJson aenderungsanfrageFlaeche = ((RegenFlaechenTableModel)getModel())
                                     .getFlaecheAenderungAt(convertRowIndexToModel(row));
 
@@ -309,7 +309,7 @@ public class RegenFlaechenTable extends AbstractCidsBeanWithGeometryTable {
                             hasFocus,
                             row,
                             column);
-                    if ((comp instanceof JLabel) && (value instanceof Integer)) {
+                    if ((comp instanceof JLabel) && (value instanceof String)) {
                         final FlaecheAenderungJson aenderungsanfrageFlaeche = ((RegenFlaechenTableModel)getModel())
                                     .getFlaecheAenderungAt(convertRowIndexToModel(row));
 
