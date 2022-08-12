@@ -21,7 +21,7 @@ import java.io.FileOutputStream;
 
 import javax.swing.KeyStroke;
 
-import de.cismet.cids.custom.utils.ByteArrayActionDownload;
+import de.cismet.cids.custom.clientutils.ByteArrayActionDownload;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -448,15 +448,15 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_rbA3ActionPerformed
-    }                                                                        //GEN-LAST:event_rbA3ActionPerformed
+    private void rbA3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbA3ActionPerformed
+    }//GEN-LAST:event_rbA3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnPrintActionPerformed
+    private void btnPrintActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         generateReport(
             taHinweise.getText(),
             jRadioButton1.isSelected()
@@ -465,16 +465,16 @@ public class EBGeneratorDialog extends javax.swing.JDialog implements Connection
                 ? null
                 : btnGroupOrientation.getSelection().getActionCommand().equals(rbLandscapeMode.getActionCommand()));
         this.setVisible(false);
-    }                                                                            //GEN-LAST:event_btnPrintActionPerformed
+    }//GEN-LAST:event_btnPrintActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.setVisible(false);
-    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
