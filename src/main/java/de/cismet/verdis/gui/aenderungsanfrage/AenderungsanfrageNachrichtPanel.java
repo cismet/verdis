@@ -24,7 +24,7 @@ import java.util.Date;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.cids.custom.utils.ByteArrayActionDownload;
+import de.cismet.cids.custom.clientutils.ByteArrayActionDownload;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
