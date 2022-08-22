@@ -6490,18 +6490,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * DOCUMENT ME!
      */
     private void processSapClipboardContents() {
-        final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
+        try {
+            final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 final String string = ((String)transferable.getTransferData(DataFlavor.stringFlavor)).trim();
                 if ((string.length() == 8)
                             && (string.startsWith("6") || string.startsWith("8"))) {
                     Integer.parseInt(string); // check if its a number
                     CidsAppBackend.getInstance().gotoKassenzeichen(string);
                 }
-            } catch (final Exception ex) {
-                LOG.warn("error processing system clipboard", ex);
             }
+        } catch (final Exception ex) {
+            LOG.warn("error processing system clipboard", ex);
         }
     }
 
