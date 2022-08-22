@@ -23,8 +23,6 @@
  */
 package de.cismet.verdis.gui.regenflaechen;
 
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.Map;
 
@@ -37,7 +35,6 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
-import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.FlaecheAenderungJson;
 
 /**
@@ -120,8 +117,6 @@ public class RegenFlaechenTableModel extends AbstractCidsBeanTableModel {
         if (cidsBean == null) {
             return null;
         }
-
-        final FlaecheAenderungJson aenderungsanfrageFlaeche = getFlaecheAenderungAt(rowIndex);
 
         switch (columnIndex) {
             case 0: {
