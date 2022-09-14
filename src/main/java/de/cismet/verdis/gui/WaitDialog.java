@@ -419,13 +419,13 @@ public class WaitDialog extends javax.swing.JDialog {
                     jProgressBar1.setMaximum(0);
                     jProgressBar1.setIndeterminate(true);
                     jProgressBar1.setValue(0);
-                    new Thread(new Runnable() {
+                    EventQueue.invokeLater(new Runnable() {
 
                             @Override
                             public void run() {
                                 WaitDialog.this.setVisible(true);
                             }
-                        }).start();
+                        });
                 }
             };
         if (EventQueue.isDispatchThread()) {
