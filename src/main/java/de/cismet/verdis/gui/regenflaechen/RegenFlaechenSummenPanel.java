@@ -47,10 +47,13 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAnschlussgrad;
     private javax.swing.JLabel lblVeranlagung;
+    private javax.swing.JLabel lblVeranlagungRueckwirkend;
     private javax.swing.JPanel panAnschlussgrad;
     private javax.swing.JPanel panVeranlagung;
+    private javax.swing.JPanel panVeranlagungRueckwirkend;
     private javax.swing.JTable tblSumAnschlussgrad;
     private javax.swing.JTable tblSumVeranlagung;
+    private javax.swing.JTable tblSumVeranlagungRueckwirkend;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -61,6 +64,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
     public RegenFlaechenSummenPanel() {
         initComponents();
         tblSumVeranlagung.setDefaultRenderer(Object.class, new SummenTableCellRenderer());
+        tblSumVeranlagungRueckwirkend.setDefaultRenderer(Object.class, new SummenTableCellRenderer());
         tblSumAnschlussgrad.setDefaultRenderer(Object.class, new SummenTableCellRenderer());
     }
 
@@ -77,6 +81,9 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
         panVeranlagung = new javax.swing.JPanel();
         lblVeranlagung = new javax.swing.JLabel();
         tblSumVeranlagung = new javax.swing.JTable();
+        panVeranlagungRueckwirkend = new javax.swing.JPanel();
+        lblVeranlagungRueckwirkend = new javax.swing.JLabel();
+        tblSumVeranlagungRueckwirkend = new javax.swing.JTable();
         panAnschlussgrad = new javax.swing.JPanel();
         lblAnschlussgrad = new javax.swing.JLabel();
         tblSumAnschlussgrad = new javax.swing.JTable();
@@ -111,6 +118,36 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(panVeranlagung, gridBagConstraints);
 
+        panVeranlagungRueckwirkend.setLayout(new java.awt.GridBagLayout());
+
+        lblVeranlagungRueckwirkend.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblVeranlagungRueckwirkend.setText("Ggf. Veranlagung vor 2023");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
+        panVeranlagungRueckwirkend.add(lblVeranlagungRueckwirkend, gridBagConstraints);
+
+        tblSumVeranlagungRueckwirkend.setBackground(javax.swing.UIManager.getDefaults().getColor("Label.background"));
+        tblSumVeranlagungRueckwirkend.setModel(new DefaultTableModel());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        panVeranlagungRueckwirkend.add(tblSumVeranlagungRueckwirkend, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(panVeranlagungRueckwirkend, gridBagConstraints);
+        panVeranlagungRueckwirkend.setVisible(false);
+
         panAnschlussgrad.setLayout(new java.awt.GridBagLayout());
 
         lblAnschlussgrad.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -141,7 +178,7 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -165,42 +202,61 @@ public class RegenFlaechenSummenPanel extends javax.swing.JPanel implements Cids
         try {
             kassenzeichenBean = cidsBean;
             if (cidsBean != null) {
-                final Map<String, Double> veranlagungHash = new HashMap<String, Double>();
-                final Map<String, Double> anschlussgradHash = new HashMap<String, Double>();
+                final Map<String, Double> veranlagungMap = new HashMap<>();
+                final Map<String, Double> veranlagungRueckwirkendMap = new HashMap<>();
+                final Map<String, Double> anschlussgradMap = new HashMap<>();
 
-                Main.getInstance().fillFlaechenVeranlagungSummeMap(veranlagungHash);
-                Main.getInstance().fillFlaechenAnschlussgradSummeMap(anschlussgradHash);
+                Main.getInstance().fillFlaechenVeranlagungSummeMap(veranlagungMap, true);
+                Main.getInstance().fillFlaechenVeranlagungSummeMap(veranlagungRueckwirkendMap, false);
+                Main.getInstance().fillFlaechenAnschlussgradSummeMap(anschlussgradMap);
 
-                final List<String> veranlagungKeys = Arrays.asList(veranlagungHash.keySet().toArray(new String[0]));
-                final List<String> anschlussgradKeys = Arrays.asList(anschlussgradHash.keySet().toArray(new String[0]));
+                final List<String> veranlagungKeys = Arrays.asList(veranlagungMap.keySet().toArray(new String[0]));
+                final List<String> veranlagungRueckwirkendKeys = Arrays.asList(veranlagungRueckwirkendMap.keySet()
+                                .toArray(new String[0]));
+                final List<String> anschlussgradKeys = Arrays.asList(anschlussgradMap.keySet().toArray(new String[0]));
+
+                final String[] header = { "A", "B" };
 
                 Collections.sort(veranlagungKeys);
-                final List<String[]> veranlagungData = new ArrayList<String[]>();
+                final List<String[]> veranlagungData = new ArrayList<>();
                 for (final String key : veranlagungKeys) {
-                    final double value = veranlagungHash.get(key);
+                    final double value = veranlagungMap.get(key);
                     if (value > 0) {
                         veranlagungData.add(new String[] { key, (int)value + " m²" });
                     }
                 }
+                ((DefaultTableModel)tblSumVeranlagung.getModel()).setDataVector(veranlagungData.toArray(
+                        new String[0][]),
+                    header);
+
+                Collections.sort(veranlagungRueckwirkendKeys);
+                final List<String[]> veranlagungRueckwirkend = new ArrayList<>();
+                for (final String key : veranlagungRueckwirkendKeys) {
+                    final double value = veranlagungRueckwirkendMap.get(key);
+                    if (value > 0) {
+                        veranlagungRueckwirkend.add(new String[] { key, (int)value + " m²" });
+                    }
+                }
+                ((DefaultTableModel)tblSumVeranlagungRueckwirkend.getModel()).setDataVector(
+                    veranlagungRueckwirkend.toArray(
+                        new String[0][]),
+                    header);
+                panVeranlagungRueckwirkend.setVisible(!veranlagungRueckwirkend.isEmpty());
 
                 Collections.sort(anschlussgradKeys);
-                final List<String[]> anschlussgradData = new ArrayList<String[]>();
+                final List<String[]> anschlussgradData = new ArrayList<>();
                 for (final String key : anschlussgradKeys) {
-                    final double value = anschlussgradHash.get(key);
+                    final double value = anschlussgradMap.get(key);
                     if (value > 0) {
                         anschlussgradData.add(new String[] { key, (int)value + " m²" });
                     }
                 }
-
-                final String[] header = { "A", "B" };
-
-                ((DefaultTableModel)tblSumVeranlagung.getModel()).setDataVector(veranlagungData.toArray(
-                        new String[0][]),
-                    header);
                 ((DefaultTableModel)tblSumAnschlussgrad.getModel()).setDataVector(anschlussgradData.toArray(
                         new String[0][]),
                     header);
+
                 tblSumVeranlagung.getColumnModel().getColumn(1).setPreferredWidth(0);
+                tblSumVeranlagungRueckwirkend.getColumnModel().getColumn(1).setPreferredWidth(0);
                 tblSumAnschlussgrad.getColumnModel().getColumn(1).setPreferredWidth(0);
             }
         } catch (Exception e) {
