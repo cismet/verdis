@@ -38,7 +38,6 @@ import Sirius.navigator.ui.tree.ResultNodeListener;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
-import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
@@ -268,6 +267,8 @@ import de.cismet.verdis.server.search.DeletedKassenzeichenIdSearchStatement;
 import de.cismet.verdis.server.search.KassenzeichenGeomSearch;
 import de.cismet.verdis.server.search.NextKassenzeichenWithoutKassenzeichenGeometrieSearchStatement;
 import de.cismet.verdis.server.search.StacInfoSearchStatement;
+import de.cismet.verdis.server.search.VeranlagungsgrundlageSearchStatement;
+import de.cismet.verdis.server.search.VeranlagungsnummernSearchStatement;
 
 /**
  * DOCUMENT ME!
@@ -338,6 +339,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     private final Map<String, CidsBean> veranlagungsnummern = new HashMap<>();
     private final Map<String, CidsBean> veranlagungsgrundlageMap = new HashMap<>();
+    private final Map<String, CidsBean> veranlagungsgrundlageRueckwirkendMap = new HashMap<>();
     private final Map<String, Double> veranlagungSummeMap = new HashMap<>();
     private CidsAppBackend.Mode currentMode = null;
 
@@ -6115,42 +6117,46 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * DOCUMENT ME!
      */
     private void initVeranlagung() {
-        final MetaClass veranlagungsgrundlageMc = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSGRUNDLAGE);
-        final MetaClass veranlagungsnummerMc = CidsAppBackend.getInstance()
-                    .getVerdisMetaClass(VerdisConstants.MC.VERANLAGUNGSNUMMER);
-        final MetaObject[] veranlagungsgrundlageMos = CidsAppBackend.getInstance()
-                    .getMetaObject(""
-                        + "SELECT " + veranlagungsgrundlageMc.getId() + ", grundlage."
-                        + VerdisConstants.PROP.VERANLAGUNGSGRUNDLAGE.ID + " "
-                        + "FROM " + veranlagungsgrundlageMc.getTableName() + " AS grundlage, "
-                        + veranlagungsnummerMc.getTableName() + " AS nummer "
-                        + "WHERE grundlage." + VerdisConstants.PROP.VERANLAGUNGSGRUNDLAGE.VERANLAGUNGSNUMMER
-                        + " = nummer." + VerdisConstants.PROP.VERANLAGUNGSNUMMER.ID + " "
-                        + "ORDER BY nummer." + VerdisConstants.PROP.VERANLAGUNGSNUMMER.BEZEICHNER,
-                        VerdisConstants.DOMAIN);
-
-        final MetaObject[] veranlagungsnummerMos = CidsAppBackend.getInstance()
-                    .getMetaObject("SELECT " + veranlagungsnummerMc.getId() + ", "
-                        + VerdisConstants.PROP.VERANLAGUNGSNUMMER.ID + " "
-                        + "FROM " + veranlagungsnummerMc.getTableName(),
-                        VerdisConstants.DOMAIN);
-
-        for (final MetaObject veranlagungsgrundlageMo : veranlagungsgrundlageMos) {
-            final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMo.getBean();
-            final Integer flaechenart = (Integer)veranlagungsgrundlageBean.getProperty("flaechenart.id");
-            final Integer anschlussgrad = (Integer)veranlagungsgrundlageBean.getProperty("anschlussgrad.id");
-            final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
-
-            veranlagungsgrundlageMap.put(mapKey, veranlagungsgrundlageBean);
+        try {
+            final Collection<MetaObjectNode> veranlagungsgrundlageMons = CidsAppBackend.getInstance()
+                        .executeCustomServerSearch(new VeranlagungsgrundlageSearchStatement());
+            if (veranlagungsgrundlageMons != null) {
+                for (final MetaObjectNode veranlagungsgrundlageMon : veranlagungsgrundlageMons) {
+                    final MetaObject veranlagungsgrundlageMo = CidsAppBackend.getInstance()
+                                .getVerdisMetaObject(veranlagungsgrundlageMon.getObjectId(),
+                                    veranlagungsgrundlageMon.getClassId());
+                    final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMo.getBean();
+                    final Integer flaechenart = (Integer)veranlagungsgrundlageBean.getProperty("flaechenart.id");
+                    final Integer anschlussgrad = (Integer)veranlagungsgrundlageBean.getProperty("anschlussgrad.id");
+                    final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
+                    final Boolean aktiv = (Boolean)veranlagungsgrundlageBean.getProperty("aktiv");
+                    if (Boolean.TRUE.equals(aktiv)) {
+                        veranlagungsgrundlageMap.put(mapKey, veranlagungsgrundlageBean);
+                    } else if (Boolean.FALSE.equals(aktiv)) {
+                        veranlagungsgrundlageRueckwirkendMap.put(mapKey, veranlagungsgrundlageBean);
+                    }
+                }
+            }
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
         }
 
-        for (final MetaObject veranlagungsnummerMo : veranlagungsnummerMos) {
-            final CidsBean veranlagungsnummerBean = veranlagungsnummerMo.getBean();
-            final String mapKey = (String)veranlagungsnummerBean.getProperty(
-                    VerdisConstants.PROP.VERANLAGUNGSNUMMER.BEZEICHNER);
-
-            veranlagungsnummern.put(mapKey, veranlagungsnummerBean);
+        try {
+            final Collection<MetaObjectNode> veranlagungsnummerMons = CidsAppBackend.getInstance()
+                        .executeCustomServerSearch(new VeranlagungsnummernSearchStatement());
+            if (veranlagungsnummerMons != null) {
+                for (final MetaObjectNode veranlagungsnummerMon : veranlagungsnummerMons) {
+                    final MetaObject veranlagungsnummerMo = CidsAppBackend.getInstance()
+                                .getVerdisMetaObject(veranlagungsnummerMon.getObjectId(),
+                                    veranlagungsnummerMon.getClassId());
+                    final CidsBean veranlagungsnummerBean = veranlagungsnummerMo.getBean();
+                    final String mapKey = (String)veranlagungsnummerBean.getProperty(
+                            VerdisConstants.PROP.VERANLAGUNGSNUMMER.BEZEICHNER);
+                    veranlagungsnummern.put(mapKey, veranlagungsnummerBean);
+                }
+            }
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
         }
     }
 
@@ -6166,7 +6172,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             veranlagungSummeMap.put(mapKey, 0d);
         }
 
-        fillFlaechenVeranlagungSummeMap(veranlagungSummeMap);
+        fillFlaechenVeranlagungSummeMap(veranlagungSummeMap, true);
         fillStrassenreinigungSummeMap(veranlagungSummeMap);
     }
 
@@ -6174,56 +6180,57 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      * DOCUMENT ME!
      *
      * @param  veranlagungSummeMap  DOCUMENT ME!
+     * @param  aktiv                DOCUMENT ME!
      */
-    public void fillFlaechenVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap) {
+    public void fillFlaechenVeranlagungSummeMap(final Map<String, Double> veranlagungSummeMap, final boolean aktiv) {
         final Collection<CidsBean> flaechen = getCidsBean().getBeanCollectionProperty(
                 VerdisConstants.PROP.KASSENZEICHEN.FLAECHEN);
 
+        final String flaecheninfo__flaechenart__id = VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "." + VerdisConstants.PROP.FLAECHENART.ID;
+        final String flaecheninfo__anschlussgrad__id = VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "." + VerdisConstants.PROP.ANSCHLUSSGRAD.ID;
+        final String flaecheninfo__groesse_korrektur = VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR;
+
         for (final CidsBean flaeche : flaechen) {
             final Float anteil = (Float)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.ANTEIL);
-            final Integer flaechenart = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
-                            + VerdisConstants.PROP.FLAECHENART.ID);
-            final Integer anschlussgrad = (Integer)flaeche.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                            + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
-                            + "."
-                            + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
+            final Integer flaechenart = (Integer)flaeche.getProperty(flaecheninfo__flaechenart__id);
+            final Integer anschlussgrad = (Integer)flaeche.getProperty(flaecheninfo__anschlussgrad__id);
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
 
-            final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
-            float veranlagungsschluessel;
-            try {
-                veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty("veranlagungsschluessel");
-            } catch (final Exception e) {
-                veranlagungsschluessel = 0;
-            }
-
-            final String bezeichner = (String)veranlagungsgrundlageBean.getProperty("veranlagungsnummer.bezeichner");
-
-            double groesse;
-            if (anteil == null) {
+            final CidsBean veranlagungsgrundlageBean =
+                (aktiv ? veranlagungsgrundlageMap : veranlagungsgrundlageRueckwirkendMap).get(mapKey);
+            if (veranlagungsgrundlageBean != null) {
+                float veranlagungsschluessel;
                 try {
-                    groesse = (Integer)flaeche.getProperty(
-                            VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                    + "."
-                                    + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
+                    veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty("veranlagungsschluessel");
                 } catch (final Exception e) {
-                    groesse = 0;
+                    veranlagungsschluessel = 0;
                 }
-            } else {
-                groesse = anteil.doubleValue();
-            }
-            final double groesseGewichtet = groesse * veranlagungsschluessel;
 
-            final double summeveranlagt = (veranlagungSummeMap.containsKey(bezeichner))
-                ? veranlagungSummeMap.get(bezeichner) : 0.0d;
+                final String bezeichner = (String)veranlagungsgrundlageBean.getProperty(
+                        "veranlagungsnummer.bezeichner");
 
-            if (groesseGewichtet > 0) {
-                veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesseGewichtet) * 1000) / 1000d);
-            } else {
-                veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesse) * 1000) / 1000d);
+                double groesse;
+                if (anteil == null) {
+                    try {
+                        groesse = (Integer)flaeche.getProperty(flaecheninfo__groesse_korrektur);
+                    } catch (final Exception e) {
+                        groesse = 0;
+                    }
+                } else {
+                    groesse = anteil.doubleValue();
+                }
+                final double groesseGewichtet = groesse * veranlagungsschluessel;
+                final double summeveranlagt = (veranlagungSummeMap.containsKey(bezeichner))
+                    ? veranlagungSummeMap.get(bezeichner) : 0.0d;
+
+                if (groesseGewichtet > 0) {
+                    veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesseGewichtet) * 1000) / 1000d);
+                } else {
+                    veranlagungSummeMap.put(bezeichner, Math.round((summeveranlagt + groesse) * 1000) / 1000d);
+                }
             }
         }
     }
@@ -6242,35 +6249,25 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             final Integer flaechenart = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                             + VerdisConstants.PROP.FLAECHENINFO.FLAECHENART + "."
                             + VerdisConstants.PROP.FLAECHENART.ID);
-            final Integer anschlussgrad = (Integer)flaeche.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                            + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
-                            + "."
+            final Integer anschlussgrad = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
                             + VerdisConstants.PROP.ANSCHLUSSGRAD.ID);
             final String mapKey = Integer.toString(flaechenart) + "-" + Integer.toString(anschlussgrad);
-            final String anschlussgradKey = (String)flaeche.getProperty(
-                    VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                            + "."
-                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD
-                            + "."
+            final String anschlussgradKey = (String)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
+                            + VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD + "."
                             + VerdisConstants.PROP.ANSCHLUSSGRAD.GRAD_ABKUERZUNG);
 
             final CidsBean veranlagungsgrundlageBean = veranlagungsgrundlageMap.get(mapKey);
-            final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty(
-                    "veranlagungsschluessel");
+            final Float veranlagungsschluessel = (Float)veranlagungsgrundlageBean.getProperty("veranlagungsschluessel");
 
             final double groesse;
             if (anteil == null) {
-                groesse = (Integer)flaeche.getProperty(
-                        VerdisConstants.PROP.FLAECHE.FLAECHENINFO
-                                + "."
+                groesse = (Integer)flaeche.getProperty(VerdisConstants.PROP.FLAECHE.FLAECHENINFO + "."
                                 + VerdisConstants.PROP.FLAECHENINFO.GROESSE_KORREKTUR);
             } else {
                 groesse = anteil.doubleValue();
             }
             final double groesseGewichtet = groesse * veranlagungsschluessel;
-
             final double summeAnschlussgrad = (flaechenAnschlussgradSummeMap.containsKey(anschlussgradKey))
                 ? flaechenAnschlussgradSummeMap.get(anschlussgradKey) : 0d;
 
