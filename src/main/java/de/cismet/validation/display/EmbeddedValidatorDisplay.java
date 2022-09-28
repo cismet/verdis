@@ -248,7 +248,9 @@ public class EmbeddedValidatorDisplay extends JLabel implements ValidatorDisplay
             } while (duration < (WAIT_BEFORE_FADEOUT_IN_MS + FADE_TIME));
             EmbeddedValidatorDisplay.this.setAlpha(ALPHA_MAX);
             EmbeddedValidatorDisplay.this.setVisible(false);
-            EmbeddedValidatorDisplay.this.getParent().repaint();
+            if (EmbeddedValidatorDisplay.this.getParent() != null) {
+                EmbeddedValidatorDisplay.this.getParent().repaint();
+            }
         }
     }
 }
