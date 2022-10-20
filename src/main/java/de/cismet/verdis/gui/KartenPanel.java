@@ -3116,23 +3116,24 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                         public void propertyChange(final PropertyChangeEvent evt) {
                                             if (ServerSearchCreateSearchGeometryListener.ACTION_SEARCH_DONE.equals(
                                                             evt.getPropertyName())) {
-                                                final Collection<Integer> result = (Collection<Integer>)
-                                                    evt.getNewValue();
-                                                if (!result.isEmpty()) {
-                                                    final Integer kassenzeichennummer = result.iterator().next();
-                                                    final CidsBean kassenzeichenBean = CidsAppBackend.getInstance()
-                                                                    .getCidsBean();
-                                                    if ((kassenzeichennummer != null)
-                                                                && ((kassenzeichenBean == null)
-                                                                    || !kassenzeichennummer.equals(
-                                                                        (Integer)kassenzeichenBean.getProperty(
-                                                                            VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)))) {
-                                                        CidsAppBackend.getInstance()
-                                                                    .gotoKassenzeichen(kassenzeichennummer.toString());
-                                                    } else {
-                                                        WaitDialog.getInstance().dispose();
+                                                try {
+                                                    final Collection<Integer> result = (Collection<Integer>)
+                                                        evt.getNewValue();
+                                                    if (!result.isEmpty()) {
+                                                        final Integer kassenzeichennummer = result.iterator().next();
+                                                        final CidsBean kassenzeichenBean = CidsAppBackend.getInstance()
+                                                                        .getCidsBean();
+                                                        if ((kassenzeichennummer != null)
+                                                                    && ((kassenzeichenBean == null)
+                                                                        || !kassenzeichennummer.equals(
+                                                                            (Integer)kassenzeichenBean.getProperty(
+                                                                                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER)))) {
+                                                            CidsAppBackend.getInstance()
+                                                                        .gotoKassenzeichen(
+                                                                            kassenzeichennummer.toString());
+                                                        }
                                                     }
-                                                } else {
+                                                } finally {
                                                     WaitDialog.getInstance().dispose();
                                                 }
                                             }

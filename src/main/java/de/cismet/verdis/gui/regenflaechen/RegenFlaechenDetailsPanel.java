@@ -2429,69 +2429,69 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGroesseGrafikActionPerformed
+    private void txtGroesseGrafikActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtGroesseGrafikActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtGroesseGrafikActionPerformed
+    } //GEN-LAST:event_txtGroesseGrafikActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnGroesseAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGroesseAenderungAcceptActionPerformed
+    private void btnGroesseAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnGroesseAenderungAcceptActionPerformed
         pruefungAenderungGroesse(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnGroesseAenderungAcceptActionPerformed
+    }                                                                                             //GEN-LAST:event_btnGroesseAenderungAcceptActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnGroesseAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGroesseAenderungRejectActionPerformed
+    private void btnGroesseAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnGroesseAenderungRejectActionPerformed
         pruefungAenderungGroesse(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnGroesseAenderungRejectActionPerformed
+    }                                                                                             //GEN-LAST:event_btnGroesseAenderungRejectActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnFlaechenartAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlaechenartAenderungAcceptActionPerformed
+    private void btnFlaechenartAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnFlaechenartAenderungAcceptActionPerformed
         pruefungAenderungFlaechenart(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnFlaechenartAenderungAcceptActionPerformed
+    }                                                                                                 //GEN-LAST:event_btnFlaechenartAenderungAcceptActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnFlaechenartAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlaechenartAenderungRejectActionPerformed
+    private void btnFlaechenartAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnFlaechenartAenderungRejectActionPerformed
         pruefungAenderungFlaechenart(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnFlaechenartAenderungRejectActionPerformed
+    }                                                                                                 //GEN-LAST:event_btnFlaechenartAenderungRejectActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnAnschlussgradAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnschlussgradAenderungRejectActionPerformed
+    private void btnAnschlussgradAenderungRejectActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnAnschlussgradAenderungRejectActionPerformed
         pruefungAenderungAnschlussgrad(Pruefung.REJECT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnAnschlussgradAenderungRejectActionPerformed
+    }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungRejectActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnAnschlussgradAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnschlussgradAenderungAcceptActionPerformed
+    private void btnAnschlussgradAenderungAcceptActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnAnschlussgradAenderungAcceptActionPerformed
         pruefungAenderungAnschlussgrad(Pruefung.ACCEPT);
         refreshAenderungButtons(isEnabled());
-    }//GEN-LAST:event_btnAnschlussgradAenderungAcceptActionPerformed
+    }                                                                                                   //GEN-LAST:event_btnAnschlussgradAenderungAcceptActionPerformed
 
     @Override
     protected void setAnnotationGeoJsonFeature(final Feature geoJsonFeature) {
@@ -2510,7 +2510,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         geoJsonFeature.setProperty("pruefung", jToggleButton1.isSelected());
         jToggleButton1.setToolTipText(jToggleButton1.isSelected() ? "Prüfmarkierung entfernen."
                                                                   : "Als geprüft markieren.");
@@ -2519,5 +2519,5 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jToggleButton1.setBorderPainted(!jToggleButton1.isSelected());
 
         Main.getInstance().getKartenPanel().refreshInMap(false);
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    } //GEN-LAST:event_jToggleButton1ActionPerformed
 }
