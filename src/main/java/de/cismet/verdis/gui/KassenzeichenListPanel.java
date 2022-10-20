@@ -1443,6 +1443,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                         allReleased();
                                     }
                                 }
+                                WaitDialog.getInstance().dispose();
                             }
                         }
                     }.execute();
