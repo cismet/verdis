@@ -3861,9 +3861,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                 @Override
                 protected void done() {
-                    WaitDialog.getInstance().dispose();
-                    setEditMode(false);
-                    kassenzeichenPanel.refresh();
+                    try {
+                        setEditMode(false);
+                        kassenzeichenPanel.refresh();
+                    } finally {
+                        WaitDialog.getInstance().dispose();
+                    }
                 }
             }.execute();
     } //GEN-LAST:event_cmdCancelActionPerformed
@@ -4022,9 +4025,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
                             @Override
                             protected void done() {
-                                WaitDialog.getInstance().dispose();
-                                setEditMode(false);
-                                kassenzeichenPanel.refresh();
+                                try {
+                                    setEditMode(false);
+                                    kassenzeichenPanel.refresh();
+                                } finally {
+                                    WaitDialog.getInstance().dispose();
+                                }
                                 renameCurrentKassenzeichen();
                             }
                         }.execute();
