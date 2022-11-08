@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis;
 
+import java.io.File;
+
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -27,9 +29,10 @@ public class BefreiungerlaubnisGeometrieClipboard extends AbstractClipboard {
      * Creates a new FrontenClipboard object.
      *
      * @param  table  DOCUMENT ME!
+     * @param  file   DOCUMENT ME!
      */
-    public BefreiungerlaubnisGeometrieClipboard(final BefreiungerlaubnisTable table) {
-        super(table);
+    public BefreiungerlaubnisGeometrieClipboard(final BefreiungerlaubnisTable table, final File file) {
+        super(table, file);
     }
 
     //~ Methods ----------------------------------------------------------------

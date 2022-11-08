@@ -180,7 +180,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                                 false);
                         if (comp instanceof JLabel) {
                             ((JLabel)comp).setText(
-                                Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
+                                Main.getInstance().getCurrentClipboard().getFromKassenzeichen()
                                         + ":"
                                         + ((JLabel)comp).getText());
                         }
@@ -1254,7 +1254,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
     }
 
     @Override
-    public void clipboardChanged() {
+    public void clipboardChanged(final AbstractClipboard clipboard) {
         updateButtons();
     }
 
@@ -1457,10 +1457,8 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
             }
             final AbstractClipboard clipboard = Main.getInstance().getCurrentClipboard();
             if (clipboard != null) {
-                final List<Integer> kassenzeichenToLockOrRelease = new ArrayList<Integer>();
-                final Integer mainToLock = (Integer)Main.getInstance().getCurrentClipboard().getFromKassenzeichenBean()
-                            .getProperty(
-                                    VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
+                final List<Integer> kassenzeichenToLockOrRelease = new ArrayList<>();
+                final Integer mainToLock = Main.getInstance().getCurrentClipboard().getFromKassenzeichen();
                 if (visible) {
                     SwingUtilities.invokeLater(new Runnable() {
 

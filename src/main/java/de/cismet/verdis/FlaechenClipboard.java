@@ -23,6 +23,8 @@
  */
 package de.cismet.verdis;
 
+import java.io.File;
+
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -49,9 +51,10 @@ public class FlaechenClipboard extends AbstractClipboard {
      * Creates a new FlaechenClipboard object.
      *
      * @param  table  DOCUMENT ME!
+     * @param  file   DOCUMENT ME!
      */
-    public FlaechenClipboard(final RegenFlaechenTable table) {
-        super(table);
+    public FlaechenClipboard(final RegenFlaechenTable table, final File file) {
+        super(table, file);
     }
 
     //~ Methods ----------------------------------------------------------------
