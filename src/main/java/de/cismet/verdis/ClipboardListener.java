@@ -35,6 +35,8 @@ public interface ClipboardListener {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  source  DOCUMENT ME!
      */
-    void clipboardChanged();
+    void clipboardChanged(final AbstractClipboard source);
 }

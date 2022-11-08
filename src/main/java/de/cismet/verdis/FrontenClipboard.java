@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis;
 
+import java.io.File;
+
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -29,9 +31,10 @@ public class FrontenClipboard extends AbstractClipboard {
      * Creates a new FrontenClipboard object.
      *
      * @param  table  DOCUMENT ME!
+     * @param  file   DOCUMENT ME!
      */
-    public FrontenClipboard(final SRFrontenTable table) {
-        super(table);
+    public FrontenClipboard(final SRFrontenTable table, final File file) {
+        super(table, file);
     }
 
     //~ Methods ----------------------------------------------------------------
