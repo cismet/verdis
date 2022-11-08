@@ -299,6 +299,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private static final String FILEPATH_LAYOUT = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_LAYOUT;
     private static final String FILEPATH_MAP = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_MAP;
     private static final String FILEPATH_SCREEN = DIRECTORYPATH_VERDIS + FILESEPARATOR + FILE_SCREEN;
+
+    private static final String FILEPATH_CLIPBOARD_FLAECHEN = DIRECTORYPATH_VERDIS + FILESEPARATOR
+                + "flaechen.clipboard.json";
+    private static final String FILEPATH_CLIPBOARD_FRONTEN = DIRECTORYPATH_VERDIS + FILESEPARATOR
+                + "fronten.clipboard.json";
+    private static final String FILEPATH_CLIPBOARD_ALLGEMEIN = DIRECTORYPATH_VERDIS + FILESEPARATOR
+                + "allgemein.clipboard.json";
+    private static final String FILEPATH_CLIPBOARD_BEFREIUNGERLAUBNIS = DIRECTORYPATH_VERDIS + FILESEPARATOR
+                + "befreiungerlaub.clipboard.json";
+
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Main.class);
     private static JFrame SPLASH;
     private static final Image BANNER_IMAGE = new javax.swing.ImageIcon(Main.class.getResource(
@@ -3612,7 +3622,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void cmdPasteActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdPasteActionPerformed
         final AbstractClipboard clipboard = getCurrentClipboard();
         if (clipboard != null) {
-            clipboard.storeToFile();
             clipboard.paste();
         }
     }                                                                            //GEN-LAST:event_cmdPasteActionPerformed
@@ -3738,18 +3747,14 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 releaseLocks();
             }
         }
-        closeAllConnections();
-    }                                                                      //GEN-LAST:event_formWindowClosing
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void closeAllConnections() {
-        try {
-        } catch (final Exception ex) {
-            LOG.error("Fehler beim Schlie\u00DFen der Connections", ex);
+        for (final AbstractClipboard clipboard : clipboards.values()) {
+            try {
+                clipboard.writeToFile();
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+            }
         }
-    }
+    }                                                                      //GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
@@ -3947,7 +3952,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void cmdCopyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdCopyActionPerformed
         final AbstractClipboard clipboard = clipboards.get(CidsAppBackend.getInstance().getMode());
         if (clipboard != null) {
-            clipboard.storeToFile();
             clipboard.copy();
         }
     }                                                                           //GEN-LAST:event_cmdCopyActionPerformed
@@ -6053,7 +6057,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         configurationManager.writeConfiguration();
         saveLayout(FILEPATH_LAYOUT + "." + currentMode);
         saveConfig(FILEPATH_MAP + "." + currentMode);
-        allClipboardsDeleteStoreFile();
         super.dispose();
         System.exit(0);
     }
@@ -6389,15 +6392,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    private void allClipboardsDeleteStoreFile() {
-        for (final AbstractClipboard clipboard : clipboards.values()) {
-            clipboard.deleteStoreFile();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
     private void initValidator() {
         aggValidator.clear();
         aggValidator.addListener(new ValidatorListener() {
@@ -6423,67 +6417,112 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final ClipboardListener clipboardListener = new ClipboardListener() {
 
                 @Override
-                public void clipboardChanged() {
-                    kassenzeichenListPanel.clipboardChanged();
+                public void clipboardChanged(final AbstractClipboard clipboard) {
+                    kassenzeichenListPanel.clipboardChanged(clipboard);
                     refreshClipboardButtons();
                 }
             };
 
         clipboards.clear();
-        final AbstractClipboard flaechenClipboard = new FlaechenClipboard(getRegenFlaechenTable());
-        flaechenClipboard.addListener(clipboardListener);
-        flaechenClipboard.loadFromFile();
+        final File flaechenClipboardFile = new File(FILEPATH_CLIPBOARD_FLAECHEN);
+        final File frontenClipboardFile = new File(FILEPATH_CLIPBOARD_FRONTEN);
+        final File allgemeinClipboardFile = new File(FILEPATH_CLIPBOARD_ALLGEMEIN);
+        final File befreiungerlaubnisClipboardFile = new File(FILEPATH_CLIPBOARD_BEFREIUNGERLAUBNIS);
 
-        if (flaechenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
+        final AbstractClipboard flaechenClipboard = new FlaechenClipboard(
+                getRegenFlaechenTable(),
+                flaechenClipboardFile);
+        flaechenClipboard.addListener(clipboardListener);
+        flaechenClipboard.addListener(new ClipboardSaveListener());
+        try {
+            flaechenClipboard.loadFromFile();
+
+            if (flaechenClipboard.isPastable()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                    "Persistente Zwischenablage",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (final Exception ex) {
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Laden der Zwischenablage",
+                        "Beim Laden der persistenten Zwischenablage kam es zu einem Fehler.",
+                        ex);
         }
 
         clipboards.put(CidsAppBackend.Mode.REGEN, flaechenClipboard);
 
-        final AbstractClipboard frontenClipboard = new FrontenClipboard(getSRFrontenTable());
+        final AbstractClipboard frontenClipboard = new FrontenClipboard(getSRFrontenTable(), frontenClipboardFile);
         frontenClipboard.addListener(clipboardListener);
-        frontenClipboard.loadFromFile();
+        frontenClipboard.addListener(new ClipboardSaveListener());
+        try {
+            frontenClipboard.loadFromFile();
 
-        if (frontenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
+            if (frontenClipboard.isPastable()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                    "Persistente Zwischenablage",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (final Exception ex) {
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Laden der Zwischenablage",
+                        "Beim Laden der persistenten Zwischenablage kam es zu einem Fehler.",
+                        ex);
         }
 
         clipboards.put(CidsAppBackend.Mode.SR, frontenClipboard);
 
         final AbstractClipboard befreiungGeometrieClipboard = new BefreiungerlaubnisGeometrieClipboard(
-                getBefreiungerlaubnisTable());
+                getBefreiungerlaubnisTable(),
+                befreiungerlaubnisClipboardFile);
         befreiungGeometrieClipboard.addListener(clipboardListener);
-        befreiungGeometrieClipboard.loadFromFile();
+        befreiungGeometrieClipboard.addListener(new ClipboardSaveListener());
+        try {
+            befreiungGeometrieClipboard.loadFromFile();
 
-        if (befreiungGeometrieClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
+            if (befreiungGeometrieClipboard.isPastable()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                    "Persistente Zwischenablage",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (final Exception ex) {
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Laden der Zwischenablage",
+                        "Beim Laden der persistenten Zwischenablage kam es zu einem Fehler.",
+                        ex);
         }
 
         clipboards.put(CidsAppBackend.Mode.KANALDATEN, befreiungGeometrieClipboard);
 
         final AbstractClipboard kassenzeichenClipboard = new KassenzeichenGeometrienClipboard(
-                kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList());
+                kassenzeichenGeometrienPanel.getKassenzeichenGeometrienList(),
+                allgemeinClipboardFile);
         kassenzeichenClipboard.addListener(clipboardListener);
-        kassenzeichenClipboard.loadFromFile();
+        kassenzeichenClipboard.addListener(new ClipboardSaveListener());
+        try {
+            kassenzeichenClipboard.loadFromFile();
 
-        if (kassenzeichenClipboard.isPastable()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
-                "Verdis wurde nicht ordnungsgem\u00E4\u00DF beendet.",
-                JOptionPane.INFORMATION_MESSAGE);
+            if (kassenzeichenClipboard.isPastable()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Der Inhalt der Zwischenablage steht Ihnen weiterhin zur Verf\u00FCgung.",
+                    "Persistente Zwischenablage",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (final Exception ex) {
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Laden der Zwischenablage",
+                        "Beim Laden der persistenten Zwischenablage kam es zu einem Fehler.",
+                        ex);
         }
 
         clipboards.put(CidsAppBackend.Mode.ALLGEMEIN, kassenzeichenClipboard);
@@ -6726,6 +6765,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             Toolkit.getDefaultToolkit()
                     .getSystemClipboard()
                     .setContents(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null), this);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    class ClipboardSaveListener implements ClipboardListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void clipboardChanged(final AbstractClipboard clipboard) {
+            clipboard.writeToFile();
         }
     }
 }

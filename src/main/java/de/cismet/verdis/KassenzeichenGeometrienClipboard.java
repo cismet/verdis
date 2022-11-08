@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis;
 
+import java.io.File;
+
 import de.cismet.cids.custom.util.VerdisUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -38,9 +40,10 @@ public class KassenzeichenGeometrienClipboard extends AbstractClipboard {
      * Creates a new KassenzeichenGeometrienClipboard object.
      *
      * @param  component  DOCUMENT ME!
+     * @param  file       DOCUMENT ME!
      */
-    public KassenzeichenGeometrienClipboard(final KassenzeichenGeometrienList component) {
-        super(component);
+    public KassenzeichenGeometrienClipboard(final KassenzeichenGeometrienList component, final File file) {
+        super(component, file);
     }
 
     //~ Methods ----------------------------------------------------------------
