@@ -207,6 +207,7 @@ import de.cismet.remote.RESTRemoteControlStarter;
 
 import de.cismet.tools.Static2DTools;
 import de.cismet.tools.StaticDebuggingTools;
+import de.cismet.tools.SystemClipboardListener;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -422,7 +423,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final SRFrontenDetailsPanel srFrontenDetailsPanel = new SRFrontenDetailsPanel();
     private final SRFrontenSummenPanel srSummenPanel = new SRFrontenSummenPanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
-    private final SAPClipboardListener sapClipboardListener = new SAPClipboardListener();
     private final TimeRecoveryPanel timeRecoveryPanel = TimeRecoveryPanel.getInstance();
 
     private boolean fixMapExtent;
@@ -1139,6 +1139,26 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         initTotd();
         initAenderungsanfrage();
         initStartupHooks();
+
+        new SystemClipboardListener() {
+
+            @Override
+            protected void processContents(final Transferable contents) {
+                if (cmdSAPCheck.isSelected() && !isInEditMode()) {
+                    try {
+                        if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                            final String string = ((String)contents.getTransferData(DataFlavor.stringFlavor)).trim();
+                            if ((string.length() == 8) && (string.startsWith("6") || string.startsWith("8"))) {
+                                Integer.parseInt(string); // check if its a number
+                                CidsAppBackend.getInstance().gotoKassenzeichen(string);
+                            }
+                        }
+                    } catch (final Exception ex) {
+                        LOG.warn("error processing system clipboard", ex);
+                    }
+                }
+            }
+        };
 
         isInit = false;
     }
@@ -2351,13 +2371,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         cmdSAPCheck.setSelectedIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/toolbar/goto_kassenzeichen_sap_selected.png"))); // NOI18N
         cmdSAPCheck.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        cmdSAPCheck.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    cmdSAPCheckActionPerformed(evt);
-                }
-            });
         tobVerdis.add(cmdSAPCheck);
 
         jPanel2.setMaximumSize(new java.awt.Dimension(2, 38));
@@ -4305,17 +4318,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mniKassenzeichen1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniKassenzeichen1ActionPerformed
         showOrHideView(vKassenzeichenList);
     }                                                                                     //GEN-LAST:event_mniKassenzeichen1ActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void cmdSAPCheckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdSAPCheckActionPerformed
-        if (cmdSAPCheck.isSelected()) {
-            sapClipboardListener.gainOwnership();
-        }
-    }                                                                               //GEN-LAST:event_cmdSAPCheckActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -6530,25 +6532,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
-     */
-    private void processSapClipboardContents() {
-        try {
-            final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                final String string = ((String)transferable.getTransferData(DataFlavor.stringFlavor)).trim();
-                if ((string.length() == 8)
-                            && (string.startsWith("6") || string.startsWith("8"))) {
-                    Integer.parseInt(string); // check if its a number
-                    CidsAppBackend.getInstance().gotoKassenzeichen(string);
-                }
-            }
-        } catch (final Exception ex) {
-            LOG.warn("error processing system clipboard", ex);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -6730,41 +6713,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 LOG.error("Fehler beim Anmelden", ex);
                 return false;
             }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    class SAPClipboardListener implements ClipboardOwner {
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void lostOwnership(final Clipboard clipboard, final Transferable transferable) {
-            if (cmdSAPCheck.isSelected()) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (!isInEditMode()) {
-                                processSapClipboardContents();
-                            }
-                        }
-                    });
-                gainOwnership();
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         */
-        public void gainOwnership() {
-            Toolkit.getDefaultToolkit()
-                    .getSystemClipboard()
-                    .setContents(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null), this);
         }
     }
 
