@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.data;
 
+import Sirius.navigator.tools.StaticNavigatorTools;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,24 +130,6 @@ public class AppPreferences {
     /**
      * DOCUMENT ME!
      *
-     * @param   from  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    private static InputStream getInputStreamFrom(final String from) throws Exception {
-        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
-                    || (from.indexOf("file:/") == 0)) {
-            return new URL(from).openStream();
-        } else {
-            return new BufferedInputStream(new FileInputStream(from));
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  root  DOCUMENT ME!
      */
     private void readFromAppPreferences(final Element root) {
@@ -246,7 +230,8 @@ public class AppPreferences {
         final String cfgFile = JnlpSystemPropertyHelper.getProperty("configFile");
         if (cfgFile != null) {
             try {
-                final AppProperties appProperties = new AppProperties(getInputStreamFrom(cfgFile));
+                final AppProperties appProperties = new AppProperties(StaticNavigatorTools.getInputStreamFromFileOrUrl(
+                            cfgFile));
                 appbackendCallserverurl = appProperties.getCallserverUrl();
                 compressionEnabled = appProperties.isCompressionEnabled();
                 appbackendDomain = appProperties.getDomain();
@@ -258,7 +243,7 @@ public class AppPreferences {
                 final String cfgProxy = ((proxyConfig != null) && !proxyConfig.isEmpty()) ? (cfgDirname + proxyConfig)
                                                                                           : null;
 
-                proxyProperties.load(getInputStreamFrom(cfgProxy));
+                proxyProperties.load(StaticNavigatorTools.getInputStreamFromFileOrUrl(cfgProxy));
             } catch (final Exception ex) {
                 log.fatal("Error while reading config file", ex);
                 System.exit(2);
