@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -391,7 +392,8 @@ public abstract class AbstractClipboard {
     public void loadFromFile() throws Exception {
         getClipboardBeans().clear();
         if (clipboardFile.exists() && (clipboardFile.length() > 0)) {
-            final DummyClipboard dummy = OBJECT_MAPPER.readValue(clipboardFile, DummyClipboard.class);
+            final FileReader read = new FileReader(clipboardFile);
+            final DummyClipboard dummy = OBJECT_MAPPER.readValue(read, DummyClipboard.class);
             if (dummy.getClipboardBeans().isEmpty()) {
                 setFromKassenzeichen(null);
                 setIsCutted(false);
