@@ -84,10 +84,10 @@ import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.FlavorEvent;
+import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -207,7 +207,6 @@ import de.cismet.remote.RESTRemoteControlStarter;
 
 import de.cismet.tools.Static2DTools;
 import de.cismet.tools.StaticDebuggingTools;
-import de.cismet.tools.SystemClipboardListener;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -1140,25 +1139,47 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         initAenderungsanfrage();
         initStartupHooks();
 
-        new SystemClipboardListener() {
+        Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
 
-            @Override
-            protected void processContents(final Transferable contents) {
-                if (cmdSAPCheck.isSelected() && !isInEditMode()) {
-                    try {
-                        if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                            final String string = ((String)contents.getTransferData(DataFlavor.stringFlavor)).trim();
+                @Override
+                public void flavorsChanged(final FlavorEvent e) {
+                    if (cmdSAPCheck.isSelected() && !isInEditMode()) {
+                        try {
+                            final String string =
+                                ((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(
+                                        DataFlavor.stringFlavor)).trim();
+
+                            Toolkit.getDefaultToolkit()
+                                    .getSystemClipboard()
+                                    .setContents(new StringSelection(string), null);
                             if ((string.length() == 8) && (string.startsWith("6") || string.startsWith("8"))) {
                                 Integer.parseInt(string); // check if its a number
                                 CidsAppBackend.getInstance().gotoKassenzeichen(string);
                             }
+                        } catch (final Exception ex) {
+                            LOG.error(ex, ex);
                         }
-                    } catch (final Exception ex) {
-                        LOG.warn("error processing system clipboard", ex);
                     }
                 }
-            }
-        };
+            });
+
+        try {
+            Toolkit.getDefaultToolkit()
+                    .getSystemClipboard()
+                    .setContents(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this), null);
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+
+        /*new SystemClipboardListener() {
+         *
+         * @Override protected void processContents(final Transferable contents) {     if (cmdSAPCheck.isSelected() &&
+         * !isInEditMode()) {         try {             if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+         *   final String string = ((String)contents.getTransferData(DataFlavor.stringFlavor)).trim(); if
+         * ((string.length() == 8) && (string.startsWith("6") || string.startsWith("8"))) { Integer.parseInt(string); //
+         * check if its a number CidsAppBackend.getInstance().gotoKassenzeichen(string);             }             } }
+         * catch
+         * (final Exception ex) {             LOG.warn("error processing system clipboard", ex);         }     } }};*/
 
         isInit = false;
     }
@@ -4980,7 +5001,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 SPLASH = null;
             }
         } catch (Exception propEx) {
-            LOG.fatal("Fehler beim Laden der Properties!", propEx);
+            LOG.fatal("Fehler beim initialisieren der Anwendung", propEx);
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Anwendung wird beendet.",
+                        "Fehler beim initialisieren der Anwendung",
+                        propEx);
             System.exit(1);
         }
     }
