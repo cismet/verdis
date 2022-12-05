@@ -1465,7 +1465,8 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                     .getKassenzeichenPanel()
                     .setSearchField((stacId != null) ? kassenzeichenNummer : kassenzeichen);
 
-            WaitDialog.getInstance().showDialog();
+            final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+            WaitDialog.getInstance().showDialog(deposit);
             WaitDialog.getInstance().startLoadingKassenzeichen(1);
 
             final String kassenzeichenNummerFinal = kassenzeichenNummer;
@@ -1537,12 +1538,12 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                                         } catch (final Exception ex) {
                                             LOG.error(ex, ex);
                                         } finally {
-                                            WaitDialog.getInstance().dispose();
+                                            WaitDialog.getInstance().closeDialog(deposit);
                                         }
                                     }
                                 }.execute();
                         } else {
-                            WaitDialog.getInstance().dispose();
+                            WaitDialog.getInstance().closeDialog(deposit);
                         }
                     }
                 }.execute();
