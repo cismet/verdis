@@ -102,8 +102,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 
 import java.sql.Timestamp;
 
@@ -122,6 +125,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -1175,11 +1180,48 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
          *
          * @Override protected void processContents(final Transferable contents) {     if (cmdSAPCheck.isSelected() &&
          * !isInEditMode()) {         try {             if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-         *   final String string = ((String)contents.getTransferData(DataFlavor.stringFlavor)).trim(); if
+         * final String string = ((String)contents.getTransferData(DataFlavor.stringFlavor)).trim(); if
          * ((string.length() == 8) && (string.startsWith("6") || string.startsWith("8"))) { Integer.parseInt(string); //
          * check if its a number CidsAppBackend.getInstance().gotoKassenzeichen(string);             }             } }
          * catch
          * (final Exception ex) {             LOG.warn("error processing system clipboard", ex);         }     } }};*/
+
+        final File disarmedFile = new File(DIRECTORYPATH_VERDIS, "closeWaitDialog.DANGER.txt");
+        final File armedFile = new File(DIRECTORYPATH_VERDIS, "closeWaitDialog.txt");
+
+        final StringBuilder sb = new StringBuilder();
+        try(final InputStreamReader reader = new InputStreamReader(
+                            Main.class.getResourceAsStream("/verdis/closeWaitDialog.DANGER.txt"),
+                            "UTF-8")) {
+            int data;
+            while ((data = reader.read()) != -1) {
+                sb.append((char)data);
+            }
+        } catch (final Exception exx) {
+            LOG.error(exx, exx);
+        }
+        final String dangerTxtFinal = sb.toString();
+        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        if (armedFile.exists() && armedFile.delete() && !WaitDialog.getInstance().isClosing()) {
+                            WaitDialog.getInstance().closeDialog(null);
+                        }
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    } finally {
+                        if (!disarmedFile.exists()) {
+                            try(final PrintStream out = new PrintStream(new FileOutputStream(disarmedFile))) {
+                                disarmedFile.createNewFile();
+                                out.print(dangerTxtFinal);
+                            } catch (final Exception ex) {
+                            }
+                        }
+                    }
+                }
+            }, 0, 10, TimeUnit.SECONDS);
 
         isInit = false;
     }
@@ -3888,7 +3930,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 return;
             }
         }
-        WaitDialog.getInstance().showDialog();
+        final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+        WaitDialog.getInstance().showDialog(deposit);
         new SwingWorker<Void, Void>() {
 
                 @Override
@@ -3904,7 +3947,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         setEditMode(false);
                         kassenzeichenPanel.refresh();
                     } finally {
-                        WaitDialog.getInstance().dispose();
+                        WaitDialog.getInstance().closeDialog(deposit);
                     }
                 }
             }.execute();
@@ -3917,7 +3960,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      */
     private void cmdEditModeActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdEditModeActionPerformed
         if (!readonly) {
-            WaitDialog.getInstance().showDialog();
+            final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+            WaitDialog.getInstance().showDialog(deposit);
             new SwingWorker<Boolean, Void>() {
 
                     @Override
@@ -3951,7 +3995,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         } catch (final Exception ex) {
                             LOG.error(ex, ex);
                         } finally {
-                            WaitDialog.getInstance().dispose();
+                            WaitDialog.getInstance().closeDialog(deposit);
                         }
                     }
                 }.execute();
@@ -4052,7 +4096,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                         renameCurrentKassenzeichen();
                     }
                 } else {
-                    WaitDialog.getInstance().showDialog();
+                    final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+                    WaitDialog.getInstance().showDialog(deposit);
                     new SwingWorker<Void, Void>() {
 
                             @Override
@@ -4067,7 +4112,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                     setEditMode(false);
                                     kassenzeichenPanel.refresh();
                                 } finally {
-                                    WaitDialog.getInstance().dispose();
+                                    WaitDialog.getInstance().closeDialog(deposit);
                                 }
                                 renameCurrentKassenzeichen();
                             }
@@ -4420,7 +4465,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 final DeletedKassenzeichenIdSearchStatement search = new DeletedKassenzeichenIdSearchStatement(
                         kassenzeichenNummer);
 
-                WaitDialog.getInstance().showDialog();
+                final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+                WaitDialog.getInstance().showDialog(deposit);
                 new SwingWorker<List<Integer>, Void>() {
 
                         @Override
@@ -4467,7 +4513,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                         .showError("Fehler", "Fehler bei der Suche nach gelöschten Kassenzeichen", ex);
                                 LOG.warn(ex, ex);
                             } finally {
-                                WaitDialog.getInstance().dispose();
+                                WaitDialog.getInstance().closeDialog(deposit);
                             }
                         }
                     }.execute();
@@ -4834,7 +4880,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.YES_OPTION) {
-                WaitDialog.getInstance().showDialog();
+                final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+                WaitDialog.getInstance().showDialog(deposit);
                 new SwingWorker<Void, Void>() {
 
                         @Override
@@ -4914,7 +4961,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                     JOptionPane.ERROR_MESSAGE);
                                 LOG.error("error while deleting kassenzeichen", ex);
                             } finally {
-                                WaitDialog.getInstance().dispose();
+                                WaitDialog.getInstance().closeDialog(deposit);
                             }
                         }
                     }.execute();
@@ -5830,7 +5877,8 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final int returnType = assessmentDialog.getReturnType();
 
         if (returnType != AssessmentDialog.RETURN_CANCEL) {
-            WaitDialog.getInstance().showDialog();
+            final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
+            WaitDialog.getInstance().showDialog(deposit);
 
             new SwingWorker<CidsBean, Void>() {
 
@@ -5892,7 +5940,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                                         "Beim Speichern des Kassenzeichens kam es zu einem Fehler.",
                                         ex);
                         } finally {
-                            WaitDialog.getInstance().dispose();
+                            WaitDialog.getInstance().closeDialog(deposit);
                         }
                     }
                 }.execute();

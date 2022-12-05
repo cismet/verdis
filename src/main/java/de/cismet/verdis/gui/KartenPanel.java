@@ -3104,6 +3104,7 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                     CidsAppBackend.getInstance().getMode().equals(
                                         CidsAppBackend.Mode.ALLGEMEIN));
 
+                                final WaitDialog.DialogOwner deposit = new WaitDialog.DialogOwner();
                                 final ServerSearchCreateSearchGeometryListener serverSearchCreateSearchGeometryListener =
                                     new ServerSearchCreateSearchGeometryListener(
                                         mappingComp,
@@ -3134,13 +3135,13 @@ public class KartenPanel extends javax.swing.JPanel implements FeatureCollection
                                                         }
                                                     }
                                                 } finally {
-                                                    WaitDialog.getInstance().dispose();
+                                                    WaitDialog.getInstance().closeDialog(deposit);
                                                 }
                                             }
                                         }
                                     });
 
-                                WaitDialog.getInstance().showDialog("Kassenzeichen suchen...");
+                                WaitDialog.getInstance().showDialog("Kassenzeichen suchen...", deposit);
                                 final SearchFeature newFeature = new SearchFeature(
                                         searchGeom,
                                         ServerSearchCreateSearchGeometryListener.INPUT_LISTENER_NAME);

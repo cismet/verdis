@@ -21,8 +21,18 @@ public class WaitDialog extends javax.swing.JDialog {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static WaitDialog INSTANCE;
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(WaitDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+/*    @Override
+    public void dispose() {
+        close();
+    }*/
+
+    private boolean closing = false;
+
+    private DialogOwner dialogOwner;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -109,25 +119,23 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  max  DOCUMENT ME!
      */
     public void startSavingKassenzeichen(final int max) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startSavingKassenzeichen(max);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        if (max == 1) {
+                            jProgressBar1.setString("Kassenzeichen wird gespeichert...");
+                            jProgressBar1.setMaximum(0);
+                            jProgressBar1.setIndeterminate(true);
+                        } else {
+                            jProgressBar1.setString("Kassenzeichen werden gespeichert...");
+                            jProgressBar1.setMaximum(max);
+                            jProgressBar1.setIndeterminate(false);
+                        }
                     }
-                });
-        } else {
-            if (max == 1) {
-                jProgressBar1.setString("Kassenzeichen wird gespeichert...");
-                jProgressBar1.setMaximum(0);
-                jProgressBar1.setIndeterminate(true);
-            } else {
-                jProgressBar1.setString("Kassenzeichen werden gespeichert...");
-                jProgressBar1.setMaximum(max);
-                jProgressBar1.setIndeterminate(false);
-            }
-        }
+                }
+            });
     }
 
     /**
@@ -136,17 +144,15 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  progress  DOCUMENT ME!
      */
     public void progressSavingKassenzeichen(final int progress) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressSavingKassenzeichen(progress);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setValue(progress);
                     }
-                });
-        } else {
-            jProgressBar1.setValue(progress);
-        }
+                }
+            });
     }
 
     /**
@@ -155,24 +161,22 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  max  DOCUMENT ME!
      */
     public void startDeletingKassenzeichen(final int max) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startSavingKassenzeichen(max);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setString("Kassenzeichen wird gelöscht...");
+                        if (max == 1) {
+                            jProgressBar1.setMaximum(0);
+                            jProgressBar1.setIndeterminate(true);
+                        } else {
+                            jProgressBar1.setMaximum(max);
+                            jProgressBar1.setIndeterminate(false);
+                        }
                     }
-                });
-        } else {
-            jProgressBar1.setString("Kassenzeichen wird gelöscht...");
-            if (max == 1) {
-                jProgressBar1.setMaximum(0);
-                jProgressBar1.setIndeterminate(true);
-            } else {
-                jProgressBar1.setMaximum(max);
-                jProgressBar1.setIndeterminate(false);
-            }
-        }
+                }
+            });
     }
 
     /**
@@ -181,17 +185,15 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  progress  DOCUMENT ME!
      */
     public void progressKassenzeichen(final int progress) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressSavingKassenzeichen(progress);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setValue(progress);
                     }
-                });
-        } else {
-            jProgressBar1.setValue(progress);
-        }
+                }
+            });
     }
 
     /**
@@ -200,19 +202,17 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  max  DOCUMENT ME!
      */
     public void startCreateCrossLinks(final int max) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startSavingKassenzeichen(max);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setString("Querverweise werden gespeichert...");
+                        jProgressBar1.setMaximum(max);
+                        jProgressBar1.setIndeterminate(false);
                     }
-                });
-        } else {
-            jProgressBar1.setString("Querverweise werden gespeichert...");
-            jProgressBar1.setMaximum(max);
-            jProgressBar1.setIndeterminate(false);
-        }
+                }
+            });
     }
 
     /**
@@ -221,17 +221,15 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  progress  DOCUMENT ME!
      */
     public void progressCreateCrossLinks(final int progress) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressCreateCrossLinks(progress);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setValue(progress);
                     }
-                });
-        } else {
-            jProgressBar1.setValue(progress);
-        }
+                }
+            });
     }
 
     /**
@@ -240,25 +238,23 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  max  DOCUMENT ME!
      */
     public void startLoadingKassenzeichen(final int max) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startLoadingKassenzeichen(max);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        if (max == 1) {
+                            jProgressBar1.setString("Kassenzeichen wird geladen...");
+                            jProgressBar1.setMaximum(0);
+                            jProgressBar1.setIndeterminate(true);
+                        } else {
+                            jProgressBar1.setString("Kassenzeichen werden geladen...");
+                            jProgressBar1.setMaximum(max);
+                            jProgressBar1.setIndeterminate(false);
+                        }
                     }
-                });
-        } else {
-            if (max == 1) {
-                jProgressBar1.setString("Kassenzeichen wird geladen...");
-                jProgressBar1.setMaximum(0);
-                jProgressBar1.setIndeterminate(true);
-            } else {
-                jProgressBar1.setString("Kassenzeichen werden geladen...");
-                jProgressBar1.setMaximum(max);
-                jProgressBar1.setIndeterminate(false);
-            }
-        }
+                }
+            });
     }
 
     /**
@@ -267,74 +263,66 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  progress  DOCUMENT ME!
      */
     public void progressLoadingKassenzeichen(final int progress) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressLoadingKassenzeichen(progress);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setValue(progress);
                     }
-                });
-        } else {
-            jProgressBar1.setValue(progress);
-        }
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      */
     public void startCheckCrosslinks() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startCheckCrosslinks();
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setString("Querverweise werden abgerufen...");
+                        jProgressBar1.setMaximum(0);
+                        jProgressBar1.setIndeterminate(true);
                     }
-                });
-        } else {
-            jProgressBar1.setString("Querverweise werden abgerufen...");
-            jProgressBar1.setMaximum(0);
-            jProgressBar1.setIndeterminate(true);
-        }
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      */
     public void startSearchDeletedKassenzeichenFromHistory() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startSearchDeletedKassenzeichenFromHistory();
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setString("Gelöschtes Kassenzeichen wird gesucht...");
+                        jProgressBar1.setMaximum(0);
+                        jProgressBar1.setIndeterminate(true);
                     }
-                });
-        } else {
-            jProgressBar1.setString("Gelöschtes Kassenzeichen wird gesucht...");
-            jProgressBar1.setMaximum(0);
-            jProgressBar1.setIndeterminate(true);
-        }
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      */
     public void startCheckLocks() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startCheckLocks();
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setString("vorhandene Sperre werden geprüft...");
+                        jProgressBar1.setMaximum(0);
+                        jProgressBar1.setIndeterminate(true);
                     }
-                });
-        } else {
-            jProgressBar1.setString("vorhandene Sperre werden geprüft...");
-            jProgressBar1.setMaximum(0);
-            jProgressBar1.setIndeterminate(true);
-        }
+                }
+            });
     }
 
     /**
@@ -344,23 +332,21 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  max            DOCUMENT ME!
      */
     public void startLockOrRelease(final boolean lockOrRelease, final int max) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        startLockOrRelease(lockOrRelease, max);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        if (lockOrRelease) {
+                            jProgressBar1.setString("Kassenzeichen werden gesperrt...");
+                        } else {
+                            jProgressBar1.setString("Kassenzeichen werden freigegeben...");
+                        }
+                        jProgressBar1.setMaximum(max);
+                        jProgressBar1.setIndeterminate(false);
                     }
-                });
-        } else {
-            if (lockOrRelease) {
-                jProgressBar1.setString("Kassenzeichen werden gesperrt...");
-            } else {
-                jProgressBar1.setString("Kassenzeichen werden freigegeben...");
-            }
-            jProgressBar1.setMaximum(max);
-            jProgressBar1.setIndeterminate(false);
-        }
+                }
+            });
     }
 
     /**
@@ -369,73 +355,162 @@ public class WaitDialog extends javax.swing.JDialog {
      * @param  progress  DOCUMENT ME!
      */
     public void progressLockOrRelease(final int progress) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        inEDT(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressLockOrRelease(progress);
+                @Override
+                public void run() {
+                    if (!isClosing()) {
+                        jProgressBar1.setValue(progress);
                     }
-                });
-        } else {
-            jProgressBar1.setValue(progress);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        dispose();
-                    }
-                });
-        } else {
-            setVisible(false);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void showDialog() {
-        showDialog("bitte warten");
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  message  DOCUMENT ME!
+     * @param  dialogOwner  DOCUMENT ME!
      */
-    public void showDialog(final String message) {
-        final Runnable r = new Runnable() {
+    public void closeDialog(final DialogOwner dialogOwner) {
+        if ((dialogOwner == null) || dialogOwner.equals(getDialogOwner())) {
+            setDialogOwner(null);
+            setClosing(true);
+            inEDT(new Runnable() {
 
-                @Override
-                public void run() {
-                    setLocationRelativeTo(Main.getInstance());
-                    jProgressBar1.setString(message);
-                    jProgressBar1.setMaximum(0);
-                    jProgressBar1.setIndeterminate(true);
-                    jProgressBar1.setValue(0);
-                    EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        setVisible(false);
+                        setClosing(false);
+                    }
+                });
+        }
+    }
 
-                            @Override
-                            public void run() {
-                                WaitDialog.this.setVisible(true);
-                            }
-                        });
-                }
-            };
-        if (EventQueue.isDispatchThread()) {
-            r.run();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dialogOwner  DOCUMENT ME!
+     */
+    public void showDialog(final DialogOwner dialogOwner) {
+        showDialog("bitte warten", dialogOwner);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dialogOwner  DOCUMENT ME!
+     */
+    private void setDialogOwner(final DialogOwner dialogOwner) {
+        this.dialogOwner = dialogOwner;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private DialogOwner getDialogOwner() {
+        return dialogOwner;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  closing  DOCUMENT ME!
+     */
+    private void setClosing(final boolean closing) {
+        this.closing = closing;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isClosing() {
+        return closing;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  message      DOCUMENT ME!
+     * @param  dialogOwner  DOCUMENT ME!
+     */
+    public void showDialog(final String message, final DialogOwner dialogOwner) {
+        if ((getDialogOwner() == null) || getDialogOwner().equals(dialogOwner)) {
+            setDialogOwner(dialogOwner);
+            inEDT(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (!isClosing()) {
+                            setLocationRelativeTo(Main.getInstance());
+                            jProgressBar1.setString(message);
+                            jProgressBar1.setMaximum(0);
+                            jProgressBar1.setIndeterminate(true);
+                            jProgressBar1.setValue(0);
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        if (!isClosing()) {
+                                            WaitDialog.this.setVisible(true);
+                                        }
+                                    }
+                                });
+                        }
+                    }
+                });
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  r  DOCUMENT ME!
+     */
+    private void inEDT(final Runnable r) {
+        final Throwable t = new Throwable();
+        final String m = t.getStackTrace()[1].getMethodName();
+
+        if (!SwingUtilities.isEventDispatchThread()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("method %s invoked outside EDT", m), t);
+            }
+            SwingUtilities.invokeLater(r);
         } else {
-            EventQueue.invokeLater(r);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("method %s invoked in EDT", m), t);
+            }
+            r.run();
         }
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class DialogOwner {
+
+        //~ Instance fields ----------------------------------------------------
+
+        final Throwable t = new Throwable();
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public StackTraceElement[] getT() {
+            return t.getStackTrace();
+        }
+    }
 
     /**
      * DOCUMENT ME!
