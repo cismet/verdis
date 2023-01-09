@@ -168,7 +168,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="76"/>
                 <Property name="text" type="java.lang.String" value="Kassenzeichen"/>
               </Properties>
               <Events>
@@ -183,7 +182,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="76"/>
                 <Property name="text" type="java.lang.String" value="Kassenzeichen-Liste"/>
               </Properties>
               <Events>
@@ -198,7 +196,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/sum.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="67"/>
                 <Property name="text" type="java.lang.String" value="Summen"/>
               </Properties>
               <Events>
@@ -213,11 +210,24 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/pipe.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="70"/>
                 <Property name="text" type="java.lang.String" value="Kanalanschluss"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mniKanalanschlussActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mniRechntlicheHinweise">
+              <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+5"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="rechtliche Hinweise"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mniRechntlicheHinweiseActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator11">
@@ -230,7 +240,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" value="Karte"/>
               </Properties>
               <Events>
@@ -245,7 +254,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="84"/>
                 <Property name="text" type="java.lang.String" value="Tabellenansicht"/>
               </Properties>
               <Events>
@@ -260,7 +268,6 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/de/cismet/verdis/res/images/titlebars/flaechen.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" value="Details"/>
               </Properties>
               <Events>

@@ -408,36 +408,6 @@
                 </BindingProperty>
               </BindingProperties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="cbBaulasten">
-              <Properties>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cismet/verdis/gui/srfronten/Bundle.properties" key="SRFrontenDetailsPanel.cbBaulasten.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                </Property>
-              </Properties>
-              <BindingProperties>
-                <BindingProperty name="selected" source="Form" sourcePath="${cidsBean.frontinfo.baulasten}" target="cbBaulasten" targetPath="selected" updateStrategy="0" immediately="false">
-                  <Property name="nullValue" type="boolean" value="false"/>
-                  <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="VerdisConstants.PROP.FRONTINFO.BAULASTEN" type="code"/>
-                  </Property>
-                </BindingProperty>
-              </BindingProperties>
-            </Component>
-            <Component class="javax.swing.JCheckBox" name="cbGrunddienstbarkeit">
-              <Properties>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cismet/verdis/gui/srfronten/Bundle.properties" key="SRFrontenDetailsPanel.cbGrunddienstbarkeit.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                </Property>
-              </Properties>
-              <BindingProperties>
-                <BindingProperty name="selected" source="Form" sourcePath="${cidsBean.frontinfo.grunddienstbarkeit}" target="cbGrunddienstbarkeit" targetPath="selected" updateStrategy="0" immediately="false">
-                  <Property name="nullValue" type="boolean" value="false"/>
-                  <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="VerdisConstants.PROP.FRONTINFO.GRUNDDIENSTBARKEIT" type="code"/>
-                  </Property>
-                </BindingProperty>
-              </BindingProperties>
-            </Component>
             <Component class="javax.swing.JCheckBox" name="cbAnteil">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -449,21 +419,6 @@
                   <Property name="nullValue" type="boolean" value="false"/>
                   <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                     <Connection code="VerdisConstants.PROP.FRONTINFO.ANTEIL" type="code"/>
-                  </Property>
-                </BindingProperty>
-              </BindingProperties>
-            </Component>
-            <Component class="javax.swing.JCheckBox" name="cbQuadratwurzel">
-              <Properties>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cismet/verdis/gui/srfronten/Bundle.properties" key="SRFrontenDetailsPanel.cbQuadratwurzel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                </Property>
-              </Properties>
-              <BindingProperties>
-                <BindingProperty name="selected" source="Form" sourcePath="${cidsBean.frontinfo.quadratwurzel}" target="cbQuadratwurzel" targetPath="selected" updateStrategy="0" immediately="false">
-                  <Property name="nullValue" type="boolean" value="false"/>
-                  <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                    <Connection code="VerdisConstants.PROP.FRONTINFO.QUADRATWURZEL" type="code"/>
                   </Property>
                 </BindingProperty>
               </BindingProperties>
@@ -552,7 +507,6 @@
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
-                <Property name="opaque" type="boolean" value="false"/>
               </Properties>
             </Component>
           </SubComponents>
