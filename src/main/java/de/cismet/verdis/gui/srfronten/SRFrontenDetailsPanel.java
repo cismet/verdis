@@ -101,10 +101,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanSrDetails;
     private javax.swing.JCheckBox cbAnteil;
-    private javax.swing.JCheckBox cbBaulasten;
     private javax.swing.JCheckBox cbGarageStellplatz;
-    private javax.swing.JCheckBox cbGrunddienstbarkeit;
-    private javax.swing.JCheckBox cbQuadratwurzel;
     private javax.swing.JComboBox cboLageSR;
     private javax.swing.JComboBox cboSR;
     private javax.swing.JComboBox cboStrasse;
@@ -317,10 +314,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         jSeparator3 = new javax.swing.JSeparator();
         jPanel2 = new javax.swing.JPanel();
         cbGarageStellplatz = new javax.swing.JCheckBox();
-        cbBaulasten = new javax.swing.JCheckBox();
-        cbGrunddienstbarkeit = new javax.swing.JCheckBox();
         cbAnteil = new javax.swing.JCheckBox();
-        cbQuadratwurzel = new javax.swing.JCheckBox();
         lblWinkel = new javax.swing.JLabel();
         txtWinkel = new javax.swing.JFormattedTextField();
         jSeparator4 = new javax.swing.JSeparator();
@@ -660,38 +654,6 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         jPanel2.add(cbGarageStellplatz);
 
-        cbBaulasten.setText(org.openide.util.NbBundle.getMessage(
-                SRFrontenDetailsPanel.class,
-                "SRFrontenDetailsPanel.cbBaulasten.text")); // NOI18N
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.baulasten}"),
-                cbBaulasten,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                VerdisConstants.PROP.FRONTINFO.BAULASTEN);
-        binding.setSourceNullValue(false);
-        bindingGroup.addBinding(binding);
-
-        jPanel2.add(cbBaulasten);
-
-        cbGrunddienstbarkeit.setText(org.openide.util.NbBundle.getMessage(
-                SRFrontenDetailsPanel.class,
-                "SRFrontenDetailsPanel.cbGrunddienstbarkeit.text")); // NOI18N
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.grunddienstbarkeit}"),
-                cbGrunddienstbarkeit,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                VerdisConstants.PROP.FRONTINFO.GRUNDDIENSTBARKEIT);
-        binding.setSourceNullValue(false);
-        bindingGroup.addBinding(binding);
-
-        jPanel2.add(cbGrunddienstbarkeit);
-
         cbAnteil.setText(org.openide.util.NbBundle.getMessage(
                 SRFrontenDetailsPanel.class,
                 "SRFrontenDetailsPanel.cbAnteil.text")); // NOI18N
@@ -707,22 +669,6 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         bindingGroup.addBinding(binding);
 
         jPanel2.add(cbAnteil);
-
-        cbQuadratwurzel.setText(org.openide.util.NbBundle.getMessage(
-                SRFrontenDetailsPanel.class,
-                "SRFrontenDetailsPanel.cbQuadratwurzel.text")); // NOI18N
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.frontinfo.quadratwurzel}"),
-                cbQuadratwurzel,
-                org.jdesktop.beansbinding.BeanProperty.create("selected"),
-                VerdisConstants.PROP.FRONTINFO.QUADRATWURZEL);
-        binding.setSourceNullValue(false);
-        bindingGroup.addBinding(binding);
-
-        jPanel2.add(cbQuadratwurzel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -786,7 +732,6 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         edtQuer.setEditable(false);
         edtQuer.setContentType("text/html"); // NOI18N
-        edtQuer.setOpaque(false);
         scpQuer.setViewportView(edtQuer);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1164,10 +1109,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         cboStrasse.setEnabled(bln);
         cboLageSR.setEnabled(bln);
         cbAnteil.setEnabled(bln);
-        cbBaulasten.setEnabled(bln);
         cbGarageStellplatz.setEnabled(bln);
-        cbGrunddienstbarkeit.setEnabled(bln);
-        cbQuadratwurzel.setEnabled(bln);
         txtWinkel.setEnabled(bln);
 
         txtBearbeitetDurch.setOpaque(bln);

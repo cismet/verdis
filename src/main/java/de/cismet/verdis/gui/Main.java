@@ -102,7 +102,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -257,6 +256,7 @@ import de.cismet.verdis.gui.regenflaechen.RegenFlaechenDetailsPanel;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenSummenPanel;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTable;
 import de.cismet.verdis.gui.regenflaechen.RegenFlaechenTablePanel;
+import de.cismet.verdis.gui.srfronten.RechtlicheHinweisePanel;
 import de.cismet.verdis.gui.srfronten.SRFrontenDetailsPanel;
 import de.cismet.verdis.gui.srfronten.SRFrontenSummenPanel;
 import de.cismet.verdis.gui.srfronten.SRFrontenTable;
@@ -389,6 +389,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private View vAenderungsanfragenTable;
     private View vAenderungsanfragenNachrichten;
     private View vKanaldaten;
+    private View vRechtlicheHinweise;
     private View vSummen;
     private View vKarte;
     private View vTabelleSR;
@@ -426,6 +427,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private final SRFrontenTablePanel srFrontenTablePanel = new SRFrontenTablePanel();
     private final SRFrontenDetailsPanel srFrontenDetailsPanel = new SRFrontenDetailsPanel();
     private final SRFrontenSummenPanel srSummenPanel = new SRFrontenSummenPanel();
+    private final RechtlicheHinweisePanel srRechtlicheHinweisePanel = new RechtlicheHinweisePanel();
     private final AggregatedValidator aggValidator = new AggregatedValidator();
     private final TimeRecoveryPanel timeRecoveryPanel = TimeRecoveryPanel.getInstance();
 
@@ -512,6 +514,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenuItem mniKassenzeichen1;
     private javax.swing.JMenuItem mniLoadLayout;
     private javax.swing.JMenuItem mniOptions;
+    private javax.swing.JMenuItem mniRechntlicheHinweise;
     private javax.swing.JMenuItem mniResetWindowLayout;
     private javax.swing.JMenuItem mniSaveLayout;
     private javax.swing.JMenuItem mniSummen;
@@ -581,6 +584,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addCidsBeanStore(kanaldatenPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(regenSumPanel);
         CidsAppBackend.getInstance().addCidsBeanStore(timeRecoveryPanel);
+        CidsAppBackend.getInstance().addCidsBeanStore(srRechtlicheHinweisePanel);
 
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenPanel);
         CidsAppBackend.getInstance().addEditModeListener(kassenzeichenListPanel);
@@ -592,6 +596,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         CidsAppBackend.getInstance().addEditModeListener(kartenPanel);
         CidsAppBackend.getInstance().addEditModeListener(kanaldatenPanel);
         CidsAppBackend.getInstance().addEditModeListener(timeRecoveryPanel);
+        CidsAppBackend.getInstance().addEditModeListener(srRechtlicheHinweisePanel);
 
         CidsAppBackend.getInstance().addEditModeListener(aenderungsanfragenNachrichtenPanel);
 
@@ -900,6 +905,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                     .setToolTipText(null);
             viewMap.addView("Kanalanschluss", vKanaldaten);
             rootWindow.setWindow(vKanaldaten);
+
+            vRechtlicheHinweise = new View(
+                    "Rechtliche Hinweise",
+                    Static2DTools.borderIcon(icoKassenzeichen, 0, 3, 0, 1),
+                    srRechtlicheHinweisePanel);
+            vRechtlicheHinweise.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(null);
+            viewMap.addView("Rechtliche Hinweise", vRechtlicheHinweise);
+            rootWindow.setWindow(vRechtlicheHinweise);
 
             vKarte = new View("Karte", Static2DTools.borderIcon(icoKarte, 0, 3, 0, 1), kartenPanel);
             vKarte.getWindowProperties()
@@ -1767,7 +1784,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
      *
      * @param  appMode  DOCUMENT ME!
      */
-    public void setupMap(final CidsAppBackend.Mode appMode) {
+    private void setupMap(final CidsAppBackend.Mode appMode) {
         final String fileName = FILEPATH_MAP + "." + appMode.name();
         final TreeMap ms = mappingModel.getMapServices();
         try {
@@ -1850,7 +1867,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupLayoutRegen() {
+    private void setupLayoutRegen() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
@@ -1864,7 +1881,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupLayoutKanaldaten() {
+    private void setupLayoutKanaldaten() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
@@ -1878,7 +1895,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupLayoutSR() {
+    private void setupLayoutSR() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
@@ -1892,7 +1909,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupLayoutInfo() {
+    private void setupLayoutInfo() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
         final String fileName = FILEPATH_LAYOUT + "." + mode.name();
         try {
@@ -1906,7 +1923,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupDefaultLayoutRegen() {
+    private void setupDefaultLayoutRegen() {
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
@@ -1924,7 +1941,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupDefaultLayoutKanaldaten() {
+    private void setupDefaultLayoutKanaldaten() {
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
@@ -1940,12 +1957,16 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupDefaultLayoutSR() {
+    private void setupDefaultLayoutSR() {
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    rootWindow.setWindow(createSplitWindow(vZusammenfassungSR, vTabelleSR, vDetailsSR));
+                    rootWindow.setWindow(
+                        createSplitWindow(
+                            new SplitWindow(false, 0.5f, vZusammenfassungSR, vRechtlicheHinweise),
+                            vTabelleSR,
+                            vDetailsSR));
                     rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                     rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 }
@@ -1955,7 +1976,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     /**
      * DOCUMENT ME!
      */
-    public void setupDefaultLayoutInfo() {
+    private void setupDefaultLayoutInfo() {
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
@@ -2238,6 +2259,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mniKassenzeichen1 = new javax.swing.JMenuItem();
         mniSummen = new javax.swing.JMenuItem();
         mniKanalanschluss = new javax.swing.JMenuItem();
+        mniRechntlicheHinweise = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         mniKarte = new javax.swing.JMenuItem();
         mniTabelle = new javax.swing.JMenuItem();
@@ -3102,7 +3124,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKassenzeichen.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
-        mniKassenzeichen.setMnemonic('L');
         mniKassenzeichen.setText("Kassenzeichen");
         mniKassenzeichen.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3118,7 +3139,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKassenzeichen1.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
-        mniKassenzeichen1.setMnemonic('L');
         mniKassenzeichen1.setText("Kassenzeichen-Liste");
         mniKassenzeichen1.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3134,7 +3154,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniSummen.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/sum.png"))); // NOI18N
-        mniSummen.setMnemonic('C');
         mniSummen.setText("Summen");
         mniSummen.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3150,7 +3169,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKanalanschluss.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/pipe.png"))); // NOI18N
-        mniKanalanschluss.setMnemonic('F');
         mniKanalanschluss.setText("Kanalanschluss");
         mniKanalanschluss.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3160,6 +3178,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         menWindows.add(mniKanalanschluss);
+
+        mniRechntlicheHinweise.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_5,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniRechntlicheHinweise.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniRechntlicheHinweise.setText("rechtliche Hinweise");
+        mniRechntlicheHinweise.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniRechntlicheHinweiseActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniRechntlicheHinweise);
         menWindows.add(jSeparator11);
 
         mniKarte.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
@@ -3167,7 +3200,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniKarte.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
-        mniKarte.setMnemonic('S');
         mniKarte.setText("Karte");
         mniKarte.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3183,7 +3215,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniTabelle.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
-        mniTabelle.setMnemonic('T');
         mniTabelle.setText("Tabellenansicht");
         mniTabelle.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3199,7 +3230,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 java.awt.event.InputEvent.CTRL_MASK));
         mniDetails.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
-        mniDetails.setMnemonic('D');
         mniDetails.setText("Details");
         mniDetails.addActionListener(new java.awt.event.ActionListener() {
 
@@ -3484,53 +3514,6 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             }
         } catch (Exception e) {
             LOG.error("problem during hide or view", e);
-        }
-    }
-
-    /**
-     * Inserting Docking Window functionalty (Sebastian) 24.07.07.
-     *
-     * @param  icoFlaeche  DOCUMENT ME!
-     */
-    public void setFlaechenPanelIcon(final Icon icoFlaeche) {
-    }
-
-    /**
-     * Inserting Docking Window functionalty (Sebastian) 24.07.07.
-     *
-     * @param  letzteAenderung  DOCUMENT ME!
-     */
-    public void setLetzteAenderungTooltip(final String letzteAenderung) {
-        if (!isInit) {
-            // ((ImageIcon)vKassenzeichen.getIcon()).setDescription()
-            // vKassenzeichen.get
-            // vKassenzeichen.getViewProperties().getViewTitleBarProperties().getNormalProperties().
-        }
-    }
-
-    /**
-     * Inserting Docking Window functionalty (Sebastian) 24.07.07.
-     *
-     * @param  icoSumme  DOCUMENT ME!
-     */
-    public void setSummenPanelIcon(final Icon icoSumme) {
-        if (!isInit) {
-            vSummen.getViewProperties().setIcon(icoSumme);
-        }
-    }
-
-    /**
-     * Inserting Docking Window functionalty (Sebastian) 24.07.07.
-     *
-     * @param  foreground  DOCUMENT ME!
-     */
-    public void setKanalTitleForeground(final Color foreground) {
-        if (!isInit) {
-            vKanaldaten.getViewProperties()
-                    .getViewTitleBarProperties()
-                    .getNormalProperties()
-                    .getComponentProperties()
-                    .setForegroundColor(foreground);
         }
     }
 
@@ -4754,6 +4737,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
         StaticSwingTools.showDialog(StacCreationDialog.getInstance());
     } //GEN-LAST:event_cmdStacActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniRechntlicheHinweiseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniRechntlicheHinweiseActionPerformed
+        showOrHideView(vRechtlicheHinweise);
+    }                                                                                          //GEN-LAST:event_mniRechntlicheHinweiseActionPerformed
 
     /**
      * DOCUMENT ME!
