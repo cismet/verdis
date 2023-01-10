@@ -12,9 +12,16 @@
  */
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.apache.log4j.Logger;
 
+import org.jdesktop.beansbinding.Converter;
+
+import java.sql.Timestamp;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 
 import javax.swing.JComponent;
@@ -74,13 +81,19 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private javax.swing.ButtonGroup btgMode;
     private javax.swing.JButton btnSearch;
     private javax.swing.JCheckBox chkSperre;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel lblBemerkung;
     private javax.swing.JLabel lblErfassungsdatum;
     private javax.swing.JLabel lblKassenzeichen;
     private javax.swing.JLabel lblLastModification;
+    private javax.swing.JLabel lblLuftbildmerker;
     private javax.swing.JLabel lblSperre;
     private javax.swing.JLabel lblSuche;
     private javax.swing.JPanel panKZValues;
@@ -156,6 +169,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         kassenzeichenBean = cidsBean;
         bindingGroup.bind();
 
+        updateLuftbildmerkerGUI(isEnabled(), cidsBean);
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
@@ -163,6 +177,23 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         mainApp.refreshLeftTitleBarColor();
         Main.getInstance().refreshTitle();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  enabled   DOCUMENT ME!
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    private void updateLuftbildmerkerGUI(final boolean enabled, final CidsBean cidsBean) {
+        jCheckBox1.setEnabled(enabled);
+        jFormattedTextField1.setEnabled(enabled);
+        final Integer luftbildmerker = (cidsBean != null) ? (Integer)cidsBean.getProperty("luftbildmerker") : null;
+        jLabel1.setVisible(!enabled && (luftbildmerker != null));
+        lblLuftbildmerker.setVisible(enabled || (luftbildmerker != null));
+        jCheckBox1.setVisible(enabled);
+        jFormattedTextField1.setVisible(enabled);
+        jPanel3.setVisible(enabled || (luftbildmerker != null));
     }
 
     /**
@@ -186,6 +217,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         } else {
             jTextPane1.setBackground(this.getBackground());
         }
+        updateLuftbildmerkerGUI(b, getCidsBean());
     }
 
     /**
@@ -254,14 +286,20 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         btnSearch = new javax.swing.JButton();
         panKZValues = new javax.swing.JPanel();
         lblKassenzeichen = new javax.swing.JLabel();
+        txtKassenzeichen = new javax.swing.JTextField();
         lblErfassungsdatum = new javax.swing.JLabel();
-        lblBemerkung = new javax.swing.JLabel();
-        lblSperre = new javax.swing.JLabel();
         txtErfassungsdatum = new javax.swing.JTextField();
-        chkSperre = new javax.swing.JCheckBox();
+        lblLuftbildmerker = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        lblBemerkung = new javax.swing.JLabel();
         scpBemerkung = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
-        txtKassenzeichen = new javax.swing.JTextField();
+        lblSperre = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        chkSperre = new javax.swing.JCheckBox();
         txtSperreBemerkung = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -303,7 +341,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
         panSearch.add(txtSearch, gridBagConstraints);
 
-        lblSuche.setText("Kassenzeichen");
+        lblSuche.setText("Kassenzeichen:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -339,37 +377,40 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         panKZValues.setLayout(new java.awt.GridBagLayout());
 
-        lblKassenzeichen.setText("Kassenzeichen");
+        lblKassenzeichen.setText("Kassenzeichen:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panKZValues.add(lblKassenzeichen, gridBagConstraints);
 
-        lblErfassungsdatum.setText("Datum der Erfassung");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panKZValues.add(lblErfassungsdatum, gridBagConstraints);
+        txtKassenzeichen.setEditable(false);
 
-        lblBemerkung.setText("Bemerkung");
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"),
+                txtKassenzeichen,
+                org.jdesktop.beansbinding.BeanProperty.create("text"),
+                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
+        bindingGroup.addBinding(binding);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panKZValues.add(lblBemerkung, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
+        panKZValues.add(txtKassenzeichen, gridBagConstraints);
 
-        lblSperre.setText("Veranlagung gesperrt");
+        lblErfassungsdatum.setText("Datum der Erfassung:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panKZValues.add(lblSperre, gridBagConstraints);
+        panKZValues.add(lblErfassungsdatum, gridBagConstraints);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
@@ -383,13 +424,146 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
         panKZValues.add(txtErfassungsdatum, gridBagConstraints);
+
+        lblLuftbildmerker.setText("Luftbildmerker:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panKZValues.add(lblLuftbildmerker, gridBagConstraints);
+
+        jPanel3.setOpaque(false);
+        jPanel3.setLayout(new java.awt.GridBagLayout());
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####"))));
+        jFormattedTextField1.setEnabled(false);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.luftbildmerker}"),
+                jFormattedTextField1,
+                org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding.setSourceNullValue(null);
+        binding.setSourceUnreadableValue(null);
+        binding.setConverter(new IntegerToLongConverter());
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        jPanel3.add(jFormattedTextField1, gridBagConstraints);
+
+        jCheckBox1.setText("Jahr:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.luftbildmerker != null}"),
+                jCheckBox1,
+                org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        bindingGroup.addBinding(binding);
+
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jCheckBox1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(jCheckBox1, gridBagConstraints);
+
+        jLabel1.setBackground(new java.awt.Color(178, 34, 34));
+        jLabel1.setForeground(java.awt.Color.white);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setOpaque(true);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.luftbildmerker}"),
+                jLabel1,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding.setSourceNullValue("-");
+        binding.setSourceUnreadableValue("-");
+        bindingGroup.addBinding(binding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create(
+                    "gesetzt von ${cidsBean.luftbildmerker_von} am ${cidsBean.luftbildmerker_am}"),
+                jLabel1,
+                org.jdesktop.beansbinding.BeanProperty.create("toolTipText"));
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel3.add(jLabel1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
+        panKZValues.add(jPanel3, gridBagConstraints);
+
+        lblBemerkung.setText("Bemerkung:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panKZValues.add(lblBemerkung, gridBagConstraints);
+
+        scpBemerkung.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scpBemerkung.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scpBemerkung.setMinimumSize(new java.awt.Dimension(6, 36));
+
+        jTextPane1.setEditable(false);
+        jTextPane1.setContentType("text/html"); // NOI18N
+        jTextPane1.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    jTextPane1MouseClicked(evt);
+                }
+            });
+        scpBemerkung.setViewportView(jTextPane1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
+        panKZValues.add(scpBemerkung, gridBagConstraints);
+
+        lblSperre.setText("Veranlagung gesperrt:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panKZValues.add(lblSperre, gridBagConstraints);
+
+        jPanel1.setOpaque(false);
+        jPanel1.setLayout(new java.awt.GridBagLayout());
 
         chkSperre.setForeground(java.awt.Color.red);
         chkSperre.setEnabled(false);
@@ -413,56 +587,11 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
-        panKZValues.add(chkSperre, gridBagConstraints);
-
-        scpBemerkung.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scpBemerkung.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        scpBemerkung.setMinimumSize(new java.awt.Dimension(6, 36));
-
-        jTextPane1.setEditable(false);
-        jTextPane1.setContentType("text/html"); // NOI18N
-        jTextPane1.addMouseListener(new java.awt.event.MouseAdapter() {
-
-                @Override
-                public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                    jTextPane1MouseClicked(evt);
-                }
-            });
-        scpBemerkung.setViewportView(jTextPane1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
-        panKZValues.add(scpBemerkung, gridBagConstraints);
-
-        txtKassenzeichen.setEditable(false);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
-                this,
-                org.jdesktop.beansbinding.ELProperty.create("${cidsBean.kassenzeichennummer8}"),
-                txtKassenzeichen,
-                org.jdesktop.beansbinding.BeanProperty.create("text"),
-                VerdisConstants.PROP.KASSENZEICHEN.KASSENZEICHENNUMMER);
-        bindingGroup.addBinding(binding);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 3, 0);
-        panKZValues.add(txtKassenzeichen, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanel1.add(chkSperre, gridBagConstraints);
 
         txtSperreBemerkung.setEditable(false);
         txtSperreBemerkung.setBackground(getBackground());
@@ -486,12 +615,20 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
-        panKZValues.add(txtSperreBemerkung, gridBagConstraints);
+        jPanel1.add(txtSperreBemerkung, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 6, 3, 0);
+        panKZValues.add(jPanel1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -505,7 +642,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setText("Modus");
+        jLabel2.setText("Modus:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -780,6 +917,25 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
             }.execute();
     } //GEN-LAST:event_togVersickerungModeActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jCheckBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox1ActionPerformed
+        jFormattedTextField1.setEnabled(jCheckBox1.isSelected() && CidsAppBackend.getInstance().isEditable());
+        try {
+            getCidsBean().setProperty(
+                "luftbildmerker",
+                jCheckBox1.isSelected() ? Calendar.getInstance().get(Calendar.YEAR) : null);
+            getCidsBean().setProperty("luftbildmerker_von", SessionManager.getSession().getUser().getName());
+            getCidsBean().setProperty("luftbildmerker_am", new Timestamp(Calendar.getInstance().getTime().getTime()));
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+            jFormattedTextField1.setEnabled(false);
+        }
+    }                                                                              //GEN-LAST:event_jCheckBox1ActionPerformed
+
     @Override
     public void appModeChanged() {
         final CidsAppBackend.Mode mode = CidsAppBackend.getInstance().getMode();
@@ -974,5 +1130,33 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                     }
                 }
             };
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class IntegerToLongConverter extends Converter<Integer, Long> {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public Long convertForward(final Integer i) {
+            if (i == null) {
+                return null;
+            }
+            return i.longValue();
+        }
+
+        @Override
+        public Integer convertReverse(final Long l) {
+            if (l == null) {
+                return null;
+            }
+            return l.intValue();
+        }
     }
 }
