@@ -18,6 +18,9 @@ import org.apache.log4j.Logger;
 
 import org.jdesktop.beansbinding.Converter;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import java.sql.Timestamp;
 
 import java.util.ArrayList;
@@ -76,6 +79,26 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
     private final Validator bindingValidator;
     private final AggregatedValidator aggVal = new AggregatedValidator();
     private MultiBemerkung multi;
+
+    private final PropertyChangeListener luftbildmerkerPropChangeListener = new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(final PropertyChangeEvent evt) {
+                if ((evt.getSource() != null) && evt.getSource().equals(getCidsBean())
+                            && VerdisConstants.PROP.KASSENZEICHEN.LUFTBILDMERKER.equals(evt.getPropertyName())) {
+                    try {
+                        getCidsBean().setProperty(
+                            "luftbildmerker_von",
+                            SessionManager.getSession().getUser().getName());
+                        getCidsBean().setProperty(
+                            "luftbildmerker_am",
+                            new Timestamp(Calendar.getInstance().getTime().getTime()));
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    }
+                }
+            }
+        };
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btgMode;
@@ -136,6 +159,10 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         ValidatorHelper.removeAllNoBindingValidatorFromDisplay(txtKassenzeichen);
         getValidatorKassenzeichenNummer(kassenzeichenBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
                 txtKassenzeichen));
+
+        ValidatorHelper.removeAllNoBindingValidatorFromDisplay(jFormattedTextField1);
+        getValidatorLuftbildmerker(kassenzeichenBean).attachDisplay(EmbeddedValidatorDisplay.getEmbeddedDisplayFor(
+                jFormattedTextField1));
     }
 
     @Override
@@ -145,16 +172,21 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
 
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
-        if (cidsBean == null) {
+        final CidsBean oldCidsBean = getCidsBean();
+        if (oldCidsBean != null) {
+            oldCidsBean.removePropertyChangeListener(luftbildmerkerPropChangeListener);
+        }
+        if (cidsBean != null) {
+            cidsBean.addPropertyChangeListener(luftbildmerkerPropChangeListener);
+            final String asJson = (String)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG);
+            multi = CidsAppBackend.transformMultiBemerkungFromJson(asJson);
+            CidsAppBackend.cleanupMultiBemerkung(multi);
+        } else {
             txtErfassungsdatum.setText("");
             txtKassenzeichen.setText("");
             txtSperreBemerkung.setText("");
             chkSperre.setSelected(false);
             multi = null;
-        } else {
-            final String asJson = (String)cidsBean.getProperty(VerdisConstants.PROP.KASSENZEICHEN.BEMERKUNG);
-            multi = CidsAppBackend.transformMultiBemerkungFromJson(asJson);
-            CidsAppBackend.cleanupMultiBemerkung(multi);
         }
         jTextPane1.setText(CidsAppBackend.transformMultiBemerkungToHtml(multi));
 
@@ -173,6 +205,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
         attachBeanValidators();
 
         aggVal.add(getValidatorKassenzeichenNummer(kassenzeichenBean));
+        aggVal.add(getValidatorLuftbildmerker(kassenzeichenBean));
         aggVal.validate();
 
         mainApp.refreshLeftTitleBarColor();
@@ -928,8 +961,6 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
             getCidsBean().setProperty(
                 "luftbildmerker",
                 jCheckBox1.isSelected() ? Calendar.getInstance().get(Calendar.YEAR) : null);
-            getCidsBean().setProperty("luftbildmerker_von", SessionManager.getSession().getUser().getName());
-            getCidsBean().setProperty("luftbildmerker_am", new Timestamp(Calendar.getInstance().getTime().getTime()));
         } catch (final Exception ex) {
             LOG.error(ex, ex);
             jFormattedTextField1.setEnabled(false);
@@ -1119,7 +1150,7 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                                         ValidatorState.Type.ERROR,
                                         "Kassenzeichen nicht im g\u00FCltigen Bereich, muss 8-stellig sein.");
                             }
-                        } catch (Exception ex) {
+                        } catch (final Exception ex) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("KassenzeichenNummer not valid", ex);
                             }
@@ -1128,6 +1159,41 @@ public class KassenzeichenPanel extends javax.swing.JPanel implements CidsBeanSt
                                     "Kassenzeichen muss eine g\u00FCltige Zahl sein.");
                         }
                     }
+                }
+            };
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   kassenzeichenBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Validator getValidatorLuftbildmerker(final CidsBean kassenzeichenBean) {
+        return new CidsBeanValidator(kassenzeichenBean, VerdisConstants.PROP.KASSENZEICHEN.LUFTBILDMERKER) {
+
+                @Override
+                public ValidatorState performValidation() {
+                    final CidsBean cidsBean = getCidsBean();
+                    if (cidsBean == null) {
+                        return null;
+                    }
+                    final Integer luftbildmerker = (Integer)cidsBean.getProperty(
+                            VerdisConstants.PROP.KASSENZEICHEN.LUFTBILDMERKER);
+                    if (luftbildmerker != null) {
+                        final Timestamp luftbildmerkerAm = (Timestamp)cidsBean.getProperty(
+                                VerdisConstants.PROP.KASSENZEICHEN.LUFTBILDMERKER_AM);
+                        final Calendar cal = Calendar.getInstance();
+                        cal.setTime(luftbildmerkerAm);
+                        final int year = cal.get(Calendar.YEAR);
+                        if (Math.abs(year - luftbildmerker) > 4) {
+                            return new ValidatorStateImpl(
+                                    ValidatorState.Type.ERROR,
+                                    "Luftbildmerker muss zwischen jetzt +- 4 Jahre liegen.");
+                        }
+                    }
+                    return new ValidatorStateImpl(ValidatorState.Type.VALID);
                 }
             };
     }
