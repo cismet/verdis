@@ -119,7 +119,10 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -128,15 +131,27 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JFormattedTextField jFormattedTextField2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JList jList2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -149,6 +164,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
@@ -425,13 +441,33 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 }
             };
         jDialog2 = new javax.swing.JDialog();
+        jPanel15 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel12 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jComboBox2 = new javax.swing.JComboBox(csUsrsModel);
+        jCheckBox2 = new javax.swing.JCheckBox();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 32767));
         jPanel7 = new javax.swing.JPanel();
         jButton9 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
         jPanel4 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -471,7 +507,13 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         jDialog2.setModal(true);
         jDialog2.getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jPanel6.setLayout(new java.awt.GridBagLayout());
+        jPanel15.setLayout(new java.awt.GridBagLayout());
+
+        jPanel12.setLayout(new java.awt.GridBagLayout());
+
+        jPanel6.setLayout(new java.awt.CardLayout());
+
+        jPanel11.setLayout(new java.awt.GridBagLayout());
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -484,7 +526,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
-        jPanel6.add(jScrollPane2, gridBagConstraints);
+        jPanel11.add(jScrollPane2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jLabel3,
@@ -493,7 +535,138 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 "ArbeitspaketeManagerPanel.jLabel3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel6.add(jLabel3, gridBagConstraints);
+        jPanel11.add(jLabel3, gridBagConstraints);
+
+        jPanel6.add(jPanel11, "card2");
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel12.add(jPanel6, gridBagConstraints);
+
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jPanel12.TabConstraints.tabTitle"),
+            jPanel12); // NOI18N
+
+        jPanel13.setLayout(new java.awt.GridBagLayout());
+
+        jPanel14.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel4,
+            org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jLabel4.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+        jPanel14.add(jLabel4, gridBagConstraints);
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("####"))));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanel14.add(jFormattedTextField1, gridBagConstraints);
+
+        jFormattedTextField2.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
+                new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("########"))));
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox1,
+                org.jdesktop.beansbinding.ELProperty.create("${selected}"),
+                jFormattedTextField2,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanel14.add(jFormattedTextField2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox1,
+            org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jCheckBox1.text")); // NOI18N
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jCheckBox1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+        jPanel14.add(jCheckBox1, gridBagConstraints);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                jCheckBox2,
+                org.jdesktop.beansbinding.ELProperty.create("${selected}"),
+                jComboBox2,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanel14.add(jComboBox2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jCheckBox2,
+            org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jCheckBox2.text")); // NOI18N
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jCheckBox2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+        jPanel14.add(jCheckBox2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        jPanel14.add(filler2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel13.add(jPanel14, gridBagConstraints);
+
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jPanel13.TabConstraints.tabTitle"),
+            jPanel13); // NOI18N
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel15.add(jTabbedPane1, gridBagConstraints);
 
         jPanel7.setLayout(new java.awt.GridBagLayout());
 
@@ -510,8 +683,8 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
         jPanel7.add(jButton9, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -527,23 +700,55 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
         jPanel7.add(jButton8, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jButton10,
+            org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jButton10.text")); // NOI18N
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton10ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel7.add(jButton10, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel6,
+            org.openide.util.NbBundle.getMessage(
+                ArbeitspaketeManagerPanel.class,
+                "ArbeitspaketeManagerPanel.jLabel6.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 10);
+        jPanel7.add(jLabel6, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel7.add(filler1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
-        jPanel6.add(jPanel7, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+        jPanel15.add(jPanel7, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jDialog2.getContentPane().add(jPanel6, gridBagConstraints);
+        jDialog2.getContentPane().add(jPanel15, gridBagConstraints);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -655,7 +860,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
 
         jPanel10.setLayout(new java.awt.GridBagLayout());
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                 this,
                 org.jdesktop.beansbinding.ELProperty.create("${selectedPaket.login_name}"),
@@ -1047,29 +1252,53 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    private KassenzeichenlistSearchStatement getSearch() {
+        if (jTabbedPane1.getSelectedComponent().equals(jPanel12)) {
+            return new KassenzeichenlistSearchStatement(jTextArea1.getText());
+        } else if (jTabbedPane1.getSelectedComponent().equals(jPanel13)) {
+            return new KassenzeichenlistSearchStatement(new StringBuffer(
+                        String.format(
+                            "kassenzeichen.luftbildmerker = %1$d",
+                            (Long)jFormattedTextField1.getValue())).append(
+                        (jFormattedTextField2.getValue() != null)
+                            ? String.format(
+                                " "
+                                        + "AND kassenzeichen.kassenzeichennummer8 >= %1$d * 10^(8 - CEIL(LOG(%1$d + 1))) "
+                                        + "AND kassenzeichen.kassenzeichennummer8 <= (%1$d + 1) * 10^(8 - CEIL(LOG(%1$d + 1))) - 1",
+                                (Long)jFormattedTextField2.getValue()) : "").append(
+                        (jComboBox2.getSelectedItem() != null)
+                            ? String.format(
+                                " AND kassenzeichen.luftbildmerker_von = '%1$s'",
+                                (String)jComboBox2.getSelectedItem()) : "").toString());
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  evt  DOCUMENT ME!
      */
     private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
-        final KassenzeichenlistSearchStatement search = new KassenzeichenlistSearchStatement(jTextArea1.getText());
+        final KassenzeichenlistSearchStatement search = getSearch();
 
         jButton9.setEnabled(false);
+        jButton10.setEnabled(false);
         jProgressBar1.setIndeterminate(true);
         new SwingWorker<List<Integer>, Void>() {
 
                 @Override
                 protected List<Integer> doInBackground() throws Exception {
-                    final List<Integer> tmpList = new ArrayList<Integer>();
-                    final Collection coll = CidsAppBackend.getInstance().executeCustomServerSearch(search);
-                    tmpList.addAll(coll);
-                    return tmpList;
+                    return new ArrayList<>(CidsAppBackend.getInstance().executeCustomServerSearch(search));
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        final List<Integer> list = get();
-
-                        addManyKassenzeichenToList(list);
+                        addManyKassenzeichenToList(get());
                         jDialog2.setVisible(false);
                     } catch (final Exception ex) {
                         CidsAppBackend.getInstance()
@@ -1077,11 +1306,67 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                         LOG.warn(ex, ex);
                     } finally {
                         jButton9.setEnabled(true);
+                        jButton10.setEnabled(true);
                         jProgressBar1.setIndeterminate(false);
                     }
                 }
             }.execute();
     } //GEN-LAST:event_jButton9ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton10ActionPerformed
+        final KassenzeichenlistSearchStatement search = getSearch();
+
+        jButton9.setEnabled(false);
+        jButton10.setEnabled(false);
+        jProgressBar1.setIndeterminate(true);
+        new SwingWorker<List<Integer>, Void>() {
+
+                @Override
+                protected List<Integer> doInBackground() throws Exception {
+                    return new ArrayList<>(CidsAppBackend.getInstance().executeCustomServerSearch(search));
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final List<Integer> list = get();
+                        jLabel6.setText(String.format("%d Treffer", list.size()));
+                    } catch (final Exception ex) {
+                        jLabel6.setText("Fehler");
+                        CidsAppBackend.getInstance()
+                                .showError("SQL-Fehler", "Fehler bei der Ausführung der SQL-Query.", ex);
+                        LOG.warn(ex, ex);
+                    } finally {
+                        jButton9.setEnabled(true);
+                        jButton10.setEnabled(true);
+                        jProgressBar1.setIndeterminate(false);
+                    }
+                }
+            }.execute();
+    } //GEN-LAST:event_jButton10ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jCheckBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox1ActionPerformed
+        jFormattedTextField2.setValue(null);
+    }                                                                              //GEN-LAST:event_jCheckBox1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
+        jComboBox2.setSelectedItem(null);
+    }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
 
     /**
      * DOCUMENT ME!

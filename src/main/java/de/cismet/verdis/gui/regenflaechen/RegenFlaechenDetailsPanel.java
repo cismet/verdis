@@ -70,6 +70,7 @@ import de.cismet.cids.custom.util.VerdisUtils;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.DefaultBindableReferenceCombo;
+import de.cismet.cids.editors.FastBindableReferenceCombo;
 import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cids.utils.multibean.EmbeddedMultiBeanDisplay;
@@ -100,6 +101,7 @@ import de.cismet.verdis.server.json.FlaechePruefungGroesseJson;
 import de.cismet.verdis.server.json.PruefungAnschlussgradJson;
 import de.cismet.verdis.server.json.PruefungFlaechenartJson;
 import de.cismet.verdis.server.json.PruefungGroesseJson;
+import de.cismet.verdis.server.search.BeschreibungLightweightSearch;
 
 /**
  * DOCUMENT ME!
@@ -151,6 +153,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         };
 
     private Feature geoJsonFeature;
+    private final BeschreibungLightweightSearch beschreibungSearch = new BeschreibungLightweightSearch(
+            "%1$2s",
+            new String[] { "beschreibung" });
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cismet.cismap.commons.gui.SimpleBackgroundedJPanel bpanRegenFlDetails;
@@ -214,7 +219,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         UIManager.put("ComboBox.disabledForeground", Color.black);
         initComponents();
 
-        ((DefaultBindableReferenceCombo)cboBeschreibung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
+        ((FastBindableReferenceCombo)cboBeschreibung).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisConstants.MC.FLAECHENBESCHREIBUNG));
         ((DefaultBindableReferenceCombo)cboAnschlussgrad).setMetaClass(CidsAppBackend.getInstance().getVerdisMetaClass(
                 VerdisConstants.MC.ANSCHLUSSGRAD));
@@ -302,6 +307,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 public void loadingFinished() {
                 }
             });
+
+        ((FastBindableReferenceCombo)cboBeschreibung).setMetaClassFromTableName(
+            VerdisConstants.DOMAIN,
+            VerdisConstants.MC.FLAECHENBESCHREIBUNG);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -614,6 +623,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
             attachBeanValidators();
         }
+        refreshBeschreibungModel();
     }
 
     @Override
@@ -1662,7 +1672,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         scpQuer = new javax.swing.JScrollPane();
         edtQuer = new javax.swing.JEditorPane();
         lblBeschreibung = new javax.swing.JLabel();
-        cboBeschreibung = new DefaultBindableReferenceCombo();
+        cboBeschreibung = new FastBindableReferenceCombo(
+                beschreibungSearch,
+                beschreibungSearch.getRepresentationPattern(),
+                beschreibungSearch.getRepresentationFields());
         pnlGroesse = new javax.swing.JPanel();
         lblGroesseAenderung = new javax.swing.JLabel();
         btnGroesseAenderungReject = new javax.swing.JButton();
@@ -2187,6 +2200,13 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
         binding.setSourceUnreadableValue(null);
         bindingGroup.addBinding(binding);
 
+        cboFlaechenart.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cboFlaechenartActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -2520,4 +2540,34 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
         Main.getInstance().getKartenPanel().refreshInMap(false);
     } //GEN-LAST:event_jToggleButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cboFlaechenartActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboFlaechenartActionPerformed
+        refreshBeschreibungModel();
+    }                                                                                  //GEN-LAST:event_cboFlaechenartActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void refreshBeschreibungModel() {
+        final CidsBean selectedArt = (cboFlaechenart.getSelectedItem() != null)
+            ? (CidsBean)cboFlaechenart.getSelectedItem() : null;
+        final String artAbkuerzung = (selectedArt != null) ? (String)selectedArt.getProperty("art_abkuerzung") : null;
+        final Boolean dachflaeche = (artAbkuerzung != null)
+            ? ("GDF".equals(artAbkuerzung) || "DF".equals(artAbkuerzung)) : null;
+        beschreibungSearch.setDachflaeche(dachflaeche);
+
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    ((FastBindableReferenceCombo)cboBeschreibung).refreshModel();
+                    return null;
+                }
+            }.execute();
+    }
 }
