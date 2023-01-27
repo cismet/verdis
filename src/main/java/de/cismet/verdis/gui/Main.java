@@ -5039,7 +5039,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 main.setVisible(true);
                 SPLASH = null;
             }
-        } catch (Exception propEx) {
+        } catch (final Throwable propEx) {
             LOG.fatal("Fehler beim initialisieren der Anwendung", propEx);
             CidsAppBackend.getInstance()
                     .showError(
