@@ -14,26 +14,26 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
-import java.awt.Component;
+import javafx.application.Platform;
+
+import javafx.concurrent.Worker;
+
+import netscape.javascript.JSObject;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.custom.clientutils.ByteArrayActionDownload;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -41,7 +41,7 @@ import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.BrowserLauncher;
 
-import de.cismet.tools.gui.downloadmanager.AbstractDownload;
+import de.cismet.tools.gui.FXWebViewPanel;
 import de.cismet.tools.gui.downloadmanager.Download;
 import de.cismet.tools.gui.downloadmanager.DownloadManager;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
@@ -49,6 +49,9 @@ import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
 import de.cismet.verdis.CidsAppBackend;
 import de.cismet.verdis.EditModeListener;
 
+import de.cismet.verdis.commons.constants.VerdisConstants;
+
+import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtParameterJson;
@@ -63,9 +66,8 @@ import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
-        implements /*CidsBeanStore, */ EditModeListener,
-            AenderungsanfrageHandler.ChangeListener {
+public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implements EditModeListener,
+    AenderungsanfrageHandler.ChangeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -74,10 +76,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
 
     //~ Instance fields --------------------------------------------------------
 
+    final FXWebViewPanel fxWebView = new FXWebViewPanel();
+
     private String email;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler3;
     private javax.swing.Box.Filler filler4;
     private javax.swing.JButton jButton1;
@@ -89,7 +92,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleButton1;
@@ -104,42 +106,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     public AenderungsanfrageNachrichtenPanel() {
         initComponents();
 
-        jScrollPane1.addComponentListener(new ComponentAdapter() {
+        jPanel1.add(fxWebView, BorderLayout.CENTER);
 
-                @Override
-                public void componentResized(final ComponentEvent e) {
-                    resize();
-                }
-            });
         AenderungsanfrageHandler.getInstance().addChangeListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void resize() {
-        final int width = jScrollPane1.getWidth() - 20;
-
-        int height = 20;
-        Component filler = null;
-        for (final Component component : jPanel1.getComponents()) {
-            if (component instanceof Box.Filler) {
-                filler = component;
-            } else {
-                height += 20 + component.getPreferredSize().getHeight();
-            }
-        }
-        if ((filler != null) && (height < jScrollPane1.getHeight())) {
-            filler.setPreferredSize(new Dimension(width, jScrollPane1.getHeight() - height));
-            height = jScrollPane1.getHeight() - 5;
-        }
-
-        jPanel1.setPreferredSize(new Dimension(width, height));
-        jScrollPane1.revalidate();
-        jScrollPane1.repaint();
-    }
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -164,11 +136,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 new java.awt.Dimension(32767, 0));
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = createNewPanel();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 32767));
+        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
@@ -362,15 +330,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         add(jPanel3, gridBagConstraints);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(filler1, gridBagConstraints);
-
-        jScrollPane1.setViewportView(jPanel1);
-
+        jPanel1.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -378,7 +338,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jScrollPane1, gridBagConstraints);
+        add(jPanel1, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
@@ -446,20 +406,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * DOCUMENT ME!
      */
     private void sendMessagePressed() {
-        String text = jTextArea1.getText().trim();
+        final String text = jTextArea1.getText().trim();
         if ((jTextArea1.getText() != null) && !jTextArea1.getText().trim().isEmpty()) {
             final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-            final int size = aenderungsanfrage.getNachrichten().size();
-            if (size > 0) {
-                final int index = size - 1;
-                final NachrichtJson lastNachricht = aenderungsanfrage.getNachrichten().get(index);
-                if ((lastNachricht.getNachricht() != null) && NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
-                            && Boolean.TRUE.equals(lastNachricht.getDraft()) && lastNachricht.getAnhang().isEmpty()) {
-                    aenderungsanfrage.getNachrichten().remove(index);
-                    refresh();
-                    text = lastNachricht.getNachricht() + "\n\n" + text;
-                }
-            }
 
             // Nachricht erzeugen und lokal hinzufügen
             final NachrichtJson nachrichtJson = new NachrichtSachberarbeiterJson(
@@ -472,7 +421,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
             aenderungsanfrage.getNachrichten().add(nachrichtJson);
 
             // GUI vorab schonmal anpassen
-            addNachricht(nachrichtJson);
+            refresh(aenderungsanfrage);
             jTextArea1.setText("");
         }
     }
@@ -622,7 +571,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 new NachrichtParameterNotifyJson(false),
                 SessionManager.getSession().getUser().getName());
         aenderungsanfrage.getNachrichten().add(nachrichtJson);
-        addNachricht(nachrichtJson);
+        refresh(aenderungsanfrage);
         jPanel1.remove(jButton6);
 
         // nachricht tatsächlich senden
@@ -662,7 +611,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                 if (NachrichtJson.Typ.CLERK.equals(lastNachricht.getTyp())
                             && Boolean.TRUE.equals(lastNachricht.getDraft())) {
                     aenderungsanfrage.getNachrichten().remove(lastNachricht);
-                    refresh();
+                    refresh(aenderungsanfrage);
                     jTextArea1.setText(lastNachricht.getNachricht() + "\n");
                     break;
                 }
@@ -674,7 +623,16 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * DOCUMENT ME!
      */
     private void refresh() {
-        refresh(getAenderungsanfrage());
+        refresh(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  scrollToBottom  DOCUMENT ME!
+     */
+    private void refresh(final boolean scrollToBottom) {
+        refresh(getAenderungsanfrage(), scrollToBottom);
     }
 
     /**
@@ -683,6 +641,16 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
      * @param  aenderungsanfrage  DOCUMENT ME!
      */
     private void refresh(final AenderungsanfrageJson aenderungsanfrage) {
+        refresh(aenderungsanfrage, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  aenderungsanfrage  DOCUMENT ME!
+     * @param  scrollToBottom     DOCUMENT ME!
+     */
+    private void refresh(final AenderungsanfrageJson aenderungsanfrage, final boolean scrollToBottom) {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -692,28 +660,54 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                     }
                 });
         } else {
-            final List<NachrichtJson> nachrichten = (getAenderungsanfrage() != null)
-                ? aenderungsanfrage.getNachrichten() : null;
-            jScrollPane1.setViewportView(jPanel1 = createNewPanel());
+            final List<NachrichtJson> nachrichten = (aenderungsanfrage != null) ? aenderungsanfrage.getNachrichten()
+                                                                                : null;
 
-            clear();
-            jScrollPane1.getViewport().doLayout();
+            jPanel1.remove(jButton6);
+            try {
+                fxWebView.loadContent(AenderungsanfrageUtils.createChatHtmlFromAenderungsanfrage(
+                        aenderungsanfrage,
+                        12,
+                        jToggleButton1.isSelected(),
+                        false,
+                        false));
+
+                new SwingWorker<Void, Void>() {
+
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            Worker.State state = null;
+                            while ((state = fxWebView.getWebEngine().getLoadWorker().getState())
+                                        != Worker.State.SUCCEEDED) {
+                                if ((state == Worker.State.FAILED) || (state == Worker.State.CANCELLED)) {
+                                    throw new Exception("worker failed or cancelled");
+                                }
+                                Thread.sleep(10);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            Platform.runLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        ((JSObject)fxWebView.getWebEngine().executeScript("window")).setMember(
+                                            "java",
+                                            AenderungsanfrageNachrichtenPanel.this);
+                                        fxWebView.getWebEngine()
+                                                .executeScript("window.scrollTo(0, document.body.scrollHeight);");
+                                    }
+                                });
+                        }
+                    }.execute();
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+            }
 
             if (nachrichten != null) {
-                NachrichtJson lastNachrichtJson = null;
-                for (final NachrichtJson nachrichtJson : nachrichten) {
-                    lastNachrichtJson = nachrichtJson;
-                    if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
-                                && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
-                        continue;
-                    }
-                    if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
-                                && !jToggleButton1.isSelected()) {
-                        continue;
-                    }
-                    addNachricht(nachrichtJson);
-                }
-
+                final NachrichtJson lastNachrichtJson = null;
                 if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
                     final boolean lastMessageIsNotification =
                         NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
@@ -740,17 +734,42 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
                         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
                         gridBagConstraints.weightx = 1.0;
                         gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
-                        jPanel1.add(jButton6, gridBagConstraints);
-                        jScrollPane1.getViewport().doLayout();
+                        jPanel1.add(jButton6, BorderLayout.SOUTH);
                     }
                 }
             }
 
             jPanel1.doLayout();
-            jScrollPane1.getViewport().doLayout();
-            jScrollPane1.doLayout();
             revalidate();
-            scrollToBottom();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  name  DOCUMENT ME!
+     * @param  json  DOCUMENT ME!
+     */
+    public void linkClicked(final String name, final String json) {
+        try {
+            if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(this)) {
+                final String jobname = DownloadManagerDialog.getInstance().getJobName();
+                final String filename = name;
+                final Download download = new ByteArrayActionDownload(
+                        VerdisConstants.DOMAIN,
+                        DownloadChangeRequestAnhangServerAction.TASK_NAME,
+                        json,
+                        null,
+                        filename,
+                        jobname,
+                        filename.substring(0, filename.lastIndexOf(".")),
+                        filename.substring(filename.lastIndexOf(".")),
+                        ConnectionContext.createDeprecated());
+
+                DownloadManager.instance().add(download);
+            }
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
         }
     }
 
@@ -762,81 +781,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
     public AenderungsanfrageJson getAenderungsanfrage() {
         return AenderungsanfrageHandler.getInstance().getAenderungsanfrage();
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  nachrichtJson  DOCUMENT ME!
-     */
-    private void addNachricht(final NachrichtJson nachrichtJson) {
-        final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = GridBagConstraints.RELATIVE;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 20, 20, 20);
-        final AenderungsanfrageNachrichtPanel panel = new AenderungsanfrageNachrichtPanel(nachrichtJson);
-        jPanel1.add(panel, gridBagConstraints);
-        jScrollPane1.getViewport().doLayout();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private JPanel createNewPanel() {
-        final JPanel panel = new myPanel();
-        panel.setBackground(new java.awt.Color(255, 255, 255));
-        panel.setLayout(new java.awt.GridBagLayout());
-        panel.doLayout();
-        return panel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void scrollToBottom() {
-        final JScrollBar verticalScrollbar = jScrollPane1.getVerticalScrollBar();
-        verticalScrollbar.setValue(verticalScrollbar.getMaximum());
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void clear() {
-        final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        jPanel1.removeAll();
-        jPanel1.add(new javax.swing.Box.Filler(
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(new Double(jScrollPane1.getViewportBorderBounds().getWidth()).intValue(), 0),
-                new java.awt.Dimension(0, Integer.MAX_VALUE)),
-            gridBagConstraints);
-    }
-
-//    /**
-//     * DOCUMENT ME!
-//     *
-//     * @param  email  DOCUMENT ME!
-//     */
-//    private void setEmail(final String email) {
-//        this.email = email;
-//    }
-//
-//    @Override
-//    public void setCidsBean(final CidsBean cb) {
-//        bindingGroup.unbind();
-//        final CidsBean aenderungsanfrageBean = AenderungsanfrageHandler.getInstance().getCidsBean();
-//        setEmail((aenderungsanfrageBean != null)
-//                ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.EMAIL) : null);
-//        bindingGroup.bind();
-//
-//        refresh();
-//    }
 
     @Override
     public void editModeChanged() {
@@ -887,78 +831,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel
         @Override
         public void setPreferredSize(final Dimension preferredSize) {
             super.setPreferredSize(preferredSize); // To change body of generated methods, choose Tools | Templates.
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private static class TxtDownload extends AbstractDownload {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private final String content;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new TxtDownload object.
-         *
-         * @param  content    DOCUMENT ME!
-         * @param  directory  DOCUMENT ME!
-         * @param  title      DOCUMENT ME!
-         * @param  filename   DOCUMENT ME!
-         * @param  extension  DOCUMENT ME!
-         */
-        public TxtDownload(
-                final String content,
-                final String directory,
-                final String title,
-                final String filename,
-                final String extension) {
-            this.content = content;
-            this.directory = directory;
-            this.title = title;
-
-            status = Download.State.WAITING;
-
-            determineDestinationFile(filename, extension);
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void run() {
-            if (status != Download.State.WAITING) {
-                return;
-            }
-
-            status = Download.State.RUNNING;
-
-            stateChanged();
-
-            BufferedWriter writer = null;
-            try {
-                writer = new BufferedWriter(new FileWriter(fileToSaveTo, false));
-                writer.write(content);
-            } catch (final Exception ex) {
-                error(ex);
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } catch (final Exception e) {
-                        log.warn("Exception occured while closing file.", e);
-                    }
-                }
-            }
-
-            if (status == Download.State.RUNNING) {
-                status = Download.State.COMPLETED;
-                stateChanged();
-            }
         }
     }
 }
