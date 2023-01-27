@@ -15,11 +15,7 @@ import Sirius.navigator.connection.SessionManager;
 
 import java.io.FileOutputStream;
 
-import java.text.DateFormat;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -35,6 +31,7 @@ import de.cismet.verdis.server.action.DownloadChangeRequestAnhangServerAction;
 import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtAnhangJson;
 import de.cismet.verdis.server.json.NachrichtJson;
+import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
  * DOCUMENT ME!
@@ -43,16 +40,10 @@ import de.cismet.verdis.server.json.NachrichtJson;
  */
 public class AenderungsanfrageDownload extends AbstractCancellableDownload implements ConnectionContextProvider {
 
-    //~ Static fields/initializers ---------------------------------------------
-
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-
     //~ Instance fields --------------------------------------------------------
 
     private final AenderungsanfrageJson aenderungsanfrage;
     private final ConnectionContext connectionContext;
-
-    private final Set<NachrichtAnhangJson> nachrichtAnhaenge = new HashSet<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -106,75 +97,29 @@ public class AenderungsanfrageDownload extends AbstractCancellableDownload imple
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     */
-    private String getProtokoll() {
-        final StringBuffer sb = new StringBuffer();
-        for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
-            if (!Boolean.TRUE.equals(nachrichtJson.getDraft())) {
-                final String anhangString;
-                if (nachrichtJson.getAnhang() != null) {
-                    final List<String> anhaenge = new ArrayList<>();
-                    for (final NachrichtAnhangJson nachrichtAnhang : nachrichtJson.getAnhang()) {
-                        anhaenge.add(nachrichtAnhang.getName());
-                        nachrichtAnhaenge.add(nachrichtAnhang);
-                    }
-                    if (anhaenge.isEmpty()) {
-                        anhangString = null;
-                    } else {
-                        anhangString = String.join(", ", anhaenge);
-                    }
-                } else {
-                    anhangString = null;
-                }
-
-                final String typ;
-                if (nachrichtJson.getTyp() != null) {
-                    switch (nachrichtJson.getTyp()) {
-                        case CITIZEN: {
-                            typ = "Bürger";
-                        }
-                        break;
-                        case CLERK: {
-                            typ = "Bearbeiter";
-                        }
-                        break;
-                        case SYSTEM: {
-                            typ = "System";
-                        }
-                        break;
-                        default: {
-                            typ = null;
-                        }
-                    }
-                } else {
-                    typ = null;
-                }
-
-                final String text = AenderungsanfrageNachrichtPanel.createText(nachrichtJson);
-                sb.append(DATE_FORMAT.format(nachrichtJson.getTimestamp()))
-                        .append(" - ")
-                        .append(typ)
-                        .append(":")
-                        .append((text != null) ? (" " + text) : "")
-                        .append((anhangString != null) ? (" [" + anhangString + "]") : "")
-                        .append(System.lineSeparator());
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @throws  Exception  DOCUMENT ME!
      */
     private void createZip() throws Exception {
         try(final FileOutputStream fos = new FileOutputStream(getFileToSaveTo());
                     final ZipOutputStream zos = new ZipOutputStream(fos)) {
-            final String nachrichten = getProtokoll();
-            zos.putNextEntry(new ZipEntry("nachrichten.txt"));
-            zos.write(nachrichten.getBytes());
+            final Set<NachrichtAnhangJson> nachrichtAnhaenge = new HashSet<>();
+
+            for (final NachrichtJson nachrichtJson : aenderungsanfrage.getNachrichten()) {
+                if (!Boolean.TRUE.equals(nachrichtJson.getDraft())) {
+                    if (nachrichtJson.getAnhang() != null) {
+                        for (final NachrichtAnhangJson nachrichtAnhang : nachrichtJson.getAnhang()) {
+                            nachrichtAnhaenge.add(nachrichtAnhang);
+                        }
+                    }
+                }
+            }
+            zos.putNextEntry(new ZipEntry("nachrichten.html"));
+            zos.write(AenderungsanfrageUtils.createChatHtmlFromAenderungsanfrage(
+                    aenderungsanfrage,
+                    14,
+                    true,
+                    true,
+                    true).getBytes());
             zos.closeEntry();
 
             final Set<String> entryNames = new HashSet<>();

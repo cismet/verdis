@@ -1616,7 +1616,7 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
      * @param  message    DOCUMENT ME!
      * @param  exception  DOCUMENT ME!
      */
-    public void showError(final String title, final String message, final Exception exception) {
+    public void showError(final String title, final String message, final Throwable exception) {
         if (SwingUtilities.isEventDispatchThread()) {
             final ErrorInfo errorInfo = new ErrorInfo(title, message, null, "", exception, null, null);
             JXErrorPane.showDialog(Main.getInstance(), errorInfo);
