@@ -148,6 +148,8 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     refreshAenderungButtons(isEnabled());
                 } else if (VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD.equals(evt.getPropertyName())) {
                     refreshAenderungButtons(isEnabled());
+                } else if (VerdisConstants.PROP.FLAECHENINFO.BESCHREIBUNG.equals(evt.getPropertyName())) {
+                    refreshBeschreibungModel();
                 }
             }
         };
@@ -307,10 +309,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 public void loadingFinished() {
                 }
             });
-
-        ((FastBindableReferenceCombo)cboBeschreibung).setMetaClassFromTableName(
-            VerdisConstants.DOMAIN,
-            VerdisConstants.MC.FLAECHENBESCHREIBUNG);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -623,7 +621,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
             attachBeanValidators();
         }
-        refreshBeschreibungModel();
+        // refreshBeschreibungModel();
     }
 
     @Override
@@ -2547,13 +2545,18 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void cboFlaechenartActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cboFlaechenartActionPerformed
-        refreshBeschreibungModel();
-    }                                                                                  //GEN-LAST:event_cboFlaechenartActionPerformed
+//        refreshBeschreibungModel();
+    } //GEN-LAST:event_cboFlaechenartActionPerformed
 
     /**
      * DOCUMENT ME!
      */
     private void refreshBeschreibungModel() {
+        final MultiBeanHelper mbh = RegenFlaechenDetailsPanel.getInstance().getMultiBeanHelper();
+        if (mbh.getBeans().size() != 1) {
+            return;
+        }
+
         final CidsBean selectedArt = (cboFlaechenart.getSelectedItem() != null)
             ? (CidsBean)cboFlaechenart.getSelectedItem() : null;
         final String artAbkuerzung = (selectedArt != null) ? (String)selectedArt.getProperty("art_abkuerzung") : null;
