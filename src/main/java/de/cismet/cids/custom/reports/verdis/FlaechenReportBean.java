@@ -98,8 +98,8 @@ public class FlaechenReportBean extends EBReportBean {
                             + VerdisConstants.PROP.FLAECHENART.ART_ABKUERZUNG);
             if (flaechenart.equals("DF") || flaechenart.equals("GDF")) {
                 dachflaechen.add(flaeche);
-            } else if (flaechenart.equals("VF") || flaechenart.equals("VFÖ") || flaechenart.equals("VFS")
-                        || flaechenart.equals("VSÖ")) {
+            } else if (flaechenart.equals("VF") || flaechenart.equals("LVF") || flaechenart.equals("VFS")
+                        || flaechenart.equals("LVS")) {
                 versiegelteflaechen.add(flaeche);
             }
         }
