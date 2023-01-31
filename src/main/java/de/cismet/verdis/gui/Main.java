@@ -5814,7 +5814,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G720,
             changedVeranlagungSummeMap.get("720-VF"));
         veranlagungBean.setProperty(VerdisConstants.PROP.VERANLAGUNG.G725,
-            changedVeranlagungSummeMap.get("725-VFÖ"));
+            changedVeranlagungSummeMap.get("725-LVF"));
         veranlagungBean.setProperty(
             VerdisConstants.PROP.VERANLAGUNG.G730,
             changedVeranlagungSummeMap.get("730-Va-über"));
