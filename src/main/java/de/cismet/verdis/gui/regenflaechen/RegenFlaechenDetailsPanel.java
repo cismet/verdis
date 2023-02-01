@@ -146,10 +146,9 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                     refreshAenderungButtons(isEnabled());
                 } else if (VerdisConstants.PROP.FLAECHENINFO.FLAECHENART.equals(evt.getPropertyName())) {
                     refreshAenderungButtons(isEnabled());
+                    refreshBeschreibungModel();
                 } else if (VerdisConstants.PROP.FLAECHENINFO.ANSCHLUSSGRAD.equals(evt.getPropertyName())) {
                     refreshAenderungButtons(isEnabled());
-                } else if (VerdisConstants.PROP.FLAECHENINFO.BESCHREIBUNG.equals(evt.getPropertyName())) {
-                    refreshBeschreibungModel();
                 }
             }
         };
@@ -621,7 +620,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
             attachBeanValidators();
         }
-        // refreshBeschreibungModel();
+        refreshBeschreibungModel();
     }
 
     @Override
