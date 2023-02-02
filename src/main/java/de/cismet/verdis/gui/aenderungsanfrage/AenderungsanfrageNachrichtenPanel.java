@@ -707,7 +707,18 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             }
 
             if (nachrichten != null) {
-                final NachrichtJson lastNachrichtJson = null;
+                NachrichtJson lastNachrichtJson = null;
+                for (final NachrichtJson nachrichtJson : nachrichten) {
+                    if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
+                                && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
+                        continue;
+                    }
+                    if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
+                                && !jToggleButton1.isSelected()) {
+                        continue;
+                    }
+                    lastNachrichtJson = nachrichtJson;
+                }
                 if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
                     final boolean lastMessageIsNotification =
                         NachrichtJson.Typ.SYSTEM.equals(lastNachrichtJson.getTyp())
