@@ -424,6 +424,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             refresh(aenderungsanfrage);
             jTextArea1.setText("");
         }
+        jButton1.setVisible(false);
     }
 
     /**
