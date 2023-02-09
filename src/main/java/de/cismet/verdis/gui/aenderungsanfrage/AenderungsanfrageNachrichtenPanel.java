@@ -75,6 +75,7 @@ import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.json.NachrichtJson;
 import de.cismet.verdis.server.json.NachrichtParameterJson;
 import de.cismet.verdis.server.json.NachrichtParameterNotifyJson;
+import de.cismet.verdis.server.json.NachrichtParameterSeenJson;
 import de.cismet.verdis.server.json.NachrichtSachberarbeiterJson;
 import de.cismet.verdis.server.json.NachrichtSystemJson;
 import de.cismet.verdis.server.json.TextbausteinJson;
@@ -505,7 +506,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             refresh(aenderungsanfrage);
             jTextArea1.setText("");
         }
-        jButton1.setVisible(false);
     }
 
     /**
@@ -616,12 +616,25 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  evt  DOCUMENT ME!
      */
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
+        final AenderungsanfrageJson aenderungsanfrage = AenderungsanfrageHandler.getInstance().getAenderungsanfrage();
+        final NachrichtJson nachrichtJson = new NachrichtSystemJson(new NachrichtParameterSeenJson(),
+                SessionManager.getSession().getUser().getName());
+        aenderungsanfrage.getNachrichten().add(nachrichtJson);
+        refresh(aenderungsanfrage);
+        jButton5.setEnabled(false);
+
         new SwingWorker<Void, Void>() {
 
                 @Override
                 protected Void doInBackground() throws Exception {
                     AenderungsanfrageHandler.getInstance()
-                            .sendAenderungsanfrage(AenderungsanfrageHandler.getInstance().getAenderungsanfrage());
+                            .sendAenderungsanfrage(new AenderungsanfrageJson(
+                                    aenderungsanfrage.getKassenzeichen(),
+                                    aenderungsanfrage.getEmailAdresse(),
+                                    aenderungsanfrage.getEmailVerifiziert(),
+                                    null,
+                                    null,
+                                    aenderungsanfrage.getNachrichten()));
                     return null;
                 }
 
@@ -629,7 +642,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 protected void done() {
                     try {
                         get();
-                        jButton5.setEnabled(false);
                         AenderungsanfrageHandler.getInstance().reloadAenderungsanfrageBeans();
                     } catch (final Exception ex) {
                         LOG.error(ex, ex);
@@ -645,12 +657,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      */
     private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
         final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrage();
-
-        final NachrichtJson nachrichtJson = new NachrichtSystemJson(
-                null,
-                null,
-                null,
-                new NachrichtParameterNotifyJson(false),
+        final NachrichtJson nachrichtJson = new NachrichtSystemJson(new NachrichtParameterNotifyJson(false),
                 SessionManager.getSession().getUser().getName());
         aenderungsanfrage.getNachrichten().add(nachrichtJson);
         refresh(aenderungsanfrage);
@@ -919,11 +926,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     @Override
     public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrage) {
         refresh(aenderungsanfrage);
-        final boolean isNewCitizenMessage = (AenderungsanfrageHandler.getInstance().getCidsBean() != null)
-                    && AenderungsanfrageUtils.Status.NEW_CITIZEN_MESSAGE.toString()
-                    .equals((String)AenderungsanfrageHandler.getInstance().getCidsBean().getProperty(
-                                "status.schluessel"));
-        jButton5.setEnabled(!isEnabled() && isNewCitizenMessage);
+        jButton5.setEnabled(!isEnabled() && AenderungsanfrageUtils.isNewCitizenMessage(aenderungsanfrage));
     }
 
     @Override
