@@ -12,13 +12,9 @@ import Sirius.navigator.exception.ConnectionException;
 
 import org.jdesktop.swingx.JXTable;
 
-import org.openide.util.Exceptions;
-
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -533,9 +529,6 @@ public class AenderungsanfrageTablePanel extends JPanel implements CidsBeanStore
                             VerdisConstants.PROP.AENDERUNGSANFRAGE.STAC_ID);
                     aenderungsanfrage.getNachrichten()
                             .add(new NachrichtSystemJson(
-                                    null,
-                                    null,
-                                    null,
                                     new NachrichtParameterProlongJson(Boolean.FALSE),
                                     SessionManager.getSession().getUser().getName()));
                     AenderungsanfrageHandler.getInstance().sendAenderungsanfrage(aenderungsanfrage, stacId);

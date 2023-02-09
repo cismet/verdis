@@ -14,12 +14,17 @@ package de.cismet.verdis.gui.aenderungsanfrage;
 
 import Sirius.navigator.connection.SessionManager;
 
+import org.openide.util.Exceptions;
+
 import java.sql.Timestamp;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -29,6 +34,7 @@ import de.cismet.verdis.commons.constants.VerdisConstants;
 
 import de.cismet.verdis.gui.AbstractCidsBeanTableModel;
 
+import de.cismet.verdis.server.json.AenderungsanfrageJson;
 import de.cismet.verdis.server.utils.AenderungsanfrageUtils;
 
 /**
@@ -56,10 +62,14 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
             Timestamp.class,
             Timestamp.class
         };
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            AenderungsanfrageTableModel.class);
 
     //~ Instance fields --------------------------------------------------------
 
     private final Map<CidsBean, CidsAppBackend.StacOptionsEntry> beanToStacEntryMap = new HashMap<>();
+
+    private final Map<CidsBean, AenderungsanfrageJson> aenderungsanfrageMap = new HashMap<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -114,10 +124,15 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
                                     + "."
                                     + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL))
                             || ((timestamp != null) && timestamp.after(now))) {
-                    return Objects.toString(aenderungsanfrageBean.getProperty(
-                                VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
-                                        + "."
-                                        + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.NAME));
+                    final AenderungsanfrageJson aenderungsanfrage = aenderungsanfrageMap.get(aenderungsanfrageBean);
+                    if (AenderungsanfrageUtils.isNewCitizenMessage(aenderungsanfrage)) {
+                        return "neue Nachricht";
+                    } else {
+                        return Objects.toString(aenderungsanfrageBean.getProperty(
+                                    VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
+                                            + "."
+                                            + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.NAME));
+                    }
                 } else {
                     return "abgelaufen";
                 }
@@ -156,5 +171,43 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
     @Override
     public Class getColumnClass(final int column) {
         return COLUMN_CLASSES[column];
+    }
+
+    @Override
+    public void setCidsBeans(final List<CidsBean> cidsBeans) {
+        super.setCidsBeans(cidsBeans);
+        aenderungsanfrageMap.clear();
+        for (final CidsBean cidsBean : cidsBeans) {
+            final String aenderungsanfrageJson = (cidsBean != null)
+                ? (String)cidsBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON) : null;
+
+            final AenderungsanfrageJson aenderungsanfrage;
+            try {
+                aenderungsanfrage = (aenderungsanfrageJson != null)
+                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(aenderungsanfrageJson) : null;
+                aenderungsanfrageMap.put(cidsBean, aenderungsanfrage);
+            } catch (final Exception ex) {
+                LOG.error(ex, ex);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public AenderungsanfrageJson getAenderungsanfrage(final CidsBean cidsBean) {
+        return aenderungsanfrageMap.get(cidsBean);
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Map<CidsBean, AenderungsanfrageJson> getAenderungsanfrageMap() {
+        return aenderungsanfrageMap;
     }
 }

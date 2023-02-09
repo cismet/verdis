@@ -291,11 +291,8 @@ public class AenderungsanfrageTable extends JXTable {
             boolean show = true;
 
             try {
-                final String aenderungsanfrageJson = (aenderungsanfrageBean != null)
-                    ? (String)aenderungsanfrageBean.getProperty(VerdisConstants.PROP.AENDERUNGSANFRAGE.CHANGES_JSON)
-                    : null;
-                final AenderungsanfrageJson aenderungsanfrage = (aenderungsanfrageJson != null)
-                    ? AenderungsanfrageUtils.getInstance().createAenderungsanfrageJson(aenderungsanfrageJson) : null;
+                final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrageTableModel().getAenderungsanfrage(
+                        aenderungsanfrageBean);
                 if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)
                             && !aenderungsanfrage.getNachrichten().isEmpty()) {
                     boolean atLeastOneIsNoDraft = false;
