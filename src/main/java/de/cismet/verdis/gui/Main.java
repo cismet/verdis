@@ -3956,7 +3956,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         } else {
                             if (acquireLocks()) {    // try to acquire
-                                final int kassenzeichenNummer = Integer.parseInt(kassenzeichenPanel.getSearchField());
+                                final String searchFieldString = kassenzeichenPanel.getSearchField();
+                                final String kassenzeichenNummerString = searchFieldString.contains(":")
+                                    ? searchFieldString.substring(0, searchFieldString.indexOf(":"))
+                                    : searchFieldString;
+                                final int kassenzeichenNummer = Integer.parseInt(kassenzeichenNummerString);
                                 CidsAppBackend.getInstance()
                                         .setCidsBean(CidsAppBackend.getInstance().loadKassenzeichenByNummer(
                                                 kassenzeichenNummer));

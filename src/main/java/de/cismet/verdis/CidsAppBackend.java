@@ -1486,7 +1486,13 @@ public class CidsAppBackend implements CidsBeanStore, HistoryModelListener {
                             if (cidsBean != null) {
                                 cidsBean.toJSONString(true);
                                 setCidsBean(cidsBean);
-                                selectCidsBeanByIdentifier(flaechenBez);
+                                SwingUtilities.invokeLater(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            selectCidsBeanByIdentifier(flaechenBez);
+                                        }
+                                    });
                                 Main.getInstance().getKassenzeichenPanel().flashSearchField(Color.GREEN);
                                 setCurrentKassenzeichen(kassenzeichen);
                                 if (historyEnabled) {
