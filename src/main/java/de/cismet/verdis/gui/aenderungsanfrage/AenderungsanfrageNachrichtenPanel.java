@@ -879,26 +879,37 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  json  DOCUMENT ME!
      */
     public void linkClicked(final String name, final String json) {
-        try {
-            if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(this)) {
-                final String jobname = DownloadManagerDialog.getInstance().getJobName();
-                final String filename = name;
-                final Download download = new ByteArrayActionDownload(
-                        VerdisConstants.DOMAIN,
-                        DownloadChangeRequestAnhangServerAction.TASK_NAME,
-                        json,
-                        null,
-                        filename,
-                        jobname,
-                        filename.substring(0, filename.lastIndexOf(".")),
-                        filename.substring(filename.lastIndexOf(".")),
-                        ConnectionContext.createDeprecated());
+        SwingUtilities.invokeLater(new Runnable() {
 
-                DownloadManager.instance().add(download);
-            }
-        } catch (final Exception ex) {
-            LOG.error(ex, ex);
-        }
+                @Override
+                public void run() {
+                    try {
+                        if (DownloadManagerDialog.getInstance().showAskingForUserTitleDialog(
+                                        AenderungsanfrageNachrichtenPanel.this)) {
+                            final String jobname = DownloadManagerDialog.getInstance().getJobName();
+                            final String filename = name;
+                            final Download download = new ByteArrayActionDownload(
+                                    VerdisConstants.DOMAIN,
+                                    DownloadChangeRequestAnhangServerAction.TASK_NAME,
+                                    json,
+                                    null,
+                                    filename,
+                                    jobname,
+                                    filename.substring(0, filename.lastIndexOf(".")),
+                                    filename.substring(filename.lastIndexOf(".")),
+                                    ConnectionContext.createDeprecated());
+
+                            DownloadManager.instance().add(download);
+                        }
+                    } catch (final Exception ex) {
+                        CidsAppBackend.getInstance()
+                                .showError(
+                                    "Fehler beim Download",
+                                    "Der Anhang konnte nicht heruntergeladen werden.",
+                                    ex);
+                    }
+                }
+            });
     }
 
     /**
