@@ -291,19 +291,11 @@ public class AenderungsanfrageTable extends JXTable {
             boolean show = true;
 
             try {
-                final AenderungsanfrageJson aenderungsanfrage = getAenderungsanfrageTableModel().getAenderungsanfrage(
-                        aenderungsanfrageBean);
-                if ((aenderungsanfrage != null) && (aenderungsanfrage.getNachrichten() != null)
-                            && !aenderungsanfrage.getNachrichten().isEmpty()) {
-                    boolean atLeastOneIsNoDraft = false;
-                    for (final NachrichtJson nachricht : aenderungsanfrage.getNachrichten()) {
-                        if (!Boolean.TRUE.equals(nachricht.getDraft())) {
-                            atLeastOneIsNoDraft = true;
-                            break;
-                        }
-                    }
-                    show &= atLeastOneIsNoDraft;
-                }
+                final AenderungsanfrageJson aenderungsanfrage = AenderungsanfrageUtils.stripAenderungsanfrageFor(
+                        getAenderungsanfrageTableModel().getAenderungsanfrage(aenderungsanfrageBean),
+                        NachrichtJson.Typ.CLERK);
+                show &= ((aenderungsanfrage.getNachrichten() != null) && !aenderungsanfrage.getNachrichten().isEmpty())
+                            || ((aenderungsanfrage.getFlaechen() != null) && !aenderungsanfrage.getFlaechen().isEmpty());
             } catch (final Exception ex) {
                 LOG.error(ex, ex);
                 show = false;
