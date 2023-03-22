@@ -27,6 +27,7 @@ import netscape.javascript.JSObject;
 import org.apache.commons.collections.map.MultiValueMap;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -113,9 +114,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleButton1;
@@ -158,7 +162,11 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             }
             ((TextbausteinePopupButton)jButton7).setData(categories.toArray(new String[0]), textBausteineCategorised);
         } catch (final Exception ex) {
-            LOG.error(ex, ex);
+            CidsAppBackend.getInstance()
+                    .showError(
+                        "Fehler beim Laden der Text-Bausteine",
+                        "Die Text-Bausteine konnten nicht geladen werden.",
+                        ex);
             jButton7.setVisible(false);
         }
     }
@@ -173,6 +181,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jButton6 = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -185,6 +195,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 new java.awt.Dimension(32767, 0));
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -208,7 +219,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                 }
             });
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.CardLayout());
+        add(jPanel5, "null");
+
+        jPanel4.setLayout(new java.awt.GridBagLayout());
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
@@ -374,13 +388,26 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         jPanel3.add(jButton2, gridBagConstraints);
         jButton2.setVisible(false);
 
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(
+                AenderungsanfrageNachrichtenPanel.class,
+                "AenderungsanfrageNachrichtenPanel.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        jPanel3.add(jLabel1, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jPanel3, gridBagConstraints);
+        jPanel4.add(jPanel3, gridBagConstraints);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -391,7 +418,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jPanel1, gridBagConstraints);
+        jPanel4.add(jPanel1, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
@@ -479,7 +506,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jPanel2, gridBagConstraints);
+        jPanel4.add(jPanel2, gridBagConstraints);
+
+        add(jPanel4, "chat");
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
@@ -740,16 +769,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * DOCUMENT ME!
      */
     private void refresh() {
-        refresh(true);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  scrollToBottom  DOCUMENT ME!
-     */
-    private void refresh(final boolean scrollToBottom) {
-        refresh(getAenderungsanfrage(), scrollToBottom);
+        refresh(getAenderungsanfrage());
     }
 
     /**
@@ -758,16 +778,6 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
      * @param  aenderungsanfrage  DOCUMENT ME!
      */
     private void refresh(final AenderungsanfrageJson aenderungsanfrage) {
-        refresh(aenderungsanfrage, true);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  aenderungsanfrage  DOCUMENT ME!
-     * @param  scrollToBottom     DOCUMENT ME!
-     */
-    private void refresh(final AenderungsanfrageJson aenderungsanfrage, final boolean scrollToBottom) {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -820,9 +830,14 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                         }
                     }.execute();
             } catch (final Exception ex) {
-                LOG.error(ex, ex);
+                CidsAppBackend.getInstance()
+                        .showError(
+                            "Fehler beim Laden des Chats",
+                            "Beim Laden des Chats kam es zu einem unerwarteten Fehler.",
+                            ex);
             }
 
+            int nonSystemCount = 0;
             if (nachrichten != null) {
                 NachrichtJson lastNachrichtJson = null;
                 for (final NachrichtJson nachrichtJson : nachrichten) {
@@ -833,6 +848,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                     if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
                                 && !jToggleButton1.isSelected()) {
                         continue;
+                    }
+                    if (!NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())) {
+                        nonSystemCount++;
                     }
                     lastNachrichtJson = nachrichtJson;
                 }
@@ -866,6 +884,10 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                     }
                 }
             }
+            jLabel1.setText(String.format(
+                    "<html><i>%d %s",
+                    nonSystemCount,
+                    (nonSystemCount == 1) ? "Nachricht" : "Nachrichten"));
 
             jPanel1.doLayout();
             revalidate();
@@ -938,6 +960,7 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
     public void aenderungsanfrageChanged(final AenderungsanfrageJson aenderungsanfrage) {
         refresh(aenderungsanfrage);
         jButton5.setEnabled(!isEnabled() && AenderungsanfrageUtils.isNewCitizenMessage(aenderungsanfrage));
+        ((CardLayout)getLayout()).show(this, (aenderungsanfrage == null) ? "null" : "chat");
     }
 
     @Override
