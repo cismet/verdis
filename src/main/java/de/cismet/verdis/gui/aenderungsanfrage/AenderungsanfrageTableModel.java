@@ -117,15 +117,15 @@ public class AenderungsanfrageTableModel extends AbstractCidsBeanTableModel {
                 final CidsAppBackend.StacOptionsEntry stacEntry = beanToStacEntryMap.get(aenderungsanfrageBean);
                 final Timestamp now = new Timestamp(new Date().getTime());
                 final Timestamp timestamp = (stacEntry != null) ? stacEntry.getTimestamp() : null;
-                if (
-                    AenderungsanfrageUtils.Status.ARCHIVED.toString().equals(
+                final boolean archived = AenderungsanfrageUtils.Status.ARCHIVED.toString()
+                            .equals(
                                 aenderungsanfrageBean.getProperty(
                                     VerdisConstants.PROP.AENDERUNGSANFRAGE.STATUS
                                     + "."
-                                    + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL))
-                            || ((timestamp != null) && timestamp.after(now))) {
+                                    + VerdisConstants.PROP.AENDERUNGSANFRAGE_STATUS.SCHLUESSEL));
+                if (archived || ((timestamp != null) && timestamp.after(now))) {
                     final AenderungsanfrageJson aenderungsanfrage = aenderungsanfrageMap.get(aenderungsanfrageBean);
-                    if (AenderungsanfrageUtils.isNewCitizenMessage(aenderungsanfrage)) {
+                    if (!archived && AenderungsanfrageUtils.isNewCitizenMessage(aenderungsanfrage)) {
                         return "neue Nachricht";
                     } else {
                         return Objects.toString(aenderungsanfrageBean.getProperty(

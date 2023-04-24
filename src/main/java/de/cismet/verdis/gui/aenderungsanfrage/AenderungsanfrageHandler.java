@@ -84,7 +84,7 @@ public class AenderungsanfrageHandler {
     private Integer stacId = null;
     private CidsBean cidsBean = null;
     private AenderungsanfrageJson aenderungsanfrage;
-    private ChangeListenerHandler changeListenerHandler = new ChangeListenerHandler();
+    private final ChangeListenerHandler changeListenerHandler = new ChangeListenerHandler();
     private final List<CidsBean> aenderungsanfrageBeans = new ArrayList<>();
 
     @Getter private boolean filterActive = true;
@@ -294,25 +294,27 @@ public class AenderungsanfrageHandler {
      * @throws  Exception  DOCUMENT ME!
      */
     public void reloadAenderungsanfrageBeans() throws Exception {
-        final List<CidsBean> aenderungsanfrageBeans = getAenderungsanfrageBeans();
-        changeListenerHandler.loadingStarted();
-        new SwingWorker<List<CidsBean>, Void>() {
+        synchronized (changeListenerHandler) {
+            final List<CidsBean> aenderungsanfrageBeans = getAenderungsanfrageBeans();
+            changeListenerHandler.loadingStarted();
+            new SwingWorker<List<CidsBean>, Void>() {
 
-                @Override
-                protected List<CidsBean> doInBackground() throws Exception {
-                    return searchAll();
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        setAenderungsanfrageBeans(get());
-                        changeListenerHandler.loadingFinished();
-                    } catch (final Exception ex) {
-                        LOG.error(ex, ex);
+                    @Override
+                    protected List<CidsBean> doInBackground() throws Exception {
+                        return searchAll();
                     }
-                }
-            }.execute();
+
+                    @Override
+                    protected void done() {
+                        try {
+                            setAenderungsanfrageBeans(get());
+                            changeListenerHandler.loadingFinished();
+                        } catch (final Exception ex) {
+                            LOG.error(ex, ex);
+                        }
+                    }
+                }.execute();
+        }
     }
 
     /**
