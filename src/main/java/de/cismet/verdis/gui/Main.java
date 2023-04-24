@@ -1170,10 +1170,11 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             final String string =
                                 ((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(
                                         DataFlavor.stringFlavor)).trim();
-
                             Toolkit.getDefaultToolkit()
                                     .getSystemClipboard()
-                                    .setContents(new StringSelection(string), null);
+                                    .setContents(
+                                        Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this),
+                                        null);
                             if ((string.length() == 8) && (string.startsWith("6") || string.startsWith("8"))) {
                                 Integer.parseInt(string); // check if its a number
                                 CidsAppBackend.getInstance().gotoKassenzeichen(string);
