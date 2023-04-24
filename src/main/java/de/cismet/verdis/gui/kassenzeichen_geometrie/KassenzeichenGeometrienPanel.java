@@ -516,23 +516,24 @@ public class KassenzeichenGeometrienPanel extends javax.swing.JPanel implements 
         final FeatureCollection featureCollection = CidsAppBackend.getInstance().getMainMap().getFeatureCollection();
 
         try {
-            final Collection<Feature> alkisLandparcelFeaturesToRemove = new ArrayList<Feature>();
-            for (final Feature feature : featureCollection.getAllFeatures()) {
-                if (feature instanceof CidsFeature) {
-                    final CidsFeature cidsFeature = (CidsFeature)feature;
-                    if (cidsFeature.getMetaClass().getTableName().equalsIgnoreCase(
-                                    "alkis_landparcel")) {
-                        alkisLandparcelFeaturesToRemove.add(cidsFeature);
-                    }
-                }
-            }
-            try {
-                featureCollection.removeFeatureCollectionListener(this);
-                featureCollection.removeFeatures(alkisLandparcelFeaturesToRemove);
-            } finally {
-                featureCollection.addFeatureCollectionListener(this);
-            }
-
+//
+//            final Collection<Feature> alkisLandparcelFeaturesToRemove = new ArrayList<Feature>();
+//            for (final Feature feature : featureCollection.getAllFeatures()) {
+//                if (feature instanceof CidsFeature) {
+//                    final CidsFeature cidsFeature = (CidsFeature)feature;
+//                    if (cidsFeature.getMetaClass().getTableName().equalsIgnoreCase(
+//                                    "alkis_landparcel")) {
+//                        alkisLandparcelFeaturesToRemove.add(cidsFeature);
+//                    }
+//                }
+//            }
+//            try {
+//                featureCollection.removeFeatureCollectionListener(this);
+//                featureCollection.removeFeatures(alkisLandparcelFeaturesToRemove);
+//            } finally {
+//                featureCollection.addFeatureCollectionListener(this);
+//            }
+//
             final DefaultListModel alkisLandparcelListModel = (DefaultListModel)lstAlkisLandparcels.getModel();
             alkisLandparcelListModel.clear();
             final int[] selectedIndices = lstKassenzeichenGeometrien.getSelectedIndices();
