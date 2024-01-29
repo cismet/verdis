@@ -87,7 +87,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -143,6 +142,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
+
+import de.cismet.cids.client.tools.ContinueOrExitHandler;
 
 import de.cismet.cids.custom.clientutils.ByteArrayActionDownload;
 import de.cismet.cids.custom.commons.gui.BaulastSuchDialog;
@@ -561,8 +562,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
 
     /**
      * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public void init() {
+    public void init() throws Exception {
+        ContinueOrExitHandler.getInstance().showFromConfAttr();
+
         readonly = readonly
                     || CidsAppBackend.getInstance().getAppPreferences().getMode().trim().toLowerCase()
                     .equals("readonly");
