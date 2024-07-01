@@ -861,8 +861,12 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                                 && NachrichtParameterJson.Type.NOTIFY.equals(
                                     lastNachrichtJson.getNachrichtenParameter().getType());
                     final boolean lastMessageIsStatusDone = (lastNachrichtJson.getNachrichtenParameter() != null)
-                                && AenderungsanfrageUtils.Status.NONE.equals(lastNachrichtJson.getNachrichtenParameter()
-                                    .getStatus());
+                                && (AenderungsanfrageUtils.Status.NONE.equals(
+                                        lastNachrichtJson.getNachrichtenParameter().getStatus())
+                                    || AenderungsanfrageUtils.Status.CLOSED.equals(
+                                        lastNachrichtJson.getNachrichtenParameter().getStatus())
+                                    || AenderungsanfrageUtils.Status.ARCHIVED.equals(
+                                        lastNachrichtJson.getNachrichtenParameter()));
                     final boolean lastMessageWasFromMe = SessionManager.getSession()
                                 .getUser()
                                 .getName()
