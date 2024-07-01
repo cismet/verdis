@@ -246,7 +246,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                 public void valueChanged(final ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
                         final int selectedRow = jTable1.getSelectedRow();
-                        
+
                         if (selectedRow != -1) {
                             final CidsBean selectedBean = (CidsBean)((AbstractCidsBeanTableModel)jTable1.getModel())
                                         .getCidsBeanByIndex(jTable1.convertRowIndexToModel(selectedRow));
@@ -1127,30 +1127,30 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         final CidsBean newBean = mcArbeitspaket.getEmptyInstance().getBean();
         ((ArbeitspaketeTableModel)jTable1.getModel()).addCidsBean(newBean);
         final int index = jTable1.convertRowIndexToView(((ArbeitspaketeTableModel)jTable1.getModel())
                         .getIndexByCidsBean(newBean));
         jTable1.getSelectionModel().setSelectionInterval(index, index);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         ((ArbeitspaketeTableModel)jTable1.getModel()).removeCidsBean(selectedPaket);
         setSelectedPaket(null);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         StaticSwingTools.showDialog(new KassenzeichenAddDialog(new KassenzeichenAddDialogListener() {
 
                     @Override
@@ -1158,14 +1158,14 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                         addOneKassenzeichenToList(kassenzeichennummer);
                     }
                 }));
-    }//GEN-LAST:event_jButton4ActionPerformed
+    } //GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         final List<CidsBean> eintraege = selectedPaket.getBeanCollectionProperty(
                 VerdisConstants.PROP.ARBEITSPAKET.KASSENZEICHENNUMMERN);
 
@@ -1174,41 +1174,41 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
         }
 
         pakedDataChanged();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    } //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
         StaticSwingTools.showDialog(jDialog2);
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton7ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jList2ValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
+    private void jList2ValueChanged(final javax.swing.event.ListSelectionEvent evt) { //GEN-FIRST:event_jList2ValueChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_jList2ValueChanged
+    } //GEN-LAST:event_jList2ValueChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
         final int selRow = jTable1.getSelectedRow();
 
         jProgressBar1.setIndeterminate(true);
@@ -1241,16 +1241,16 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    } //GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton8ActionPerformed
         jDialog2.setVisible(false);
-    }//GEN-LAST:event_jButton8ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1285,7 +1285,7 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
         final KassenzeichenlistSearchStatement search = getSearch();
 
         jButton9.setEnabled(false);
@@ -1314,14 +1314,14 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton9ActionPerformed
+    } //GEN-LAST:event_jButton9ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+    private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton10ActionPerformed
         final KassenzeichenlistSearchStatement search = getSearch();
 
         jButton9.setEnabled(false);
@@ -1351,25 +1351,25 @@ public class ArbeitspaketeManagerPanel extends javax.swing.JPanel {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_jButton10ActionPerformed
+    } //GEN-LAST:event_jButton10ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void jCheckBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox1ActionPerformed
         jFormattedTextField2.setValue(null);
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }                                                                              //GEN-LAST:event_jCheckBox1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void jCheckBox2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jCheckBox2ActionPerformed
         jComboBox2.setSelectedItem(null);
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }                                                                              //GEN-LAST:event_jCheckBox2ActionPerformed
 
     /**
      * DOCUMENT ME!
