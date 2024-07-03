@@ -840,19 +840,24 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
             int nonSystemCount = 0;
             if (nachrichten != null) {
                 NachrichtJson lastNachrichtJson = null;
+                NachrichtParameterJson lastParameter = null;
+
                 for (final NachrichtJson nachrichtJson : nachrichten) {
                     if (NachrichtJson.Typ.CITIZEN.equals(nachrichtJson.getTyp())
                                 && Boolean.TRUE.equals(nachrichtJson.getDraft())) {
+                        lastParameter = nachrichtJson.getNachrichtenParameter();
                         continue;
                     }
                     if (NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())
                                 && !jToggleButton1.isSelected()) {
+                        lastParameter = nachrichtJson.getNachrichtenParameter();
                         continue;
                     }
                     if (!NachrichtJson.Typ.SYSTEM.equals(nachrichtJson.getTyp())) {
                         nonSystemCount++;
                     }
                     lastNachrichtJson = nachrichtJson;
+                    lastParameter = nachrichtJson.getNachrichtenParameter();
                 }
                 if ((lastNachrichtJson != null) && !CidsAppBackend.getInstance().isEditable()) {    // to ensure that all we don't send notifications before changes are undrafted
                     final boolean lastMessageIsNotification =
@@ -867,6 +872,9 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                                         lastNachrichtJson.getNachrichtenParameter().getStatus())
                                     || AenderungsanfrageUtils.Status.ARCHIVED.equals(
                                         lastNachrichtJson.getNachrichtenParameter()));
+                    final boolean notified = (lastParameter != null)
+                                && (lastParameter.getBenachrichtigt() != null)
+                                && lastParameter.getBenachrichtigt();
                     final boolean lastMessageWasFromMe = SessionManager.getSession()
                                 .getUser()
                                 .getName()
@@ -876,7 +884,8 @@ public class AenderungsanfrageNachrichtenPanel extends javax.swing.JPanel implem
                     final boolean showButton = hasVerifiedEmail
                                 && lastMessageWasFromMe
                                 && !lastMessageIsNotification
-                                && !lastMessageIsStatusDone;
+                                && !lastMessageIsStatusDone
+                                && !notified;
                     if (showButton) {
                         final java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                         gridBagConstraints.gridx = 0;
