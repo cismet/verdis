@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import org.openide.util.Exceptions;
+
 import java.util.Collection;
 
 import javax.swing.SwingWorker;
@@ -61,8 +63,14 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
             setCidsBean(null);
             return;
         }
-        if ((previousSwingworker != null) && !previousSwingworker.isDone()) {
-            previousSwingworker.cancel(true);
+        while ((previousSwingworker != null) && !previousSwingworker.isDone()) {
+            try {
+                // do not cancel the previousSwingWorker. This can lead to a race condition with and the cancelled
+                // worker ends with setCidsBean(null); after the new worker.
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                // nothing to do
+            }
         }
         previousSwingworker = new SwingWorker<CidsBean, Void>() {
 
