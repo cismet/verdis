@@ -510,8 +510,12 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private javax.swing.JMenu menFile;
     private javax.swing.JMenu menHelp;
     private javax.swing.JMenu menWindows;
+    private javax.swing.JMenuItem mniAenderungsanfragen;
+    private javax.swing.JMenuItem mniAenderungsanfragenNachrichten;
     private javax.swing.JMenuItem mniClose;
     private javax.swing.JMenuItem mniDetails;
+    private javax.swing.JMenuItem mniEsw;
+    private javax.swing.JMenuItem mniInfo;
     private javax.swing.JMenuItem mniKanalanschluss;
     private javax.swing.JMenuItem mniKarte;
     private javax.swing.JMenuItem mniKassenzeichen;
@@ -1795,7 +1799,21 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         }
         setupMap(currentMode);
 
+        refreshWindowMenu(currentMode);
+
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  appMode  DOCUMENT ME!
+     */
+    private void refreshWindowMenu(final CidsAppBackend.Mode appMode) {
+        mniAenderungsanfragen.setVisible(appMode.equals(CidsAppBackend.Mode.REGEN));
+        mniAenderungsanfragenNachrichten.setVisible(appMode.equals(CidsAppBackend.Mode.REGEN));
+        mniEsw.setVisible(appMode.equals(CidsAppBackend.Mode.SR));
+        mniInfo.setVisible(appMode.equals(CidsAppBackend.Mode.ALLGEMEIN));
     }
 
     /**
@@ -2283,6 +2301,10 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         mniKarte = new javax.swing.JMenuItem();
         mniTabelle = new javax.swing.JMenuItem();
         mniDetails = new javax.swing.JMenuItem();
+        mniAenderungsanfragen = new javax.swing.JMenuItem();
+        mniAenderungsanfragenNachrichten = new javax.swing.JMenuItem();
+        mniEsw = new javax.swing.JMenuItem();
+        mniInfo = new javax.swing.JMenuItem();
         mniResetWindowLayout = new javax.swing.JMenuItem();
         menHelp = new javax.swing.JMenu();
         mnuHelp = new javax.swing.JMenuItem();
@@ -3258,6 +3280,66 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                 }
             });
         menWindows.add(mniDetails);
+
+        mniAenderungsanfragen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_6,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniAenderungsanfragen.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniAenderungsanfragen.setText("Änderungsanfragen");
+        mniAenderungsanfragen.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniAenderungsanfragenActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniAenderungsanfragen);
+
+        mniAenderungsanfragenNachrichten.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_0,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniAenderungsanfragenNachrichten.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/kassenzeichen.png"))); // NOI18N
+        mniAenderungsanfragenNachrichten.setText("Änderungsanfragen-Nachrichten");
+        mniAenderungsanfragenNachrichten.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniAenderungsanfragenNachrichtenActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniAenderungsanfragenNachrichten);
+
+        mniEsw.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_6,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniEsw.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniEsw.setText("ESW Zusammenfassung");
+        mniEsw.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniEswActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniEsw);
+
+        mniInfo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_6,
+                java.awt.event.InputEvent.CTRL_MASK));
+        mniInfo.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/verdis/res/images/titlebars/flaechen.png"))); // NOI18N
+        mniInfo.setText("Informationen");
+        mniInfo.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    mniInfoActionPerformed(evt);
+                }
+            });
+        menWindows.add(mniInfo);
 
         mniResetWindowLayout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
                 java.awt.event.KeyEvent.VK_R,
@@ -4769,6 +4851,42 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
     private void mniRechntlicheHinweiseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniRechntlicheHinweiseActionPerformed
         showOrHideView(vRechtlicheHinweise);
     }                                                                                          //GEN-LAST:event_mniRechntlicheHinweiseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniAenderungsanfragenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniAenderungsanfragenActionPerformed
+        showOrHideView(vAenderungsanfragenTable);
+    }                                                                                         //GEN-LAST:event_mniAenderungsanfragenActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniAenderungsanfragenNachrichtenActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniAenderungsanfragenNachrichtenActionPerformed
+        showOrHideView(vAenderungsanfragenNachrichten);
+    }                                                                                                    //GEN-LAST:event_mniAenderungsanfragenNachrichtenActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniEswActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniEswActionPerformed
+        showOrHideView(vZusammenfassungSR);
+    }                                                                          //GEN-LAST:event_mniEswActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void mniInfoActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_mniInfoActionPerformed
+        showOrHideView(vInfoAllgemein);
+    }                                                                           //GEN-LAST:event_mniInfoActionPerformed
 
     /**
      * DOCUMENT ME!
