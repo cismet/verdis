@@ -68,6 +68,10 @@ import net.infonode.gui.componentpainter.GradientComponentPainter;
 import net.infonode.util.Direction;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
 import org.jdesktop.swingx.JXLoginPane;
 import org.jdesktop.swingx.JXPanel;
@@ -101,6 +105,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -5139,16 +5144,28 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         try {
             if (StaticDebuggingTools.checkHomeForFile("cismetCustomLog4JConfigurationInDotVerdis")) {
                 try {
-                    org.apache.log4j.PropertyConfigurator.configure(DIRECTORYPATH_VERDIS + FILESEPARATOR
-                                + "custom.log4j.properties");
+                    try(final InputStream configStream = new FileInputStream(
+                                        DIRECTORYPATH_VERDIS
+                                        + FILESEPARATOR
+                                        + "custom.log4j.xml")) {
+                        final ConfigurationSource source = new ConfigurationSource(configStream);
+                        final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                        context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                    }
                     LOG.info("CustomLoggingOn");
                 } catch (final Exception ex) {
-                    org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource(
-                            "log4j.properties"));
+                    try(final InputStream configStream = ClassLoader.getSystemResourceAsStream("log4j.xml")) {
+                        final ConfigurationSource source = new ConfigurationSource(configStream);
+                        final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                        context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                    }
                 }
             } else {
-                org.apache.log4j.PropertyConfigurator.configure(Main.class.getResource(
-                        "log4j.properties"));
+                try(final InputStream configStream = Main.class.getResourceAsStream("log4j.xml")) {
+                    final ConfigurationSource source = new ConfigurationSource(configStream);
+                    final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                    context.start(new XmlConfiguration(context, source));     // Apply new configuration
+                }
             }
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
