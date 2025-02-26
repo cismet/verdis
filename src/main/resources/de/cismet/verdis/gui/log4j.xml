@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
+        </Console>
+
+        <!-- File Appender -->
+        <File name="File" fileName="logs/Navigator.log" append="false">
+            <XMLLayout />
+        </File>
+
+        <!-- Remote Socket Appender -->
+        <Socket name="Remote" host="localhost" port="4445">
+            <JsonLayout compact="true" eventEol="true"/>
+        </Socket>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger -->
+        <Root level="WARN">
+            <AppenderRef ref="Remote"/>
+        </Root>
+    </Loggers>
+</Configuration>
