@@ -353,18 +353,18 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         closeDialog();
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
+    private void btnLoadSelectedFlurstueckActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadSelectedFlurstueckActionPerformed
         loadSelectedFlurstueck();
-    }                                                                                             //GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
+    }//GEN-LAST:event_btnLoadSelectedFlurstueckActionPerformed
     /**
      * ToDo ugly.
      */
@@ -638,12 +638,10 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
         private List<CidsBean> getIntersectingFlurstuecke(final Geometry geom, final double buffer) {
             final String sql = "SELECT " + ALKIS_LANDPARCEL_META_CLASS_ID + ", alkis_landparcel.id "
                         + "FROM "
-                        + "   alkis_landparcel, "
-                        + "   geom "
+                        + "   alkis_landparcel "
                         + "WHERE "
-                        + "   geom.id = alkis_landparcel.geometrie "
-                        + "   AND not ST_IsEmpty(geom.geo_field)"
-                        + "   AND st_intersects(geom.geo_field, "
+                        + "   not ST_IsEmpty(geometrie)"
+                        + "   AND st_intersects(geometrie, "
                         + "                    st_buffer(st_buffer("
                         + "st_transform( "
                         + "   st_geomFromText('" + geom.toText() + "'," + geom.getSRID() + ")"
