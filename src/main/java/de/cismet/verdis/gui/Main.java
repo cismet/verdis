@@ -6069,8 +6069,15 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
                             }
                         }
 
-                        AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean, veranlagt);
-
+                        try {
+                            AenderungsanfrageHandler.getInstance().finishProcessing(savedKassenzeichenBean, veranlagt);
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(
+                                Main.this,
+                                "Potenzielle neue Nachrichten bei Änderungsanfragen konnten aufgrund fehlender Berechtigung nicht gespeichert werden.",
+                                "Änderungsanfragen",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        }
                         final CidsBean assessedKassenzeichenBean = persistKassenzeichen(savedKassenzeichenBean);
                         releaseLocks();
                         return assessedKassenzeichenBean;
