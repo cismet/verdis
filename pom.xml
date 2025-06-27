@@ -382,7 +382,7 @@
         <dependency>
             <groupId>de.cismet.custom</groupId>
             <artifactId>netbeans-visual-diff-standalone-without-dependencies</artifactId>
-            <version>8.1</version>
+            <version>9.0</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -838,6 +838,8 @@
                               <ignoreClass>org.jdesktop.*</ignoreClass>
                               <ignoreClass>org.apache.lucene.*</ignoreClass>
                               <ignoreClass>org.apache.log4j.*</ignoreClass>
+                              <ignoreClass>org.apache.logging.*</ignoreClass>
+                              <ignoreClass>META-INF.versions.9.org.apache.logging.*</ignoreClass>
                               <ignoreClass>javax.annotation.*</ignoreClass>
                               <ignoreClass>org.objectweb.asm.*</ignoreClass>
                             </ignoreClasses>
