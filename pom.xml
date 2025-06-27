@@ -10,7 +10,7 @@
 
     <groupId>de.cismet.verdis</groupId>
     <artifactId>verdis</artifactId>
-    <version>9.0.3</version>
+    <version>9.0.4</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <connection>https://github.com/cismet/verdis.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/verdis.git</developerConnection>
         <url>https://github.com/cismet/verdis</url>
-      <tag>v9.0.3</tag>
+      <tag>v9.0.4</tag>
   </scm>
 
   <issueManagement>
@@ -382,7 +382,7 @@
         <dependency>
             <groupId>de.cismet.custom</groupId>
             <artifactId>netbeans-visual-diff-standalone-without-dependencies</artifactId>
-            <version>8.1</version>
+            <version>9.0</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -838,6 +838,8 @@
                               <ignoreClass>org.jdesktop.*</ignoreClass>
                               <ignoreClass>org.apache.lucene.*</ignoreClass>
                               <ignoreClass>org.apache.log4j.*</ignoreClass>
+                              <ignoreClass>org.apache.logging.*</ignoreClass>
+                              <ignoreClass>META-INF.versions.9.org.apache.logging.*</ignoreClass>
                               <ignoreClass>javax.annotation.*</ignoreClass>
                               <ignoreClass>org.objectweb.asm.*</ignoreClass>
                             </ignoreClasses>
