@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -194,6 +193,7 @@ public class AenderungsanfrageTable extends JXTable {
                 beanToStacEntryMap.keySet().toArray(new CidsBean[0])));
 
         setSelectedAenderungsanfrageBean(selectedBean);
+        update();
     }
 
     /**
