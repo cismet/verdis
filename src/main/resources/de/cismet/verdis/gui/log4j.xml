@@ -10,17 +10,12 @@
         <File name="File" fileName="logs/Navigator.log" append="false">
             <XMLLayout />
         </File>
-
-        <!-- Remote Socket Appender -->
-        <Socket name="Remote" host="localhost" port="4445">
-            <JsonLayout compact="true" eventEol="true"/>
-        </Socket>
     </Appenders>
 
     <Loggers>
         <!-- Root Logger -->
         <Root level="WARN">
-            <AppenderRef ref="Remote"/>
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>

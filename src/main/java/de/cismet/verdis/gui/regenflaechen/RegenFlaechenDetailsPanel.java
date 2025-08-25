@@ -952,7 +952,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent he) {
-        final Thread t = new Thread() {
+        final Thread t = new Thread("RegenFlaechenDetailsPanel.hyperlinkUpdate") {
 
                 @Override
                 public void run() {

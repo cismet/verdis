@@ -876,7 +876,7 @@ public class BefreiungerlaubnisGeometrieDetailsPanel extends AbstractCidsBeanDet
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent he) {
-        final Thread t = new Thread() {
+        final Thread t = new Thread("BefreiungerlaubnisGeometrieDetailsPanel.hyperlinkUpdate") {
 
                 @Override
                 public void run() {
