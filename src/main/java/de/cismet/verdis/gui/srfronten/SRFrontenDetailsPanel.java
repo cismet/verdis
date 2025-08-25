@@ -1449,7 +1449,7 @@ public class SRFrontenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent he) {
-        final Thread t = new Thread() {
+        final Thread t = new Thread("SRFrontenDetailsPanel.hyperlinkUpdate") {
 
                 @Override
                 public void run() {

@@ -714,7 +714,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
         int progress = 0;
         for (final CidsBean kassenzeichen : kassenzeichenBeans) {
             try {
-                SwingUtilities.invokeLater(new Thread() {
+                SwingUtilities.invokeLater(new Thread("KassenzeichenListPanel.executeCopy") {
 
                         @Override
                         public void run() {
@@ -768,7 +768,7 @@ public class KassenzeichenListPanel extends javax.swing.JPanel implements CidsBe
                 }
                 kassenzeichen.persist();
                 final int temp = progress++;
-                SwingUtilities.invokeLater(new Thread() {
+                SwingUtilities.invokeLater(new Thread("KassenzeichenListPanel.executeCopy2") {
 
                         @Override
                         public void run() {

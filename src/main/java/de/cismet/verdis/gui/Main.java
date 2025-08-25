@@ -3732,6 +3732,7 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Login fehlgeschlagen");
             }
+            System.exit(0);
             return false;
         }
     }
