@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.verdis.gui;
 
+import Sirius.navigator.connection.SessionManager;
+
 import org.openide.util.Exceptions;
 
 import java.util.Collection;
@@ -17,7 +19,14 @@ import javax.swing.event.HyperlinkListener;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 
+import de.cismet.cids.server.actions.UncaughtClientExceptionServerAction;
+
 import de.cismet.cids.utils.multibean.MultiBeanHelper;
+
+import de.cismet.connectioncontext.AbstractConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
+
+import de.cismet.security.PrivacyClientHandler;
 
 import de.cismet.validation.Validatable;
 
@@ -91,6 +100,20 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
                     } catch (Exception ex) {
                         setCidsBean(null);
                         LOG.warn(ex, ex);
+                        if (PrivacyClientHandler.getInstance().isSendUncaughtExceptions()) {
+                            try {
+                                SessionManager.getProxy()
+                                        .executeTask(
+                                            UncaughtClientExceptionServerAction.TASK_NAME,
+                                            SessionManager.getSession().getUser().getDomain(),
+                                            ex,
+                                            ConnectionContext.create(
+                                                AbstractConnectionContext.Category.EDITOR,
+                                                "VERDIS"));
+                            } catch (Exception e) {
+                                LOG.error("Cannot log exception ", e);
+                            }
+                        }
                     }
                 }
             };
