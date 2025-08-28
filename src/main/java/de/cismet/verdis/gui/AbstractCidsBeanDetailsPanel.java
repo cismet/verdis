@@ -98,7 +98,6 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
                         dummyBean = get();
                         setCidsBean(dummyBean);
                     } catch (Exception ex) {
-                        setCidsBean(null);
                         LOG.warn(ex, ex);
                         if (PrivacyClientHandler.getInstance().isSendUncaughtExceptions()) {
                             try {
@@ -114,6 +113,7 @@ public abstract class AbstractCidsBeanDetailsPanel extends javax.swing.JPanel im
                                 LOG.error("Cannot log exception ", e);
                             }
                         }
+                        setCidsBean(null);
                     }
                 }
             };

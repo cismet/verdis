@@ -589,9 +589,6 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
                 flaecheinfoBeanChangeListener);
         }
 
-        setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
-        jToggleButton1.setEnabled(CidsAppBackend.getInstance().isEditable());
-
 //        DefaultCustomObjectEditor.setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
         if (cidsBean != null) {
             bindingGroup.unbind();
@@ -601,6 +598,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
             bindingGroup.unbind();
             hideContent(true);
         }
+
+        setEnabled(CidsAppBackend.getInstance().isEditable() && (cidsBean != null));
+        jToggleButton1.setEnabled(CidsAppBackend.getInstance().isEditable());
+
         try {
             if ((cidsBean != null)
                         && (cidsBean.getProperty(
@@ -1559,7 +1560,7 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
      *
      * @return  DOCUMENT ME!
      */
-    public DefaultBindableReferenceCombo createComboArtForEdit() {
+    private DefaultBindableReferenceCombo createComboArtForEdit() {
         final DefaultBindableReferenceCombo combo = new DefaultBindableReferenceCombo() {
 
                 @Override
