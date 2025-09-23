@@ -1096,8 +1096,18 @@ public final class Main extends javax.swing.JFrame implements AppModeListener, C
         final MappingComponent mainMap = CidsAppBackend.getInstance().getMainMap();
         configurationManager.configure(mappingModel);
         mainMap.preparationSetMappingModel(mappingModel);
-        ((NewSimpleInternalLayerWidget)mainMap.getInternalWidget(MappingComponent.LAYERWIDGET)).setMappingModel(
-            mappingModel);
+
+        // The mappingModel will be filled with invokeLater invocations. If I use here an invokeLater, then
+        // the mapping should be filled, when it is used the first time in the internal Widget.
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    ((NewSimpleInternalLayerWidget)mainMap.getInternalWidget(MappingComponent.LAYERWIDGET))
+                            .setMappingModel(mappingModel);
+                }
+            });
+
         configurationManager.configure(mainMap);
         mainMap.setMappingModel(mappingModel);
         kartenPanel.changeSelectedButtonAccordingToInteractionMode();
