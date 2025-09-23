@@ -21,6 +21,7 @@
             netbeans dependencies.
         -->
         <netbeans.version>RELEASE210</netbeans.version>
+        <prettier.skip>true</prettier.skip>
     </properties>
    
     <name>${names.verdis-client}  [${project.version}]</name>
@@ -58,7 +59,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-commons</artifactId>
-              <version>9.0.5</version>
+              <version>9.0.6</version>
               <type>jar</type>
               <scope>compile</scope>
           </dependency>
@@ -66,7 +67,7 @@
           <dependency>
               <groupId>de.cismet.commons</groupId>
               <artifactId>cismet-gui-commons</artifactId>
-              <version>9.1</version>
+              <version>9.1.1</version>
               <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -74,7 +75,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>9.1.1</version>
+                <version>9.0.7</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -82,21 +83,21 @@
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp.server</groupId>
                 <artifactId>cids-custom-server-wuppertal</artifactId>
-                <version>9.4.1</version>
+                <version>9.4.2</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.cids.custom.wupp</groupId>
                 <artifactId>cids-custom-wuppertal</artifactId>
-                <version>9.3.3</version>
+                <version>9.3.4</version>
                 <type>jar</type>
             </dependency>
                                     
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>9.1.5</version>
+                <version>9.1.6</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
@@ -120,7 +121,7 @@
             <dependency>
                 <groupId>de.cismet.cismap</groupId>
                 <artifactId>cismap-plugin</artifactId>
-                <version>9.0.1</version>
+                <version>9.0.2</version>
                 <type>jar</type>
                 <scope>compile</scope>
             </dependency>
