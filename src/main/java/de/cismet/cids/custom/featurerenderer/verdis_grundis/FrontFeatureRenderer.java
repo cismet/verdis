@@ -82,7 +82,7 @@ public class FrontFeatureRenderer extends CustomCidsFeatureRenderer {
         if (key == null) {
             return Color.GREEN.darker();
         }
-        if (key.equals("C1") || key.equals("C2") || key.equals("C3")) {
+        if (key.equals("C1") || key.equals("C2") || key.equals("C3") || key.equals("P0") || key.equals("L0")) {
             return erColor;
         } else {
             return Color.ORANGE;
