@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="panAll" alignment="0" pref="500" max="32767" attributes="0"/>
+          <Component id="panAll" alignment="0" max="32767" attributes="0"/>
           <Component id="panControl" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
@@ -45,7 +45,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="337" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="btnLoadSelectedFlurstueck" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnClose" min="-2" max="-2" attributes="0"/>
@@ -61,7 +61,7 @@
                       <Component id="btnClose" alignment="1" max="32767" attributes="1"/>
                       <Component id="btnLoadSelectedFlurstueck" alignment="1" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace pref="5" max="32767" attributes="0"/>
+                  <EmptySpace pref="7" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

@@ -22,8 +22,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXTable;
@@ -66,10 +64,6 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
     private static final Logger log = org.apache.log4j.Logger.getLogger(PopupLagisCrossoverPanel.class);
     private static final String server = "http://localhost:";
     private static final String request = "/loadFlurstueck?";
-    public static final NameValuePair PARAMETER_GEMARKUNG = new NameValuePair("gemarkung", "");
-    public static final NameValuePair PARAMETER_FLUR = new NameValuePair("flur", "");
-    public static final NameValuePair PARAMETER_FLURSTUECK_ZAEHLER = new NameValuePair("zaehler", "");
-    public static final NameValuePair PARAMETER_FLURSTUECK_NENNER = new NameValuePair("nenner", "");
     private static final String PROGRESS_CARD_NAME = "progress";
     private static final String CONTENT_CARD_NAME = "content";
     private static final String MESSAGE_CARD_NAME = "message";
@@ -507,27 +501,16 @@ public class PopupLagisCrossoverPanel extends javax.swing.JPanel implements Mous
             log.warn("Crossover: lagisCrossoverPort ist ungültig: " + port);
         } else {
             try {
-                // ToDo ugly because is static
-                PARAMETER_GEMARKUNG.setValue(String.valueOf(bean.getProperty("gemarkung")));
-                PARAMETER_FLUR.setValue(convertFlurstueckNumbersToString(bean.getProperty("flur")));
-                PARAMETER_FLURSTUECK_ZAEHLER.setValue(convertFlurstueckNumbersToString(
-                        bean.getProperty("fstck_zaehler")));
-                PARAMETER_FLURSTUECK_NENNER.setValue(convertFlurstueckNumbersToString(
-                        bean.getProperty("fstck_nenner")));
+                final String url = server + port + request + "?gemarkung="
+                            + String.valueOf(bean.getProperty("gemarkung"))
+                            + "&flur=" + convertFlurstueckNumbersToString(bean.getProperty("flur")) + "&zaehler="
+                            + convertFlurstueckNumbersToString(bean.getProperty("fstck_zaehler")) + "&nenner="
+                            + convertFlurstueckNumbersToString(bean.getProperty("fstck_nenner"));
 
-                final GetMethod tmp = new GetMethod(server + port + request);
-                tmp.setQueryString(
-                    new NameValuePair[] {
-                        PARAMETER_GEMARKUNG,
-                        PARAMETER_FLUR,
-                        PARAMETER_FLURSTUECK_ZAEHLER,
-                        PARAMETER_FLURSTUECK_NENNER
-                    });
                 if (log.isDebugEnabled()) {
-                    log.debug("Crossover: lagisCrossOverQuery: " + tmp.getURI().toString());
+                    log.debug("Crossover: lagisCrossOverQuery: " + url);
                 }
-                return new URL(tmp.getURI().toString());
-                    // WebAccessManager.getInstance(lagisCrossoverQuery.toString());
+                return new URL(url);
             } catch (Exception ex) {
                 log.error("Crossover: Fehler beim fernsteuern von LagIS.", ex);
             }

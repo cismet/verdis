@@ -38,6 +38,7 @@ import org.openide.util.Exceptions;
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 
 import java.beans.PropertyChangeEvent;
@@ -936,9 +937,25 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
     @Override
     public final void setEnabled(final boolean b) {
-        super.setEnabled(b);
-        refreshFieldsEnabled(b);
-        repaint();
+        if (EventQueue.isDispatchThread()) {
+            super.setEnabled(b);
+            refreshFieldsEnabled(b);
+            repaint();
+        } else {
+            try {
+                EventQueue.invokeAndWait(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            RegenFlaechenDetailsPanel.super.setEnabled(b);
+                            refreshFieldsEnabled(b);
+                            repaint();
+                        }
+                    });
+            } catch (Exception e) {
+                LOG.error("Error during setEnabled", e);
+            }
+        }
     }
 
     /**
@@ -1565,7 +1582,10 @@ public class RegenFlaechenDetailsPanel extends AbstractCidsBeanDetailsPanel {
 
                 @Override
                 public void setModel(final ComboBoxModel aModel) {
-                    bindingGroup.unbind();
+                    if ((bindingGroup.getBindings() != null) && !bindingGroup.getBindings().isEmpty()
+                                && bindingGroup.getBindings().get(0).isBound()) {
+                        bindingGroup.unbind();
+                    }
                     super.setModel(aModel);
                     try {
                         bindingGroup.bind();

@@ -22,7 +22,7 @@ import Sirius.server.middleware.types.MetaObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -190,19 +190,19 @@ public class KassenzeichenGrundbuchblattSearchDialog extends javax.swing.JDialog
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Main.getInstance().showRenderer(grundbuchblatt);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
+    private void cmdLagisCrossover1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLagisCrossover1ActionPerformed
         setVisible(false);
         StaticSwingTools.showDialog(GrundbuchblattSucheDialog.getInstance());
-    }                                                                                      //GEN-LAST:event_cmdLagisCrossover1ActionPerformed
+    }//GEN-LAST:event_cmdLagisCrossover1ActionPerformed
 
     @Override
     public void setEnabled(final boolean b) {
